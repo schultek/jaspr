@@ -36,7 +36,7 @@ There exist components for the most common HTML tags, like `div`, `a`, `p`, `img
 If you want support for a tag that does not have such a method yet, please don't hesitate to open an issue on github.
 </Info>
 
-These components are available under the `package:jaspr/dom.dart` library, and each component has the following fields:
+These components are available under the `package:jaspr/dom.dart` library, and each component is defined like this:
 
 ```dart
 class <tagname> extends Component {
@@ -52,11 +52,14 @@ class <tagname> extends Component {
 }
 ```
 
-In addition to these fields some components support tag-specific attributes, like `img(src: "...")` or `a(href: "...")`.
+In addition to these common properties some components support tag-specific properties, like `img(src: "...")` or `a(href: "...")`.
+
+<Info>
 
 For readability, it is recommended to put the list of child components last in the parameter list:
 `div(id: "main", [.text('Hello World')])` is more readable than `div([.text('Hello World')], id: "main")`.
 In case of no children specify an empty list (`[]`). Some tags also omit this parameter, like `img`.
+</Info>
 
 [Try it out on JasprPad](https://playground.jaspr.site/?sample=html)
 

@@ -281,15 +281,15 @@ css('.my-component').styles(
 
 Here's a complete example that brings together all the customization options:
 
-```dart title="lib/main.dart"
+```dart title="lib/main.server.dart"
 import 'package:jaspr/server.dart';
 import 'package:jaspr_content/jaspr_content.dart';
 import 'package:jaspr_content/theme.dart';
 
-import 'jaspr_options.dart';
+import 'main.server.options.dart';
 
 void main() {
-  Jaspr.initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultServerOptions);
 
   runApp(ContentApp.custom(
     loaders: [

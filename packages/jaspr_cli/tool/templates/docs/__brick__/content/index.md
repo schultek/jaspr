@@ -9,7 +9,7 @@ This is the starting point for your brand new documentation site, powered by the
 
 Here are a few things you can do to begin:
 
-*   Explore the features of `jaspr_content` inside `lib/main.dart`.
+*   Explore the features of `jaspr_content` inside `lib/main.server.dart`.
 *   Read the [Quick Start Guide]({{links.quickstart}}) to understand how to set up your your content-driven site.
 *   Start adding your own content pages in the `content/` directory.
 
@@ -37,7 +37,7 @@ Use `inline code` for brief mentions of code, **bold text** for emphasis, or *it
 You can easily include code snippets. `jaspr_content` even comes with syntax highlighting and copy functionality out of the box.
 
 ```dart
-// lib/main.dart
+// lib/main.server.dart
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_content/jaspr_content.dart';
 

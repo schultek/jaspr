@@ -42,8 +42,13 @@ With Jaspr you can handle hydration in two ways:
 
 For automatic hydration simply use the `@client` annotation on any component.
 
-A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle,
-this is like 'resuming' the rendering for a component on the client and picking up where the server-side rendering has left off.
+A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle, this is like 'resuming' the rendering for a component on the client and picking up where the server-side rendering has left off.
+
+<Info>
+
+`@client` components also have other features that are not easily replicable with manual hydration, such as passing data
+from server to client or hydrating components dynamically based on server-side state.
+</Info>
 
 Read more about `@client` components and how to best use them [here](/api/utils/at_client).
 
@@ -51,11 +56,13 @@ Read more about `@client` components and how to best use them [here](/api/utils/
 
 ### Manual Hydration
 
-With manual hydration, you need to create a separate client entrypoint for your app inside the `web/` directory:
+With manual hydration, you build a separate component tree in your client entrypoint that needs to match your server-rendered HTML.
 
-```dart title="web/main.dart"
+In the simplest form, you can mount the same `App` component you use on the server.
+
+```dart title="lib/main.client.dart"
 // Client-specific import
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/client.dart';
 
 // Our main component
 import 'lib/app.dart';
@@ -67,39 +74,13 @@ void main() {
 }
 ```
 
-This entrypoint, as any `.dart` file, will then be compiled to javascript as `<filename>.dart.js`.
-To load this compiled javascript file on the client, include it as a `<source>` element in your server-rendered html:
+This has the same effect as adding `@client` to `App` but forces it to be rendered directly inside the `<body>` element.
 
-```dart title="lib/main.dart"
-// Server-specific import
-import 'package:jaspr/server.dart';
+--- 
 
-// Our main component
-import 'app.dart';
+The above approach mounts your whole app on the client. However, when you are building a more content-heavy or mostly static website (static meaning without much user interaction) you probably don't need to ship your whole app structure to the client, but rather want only certain parts of your app to be interactive.
 
-import 'jaspr_options.dart';
-
-void main() {
-    Jaspr.initializeApp(options: defaultJasprOptions);
-
-    runApp(Document(
-      head: [
-        // Links to the compiled `web/main.dart` file.
-        script(src: 'main.dart.js'),
-      ],
-      // Pre-renders the [App] component inside the <body> tag
-      body: App(),
-    ));
-}
-```
-
-The above setup mounts the `App()` component directly inside the `<body>` element. However, when you are building a more
-content-heavy or mostly static website (static meaning without much user interaction)
-you probably don't need to ship your whole app structure to the client, but rather want only certain parts of your
-app to be interactive.
-
-You can choose which part(s) of your app you want to hydrate by mounting only that part in your client entrypoint.
-Additionally on the client, you can call `runApp()` multiple times to mount different parts of your app separately:
+You can choose which part(s) of your app you want to hydrate by mounting only that part in your client entrypoint. This can be done in Jaspr by using the `SlottedChildView` component.
 
 Assuming you have a page layout like this:
 
@@ -116,20 +97,21 @@ Assuming you have a page layout like this:
 
 Your client entrypoint could be:
 
-```dart title="web/main.dart"
+```dart title="lib/main.client.dart"
 void main() {
-  runApp(Header(), attachTo: 'header');
-  runApp(Sidebar(), attachTo: '#sidebar');
-  runApp(Content(), attachTo: '#content');
+  runApp(SlottedChildView(slots: [
+    ChildSlot.fromQuery('header', child: Header()),
+    ChildSlot.fromQuery('#sidebar', child: Sidebar()),
+    ChildSlot.fromQuery('#content', child: Content()),
+  ]));
 }
 ```
 
-
-This will run three apps simultaneously, attached to the specified root elements using css selectors.
+This will attach the child components to the specified elements using css selectors.
 
 The advantage of this approach is that you can leave other parts of your app, e.g. a static footer,
 out of the bundled javascript and thereby reducing loading and startup time.
 
 **Be aware** that on the server, you must still construct the complete app layout and and render the
-targeted island components manually at the right location.
+targeted components manually at the right location. Keeping your server and client component tree in sync like this is generally cumbersome and error-prone, therefore it is recommended to use `@client` components instead of manual hydration.
 

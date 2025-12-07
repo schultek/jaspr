@@ -103,7 +103,7 @@ In some cases you might want to access all, or a subset of all pages of your sit
 You can achieve this by using the `context.pages` extension getter on `BuildContext`. **For this to work, you need to enable eager loading of all pages by setting `eagerlyLoadAllPages: true` in your `ContentApp` configuration.**
 
 ```dart
-// in main.dart
+// in main.server.dart
 ContentApp(
   eagerlyLoadAllPages: true,
   ...
