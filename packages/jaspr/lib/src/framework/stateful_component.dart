@@ -78,8 +78,8 @@ part of 'framework.dart';
 ///
 ///  * Minimize the number of nodes transitively created by the build method and
 ///    any components it creates. Ideally, a stateful component would only create a
-///    single component, and that component would be a [RenderObjectComponent].
-///    (Obviously this isn't always practical, but the closer a component gets to
+///    single component, and that component would be a [DomComponent].
+///    (Of course this isn't always practical, but the closer a component gets to
 ///    this ideal, the more efficient it will be.)
 ///
 ///  * If a subtree does not change, cache the component that represents that
@@ -103,12 +103,12 @@ part of 'framework.dart';
 ///
 ///  * Avoid changing the depth of any created subtrees or changing the type of
 ///    any components in the subtree. For example, rather than returning either the
-///    child or the child wrapped in an [IgnorePointer], always wrap the child
-///    component in an [IgnorePointer] and control the [IgnorePointer.ignoring]
+///    child or the child wrapped in an `IgnorePointer`, always wrap the child
+///    component in an `IgnorePointer` and control the `IgnorePointer.ignoring`
 ///    property. This is because changing the depth of the subtree requires
 ///    rebuilding, laying out, and painting the entire subtree, whereas just
 ///    changing the property will require the least possible change to the
-///    render tree (in the case of [IgnorePointer], for example, no layout or
+///    render tree (in the case of `IgnorePointer`, for example, no layout or
 ///    repaint is necessary at all).
 ///
 ///  * If the depth must be changed for some reason, consider wrapping the
@@ -230,10 +230,6 @@ typedef StateSetter = void Function(VoidCallback fn);
 ///    associated component (e.g., to start implicit animations). The framework
 ///    always calls [build] after calling [didUpdateComponent], which means any
 ///    calls to [setState] in [didUpdateComponent] are redundant.
-///  * During development, if a hot reload occurs (whether initiated from the
-///    command line `flutter` tool by pressing `r`, or from an IDE), the
-///    [reassemble] method is called. This provides an opportunity to
-///    reinitialize any data that was prepared in the [initState] method.
 ///  * If the subtree containing the [State] object is removed from the tree
 ///    (e.g., because the parent built a component with a different [runtimeType]
 ///    or [Component.key]), the framework calls the [deactivate] method. Subclasses

@@ -58,7 +58,7 @@ extension AppContext on BuildContext {
     /// The domain that the cookie applies to.
     String? domain,
 
-    /// The path within the [domain] that the cookie applies to.
+    /// The path within the `domain` that the cookie applies to.
     String? path,
 
     /// Whether to only send this cookie on secure connections.

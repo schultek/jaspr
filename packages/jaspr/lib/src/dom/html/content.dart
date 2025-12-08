@@ -809,6 +809,53 @@ final class blockquote extends StatelessComponent {
   }
 }
 
+/// {@template jaspr.html.dd}
+/// The &lt;dd&gt; HTML element provides the description, definition, or value for the preceding term (&lt;dt&gt;) in a description list (&lt;dl&gt;).
+/// {@endtemplate}
+final class dd extends StatelessComponent {
+  /// {@macro jaspr.html.dd}
+  const dd(
+    this.children, {
+    this.id,
+    this.classes,
+    this.styles,
+    this.attributes,
+    this.events,
+    super.key,
+  });
+
+  /// The id of the HTML element. Must be unique within the document.
+  final String? id;
+
+  /// The CSS classes to apply to the HTML element, separated by whitespace.
+  final String? classes;
+
+  /// The inline styles to apply to the HTML element.
+  final Styles? styles;
+
+  /// Additional attributes to apply to the HTML element.
+  final Map<String, String>? attributes;
+
+  /// Event listeners to attach to the HTML element.
+  final Map<String, EventCallback>? events;
+
+  /// The children of this component.
+  final List<Component> children;
+
+  @override
+  Component build(BuildContext context) {
+    return Component.element(
+      tag: 'dd',
+      id: id,
+      classes: classes,
+      styles: styles,
+      attributes: attributes,
+      events: events,
+      children: children,
+    );
+  }
+}
+
 /// {@template jaspr.html.div}
 /// The &lt;div&gt; HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element).
 /// {@endtemplate}
@@ -846,6 +893,102 @@ final class div extends StatelessComponent {
   Component build(BuildContext context) {
     return Component.element(
       tag: 'div',
+      id: id,
+      classes: classes,
+      styles: styles,
+      attributes: attributes,
+      events: events,
+      children: children,
+    );
+  }
+}
+
+/// {@template jaspr.html.dl}
+/// The &lt;dl&gt; HTML element represents a description list. The element encloses a list of groups of terms (specified using the &lt;dt&gt; element) and descriptions (provided by &lt;dd&gt; elements). Common uses for this element are to implement a glossary or to display metadata (a list of key-value pairs).
+/// {@endtemplate}
+final class dl extends StatelessComponent {
+  /// {@macro jaspr.html.dl}
+  const dl(
+    this.children, {
+    this.id,
+    this.classes,
+    this.styles,
+    this.attributes,
+    this.events,
+    super.key,
+  });
+
+  /// The id of the HTML element. Must be unique within the document.
+  final String? id;
+
+  /// The CSS classes to apply to the HTML element, separated by whitespace.
+  final String? classes;
+
+  /// The inline styles to apply to the HTML element.
+  final Styles? styles;
+
+  /// Additional attributes to apply to the HTML element.
+  final Map<String, String>? attributes;
+
+  /// Event listeners to attach to the HTML element.
+  final Map<String, EventCallback>? events;
+
+  /// The children of this component.
+  final List<Component> children;
+
+  @override
+  Component build(BuildContext context) {
+    return Component.element(
+      tag: 'dl',
+      id: id,
+      classes: classes,
+      styles: styles,
+      attributes: attributes,
+      events: events,
+      children: children,
+    );
+  }
+}
+
+/// {@template jaspr.html.dt}
+/// The &lt;dt&gt; HTML element specifies a term in a description or definition list, and as such must be used inside a &lt;dl&gt; element. It is usually followed by a &lt;dd&gt; element; however, multiple &lt;dt&gt; elements in a row indicate several terms that are all defined by the immediate next &lt;dd&gt; element.
+///
+/// The subsequent &lt;dd&gt; (Description Details) element provides the definition or other related text associated with the term specified using &lt;dt&gt;.
+/// {@endtemplate}
+final class dt extends StatelessComponent {
+  /// {@macro jaspr.html.dt}
+  const dt(
+    this.children, {
+    this.id,
+    this.classes,
+    this.styles,
+    this.attributes,
+    this.events,
+    super.key,
+  });
+
+  /// The id of the HTML element. Must be unique within the document.
+  final String? id;
+
+  /// The CSS classes to apply to the HTML element, separated by whitespace.
+  final String? classes;
+
+  /// The inline styles to apply to the HTML element.
+  final Styles? styles;
+
+  /// Additional attributes to apply to the HTML element.
+  final Map<String, String>? attributes;
+
+  /// Event listeners to attach to the HTML element.
+  final Map<String, EventCallback>? events;
+
+  /// The children of this component.
+  final List<Component> children;
+
+  @override
+  Component build(BuildContext context) {
+    return Component.element(
+      tag: 'dt',
       id: id,
       classes: classes,
       styles: styles,

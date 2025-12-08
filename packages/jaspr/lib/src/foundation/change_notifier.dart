@@ -33,9 +33,6 @@ import 'basic_types.dart';
 ///  * [ValueListenableBuilder], a widget that uses a builder callback to
 ///    rebuild whenever a [ValueListenable] object triggers its notifications,
 ///    providing the builder with the value of the object.
-///  * [InheritedNotifier], an abstract superclass for widgets that use a
-///    [Listenable]'s notifications to trigger rebuilds in descendant components
-///    that declare a dependency on them, using the [InheritedComponent] mechanism.
 ///  * [Listenable.merge], which creates a [Listenable] that triggers
 ///    notifications whenever any of a list of other [Listenable]s trigger their
 ///    notifications.
@@ -261,9 +258,6 @@ mixin class ChangeNotifier implements Listenable {
   /// object may have changed. Listeners that are added during this iteration
   /// will not be visited. Listeners that are removed during this iteration will
   /// not be visited after they are removed.
-  ///
-  /// Exceptions thrown by listeners will be caught and reported using
-  /// [FlutterError.reportError].
   ///
   /// This method must not be called after [dispose] has been called.
   ///

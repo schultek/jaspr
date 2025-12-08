@@ -16,7 +16,7 @@ abstract class AppBinding with SchedulerBinding {
 
   /// The [Element] that is at the root of the hierarchy.
   ///
-  /// This is initialized when [runApp] is called.
+  /// This is initialized when `runApp` is called.
   Element? get rootElement;
 
   /// Report an error that occurred during the build process of [element].

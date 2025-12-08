@@ -1,4 +1,4 @@
-## Unreleased breaking
+## Blocked Unreleased breaking
 
 - **Breaking** Removed `custom_lint` dependency and migrated to new `analysis_server_plugin`.
   Changes in `analysis_options.yaml` are needed, see [Using plugins](https://github.com/dart-lang/sdk/blob/main/pkg/analysis_server_plugin/doc/using_plugins.md).
