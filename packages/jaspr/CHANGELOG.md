@@ -1,3 +1,7 @@
+## Unreleased 0.22.0-beta.2
+
+- Add `dl`, `dt`, and `dd` dom components to `package:jaspr/dom.dart`.
+
 ## 0.22.0-beta.1
 
 - Changed build extensions to use `.options.dart` instead of `.g.dart`.

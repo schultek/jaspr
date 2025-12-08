@@ -58,8 +58,17 @@
         }
       }
     },
+    "dd": {
+      "doc": "The &lt;dd&gt; HTML element provides the description, definition, or value for the preceding term (&lt;dt&gt;) in a description list (&lt;dl&gt;)."
+    },
     "div": {
       "doc": "The &lt;div&gt; HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element)."
+    },
+    "dl": {
+      "doc": "The &lt;dl&gt; HTML element represents a description list. The element encloses a list of groups of terms (specified using the &lt;dt&gt; element) and descriptions (provided by &lt;dd&gt; elements). Common uses for this element are to implement a glossary or to display metadata (a list of key-value pairs)."
+    },
+    "dt": {
+      "doc": "The &lt;dt&gt; HTML element specifies a term in a description or definition list, and as such must be used inside a &lt;dl&gt; element. It is usually followed by a &lt;dd&gt; element; however, multiple &lt;dt&gt; elements in a row indicate several terms that are all defined by the immediate next &lt;dd&gt; element.\n\nThe subsequent &lt;dd&gt; (Description Details) element provides the definition or other related text associated with the term specified using &lt;dt&gt;."
     },
     "ul": {
       "doc": "The &lt;ul&gt; HTML element represents an unordered list of items, typically rendered as a bulleted list."
