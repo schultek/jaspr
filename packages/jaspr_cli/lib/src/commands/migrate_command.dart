@@ -147,7 +147,8 @@ class MigrateCommand extends BaseCommand {
             }
           }
           if (pubspecMap.nodes['dev_dependencies'] case final YamlMap devDependencies) {
-            if (devDependencies.nodes['jaspr_builder'] case final YamlScalar builderNode when builderNode.value != null) {
+            if (devDependencies.nodes['jaspr_builder'] case final YamlScalar builderNode
+                when builderNode.value != null) {
               builder.replace(builderNode.span.start.offset, builderNode.span.length, '^$targetJasprVersion');
             }
             if (devDependencies.nodes['jaspr_test'] case final YamlScalar testNode when testNode.value != null) {

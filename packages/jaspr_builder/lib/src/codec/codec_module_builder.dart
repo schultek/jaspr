@@ -201,7 +201,9 @@ class CodecModule {
     BuildStep buildStep,
   ) {
     return CodecModule(
-      elements: [for (final (element, decoder, encoder) in elements) CodecElement.fromElement(element, decoder, encoder)],
+      elements: [
+        for (final (element, decoder, encoder) in elements) CodecElement.fromElement(element, decoder, encoder),
+      ],
     );
   }
 
