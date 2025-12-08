@@ -188,7 +188,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     args.addAll(argResults!.rest);
     var process = await Process.start(
-      Platform.executable,
+      dartExecutable,
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
       workingDirectory: Directory.current.absolute.path,
