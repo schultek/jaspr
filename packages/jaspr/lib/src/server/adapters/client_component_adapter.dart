@@ -1,15 +1,15 @@
-import '../../foundation/options.dart';
-import '../../foundation/validator.dart';
+import '../../dom/validator.dart';
 import '../../framework/framework.dart';
+import '../components/client_component_registry.dart';
 import '../markup_render_object.dart';
-import 'client_script_adapter.dart';
+import '../options.dart';
 import 'element_boundary_adapter.dart';
 import 'server_component_adapter.dart';
 
 class ClientComponentAdapter extends ElementBoundaryAdapter {
-  ClientComponentAdapter(this.adapter, this.target, super.element);
+  ClientComponentAdapter(this.registry, this.target, super.element);
 
-  final ClientScriptAdapter adapter;
+  final ClientComponentRegistryElement registry;
   final ClientTarget target;
 
   late String? data;
@@ -19,9 +19,9 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   void prepareBoundary(ChildListRange range) {
     isClientBoundary = true;
     element.visitAncestorElements((e) {
-      if (adapter.serverElements.containsValue(e)) {
+      if (registry.serverElements.containsValue(e)) {
         return false;
-      } else if (adapter.clientElements.contains(e)) {
+      } else if (registry.clientElements.contains(e)) {
         isClientBoundary = false;
         return false;
       }
@@ -52,17 +52,20 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   }
 
   String? getData() {
-    var data = target.dataFor(element.component, encode: (o) {
-      if (o is Component) {
-        return getDataForServerComponent(o, element);
-      }
-      return o;
-    });
+    var data = target.dataFor(
+      element.component,
+      encode: (o) {
+        if (o is Component) {
+          return getDataForServerComponent(o, element);
+        }
+        return o;
+      },
+    );
     return data;
   }
 
   String getDataForServerComponent(Component component, Element parent) {
-    if (adapter.serverComponents[component] case var s?) {
+    if (registry.serverComponents[component] case var s?) {
       return 's${DomValidator.clientMarkerPrefix}$s';
     }
 
@@ -83,13 +86,13 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
     if (element == null) {
       print("Warning: Component parameter not used in build method. This will result in empty html on the client.");
-      
-      adapter.serverComponents[component] = 0;
+
+      registry.serverComponents[component] = 0;
       return 's${DomValidator.clientMarkerPrefix}_';
     }
 
-    var s = adapter.serverComponents[component] = adapter.serverElementNum++;
-    adapter.serverElements[s] = element;
+    var s = registry.serverComponents[component] = registry.serverElementNum++;
+    registry.serverElements[s] = element;
 
     binding.addRenderAdapter(ServerComponentAdapter(s, element!));
 

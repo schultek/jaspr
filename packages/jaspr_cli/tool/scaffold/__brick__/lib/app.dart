@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';{{#routing}}
 import 'package:jaspr_router/jaspr_router.dart';{{/routing}}
 {{#routing}}
@@ -10,7 +11,7 @@ import 'pages/home.dart';
 // By using multi-page routing, this component will only be built on the server during pre-rendering and
 // **not** executed on the client. Instead only the nested [Home] and [About] components will be mounted on the client.
 class App extends StatelessComponent {
-  const App({super.key});{{/multipage}}{{^multipage}}{{#hydration}}
+  const App({super.key});{{/multipage}}{{^multipage}}
 // By using the @client annotation this component will be automatically compiled to javascript and mounted
 // on the client. Therefore:
 // - this file and any imported file must be compilable for both server and client environments.
@@ -38,13 +39,7 @@ class AppState extends State<App> {
     } else {
       print("Hello server");
     }
-  }{{/hydration}}{{^hydration}}
-// This component is used on both the server (`lib/main.dart`) and the client (`web/main.dart`). Therefore:
-// - this file and any imported file must be compilable for both server and client environments.
-// - this component and any child components will be built once on the server during pre-rendering and then
-//   again on the client during normal rendering.
-class App extends StatelessComponent {
-  const App({super.key});{{/hydration}}{{/multipage}}{{/server}}{{^server}}
+  }{{/multipage}}{{/server}}{{^server}}
 class App extends StatelessComponent {
   const App({super.key});{{/server}}
 
@@ -59,7 +54,7 @@ class App extends StatelessComponent {
         Route(path: '/', title: 'Home', builder: (context, state) => const Home()),
         Route(path: '/about', title: 'About', builder: (context, state) => const About()),{{/multipage}}{{^multipage}}
         ShellRoute(
-          builder: (context, state, child) => fragment([
+          builder: (context, state, child) => .fragment([
             const Header(),
             child,
           ]),
@@ -83,16 +78,16 @@ class App extends StatelessComponent {
     css('.main', [
       // The '&' refers to the parent selector of a nested style rules.
       css('&').styles(
-        display: Display.flex,
+        display: .flex,
         height: 100.vh,
-        flexDirection: FlexDirection.{{#routing}}column{{/routing}}{{^routing}}row{{/routing}},
-        flexWrap: FlexWrap.wrap,
+        flexDirection: .{{#routing}}column{{/routing}}{{^routing}}row{{/routing}},
+        flexWrap: .wrap,
       ),
       css('section').styles(
-        display: Display.flex,
-        flexDirection: FlexDirection.column,
-        justifyContent: JustifyContent.center,
-        alignItems: AlignItems.center,
+        display: .flex,
+        flexDirection: .column,
+        justifyContent: .center,
+        alignItems: .center,
         flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: 400.px{{/routing}}),
       ),
     ]),

@@ -3,12 +3,14 @@ on:
   pull_request:
     branches:
       - main
+      - next
     paths:
       - '.github/workflows/cli.yml'
       - 'packages/jaspr_cli/**'
   push:
     branches:
       - main
+      - next
     paths:
       - '.github/workflows/cli.yml'
       - 'packages/jaspr_cli/**'
@@ -22,14 +24,14 @@ jobs:
     strategy:
       matrix:
         Variant:
-          - sampn
-          - vnsnn
-          - cnsnn
-          - vanen
-          - cnnen
-          - vanns
-          - sanpn
-          - cnspn
+          - smpn
+          - vsnn
+          - csnn
+          - vnen
+          - cnen
+          - vnns
+          - snpn
+          - cspn
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -38,9 +40,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          # remove once Flutter stable supports analyzer 8
-          channel: beta 
-          flutter-version: 3.36.0-0.4.pre
+          channel: stable
 
       - name: Bootstrap
         run: |

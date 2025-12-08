@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
+import 'package:collection/collection.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 
@@ -14,67 +15,97 @@ class ImportsStubsBuilder implements Builder {
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    var imports = buildStep.findAssets(Glob('**/*.imports.json'));
+    final imports = buildStep.findAssets(Glob('**/*.imports.json'));
 
-    var webImports = <String, Set<String>>{};
-    var vmImports = <String, Set<String>>{};
+    final webImports = PlatformImports();
+    final vmImports = PlatformImports();
 
-    var stubs = <String>{};
+    final stubs = <String>[];
+    final stubbedNames = <String>{};
 
-    await for (var id in imports) {
-      var entries = jsonDecode(await buildStep.readAsString(id)) as Iterable;
-      for (var entry in entries) {
-        var url = entry['url'];
-        var platform = entry['platform'];
-        var show = entry['show'] as List;
+    final allEntries = <ImportEntry>[];
 
-        stubs.addAll(show.map((n) => 'dynamic $n;'));
+    await for (final id in imports) {
+      final entries = (jsonDecode(await buildStep.readAsString(id)) as List<Object?>).cast<Map<String, Object?>>().map(
+        ImportEntry.fromJson,
+      );
 
-        var types = show.where((n) => n.substring(0, 1).toLowerCase() != n.substring(0, 1));
-        stubs.addAll(types.map((n) => 'typedef ${n}OrStubbed = dynamic;'));
-
-        var uri = Uri.parse(url);
+      for (final entry in entries) {
+        final uri = Uri.parse(entry.url);
         if (uri.scheme.isEmpty && path.isRelative(uri.path)) {
-          var absUrl = path.join(path.dirname(id.path), url);
-          url = path.relative(absUrl, from: 'lib/generated/imports/_.dart');
-        }
-
-        if (platform == 0) {
-          (webImports[url] ??= {}).addAll(show.cast());
+          final absUrl = path.join(path.dirname(id.path), entry.url);
+          allEntries.add(
+            ImportEntry(
+              path.relative(absUrl, from: 'lib/generated/imports/_.dart'),
+              entry.platform,
+              entry.elements,
+            ),
+          );
         } else {
-          (vmImports[url] ??= {}).addAll(show.cast());
+          allEntries.add(entry);
         }
       }
     }
 
-    if (vmImports.isNotEmpty) {
-      await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'), """
-          // ignore_for_file: directives_ordering, deprecated_member_use
-          
-          ${vmImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
-          ${vmImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
-          
-          ${vmImports.values.expand((v) => v.where((e) => e.isType)).map((e) => 'typedef ${e}OrStubbed = $e;').join('\n')}
-        """);
+    allEntries.sortBy((e) => e.url);
+
+    for (final entry in allEntries) {
+      if (entry.platform == 0) {
+        webImports.add(entry.url, entry.elements);
+      } else {
+        vmImports.add(entry.url, entry.elements);
+      }
+
+      for (final elem in entry.elements) {
+        if (stubbedNames.contains(elem.name)) {
+          continue;
+        }
+        stubbedNames.add(elem.name);
+        if (elem.type == ElementType.variable) {
+          stubs.add('dynamic ${elem.name};');
+        } else if (elem.type == ElementType.type) {
+          stubs.add(
+            'dynamic ${elem.name};\n'
+            'typedef ${elem.name}OrStubbed = dynamic;',
+          );
+        } else if (elem.type == ElementType.extension) {
+          stubs.add(
+            'extension ${elem.name} on dynamic {\n'
+            '${elem.details.join('\n')}\n'
+            '}',
+          );
+        }
+      }
     }
 
-    if (webImports.isNotEmpty) {
+    if (!vmImports.isEmpty) {
+      await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'), """
+        // ignore_for_file: directives_ordering, deprecated_member_use
+        
+        ${vmImports.imports}
+        ${vmImports.exports}
+
+        ${vmImports.stubs}
+      """);
+    }
+
+    if (!webImports.isEmpty) {
       await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_web.dart'), """
-          // ignore_for_file: directives_ordering, deprecated_member_use
-          
-          ${webImports.entries.where((e) => e.value.any((v) => v.isType)).map((e) => "import '${e.key}' show ${e.value.where((v) => v.isType).join(', ')};").join('\n')}
-          ${webImports.entries.map((e) => "export '${e.key}' show ${e.value.join(', ')};").join('\n')}
-          
-          ${webImports.values.expand((v) => v.where((e) => e.isType)).map((e) => 'typedef ${e}OrStubbed = $e;').join('\n')}
-        """);
+        // ignore_for_file: directives_ordering, deprecated_member_use
+
+        ${webImports.imports}
+        ${webImports.exports}
+
+        ${webImports.stubs}
+      """);
     }
 
     if (stubs.isNotEmpty) {
       await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_stubs.dart'), """
-         // ignore_for_file: directives_ordering, non_constant_identifier_names
-         
-         ${stubs.join('\n')}
-        """);
+        // ignore_for_file: directives_ordering, non_constant_identifier_names
+        
+        ${stubs.join('\n')}
+      """);
     }
   }
 
@@ -86,4 +117,45 @@ class ImportsStubsBuilder implements Builder {
       'lib/generated/imports/_vm.dart',
     ],
   };
+}
+
+class PlatformImports {
+  final Map<String, String> _uniqueNames = {};
+  final Map<String, Set<String>> _importedNames = {};
+  final Map<String, Set<String>> _exportedNames = {};
+  final Set<String> _stubbedNames = {};
+
+  void add(String url, List<ImportElement> elements) {
+    final importedNames = _importedNames[url] ??= <String>{};
+    final exportedNames = _exportedNames[url] ??= <String>{};
+
+    for (final element in elements) {
+      if (_uniqueNames[element.name] case final existingImport? when existingImport != url) {
+        throw Exception(
+          "Cannot import ${element.name} from $url, because it is also imported from $existingImport. "
+          'Names imported via @Import must be unique for each platform across the project.',
+        );
+      }
+      _uniqueNames[element.name] = url;
+      exportedNames.add(element.name);
+      if (element.type == ElementType.type) {
+        importedNames.add(element.name);
+        _stubbedNames.add(element.name);
+      }
+    }
+  }
+
+  bool get isEmpty => _uniqueNames.isEmpty;
+
+  String get imports => [
+    for (final MapEntry(key: url, value: names) in _importedNames.entries)
+      if (names.isNotEmpty) "import '$url' show ${names.join(', ')};",
+  ].join('\n');
+  String get exports => [
+    for (final MapEntry(key: url, value: names) in _exportedNames.entries)
+      if (names.isNotEmpty) "export '$url' show ${names.join(', ')};",
+  ].join('\n');
+  String get stubs => [
+    for (final name in _stubbedNames.toList()..sort()) "typedef ${name}OrStubbed = $name;",
+  ].join('\n');
 }

@@ -1,11 +1,12 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../jaspr_content.dart';
 import '_internal/zoomable_image.dart';
 
 /// An image component with optional zooming and caption support.
-class Image implements CustomComponent {
-  const Image({this.zoom = false, this.replaceImg = true});
+class Image extends CustomComponent {
+  const Image({this.zoom = false, this.replaceImg = true}) : super.base();
 
   static Component from({required String src, String? alt, String? caption, bool zoom = false, Key? key}) {
     if (zoom) {
@@ -61,7 +62,7 @@ class _Image extends StatelessComponent {
   Component build(BuildContext context) {
     return figure(classes: 'image', [
       img(src: src, alt: alt ?? caption),
-      if (caption != null) figcaption([text(caption!)]),
+      if (caption != null) figcaption([Component.text(caption!)]),
     ]);
   }
 }

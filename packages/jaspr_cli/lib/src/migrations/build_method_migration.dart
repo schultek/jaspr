@@ -33,8 +33,8 @@ class BuildMethodMigration implements Migration {
   }
 
   @override
-  void runForUnit(CompilationUnit unit, MigrationReporter reporter) {
-    for (final declaration in unit.declarations) {
+  void runForUnit(MigrationUnitContext context) {
+    for (final declaration in context.unit.declarations) {
       if (declaration is ClassDeclaration) {
         if (!_isBuildableClass(declaration)) {
           continue;
@@ -45,11 +45,17 @@ class BuildMethodMigration implements Migration {
               continue;
             }
 
-            _migrateBuildMethod(member, declaration.name.lexeme, reporter);
+            _migrateBuildMethod(member, declaration.name.lexeme, context.reporter);
           }
         }
       }
     }
+  }
+
+  @override
+  List<MigrationResult> runForDirectory(MigrationContext context) {
+    // This migration does not implement directory-level processing.
+    return [];
   }
 
   void _migrateBuildMethod(MethodDeclaration node, String className, MigrationReporter reporter) {
@@ -93,7 +99,7 @@ class BuildMethodMigration implements Migration {
     });
   }
 
-  void _migrateFunctionBody(FunctionBody node, MigrationBuilder builder) {
+  void _migrateFunctionBody(FunctionBody node, EditBuilder builder) {
     final keyword = node.keyword;
     if (keyword == null || node is! BlockFunctionBody) {
       return;

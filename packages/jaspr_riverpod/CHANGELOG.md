@@ -1,3 +1,11 @@
+## 0.4.2-beta.0
+
+- `jaspr` upgraded to `0.22.0-beta.0`
+
+## 0.4.1
+
+- Fix compilation errors with `riverpod` versions `^3.0.2`.
+
 ## 0.4.0
 
 - Upgrade `riverpod` to `^3.0.0`

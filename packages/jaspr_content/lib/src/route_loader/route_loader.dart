@@ -74,7 +74,7 @@ abstract class RouteLoaderBase implements RouteLoader {
   }
 
   PageSource? getSourceForPage(Page page) {
-    return _sources?.where((s) => s.page == page).firstOrNull;
+    return _sources?.where((source) => source.page == page).firstOrNull;
   }
 
   @override
@@ -115,14 +115,14 @@ abstract class RouteLoaderBase implements RouteLoader {
       }
       final pageBuilder = AsyncBuilder(builder: (_) => source.load());
 
-      routes.add(Route(path: source.url, builder: (_, __) => pageBuilder));
+      routes.add(Route(path: source.url, builder: (_, _) => pageBuilder));
 
       for (final output in config.secondaryOutputs) {
         if (output.pattern.matchAsPrefix(source.path) != null) {
           routes.add(
             Route(
               path: output.createRoute(source.url),
-              builder: (_, __) => InheritedSecondaryOutput(builder: output.build, child: pageBuilder),
+              builder: (_, _) => InheritedSecondaryOutput(builder: output.build, child: pageBuilder),
             ),
           );
         }
@@ -172,32 +172,24 @@ abstract class RouteLoaderBase implements RouteLoader {
   }
 }
 
-final indexRegex = RegExp(r'index\.[^/]*$');
-
 abstract class PageSource {
   PageSource(this.path, this.loader, {bool keepSuffix = false, pkg_path.Context? context}) {
-    final segments = (context ?? pkg_path.context).split(path);
-
-    private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
+    final pathContext = context ?? pkg_path.context;
+    final segments = pathContext.split(path).where((segment) => segment.isNotEmpty).toList();
 
     if (segments.isEmpty) {
       url = '/';
       return;
     }
 
-    if (segments.first.isEmpty) {
-      segments.removeAt(0);
-    }
-    if (segments.last.isEmpty) {
-      segments.removeLast();
-    }
+    private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
 
     if (!keepSuffix) {
-      final isIndex = indexRegex.hasMatch(segments.last);
-      if (isIndex) {
+      final lastSegmentName = pathContext.basenameWithoutExtension(segments.last);
+      if (lastSegmentName == 'index') {
         segments.removeLast();
       } else {
-        segments.last = segments.last.replaceFirst(RegExp(r'\.[^/]*$'), '');
+        segments.last = lastSegmentName;
       }
     }
 

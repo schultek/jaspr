@@ -6,10 +6,10 @@ mixin SchedulerBinding {
   SchedulerPhase _schedulerPhase = SchedulerPhase.idle;
   SchedulerPhase get schedulerPhase => _schedulerPhase;
 
-  /// Schedules a frame with the provided [frameCallback]
+  /// Schedules a frame with the provided [frameCallback].
   void scheduleFrame(VoidCallback frameCallback);
 
-  /// Schedules a build and ultimately calls [handleFrame] with the provided [buildCallback]
+  /// Schedules a build and ultimately calls [_handleFrame] with the provided [buildCallback].
   void scheduleBuild(VoidCallback buildCallback) {
     scheduleFrame(() => _handleFrame(buildCallback));
   }

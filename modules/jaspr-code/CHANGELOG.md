@@ -1,3 +1,12 @@
+## 0.3.0
+
+- Added the `Serve` code-lens to `main` functions for launching Jaspr, and hide the default `Run / Debug` code lenses.
+- Allow latest Dart Extension.
+
+## 0.2.3
+
+- Improved stability of component scope analysis.
+
 ## 0.2.2
 
 - Convert HTML to Jaspr code when pasting into a Dart editor.

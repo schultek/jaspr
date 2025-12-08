@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../models/session.dart';
@@ -34,16 +35,16 @@ class LikeButton extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('.like-button', [
       css('&').styles(
-        border: Border.none,
-        outline: Outline(style: OutlineStyle.none),
+        border: .none,
+        outline: .new(style: .none),
         fontSize: 1.5.em,
         backgroundColor: Colors.transparent,
       ),
-      css('&:hover span').styles(transform: Transform.scale(1.2)),
+      css('&:hover span').styles(transform: .scale(1.2)),
       css('&.active span').styles(color: Colors.red),
       css('span').styles(
-        display: Display.inlineBlock,
-        transition: Transition('transform', duration: 300, curve: Curve.ease),
+        display: .inlineBlock,
+        transition: .new('transform', duration: 300.ms, curve: .ease),
       ),
     ]),
   ];

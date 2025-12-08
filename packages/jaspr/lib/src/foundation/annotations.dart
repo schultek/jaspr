@@ -30,7 +30,7 @@ final class DecoderAnnotation {
 /// The following example is equivalent to `import 'dart:html' show window`,
 /// but does not lead to a compilation error on the server:
 ///
-/// ```
+/// ```dart
 /// @Import.onWeb('dart:html', show: [#window])
 /// import 'file.imports.dart';
 /// ```
@@ -42,9 +42,10 @@ final class DecoderAnnotation {
 ///
 /// The associated file will be generated the next time you run `jaspr serve`.
 ///
-/// Make sure to use the imported elements and types only after the appropriate platform check
-/// using `kIsWeb`, e.g.:
-/// ```
+/// Make sure to use the imported elements and types only after
+/// the appropriate platform check using `kIsWeb`. For example:
+///
+/// ```dart
 /// if (kIsWeb) {
 ///   print(window.name);
 /// }

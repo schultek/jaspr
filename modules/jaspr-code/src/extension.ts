@@ -6,8 +6,7 @@ import {
 } from "./debug";
 
 import { createJasprProject, handleNewProjects } from "./create";
-import { jasprClean, jasprDoctor } from "./commands";
-import { ComponentCodeLensProvider } from "./code_lens";
+import { jasprClean, jasprDoctor, jasprServe } from "./commands";
 import { JasprServeDaemon } from "./jaspr/serve_daemon";
 import {
   findJasprProjectFolders,
@@ -16,6 +15,9 @@ import {
 import { JasprToolingDaemon } from "./jaspr/tooling_daemon";
 import { ScopesDomain } from "./jaspr/scopes_domain";
 import { HtmlDomain } from "./jaspr/html_domain";
+import { dartExtensionApi } from "./api";
+import { ComponentCodeLensProvider } from "./code_lenses/component_code_lens";
+import { ServeCodeLensProvider } from "./code_lenses/serve_code_lens";
 
 export async function activate(context: vscode.ExtensionContext) {
   let projects = await findJasprProjectFolders();
@@ -64,24 +66,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("jaspr.serve", async () => {
-      const folderToRunCommandIn = await getFolderToRunCommandIn(
-        `Select the folder to run "jaspr serve" in`
-      );
-      if (!folderToRunCommandIn) {
-        return;
-      }
-
-      const process = new JasprServeDaemon();
-      context.subscriptions.push(process);
-
-      process.start(context, undefined, {
-        name: "Jaspr",
-        request: "launch",
-        type: "jaspr",
-        cwd: folderToRunCommandIn,
-      });
-    })
+    vscode.commands.registerCommand("jaspr.serve", jasprServe(context))
   );
 
   const toolingDaemon = new JasprToolingDaemon();
@@ -97,6 +82,15 @@ export async function activate(context: vscode.ExtensionContext) {
       new ComponentCodeLensProvider(scopesDomain)
     )
   );
+
+  if (dartExtensionApi.version >= 3) {
+    context.subscriptions.push(
+      vscode.languages.registerCodeLensProvider(
+        { language: "dart", scheme: "file" },
+        new ServeCodeLensProvider()
+      )
+    );
+  }
 
   const htmlDomain = new HtmlDomain(toolingDaemon);
   context.subscriptions.push(htmlDomain);

@@ -1,8 +1,8 @@
 import 'package:universal_web/web.dart' as web;
 
-import '../../../browser.dart';
-import '../../browser/utils.dart';
-import '../../foundation/type_checks.dart';
+import '../../../client.dart';
+import '../../client/utils.dart';
+import '../../dom/type_checks.dart';
 
 abstract class Document implements Component {
   /// Attaches a set of attributes to the `<html>` element.

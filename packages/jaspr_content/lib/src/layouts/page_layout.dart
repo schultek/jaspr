@@ -3,6 +3,7 @@
 /// @docImport 'empty_layout.dart';
 library;
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 
 import '../page.dart';
@@ -49,7 +50,7 @@ abstract class PageLayoutBase implements PageLayout {
       _ => '',
     };
 
-    yield Component.element(tag: 'title', children: [text(title)]);
+    yield Component.element(tag: 'title', children: [Component.text(title)]);
     yield meta(attributes: {'property': 'og:title'}, content: title);
 
     if (siteData['favicon'] case final String faviconHref) {

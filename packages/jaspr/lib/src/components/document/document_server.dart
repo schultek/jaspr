@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 
-import '../../../server.dart';
-import '../../server/adapters/document_adapter.dart';
-
-export '../style.dart' hide Style;
+import '/dom.dart';
+import '/server.dart';
+import '/src/server/adapters/document_adapter.dart';
 
 abstract class Document implements Component {
   /// Sets up a basic document structure at the root of your app and renders the main `<html>`, `<head>` and `<body>` tags.
@@ -141,14 +140,14 @@ class BaseDocument extends StatelessComponent implements Document {
   Component build(BuildContext context) {
     return Component.element(
       tag: 'html',
-      attributes: {if (lang != null) 'lang': lang!},
+      attributes: {'lang': ?lang},
       children: [
         Component.element(
           tag: 'head',
           children: [
             if (base != null) Component.element(tag: 'base', attributes: {'href': _normalizedBase!}),
             if (charset != null) Component.element(tag: 'meta', attributes: {'charset': charset!}),
-            HeadDocument(title: title, meta: {if (viewport != null) 'viewport': viewport!, ...meta}),
+            HeadDocument(title: title, meta: {'viewport': ?viewport, ...meta}),
             if (styles.isNotEmpty) //
               Style(styles: styles),
             ...head,

@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 import '../utils.dart';
 
-var path = p.posix;
+final p.Context path = p.posix;
 
 class ImportsOutputBuilder implements Builder {
   ImportsOutputBuilder(BuilderOptions options);
@@ -14,26 +15,32 @@ class ImportsOutputBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
-      var json = jsonDecode(await buildStep.readAsString(buildStep.inputId));
-      var outputId = buildStep.inputId.changeExtension('.dart');
+      final entries = (jsonDecode(await buildStep.readAsString(buildStep.inputId)) as List<Object?>)
+          .cast<Map<String, Object?>>()
+          .map(ImportEntry.fromJson)
+          .toList()
+          .sortedBy((e) => e.url);
+      final outputId = buildStep.inputId.changeExtension('.dart');
 
-      var webShow = <String>{};
-      var vmShow = <String>{};
+      final webShow = <String>{};
+      final vmShow = <String>{};
 
-      for (var e in json) {
-        var platform = e['platform'];
-        var show = (e['show'] as List).cast<String>();
-
-        var items = <String>[...show, ...show.where((v) => v.isType).map((v) => '${v}OrStubbed')];
-        if (platform == 0) {
+      for (final entry in entries) {
+        final items = <String>[
+          for (final elem in entry.elements) ...[
+            elem.name,
+            if (elem.type == ElementType.type) '${elem.name}OrStubbed',
+          ],
+        ];
+        if (entry.platform == 0) {
           webShow.addAll(items);
         } else {
           vmShow.addAll(items);
         }
       }
 
-      var outputDir = 'lib/generated/imports';
-      var relativeDir = path.relative(outputDir, from: path.dirname(buildStep.inputId.path));
+      final outputDir = 'lib/generated/imports';
+      final relativeDir = path.relative(outputDir, from: path.dirname(buildStep.inputId.path));
 
       await buildStep.writeAsFormattedDart(outputId, """
           ${webShow.isNotEmpty ? """

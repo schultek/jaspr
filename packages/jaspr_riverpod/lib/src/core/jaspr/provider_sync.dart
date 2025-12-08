@@ -3,19 +3,19 @@ part of '../../core.dart';
 
 sealed class ProviderSync {}
 
-class _ProviderSync implements ProviderSync {
+class _ProviderSync<T> implements ProviderSync {
   _ProviderSync(this.provider, this.id, this.codec, this.fn);
 
-  final ProviderBase provider;
+  final ProviderBase<T> provider;
   final String id;
-  final Codec? codec;
-  final Override Function(dynamic value) fn;
+  final Codec<T, Object?>? codec;
+  final Override Function(Object? value) fn;
 }
 
 extension SyncNotifierExtension<NotifierT extends Notifier<T>, T> on NotifierProvider<NotifierT, T> {
   ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
     return _ProviderSync(this, id, codec, (value) {
-      return overrideWithBuild((_, __) => value as T);
+      return overrideWithBuild((_, _) => value as T);
     });
   }
 }
@@ -23,7 +23,7 @@ extension SyncNotifierExtension<NotifierT extends Notifier<T>, T> on NotifierPro
 extension SyncAsyncNotifierExtension<NotifierT extends AsyncNotifier<T>, T> on AsyncNotifierProvider<NotifierT, T> {
   ProviderSync syncWith(String id, {Codec<T, Object?>? codec}) {
     return _ProviderSync(this, id, codec, (value) {
-      return overrideWithBuild((_, __) => value as T);
+      return overrideWithBuild((_, _) => value as T);
     });
   }
 }
@@ -61,7 +61,7 @@ extension SyncStateProviderExtension<T> on StateProvider<T> {
 }
 
 mixin SyncScopeMixin on State<ProviderScope>
-    implements PreloadStateMixin<ProviderScope>, SyncStateMixin<ProviderScope, Map<String, dynamic>?> {
+    implements PreloadStateMixin<ProviderScope>, SyncStateMixin<ProviderScope, Map<String, Object?>?> {
   ProviderContainer get container;
 
   final Map<String, Object?> _syncValues = {};
@@ -70,7 +70,7 @@ mixin SyncScopeMixin on State<ProviderScope>
     if (component.sync.isEmpty) {
       return Future.value();
     }
-    final futures = <Future>[];
+    final futures = <Future<void>>[];
     for (var s in component.sync) {
       final provider = (s as _ProviderSync).provider;
       final Object? value;
@@ -81,23 +81,23 @@ mixin SyncScopeMixin on State<ProviderScope>
       }
       if (value is Future) {
         futures.add(value);
-        value.then((v) => _syncValues[s.id] = s.codec != null ? s.codec!.encode(v) : v);
+        value.then((v) => _syncValues[s.id] = s.codec?.encode(v) ?? v);
       } else {
-        _syncValues[s.id] = s.codec != null ? s.codec!.encode(value) : value;
+        _syncValues[s.id] = s.codec?.encode(value) ?? value;
       }
     }
-    return Future.wait(futures);
+    return futures.wait;
   }
 
   @override
-  Map<String, dynamic>? getState() {
+  Map<String, Object?>? getState() {
     return _syncValues;
   }
 
   final List<Override> _syncOverrides = [];
 
   @override
-  void updateState(Map<String, dynamic>? value) {
+  void updateState(Map<String, Object?>? value) {
     if (value == null) {
       return;
     }
@@ -107,7 +107,12 @@ mixin SyncScopeMixin on State<ProviderScope>
       }
 
       final encodedValue = value[s.id];
-      final decodedValue = encodedValue != null && s.codec != null ? s.codec!.decode(encodedValue) : encodedValue;
+      final Object? decodedValue;
+      if (s.codec case final codec? when encodedValue != null) {
+        decodedValue = codec.encode(encodedValue);
+      } else {
+        decodedValue = encodedValue;
+      }
 
       _syncOverrides.add(s.fn(decodedValue));
     }

@@ -2,9 +2,11 @@
 /// @docImport 'markdown_parser.dart';
 library;
 
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../page.dart';
+import '../theme/theme.dart';
 
 /// Parses a page into a list of nodes.
 ///
@@ -82,11 +84,24 @@ extension NodeExtension on Node {
 }
 
 abstract class CustomComponent {
+  /// Constructor for subclasses.
+  const CustomComponent.base();
+
+  /// Creates a custom component with the given pattern and builder.
+  factory CustomComponent({
+    required Pattern pattern,
+    required CustomComponentBuilder builder,
+    ThemeExtension<Object?>? theme,
+  }) = _CustomComponent;
+
   /// Creates a component for the given node, or returns null.
   Component? create(Node node, NodesBuilder builder);
 
-  /// Creates a custom component with the given pattern and builder.
-  factory CustomComponent({required Pattern pattern, required CustomComponentBuilder builder}) = _CustomComponent;
+  /// An optional theme extension for this component.
+  ///
+  /// This will be merged into the [ContentTheme] of a page when the component
+  /// is included in it's [PageConfig].
+  ThemeExtension<Object?>? get theme => null;
 }
 
 /// A builder for creating components from a name, attributes, and child.
@@ -109,14 +124,20 @@ abstract mixin class CustomComponentBase implements CustomComponent {
     }
     return null;
   }
+
+  @override
+  ThemeExtension<Object?>? get theme => null;
 }
 
 class _CustomComponent extends CustomComponentBase {
-  const _CustomComponent({required this.pattern, required CustomComponentBuilder builder}) : _builder = builder;
+  const _CustomComponent({required this.pattern, required CustomComponentBuilder builder, this.theme})
+    : _builder = builder;
 
   @override
   final Pattern pattern;
   final CustomComponentBuilder _builder;
+  @override
+  final ThemeExtension<Object?>? theme;
 
   @override
   Component apply(String name, Map<String, String> attributes, Component? child) {
@@ -154,9 +175,9 @@ class NodesBuilder {
       }
       if (node is TextNode) {
         if (node.raw) {
-          result.add(raw(node.text));
+          result.add(RawText(node.text));
         } else {
-          result.add(text(node.text));
+          result.add(Component.text(node.text));
         }
       } else if (node is ElementNode) {
         result.add(

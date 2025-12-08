@@ -1,3 +1,25 @@
+## 0.4.5-beta.0
+
+- `jaspr` upgraded to `0.22.0-beta.0`
+
+## 0.4.4
+
+- Adjust styling of `DocsLayout` to be more responsive on large screens.
+
+## 0.4.3
+
+- Added a new `FileTree` component for rendering file tree structures.
+- Enable adding a header based on the current page to `MarkdownOutput`.
+- Fixed `TableOfContentsExtension` to correctly find headers in nested elements.
+- Update `package:mustache_template` constraint to `^2.0.2`.
+  This version adds support for emojis in templates,
+  no longer requiring a dependency override.
+
+## 0.4.2
+
+- Fix `FilesystemLoader` not recognizing file changes on Linux.
+- Fix the default `PageSource` stripping dots (`.`) from file names when loaded.
+
 ## 0.4.1
 
 - `jaspr` upgraded to `0.21.1`

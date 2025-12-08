@@ -2,7 +2,7 @@ import 'dart:convert';
 
 const stylesClassSources = {
   'site|lib/styles_class.dart': '''
-    import 'package:jaspr/jaspr.dart';
+    import 'package:jaspr/dom.dart';
         
     class Component {
       @css

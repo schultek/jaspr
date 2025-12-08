@@ -3,6 +3,7 @@ library;
 
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 

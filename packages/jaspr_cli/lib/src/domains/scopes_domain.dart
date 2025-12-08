@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' as io;
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/analysis/session.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:collection/collection.dart';
+import 'package:glob/glob.dart';
+import 'package:glob/list_local_fs.dart';
+import 'package:path/path.dart' as path;
 import 'package:watcher/watcher.dart';
 import 'package:yaml/yaml.dart';
 
@@ -27,7 +32,7 @@ class ScopesDomain extends Domain {
   final Map<AnalysisContext, InspectData> _inspectedData = {};
 
   Future<void> registerScopes(
-    Map<String, dynamic> params, {
+    Map<String, Object?> params, {
     ResourceProvider? resourceProvider,
   }) async {
     await _collection?.dispose();
@@ -36,10 +41,44 @@ class ScopesDomain extends Domain {
     _watcherSubscriptions.clear();
     _inspectedData.clear();
 
-    final folders = params['folders'] as List<dynamic>;
+    final folders = (params['folders'] as List<Object?>).cast<String>();
+    final entryPaths = <String>[];
+    final serverEntrypointGlob = Glob('**/*.server.dart');
+
+    for (final folder in folders) {
+      try {
+        final pubspecFile = io.File(path.join(folder, 'pubspec.yaml'));
+        if (!pubspecFile.existsSync()) {
+          logger.write('No pubspec.yaml found in $folder');
+          continue;
+        }
+
+        final pubspecYaml = loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
+        if (pubspecYaml case {'jaspr': {'mode': 'server' || 'static'}}) {
+          // ok
+        } else {
+          logger.write('Scopes not available in client mode.');
+          continue;
+        }
+      } catch (e) {
+        logger.write('Failed to read pubspec.yaml in $folder: $e');
+        continue;
+      }
+
+      final serverEntrypoints = serverEntrypointGlob.listSync(root: folder);
+      if (serverEntrypoints.isEmpty) {
+        logger.write('No server entrypoints found in $folder.');
+        continue;
+      }
+      entryPaths.addAll(serverEntrypoints.map((e) => e.path));
+    }
+
+    if (entryPaths.isEmpty) {
+      return;
+    }
 
     _collection = AnalysisContextCollection(
-      includedPaths: folders.cast(),
+      includedPaths: entryPaths,
       resourceProvider: resourceProvider ?? PhysicalResourceProvider.INSTANCE,
     );
 
@@ -50,8 +89,11 @@ class ScopesDomain extends Domain {
             final path = event.path;
             logger.write('File changed: $path');
 
-            if (path.endsWith('.dart')) {
-              _reanalyze(path);
+            if (path.endsWith('.server.dart') && event.type != ChangeType.MODIFY) {
+              // Recreate all scopes if an entrypoint is added or removed.
+              registerScopes(params);
+            } else if (path.endsWith('.dart')) {
+              _reanalyze(path, entryPaths);
             } else if (path.endsWith('pubspec.yaml') ||
                 path.endsWith('pubspec.lock') ||
                 path.endsWith('package_config.json')) {
@@ -64,85 +106,83 @@ class ScopesDomain extends Domain {
     }
 
     for (final context in _collection!.contexts) {
-      analyze(context);
+      analyze(context, entryPaths);
     }
   }
 
-  void _reanalyze(String path) {
+  void _reanalyze(String path, List<String> entryPaths) {
     for (final context in _collection!.contexts) {
       context.changeFile(path);
-      analyze(context, true);
+      analyze(context, entryPaths, true);
     }
   }
 
-  Future<void> analyze(AnalysisContext context, [bool awaitPendingChanges = false]) async {
+  Future<void> analyze(AnalysisContext context, List<String> entryPaths, [bool awaitPendingChanges = false]) async {
     final rootPath = context.contextRoot.root.path;
 
+    final targets = entryPaths.where((e) => e.startsWith(rootPath)).toList();
+    if (targets.isEmpty) {
+      return;
+    }
+
     try {
-      final pubspecFile = context.contextRoot.root.getChildAssumingFile('pubspec.yaml');
-      if (!pubspecFile.exists) {
-        logger.write('No pubspec.yaml found in $rootPath');
-        return;
-      }
-
-      try {
-        final pubspecYaml = loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
-
-        if (pubspecYaml case {'jaspr': {'mode': 'server' || 'static'}}) {
-          // ok
-        } else {
-          logger.write('Scopes not available in client mode.');
-          return;
-        }
-      } catch (e) {
-        logger.write('Failed to read pubspec.yaml in $rootPath: $e');
-        return;
-      }
-
-      final mainFile = context.contextRoot.root.getChildAssumingFolder('lib').getChildAssumingFile('main.dart');
-
-      if (!mainFile.exists) {
-        logger.write('No main.dart found in $rootPath');
-        return;
-      }
-
-      final sw = Stopwatch()..start();
-      logger.write('Analyzing $rootPath...');
-
-      _analysisStatus[context] = true;
-      emitStatus();
-
       if (awaitPendingChanges) {
+        final sw = Stopwatch()..start();
         await context.applyPendingFileChanges();
+        sw.stop();
         logger.write('Applied pending changes in ${sw.elapsedMilliseconds}ms');
-        sw.reset();
       }
-
-      final result = await context.currentSession.getResolvedLibrary(mainFile.path);
-      sw.stop();
-
-      if (result is! ResolvedLibraryResult) {
-        logger.write('Failed to resolve main.dart in $rootPath');
-        return;
-      }
-      logger.write('Resolved main.dart in ${sw.elapsedMilliseconds}ms');
 
       bool usesJasprWebCompilers = false;
       try {
         final packagesContent = context.contextRoot.packagesFile?.readAsStringSync();
         final packagesJson = jsonDecode(packagesContent ?? '{}');
         if (packagesJson case {
-          'packages': List packages,
-        } when packages.any((p) => p['name'] == 'jaspr_web_compilers')) {
+          'packages': List<Object?> packages,
+        } when packages.cast<Map<String, Object?>>().any((p) => p['name'] == 'jaspr_web_compilers')) {
           usesJasprWebCompilers = true;
         }
       } catch (_) {
         // Ignore errors in reading packages file.
       }
 
-      final inspectData = await InspectData.analyze(result.element, usesJasprWebCompilers, logger);
+      logger.write('Analyzing $rootPath...');
+
+      _analysisStatus[context] = true;
+      emitStatus();
+
+      final sw = Stopwatch()..start();
+
+      final results = await Future.wait([
+        for (final target in targets) context.currentSession.getResolvedLibrary(target),
+      ]);
+
+      sw.stop();
+
+      final libraries = <LibraryElement>[];
+
+      for (final result in results) {
+        if (result is! ResolvedLibraryResult) {
+          final target = targets[results.indexOf(result)];
+          logger.write('Failed to resolve "$target" in "$rootPath"');
+          continue;
+        }
+        libraries.add(result.element);
+      }
+
+      logger.write('Resolved ${libraries.length} libraries in "$rootPath" in ${sw.elapsedMilliseconds}ms');
+
+      if (libraries.isEmpty) {
+        return;
+      }
+
+      final inspectData = await InspectData.analyze(libraries, usesJasprWebCompilers, logger);
       _inspectedData[context] = inspectData;
       emitScopes();
+    } on InconsistentAnalysisException catch (_) {
+      logger.write('Skipping inconsistent analysis for $rootPath');
+    } catch (e) {
+      logger.write('Error analyzing $rootPath: $e');
     } finally {
       _analysisStatus[context] = false;
       emitStatus();
@@ -152,7 +192,7 @@ class ScopesDomain extends Domain {
   void emitScopes() {
     final allLibraries = _inspectedData.values.expand((data) => data.libraries.keys).toSet();
 
-    final output = <String, dynamic>{};
+    final output = <String, Object?>{};
 
     for (final libraryPath in allLibraries) {
       final components = <String>{};
@@ -217,7 +257,7 @@ class ScopesDomain extends Domain {
   }
 
   void emitStatus() {
-    final output = <String, dynamic>{};
+    final output = <String, Object?>{};
 
     for (final context in _collection!.contexts) {
       final status = _analysisStatus[context] ?? false;
@@ -238,22 +278,24 @@ class ScopesDomain extends Domain {
 
 class InspectData {
   InspectData._(this.usesJasprWebCompilers, this.logger);
-  static Future<InspectData> analyze(LibraryElement root, bool usesJasprWebCompilers, Logger logger) async {
+  static Future<InspectData> analyze(List<LibraryElement> libraries, bool usesJasprWebCompilers, Logger logger) async {
     final inspectData = InspectData._(usesJasprWebCompilers, logger);
 
-    final mainFunction = root.topLevelFunctions.where((e) => e.name == 'main').firstOrNull?.firstFragment;
-    final mainLocation = mainFunction?.libraryFragment.lineInfo.getLocation(
-      mainFunction.nameOffset ?? mainFunction.offset,
-    );
-    final mainTarget = InspectTarget(
-      root.firstFragment.source.fullName,
-      'main',
-      mainLocation?.lineNumber ?? 0,
-      mainLocation?.columnNumber ?? 0,
-    );
+    for (final root in libraries) {
+      final mainFunction = root.topLevelFunctions.where((e) => e.name == 'main').firstOrNull?.firstFragment;
+      final mainLocation = mainFunction?.libraryFragment.lineInfo.getLocation(
+        mainFunction.nameOffset ?? mainFunction.offset,
+      );
+      final mainTarget = InspectTarget(
+        root.firstFragment.source.fullName,
+        'main',
+        mainLocation?.lineNumber ?? 0,
+        mainLocation?.columnNumber ?? 0,
+      );
 
-    var data = await inspectData.inspectLibrary(root, null, {}, {mainTarget});
-    await data.analyzeChildren();
+      final data = await inspectData.inspectLibrary(root, null, {}, {mainTarget});
+      await data.analyzeChildren();
+    }
     return inspectData;
   }
 
@@ -331,7 +373,7 @@ class InspectData {
   }
 
   bool isClientLib(LibraryElement lib) {
-    return lib.identifier == 'package:jaspr/browser.dart' ||
+    return lib.identifier == 'package:jaspr/client.dart' ||
         lib.identifier == 'package:web/web.dart' ||
         lib.identifier == 'dart:js_interop' ||
         lib.identifier == 'dart:js_interop_unsafe' ||
@@ -582,7 +624,7 @@ class DirectiveTarget {
 
   DirectiveTarget(this.uri, this.target, this.line, this.character, this.length);
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toJson() {
     return {'uri': uri, 'target': target, 'line': line, 'character': character, 'length': length};
   }
 
@@ -599,7 +641,7 @@ class InspectTarget {
 
   InspectTarget(this.path, this.name, this.line, this.character);
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toJson() {
     return {'path': path, 'name': name, 'line': line, 'character': character};
   }
 }

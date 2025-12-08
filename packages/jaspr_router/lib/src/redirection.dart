@@ -10,6 +10,7 @@ import 'package:jaspr/jaspr.dart';
 import 'configuration.dart';
 import 'match.dart';
 import 'matching.dart';
+import 'platform/platform.dart';
 import 'route.dart';
 
 /// A GoRouter redirector function.
@@ -63,6 +64,9 @@ FutureOr<RouteMatchList> redirect(
           return newMatch;
         }
         return redirect(context, newMatch, configuration, matcher, redirectHistory: redirectHistory, extra: extra);
+      }
+      if (!context.binding.isClient && (redirectHistory?.length ?? 0) > 1) {
+        return _setRedirectHeader(context, prevMatchList);
       }
       return prevMatchList;
     }
@@ -204,4 +208,30 @@ void _addRedirect(List<RouteMatchList> redirects, RouteMatchList newMatch, Uri p
     log('redirecting to $newMatch');
     return true;
   }());
+}
+
+RouteMatchList _setRedirectHeader(BuildContext context, RouteMatchList matchList) {
+  PlatformRouter.instance.redirect(context, matchList.uri.path);
+  return _redirectMatch(matchList.uri);
+}
+
+/// The match used when redirecting on the server, renders nothing.
+RouteMatchList _redirectMatch(Uri uri) {
+  return RouteMatchList(
+    <RouteMatch>[
+      RouteMatch(
+        subloc: uri.path,
+        extra: null,
+        error: null,
+        route: Route(
+          path: uri.toString(),
+          builder: (BuildContext context, RouteState state) {
+            return const Component.empty();
+          },
+        ),
+      ),
+    ],
+    uri,
+    const <String, String>{},
+  );
 }

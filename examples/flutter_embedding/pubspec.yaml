@@ -1,10 +1,10 @@
 name: flutter_embedding_demo
 description: A demo of embedding a flutter app into a jaspr website.
-version: 0.1.10
+version: 0.1.11-beta.0
 publish_to: none
 
 environment:
-  sdk: '>=3.8.0 <4.0.0'
+  sdk: ^3.10.0
 
 resolution: workspace
 
@@ -13,7 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.0.0
-  jaspr: ^0.21.0
+  jaspr: ^0.22.0-beta.0
   jaspr_flutter_embed: ^0.4.7
   jaspr_riverpod: ^0.4.0
   riverpod: ^3.0.0
@@ -22,8 +22,7 @@ dev_dependencies:
   build_runner: ^2.6.0
   flutter_test:
     sdk: flutter
-  jaspr_builder: ^0.21.0
-  jaspr_repo: any
+  jaspr_builder: ^0.22.0-beta.0
   jaspr_web_compilers: ^4.2.0
 
 flutter:

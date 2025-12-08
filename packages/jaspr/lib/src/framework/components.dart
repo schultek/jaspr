@@ -2,8 +2,8 @@ part of 'framework.dart';
 
 /// Represents a html element in the DOM
 ///
-/// Must have a [tag] and any number of attributes.
-/// Can have a single [child] component or any amount of [children].
+/// Must have a [tag] and any number of [attributes].
+/// Accepts a list of [children].
 class DomComponent extends Component {
   const DomComponent._({
     super.key,
@@ -28,6 +28,8 @@ class DomComponent extends Component {
   Element createElement() => DomElement(this);
 }
 
+typedef EventCallback = void Function(web.Event event);
+
 class DomElement extends MultiChildRenderObjectElement {
   DomElement(DomComponent super.component);
 
@@ -42,10 +44,14 @@ class DomElement extends MultiChildRenderObjectElement {
   @override
   void _updateInheritance() {
     super._updateInheritance();
-    if (_inheritedElements != null && _inheritedElements!.containsKey(_WrappingDomComponent)) {
-      _inheritedElements = HashMap<Type, InheritedElement>.from(_inheritedElements!);
+    if (_inheritedElements case final originalInheritedElements?
+        when originalInheritedElements.containsKey(_WrappingDomComponent)) {
+      final updatedInheritedElements = HashMap<Type, InheritedElement>.of(originalInheritedElements);
+      _wrappingElement = updatedInheritedElements.remove(_WrappingDomComponent);
+      _inheritedElements = updatedInheritedElements;
+      return;
     }
-    _wrappingElement = _inheritedElements?.remove(_WrappingDomComponent);
+    _wrappingElement = null;
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import 'sidebar_toggle_button.dart';
@@ -34,9 +35,11 @@ class Header extends StatelessComponent {
         ...leading,
         a(classes: 'header-title', href: '/', [
           img(src: logo, alt: 'Logo'),
-          span([text(title)]),
+          span([Component.text(title)]),
         ]),
-        div(classes: 'header-items', items),
+        div(classes: 'header-content', [
+          div(classes: 'header-items', items),
+        ]),
       ]),
     ]);
   }
@@ -47,8 +50,7 @@ class Header extends StatelessComponent {
         height: 4.rem,
         display: Display.flex,
         alignItems: AlignItems.center,
-        gap: Gap(column: 1.rem),
-        maxWidth: 90.rem,
+        gap: Gap.column(1.rem),
         padding: Padding.symmetric(horizontal: 1.rem, vertical: .25.rem),
         margin: Margin.symmetric(horizontal: Unit.auto),
         border: Border.only(
@@ -58,18 +60,25 @@ class Header extends StatelessComponent {
       css.media(MediaQuery.all(minWidth: 768.px), [css('&').styles(padding: Padding.symmetric(horizontal: 2.5.rem))]),
       css('.header-title', [
         css('&').styles(
-          flex: Flex(grow: 1),
           display: Display.inlineFlex,
+          flex: Flex(basis: 17.rem),
           alignItems: AlignItems.center,
-          gap: Gap(column: .75.rem),
+          gap: Gap.column(.75.rem),
         ),
         css('img').styles(height: 1.5.rem, width: Unit.auto),
         css('span').styles(fontWeight: FontWeight.w700),
       ]),
+      css('.header-content', [
+        css('&').styles(
+          display: Display.flex,
+          flex: Flex(grow: 1),
+          justifyContent: JustifyContent.end,
+        ),
+      ]),
       css('.header-items', [
         css('&').styles(
           display: Display.flex,
-          gap: Gap(column: 0.25.rem),
+          gap: Gap.column(0.25.rem),
         ),
       ]),
     ]),

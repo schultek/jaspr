@@ -36,7 +36,7 @@ class ClientsBundleBuilder implements Builder {
 
   Future<void> generateClientsBundle(BuildStep buildStep) async {
     var modules = await buildStep
-        .findAssets(Glob('lib/**.client.json'))
+        .findAssets(Glob('lib/**.client.module.json'))
         .asyncMap((id) => buildStep.readAsString(id))
         .map((c) => jsonDecode(c))
         .toList();

@@ -1,5 +1,8 @@
+import { ExtensionContext } from "vscode";
 import { checkJasprInstalled } from "./helpers/install_helper";
 import { runJaspr, runJasprInFolder } from "./helpers/process_helper";
+import { getFolderToRunCommandIn } from "./helpers/project_helper";
+import { JasprServeDaemon } from "./jaspr/serve_daemon";
 
 export type JasprMode = "static" | "server" | "client";
 export type JasprModeOption = JasprMode | "static:auto" | "server:auto";
@@ -59,4 +62,28 @@ export async function jasprClean(): Promise<number | undefined> {
 
 export function jasprDoctor(): Promise<number | undefined> {
   return runJaspr(["doctor"], true);
+}
+
+export function jasprServe(context: ExtensionContext) {
+  return async (input: string | undefined, folder: string | undefined) => {
+    if (!folder) {
+      folder = await getFolderToRunCommandIn(
+        `Select the folder to run "jaspr serve" in`
+      );
+    }
+    if (!folder) {
+      return;
+    }
+
+    const process = new JasprServeDaemon();
+    context.subscriptions.push(process);
+
+    process.start(context, undefined, {
+      name: "Jaspr",
+      request: "launch",
+      type: "jaspr",
+      cwd: folder,
+      args: !!input ? ['--input=' + input] : []
+    });
+  }
 }

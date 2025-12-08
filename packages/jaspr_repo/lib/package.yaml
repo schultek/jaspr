@@ -1,10 +1,27 @@
 include: package:lints/recommended.yaml
 
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
 linter:
   rules:
-    sort_pub_dependencies: true
-    prefer_relative_imports: true
+    always_declare_return_types: true
+    avoid_dynamic_calls: true
     directives_ordering: true
+    eol_at_end_of_file: true
+    missing_code_block_language_in_doc_comment: true
+    prefer_relative_imports: true
+    sort_pub_dependencies: true
+    strict_top_level_inference: true
+    type_annotate_public_apis: true
+    unnecessary_breaks: true
+    unnecessary_library_directive: true
+    unnecessary_underscores: true
+    use_null_aware_elements: true
+    use_truncating_division: true
 
 formatter:
   page_width: 120

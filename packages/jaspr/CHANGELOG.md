@@ -1,3 +1,118 @@
+## 0.22.0-beta.1
+
+- Changed build extensions to use `.options.dart` instead of `.g.dart`.
+
+## 0.22.0-beta.0
+
+- **Breaking** Changed project entrypoint conventions:
+
+  - Any server entrypoint file must now end in `.server.dart` (e.g. `lib/main.server.dart`).
+  - The generated server-side options file is now generated alongside the server entrypoint (e.g. as `lib/main.server.g.dart`) containing `defaultServerOptions`.
+  - `Jaspr.initializeApp()` now requires the `package:jaspr/server.dart` import.
+
+  - The project can contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering (also available in **client** mode).
+  - A new client-side Jaspr options file is generated alongside the client entrypoint (e.g. as `lib/main.client.g.dart`) containing `defaultClientOptions`.
+  - Added a new `ClientApp` component that should be used inside the client entrypoint like this:
+    ```dart
+    // This file is lib/main.client.dart
+
+    import 'package:jaspr/client.dart';
+    import 'main.client.g.dart';
+
+    void main() {
+      Jaspr.initializeApp(
+        options: defaultClientOptions,
+      );
+
+      runApp(
+        const ClientApp(),
+      );
+    }
+    ```
+
+- **Breaking** Renamed `package:jaspr/browser.dart` library to `package:jaspr/client.dart`, as well as:
+  
+  - Renamed `BrowserAppBinding` class to `ClientAppBinding`.
+  - Renamed `package:jaspr_test/browser_test.dart` library to `package:jaspr_test/client_test.dart`.
+  - Renamed `testBrowser()` class to `testClient()`.
+
+- **Breaking** Moved all html components, style classes and dom utilities including `div()` et al., `Styles`, `css`, `Color` et al., `events()`, `RawText`, and `ViewTransitionMixin` to a separate `package:jaspr/dom.dart` library.
+
+  This reduces the "pollution" of the global namespace when importing `package:jaspr/jaspr.dart` and allows for more fine-grained control of imported APIs.
+
+- **Breaking** All html components are now implemented as classes instead of functions, and can thereby used with `const`. 
+
+  This is mostly a structural change, as all components keep their lowercase names to have the familiar html-like syntax and differentiate to other Components. All standard uses of these components should still work as before, with a few exceptions when used with inferred typing (such as `var child = div([]);`), which may now require an explicit type annotation (such as `Component child = div([]);`) when assigning other values (such as `child = span([]);`).
+
+- Deprecated `text()`, `fragment()` and `raw()` functions in favor of `Component.text()`, `Component.fragment()` and `RawText`, respectively.
+
+  ```dart
+  // Before:
+  text('Hello World');
+  fragment([ ... ]);
+  raw('<div>Raw HTML</div>');
+
+  // After (with dot-shorthands):
+  .text('Hello World');
+  .fragment([ ... ]);
+  RawText('<div>Raw HTML</div>');
+  ```
+
+- **Breaking** Removed deprecated `package:jaspr/ui.dart` library. 
+
+- **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`.
+
+- Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`. 
+  This can still be overridden using the `--port` flag. If neither is set, the default port stays `8080`.
+
+- **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
+- Allow binary responses in `AppContext.setStatusCode`.
+
+- Global `@css` styles from other packages will no longer be included automatically. To include them, import the file where they are defined.
+
+- **Breaking** Changed `events()` method to accept only one optional type parameter for both `onInput` and `onChange` events.
+
+- Added `Animation`, `Quotes` CSS properties.
+- Added `Curve.linearFn()` easing function.
+- Added `Gap.row()` and `Gap.column()` constructors.
+- Added `Flex.grow()`, `Flex.shrink()` and `Flex.basis()` constructors.
+- Added `Border.all()` constructor and deprecate the unnamed `Border` constructor.
+- **Breaking**: `Transition`'s `duration` and `delay` are now of type `Duration` instead of `double`.
+- Added `ms` and `seconds` extensions to `int` for simple conversion to `Duration`.
+- **Breaking**: Changed `FontStyle.obliqueAngle` to accept `Angle` instead of `double`.
+- Added `initial`, `inherit`, `revert`, `revertLayer` and `unset` to `Transition`, `TextShadow` and `BoxShadow`.
+- Allow nesting non-empty `Filter.list` inside each other.
+
+## 0.21.7
+
+- `@Import` now supports defining extensions and properly checks elements inside the `show` parameter.
+- Fixed bug when using `SyncStateMixin` or `@sync` on a `@client` component.
+- Fixed bug with `checked` and `indeterminate` attributes not rendering correctly on `input` elements.
+- Fixed allowing children for `path` tag by removing it from the list of self-closing tags.
+- Deprecate the `package:jaspr/ui.dart` library that provides legacy utility components.
+  For accessing Jaspr APIs, import `package:jaspr/jaspr.dart` instead.
+  For the utility components, build your own or use a component library.
+
+## 0.21.6
+
+- Added `checked` and `indeterminate` parameters to `input()`. These will control the state of a checkbox or radio input.
+- Fixed client hydration and debugging bug on chrome when running the app under a base path.
+
+## 0.21.5
+
+- Fixed regression in rendering implementation.
+
+## 0.21.4
+
+- Added `JasprBadge` component that renders a "Built with Jaspr" badge.
+- Add the `--no-managed-build-options` flag to commands launching a build daemon. Without managed
+  build options, users are responsible for configuring `build_web_compilers`.
+- Fixed another whitespace rendering bug.
+
+## 0.21.3
+
+- Fix tooling daemon crash while analyzing component scopes.
+
 ## 0.21.2
 
 - Added html domain to tooling daemon.
@@ -66,7 +181,7 @@
 
 - Added `allowedPathSuffixes` option to `Jaspr.initializeApp()` to enable handling route paths with extensions other than `html`.
 
-- Added support for generating a **sitemap.xml** in static mode. To enable this, pass `--sitemap-domain=my.domain.com` to `jaspr build`. 
+- Added support for generating a **sitemap.xml** in static mode. To enable this, pass `--sitemap-domain=my.domain.com` to `jaspr build`.
 
   Add sitemap params like `changefreq` and `priority` to your routes by using `Route(settings: RouteSettings(priority: 0.5))` or set them through `ServerApp.requestRouteGeneration()`.
 
@@ -105,7 +220,7 @@
 
 - **BREAKING** Changed `AppBinding`s `Uri get currentUri` to `String get currentUrl`.
 
-- **BREAKING** Changed return type of `renderComponent()` from `Future<String>` to `Future<({int statusCode, String body, Map<String, List<String>> headers})>`. 
+- **BREAKING** Changed return type of `renderComponent()` from `Future<String>` to `Future<({int statusCode, String body, Map<String, List<String>> headers})>`.
 
   The rendered html is accessible through the `body` property. `statusCode` and `headers` can be used to create a response object when part of a custom http handler.
 
@@ -116,6 +231,7 @@
 - Deprecated having seperate style groups (`Styles.box()`, `Styles.text()`, `Styles.background()`, etc. as well as `.box()`, `.text()`, etc.). All styling properties are now available under the single `Styles()` constructur and `.styles()` method.
 
   **Before:**
+
   ```dart
   css('.main')
     .box(width: 100.px, height: 100.px)
@@ -124,6 +240,7 @@
   ````
 
   **After:**
+
   ```dart
   css('.main').styles(
     width: 100.px,
@@ -144,7 +261,6 @@
 - Update logo and website links.
 
 ## 0.17.0
-
 
 - **BREAKING** Removed `currentState` from `GlobalKey`, use `GlobalStateKey` instead.
 - Added `GlobalStateKey<T extends State>` to access the state of a component using `currentState`.
@@ -276,11 +392,14 @@
   To enable this a custom model class must have two methods:
 
   - An instance method that encodes the model to a primitive value and is annotated with `@encoder`:
+
     ```dart
     @encoder
     String toJson() { ... }
     ```
+
   - A static method that decodes the model from a primitive value and is annotated with `@decoder`:
+
     ```dart
     @decoder
     static MyModel fromJson(String json) { ... }
@@ -589,7 +708,7 @@
     jaspr_web_compilers: ^4.0.4
   ```
 
-  For an example see `examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop).
+  For an example see [`examples/flutter_plugin_interop`](https://github.com/schultek/Jaspr/tree/main/examples/flutter_plugin_interop).
 
 - Improved **flutter element embedding**.
 
@@ -599,7 +718,7 @@
   This removes the need for any kind of interop between apps as they can directly communicate
   through the usual primitives of passing properties and callbacks.
 
-  For an example see `examples/flutter_embedding`](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding).
+  For an example see [`examples/flutter_embedding`](https://github.com/schultek/jaspr/tree/main/examples/flutter_embedding).
 
 - `jaspr build` now outputs to `/build/jaspr` instead of `/build`.
 
@@ -642,10 +761,12 @@
 ## 0.3.0
 
 - **BREAKING** The cli is now a separate package: `jaspr_cli`. To migrate run:
+
   ```shell
     dart pub global deactivate jaspr
     dart pub global activate jaspr_cli
   ```
+
   The usage stays the same with `jaspr create`, `jaspr serve` and `jaspr build`.
 
 ## 0.2.0

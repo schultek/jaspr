@@ -48,12 +48,10 @@ abstract class ObserverElement extends BuildableElement {
   @override
   void _updateObservers() {
     assert(_lifecycleState == _ElementLifecycle.active);
-    final List<ObserverElement>? incomingElements = _parent?._observerElements;
-    if (incomingElements != null) {
-      _observerElements = List<ObserverElement>.from(incomingElements);
-    } else {
-      _observerElements = <ObserverElement>[];
-    }
-    _observerElements!.add(this);
+    final incomingElements = _parent?._observerElements;
+    _observerElements = [
+      ...?incomingElements,
+      this,
+    ];
   }
 }

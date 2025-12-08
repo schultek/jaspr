@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import 'view_constraints.dart';
@@ -24,7 +25,7 @@ class FlutterEmbedView extends StatelessComponent {
   final Styles? styles;
   final ViewConstraints? constraints;
   final Component? loader;
-  final Future? loadLibrary;
+  final Future<void>? loadLibrary;
   final Widget? widget;
 
   final Object Function()? builder;
@@ -44,9 +45,9 @@ class FlutterEmbedView extends StatelessComponent {
             minHeight: c.minHeight != double.infinity ? c.minHeight?.px : null,
             maxHeight: c.maxHeight != double.infinity ? c.maxHeight?.px : null,
           ),
-        if (styles != null) styles!,
+        ?styles,
       ]),
-      [if (loader != null) loader!],
+      [?loader],
     );
   }
 }

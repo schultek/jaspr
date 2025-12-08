@@ -294,15 +294,15 @@ extension PageHandlersExtension on Page {
     if (data['content-type'] case final String type) {
       return type;
     }
-    if (this.path.endsWith('.html')) {
+    if (path.endsWith('.html')) {
       return 'text/html';
-    } else if (this.path.endsWith('.xml')) {
+    } else if (path.endsWith('.xml')) {
       return 'text/xml';
-    } else if (this.path.endsWith('.md')) {
+    } else if (path.endsWith('.md')) {
       return 'text/markdown';
-    } else if (this.path.endsWith('.json')) {
+    } else if (path.endsWith('.json')) {
       return 'application/json';
-    } else if (this.path.endsWith('.yaml') || this.path.endsWith('.yml')) {
+    } else if (path.endsWith('.yaml') || path.endsWith('.yml')) {
       return 'application/yaml';
     } else {
       return 'text/plain';
@@ -342,8 +342,22 @@ extension PageHandlersExtension on Page {
   }
 
   /// Wraps [child] in the provided theme.
+  ///
+  /// If no theme is provided, uses the default [ContentTheme].
+  /// Adds any missing component themes from the configured components to the page theme.
   Component wrapTheme(Component child) {
-    return Content.wrapTheme(config.theme ?? ContentTheme(), child: child);
+    var theme = config.theme ?? ContentTheme();
+    if (theme.enabled) {
+      final addExtensions = <ThemeExtension<Object?>>[];
+      for (final component in config.components) {
+        final componentTheme = component.theme;
+        if (componentTheme != null && !theme.extensions.containsKey(componentTheme.type)) {
+          addExtensions.add(componentTheme);
+        }
+      }
+      theme = theme.apply(extensions: addExtensions);
+    }
+    return Content.wrapTheme(theme, child: child);
   }
 }
 

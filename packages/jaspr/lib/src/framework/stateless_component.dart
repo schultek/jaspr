@@ -6,7 +6,7 @@ part of 'framework.dart';
 /// building a constellation of other components that describe the user interface
 /// more concretely. The building process continues recursively until the
 /// description of the user interface is fully concrete (e.g., consists
-/// entirely of [DOMComponent]s, which describe concrete DOM elements).
+/// entirely of [DomComponent]s, which describe concrete DOM elements).
 ///
 /// Stateless component are useful when the part of the user interface you are
 /// describing does not depend on anything other than the configuration
@@ -144,7 +144,7 @@ class StatelessElement extends BuildableElement {
   @override
   StatelessComponent get component => super.component as StatelessComponent;
 
-  Future? _asyncFirstBuild;
+  Future<void>? _asyncFirstBuild;
 
   @override
   void didMount() {
@@ -153,7 +153,7 @@ class StatelessElement extends BuildableElement {
 
     if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
       var result = (component as OnFirstBuild).onFirstBuild(this);
-      if (result is Future) {
+      if (result is Future<void>) {
         _asyncFirstBuild = result;
       }
     }
@@ -176,7 +176,7 @@ class StatelessElement extends BuildableElement {
           .then((_) {
             super.performRebuild();
           })
-          .catchError((e, st) {
+          .onError<Object>((e, st) {
             failRebuild(e, st);
           });
     }

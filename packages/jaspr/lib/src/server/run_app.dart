@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:shelf/shelf.dart';
 
-import '../foundation/options.dart';
 import '../framework/framework.dart';
+import 'options.dart';
 import 'render_functions.dart';
 import 'server_app.dart';
 import 'server_handler.dart';
 
-/// Main entry point on the server
-/// TODO: Add hint about usage of global variables and isolate state
+/// Main entry point on the server.
+// TODO: Add hint about usage of global variables and isolate state.
 void runApp(Component app) {
   _checkInitialized('runApp');
   ServerApp.run(_createSetup(app));
@@ -30,7 +31,7 @@ Handler serveApp(AppHandler handler) {
 }
 
 /// A record containing the status code, body, and headers for a response.
-typedef ResponseLike = ({int statusCode, String body, Map<String, List<String>> headers});
+typedef ResponseLike = ({int statusCode, Uint8List body, Map<String, List<String>> headers});
 
 /// Directly renders the provided component to HTML. Returns a [ResponseLike] object.
 ///

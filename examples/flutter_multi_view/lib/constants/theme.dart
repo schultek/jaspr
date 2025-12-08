@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 const primaryColorValue = 0x01589B;
 const surfaceColorValue = 0xF7F2FB;

@@ -1,3 +1,6 @@
+/// @docImport 'dart:typed_data';
+library;
+
 import 'dart:io';
 
 import '../framework/framework.dart';
@@ -60,7 +63,7 @@ extension AppContext on BuildContext {
     /// The domain that the cookie applies to.
     String? domain,
 
-    /// The path within the [domain] that the cookie applies to.
+    /// The path within the `domain` that the cookie applies to.
     String? path,
 
     /// Whether to only send this cookie on secure connections.
@@ -88,9 +91,10 @@ extension AppContext on BuildContext {
   /// Sets the response status code.
   ///
   /// When [responseBody] is provided, it will be used as the response body instead of the rendered html.
-  void setStatusCode(int statusCode, {String? responseBody}) {
+  /// Supported types for [responseBody] are [String] and [Uint8List].
+  void setStatusCode(int statusCode, {Object? responseBody}) {
     _binding
       ..responseStatusCode = statusCode
-      ..responseBodyOverride = responseBody;
+      ..overrideBody(responseBody);
   }
 }

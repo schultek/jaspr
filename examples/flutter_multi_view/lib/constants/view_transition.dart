@@ -1,4 +1,4 @@
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
 
 @css
 List<StyleRule> get viewTransitionStyles => [
@@ -22,8 +22,8 @@ List<StyleRule> get viewTransitionStyles => [
     /* Newly added cards should animate-in. */
     css.layer(name: 'add-card', [
       css.keyframes('animate-in', {
-        '0%': Styles(opacity: 0, transform: Transform.translate(y: (-100).px)),
-        '100%': Styles(opacity: 1, transform: Transform.translate(y: Unit.zero)),
+        '0%': Styles(opacity: 0, transform: .translate(y: (-100).px)),
+        '100%': Styles(opacity: 1, transform: .translate(y: .zero)),
       }),
       css('::view-transition-new(targeted-counter):only-child').styles(raw: {'animation': 'animate-in ease-in 0.25s'}),
     ]),
@@ -31,8 +31,8 @@ List<StyleRule> get viewTransitionStyles => [
     /* Cards that get removed should animate-out. */
     css.layer(name: 'remove-card', [
       css.keyframes('animate-out', {
-        '0%': Styles(opacity: 1, transform: Transform.translate(y: Unit.zero)),
-        '100%': Styles(opacity: 0, transform: Transform.translate(y: (-100).px)),
+        '0%': Styles(opacity: 1, transform: .translate(y: .zero)),
+        '100%': Styles(opacity: 0, transform: .translate(y: (-100).px)),
       }),
       css('::view-transition-old(targeted-counter):only-child').styles(raw: {'animation': 'animate-out ease-out 0.5s'}),
     ]),

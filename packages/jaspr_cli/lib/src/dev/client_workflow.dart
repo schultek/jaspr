@@ -81,7 +81,7 @@ class ClientWorkflow {
     });
   }
 
-  final _doneCompleter = Completer();
+  final _doneCompleter = Completer<void>();
   final BuildDaemonClient client;
   final Logger logger;
 
@@ -100,7 +100,7 @@ Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<Strin
   try {
     logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
     return await connectClient(workingDirectory, buildOptions, (serverLog) {
-      var level = mapBuilderLevel(toLoggingLevel(serverLog.level));
+      var level = _mapBuilderLevel(toLoggingLevel(serverLog.level));
       if (!logger.verbose && level.index < Level.info.index) return;
 
       var buffer = StringBuffer(serverLog.message);
@@ -128,7 +128,7 @@ Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<Strin
   }
 }
 
-Level mapBuilderLevel(l.Level builderLevel) {
+Level _mapBuilderLevel(l.Level builderLevel) {
   if (builderLevel.value < l.Level.INFO.value) {
     return Level.verbose;
   } else if (builderLevel.value == l.Level.INFO.value) {

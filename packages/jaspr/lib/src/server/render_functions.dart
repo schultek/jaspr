@@ -1,3 +1,6 @@
+/// @docImport '../foundation/binding.dart';
+library;
+
 import 'dart:async';
 import 'dart:isolate';
 
@@ -5,7 +8,7 @@ import 'package:shelf/shelf.dart';
 // ignore: implementation_imports
 import 'package:shelf/src/headers.dart';
 
-import '../../jaspr.dart';
+import 'options.dart';
 import 'run_app.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
@@ -14,7 +17,7 @@ typedef RequestLike = ({String url, Headers headers});
 
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
-/// If [Jaspr.useIsolates] is true, this spawns an isolate for each render.
+/// If [Jaspr.useIsolates] is `true`, this spawns an isolate for each render.
 Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loadFile, bool standalone) async {
   var url = request.url.normalizePath().toString();
   if (!url.startsWith('/')) {
@@ -36,8 +39,9 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
   var errorPort = ReceivePort();
 
   var errorSub = errorPort.listen((message) {
-    var [error, stack] = message;
-    resultCompleter.completeError(error, StackTrace.fromString(stack));
+    if (message case [final Object error, final String stack]) {
+      resultCompleter.completeError(error, StackTrace.fromString(stack));
+    }
   });
 
   var sub = port.listen((message) async {
@@ -69,7 +73,7 @@ void _render(_RenderMessage message) async {
     loadFile: (name) {
       receivePort ??= ReceivePort();
       message.sendPort.send(_LoadFileRequest(name, receivePort!.sendPort));
-      return receivePort!.first.then((value) => value);
+      return receivePort!.first.then((value) => value as String?);
     },
   );
   message.setup(binding);

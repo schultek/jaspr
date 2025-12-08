@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - main
+      - next
     paths:
       - '.github/workflows/test.yml'
       - 'apps/**'
@@ -12,6 +13,7 @@ on:
   push:
     branches:
       - main
+      - next
     paths:
       - '.github/workflows/test.yml'
       - 'apps/**'
@@ -31,9 +33,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          # remove once Flutter stable supports analyzer 8
-          channel: beta 
-          flutter-version: 3.36.0-0.4.pre
+          channel: stable
 
       - name: Bootstrap
         run: |
@@ -57,9 +57,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          # remove once Flutter stable supports analyzer 8
-          channel: beta 
-          flutter-version: 3.36.0-0.4.pre
+          channel: stable
 
       - name: Bootstrap
         run: |

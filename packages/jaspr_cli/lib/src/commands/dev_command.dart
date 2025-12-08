@@ -18,7 +18,12 @@ import 'base_command.dart';
 
 abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   DevCommand({super.logger}) {
-    argParser.addOption('input', abbr: 'i', help: 'Specify the input file for the web app.');
+    argParser.addOption(
+      'input',
+      abbr: 'i',
+      help:
+          'Specify the entry file for the server app. Must end in ".server.dart".\nDefaults to the first found "*.server.dart" file in the project.',
+    );
     argParser.addOption(
       'mode',
       abbr: 'm',
@@ -30,21 +35,43 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: 'refresh',
     );
-    argParser.addOption('port', abbr: 'p', help: 'Specify a port to run the dev server on.', defaultsTo: '8080');
+    argParser.addOption(
+      'port',
+      abbr: 'p',
+      help: 'Specify a port to run the dev server on. Defaults to {jaspr.port} from pubspec.yaml or "8080".',
+    );
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
+    argParser.addFlag(
+      'managed-build-options',
+      help:
+          'Whether jaspr will launch `build_runner` with options derived from command line arguments (the default).'
+          'When disabled, builders compiling to the web need to be configured manually.',
+      negatable: true,
+      defaultsTo: true,
+    );
+    argParser.addFlag(
+      'skip-server',
+      help:
+          'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
+      negatable: false,
+      defaultsTo: false,
+    );
     addDartDefineArgs();
   }
 
   @override
   String get category => 'Project';
 
-  late final debug = argResults!['debug'] as bool;
-  late final release = argResults!['release'] as bool;
-  late final mode = argResults!['mode'] as String;
-  late final port = argResults!['port'] as String;
-  late final useWasm = argResults!['experimental-wasm'] as bool;
+  late final input = argResults!.option('input');
+  late final debug = argResults!.flag('debug');
+  late final release = argResults!.flag('release');
+  late final mode = argResults!.option('mode')!;
+  late final port = argResults!.option('port') ?? project.port ?? '8080';
+  late final useWasm = argResults!.flag('experimental-wasm');
+  late final managedBuildOptions = argResults!.flag('managed-build-options');
+  late final skipServer = argResults!.flag('skip-server');
 
   bool get launchInChrome;
   bool get autoRun;
@@ -60,6 +87,15 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var proxyPort = project.requireMode == JasprMode.client ? port : '5567';
     var flutterPort = '5678';
     var webPort = '5467';
+
+    final entryPoint = await getServerEntryPoint(input);
+
+    if (entryPoint != null && !entryPoint.startsWith('lib/')) {
+      logger.write(
+        "Entry point is not located inside lib/ folder, disabling server-side hot-reload.",
+        level: Level.warning,
+      );
+    }
 
     var workflow = await _runClient(webPort);
     if (workflow == null) {
@@ -97,18 +133,26 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       return 0;
     }
 
-    if (project.devCommand != null) {
-      return await _runDevCommand(project.devCommand!, proxyPort);
-    } else {
-      return await _runServer(proxyPort, workflow);
+    if (skipServer) {
+      logger.write(
+        'Skipping server as per --skip-server flag.\n'
+        'Make sure to set the JASPR_PROXY_PORT=$proxyPort environment variable when starting the server manually.',
+        tag: Tag.cli,
+        level: Level.warning,
+      );
+      await workflow.done;
+      return 0;
     }
+    return await _runServer(entryPoint!, proxyPort, workflow);
   }
 
-  Future<int> _runServer(String proxyPort, ClientWorkflow workflow) async {
+  Future<int> _runServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
     logger.write("Starting server...", tag: Tag.cli, progress: ProgressState.running);
 
+    final useHotReload = entryPoint.startsWith('lib/') && !release;
+
     var serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
-    if (!serverTarget.existsSync()) {
+    if (useHotReload && !serverTarget.existsSync()) {
       serverTarget.createSync(recursive: true);
     }
 
@@ -133,9 +177,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       args.add('--pause-isolates-on-start');
     }
 
-    var entryPoint = await getEntryPoint(argResults!['input'], true);
-
-    if (!release) {
+    if (useHotReload) {
       var import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
       serverTarget.writeAsStringSync(serverEntrypoint(import));
 
@@ -149,7 +191,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       Platform.executable,
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
-      workingDirectory: Directory.current.path,
+      workingDirectory: Directory.current.absolute.path,
     );
 
     logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
@@ -177,7 +219,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     // Wait until server is reachable.
     var n = 0;
     while (true) {
-      await Future.delayed(Duration(seconds: 2));
+      await Future<void>.delayed(Duration(seconds: 2));
       try {
         await http.head(Uri.parse('http://localhost:$port'));
         break;
@@ -198,38 +240,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     await _runChrome();
     return serverFuture;
-  }
-
-  Future<int> _runDevCommand(String command, String proxyPort) async {
-    logger.write("Starting server...", tag: Tag.cli, progress: ProgressState.running);
-
-    if (release) {
-      logger.write("Ignoring --release flag since custom dev command is used.", tag: Tag.cli, level: Level.warning);
-    }
-    if (debug) {
-      logger.write("Ignoring --debug flag since custom dev command is used.", tag: Tag.cli, level: Level.warning);
-    }
-    var userDefines = getServerDartDefines();
-    if (userDefines.isNotEmpty) {
-      logger.write(
-        "Ignoring all --dart-define options since custom dev command is used.",
-        tag: Tag.cli,
-        level: Level.warning,
-      );
-    }
-
-    var [exec, ...args] = command.split(" ");
-
-    var process = await Process.start(
-      exec,
-      args,
-      environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
-      workingDirectory: Directory.current.path,
-    );
-
-    logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
-
-    return await watchProcess('server', process, tag: Tag.server);
   }
 
   Future<void> _runChrome() async {
@@ -253,7 +263,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   Future<ClientWorkflow?> _runClient(String webPort) async {
     if (useWasm) {
-      checkWasmSupport();
+      project.checkWasmSupport();
     }
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
@@ -283,13 +293,15 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final buildArgs = [
       if (release) '--release',
-      '--define',
-      '$package:ddc=generate-full-dill=true',
-      '--delete-conflicting-outputs',
-      '--define=$package:entrypoint=compiler=$compiler',
-      if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
-      if (compiler != 'dartdevc')
-        '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
+      if (managedBuildOptions) ...[
+        '--define',
+        '$package:ddc=generate-full-dill=true',
+        '--delete-conflicting-outputs',
+        '--define=$package:entrypoint=compiler=$compiler',
+        if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
+        if (compiler != 'dartdevc')
+          '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
+      ],
     ];
 
     var workflow = await ClientWorkflow.start(configuration, buildArgs, webPort, logger, guardResource);
@@ -302,7 +314,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       await workflow.shutDown();
     });
 
-    var buildCompleter = Completer();
+    var buildCompleter = Completer<void>();
 
     var timer = Timer(Duration(seconds: 20), () {
       if (!buildCompleter.isCompleted) {
@@ -379,11 +391,14 @@ String serverEntrypoint(String import) =>
   import '$import' as m;
   import 'package:hotreloader/hotreloader.dart';
       
-  void main() async {
+  void main(List<String> args) async {
+    final mainFunc = m.main as dynamic;
+    final mainCall = mainFunc is dynamic Function(List<String>) ? () => mainFunc(args) : () => mainFunc();
+
     try {
       await HotReloader.create(
         debounceInterval: Duration.zero,
-        onAfterReload: (ctx) => m.main(),
+        onAfterReload: (ctx) => mainCall(),
       );
       print('[INFO] Server hot reload is enabled.');
     } on StateError catch (e) {
@@ -394,6 +409,6 @@ String serverEntrypoint(String import) =>
       }
     }
     
-    m.main();
+    mainCall();
   }
 ''';

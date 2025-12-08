@@ -6,7 +6,6 @@ import {
   checkJasprVersion,
 } from "../helpers/install_helper";
 import { spawn } from "child_process";
-import { minimumJasprVersion } from "../constants";
 
 export class JasprToolingDaemon implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
@@ -51,7 +50,6 @@ export class JasprToolingDaemon implements vscode.Disposable {
     this.statusItem.name = "Jaspr Tooling Daemon";
 
     await this._startProcess();
-    this._isDevMode = false;
   }
 
   public setBusy(busy: boolean) {

@@ -1,16 +1,27 @@
-import 'dart:io';
+import 'dart:io' as io;
 
+import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:path/path.dart' as path;
+import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
 import 'logging.dart';
 
 enum JasprMode { static, server, client }
 
+extension JasprModeExtension on JasprMode {
+  bool get isServerOrStatic => this == JasprMode.server || this == JasprMode.static;
+}
+
 class Project {
-  Project(this.logger);
+  Project(this.logger, {FileSystem? fs, Never Function(int)? exitFn})
+    : _fs = fs ?? const LocalFileSystem(),
+      _exitFn = exitFn ?? io.exit;
 
   final Logger logger;
+  final FileSystem _fs;
+  final Never Function(int) _exitFn;
 
   YamlMap? get pubspecYaml => _pubspecYaml;
   YamlMap get requirePubspecYaml {
@@ -21,14 +32,14 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
     return pubspecYaml;
   }
 
+  late final File pubspecFile = _fs.file('pubspec.yaml').absolute;
+
   late final YamlMap? _pubspecYaml = () {
-    var pubspecPath = 'pubspec.yaml';
-    var pubspecFile = File(pubspecPath).absolute;
     if (!pubspecFile.existsSync()) {
       return null;
     }
@@ -37,7 +48,7 @@ class Project {
       return loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
     } catch (e) {
       logger.write('Could not parse pubspec.yaml file: $e', tag: Tag.cli, level: Level.critical);
-      exit(1);
+      _exitFn(1);
     }
   }();
 
@@ -50,7 +61,7 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
   }
 
@@ -71,15 +82,15 @@ class Project {
           defaultValue: true,
         );
         if (result) {
-          var result = Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
+          var result = io.Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
           if (result.exitCode != 0) {
-            log.err(result.stderr);
+            log.err(result.stderr as String?);
             logger.write(
               'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.',
               tag: Tag.cli,
               level: Level.critical,
             );
-            exit(1);
+            _exitFn(1);
           }
 
           log.success('Successfully added jaspr_builder to your dev_dependencies.');
@@ -106,11 +117,11 @@ class Project {
     var configYaml = requirePubspecYaml['jaspr'];
     if (configYaml == null) {
       logger.write('Missing \'jaspr\' options in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
-      exit(1);
+      _exitFn(1);
     }
     if (configYaml is! YamlMap) {
       logger.write('\'jaspr\' options must be a yaml map in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
-      exit(1);
+      _exitFn(1);
     }
     return configYaml;
   }
@@ -134,42 +145,46 @@ class Project {
     var modeYaml = configYaml['mode'];
     if (modeYaml == null) {
       logger.write(
-        '\'jaspr.mode\' option is required but missing in pubspec.yaml.',
+        '\'jaspr.mode\' option in pubspec.yaml is required but missing.',
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
     var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     if (modeOrNull == null) {
       logger.write(
-        '\'jaspr.mode\' must be one of ${JasprMode.values.map((v) => v.name).join(', ')} in pubspec.yaml.',
+        '\'jaspr.mode\' in pubspec.yaml must be one of ${JasprMode.values.map((v) => v.name).join(', ')}.',
         tag: Tag.cli,
         level: Level.critical,
       );
-      exit(1);
+      _exitFn(1);
     }
     return modeOrNull;
   }
 
-  String? get devCommand {
+  String? get port {
     var configYaml = _requireJasprOptions;
 
-    var devCommandYaml = configYaml['dev-command'];
-    if (devCommandYaml != null) {
-      if (devCommandYaml is! String) {
-        logger.write('\'jaspr.dev-command\' must be a string in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
-        exit(1);
+    var portYaml = configYaml['port'];
+    if (portYaml != null) {
+      if (portYaml is int) {
+        return portYaml.toString();
+      } else {
+        logger.write(
+          '\'jaspr.port\' in pubspec.yaml must be an integer.',
+          tag: Tag.cli,
+          level: Level.critical,
+        );
+        _exitFn(1);
       }
-
-      return devCommandYaml;
     }
     return null;
   }
 
   late final YamlMap? pubspecLock = () {
     var pubspecLockPath = 'pubspec.lock';
-    var pubspecLockFile = File(pubspecLockPath).absolute;
+    var pubspecLockFile = _fs.file(pubspecLockPath).absolute;
 
     if (!pubspecLockFile.existsSync() && pubspecYaml?['resolution'] == 'workspace') {
       var n = 1;
@@ -178,7 +193,7 @@ class Project {
         if (parent == pubspecLockFile.path) {
           break;
         }
-        pubspecLockFile = File(path.join(parent, 'pubspec.lock'));
+        pubspecLockFile = _fs.file(path.join(parent, 'pubspec.lock'));
         if (pubspecLockFile.existsSync()) {
           break;
         }
@@ -191,9 +206,37 @@ class Project {
         return loadYaml(pubspecLockFile.readAsStringSync()) as YamlMap;
       } catch (e) {
         logger.write('Could not parse pubspec.lock file: $e', tag: Tag.cli, level: Level.critical);
-        exit(1);
+        _exitFn(1);
       }
     }
     return null;
   }();
+
+  void checkWasmSupport() {
+    final package = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
+    final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
+    final version = switch (devDependencies?[package]) {
+      String v => VersionConstraint.parse(v),
+      _ => null,
+    };
+    final minVersion = VersionConstraint.compatibleWith(Version(4, 1, 0));
+    if (version == null || !minVersion.allowsAll(version)) {
+      logger.write(
+        'Using "--experimental-wasm" requires $package 4.1.0 or newer. '
+        'Please update your version constraint in pubspec.yaml.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
+      _exitFn(1);
+    }
+
+    if (usesFlutter) {
+      logger.write(
+        'Using "--experimental-wasm" is currently not supported together with Flutter embedding.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
+      _exitFn(1);
+    }
+  }
 }

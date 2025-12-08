@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 {{#server}}
@@ -17,7 +18,7 @@ class Header extends StatelessComponent {
           (label: 'About', path: '/about'),
         ])
           div(classes: activePath == route.path ? 'active' : null, [
-            Link(to: route.path, child: text(route.label)),
+            Link(to: route.path, child: .text(route.label)),
           ]),
       ]),
     ]);
@@ -27,41 +28,41 @@ class Header extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('header', [
       css('&').styles(
-        display: Display.flex,
-        padding: Padding.all(1.em),
-        justifyContent: JustifyContent.center,
+        display: .flex,
+        padding: .all(1.em),
+        justifyContent: .center,
       ),
       css('nav', [
         css('&').styles(
-          display: Display.flex,
+          display: .flex,
           height: 3.em,
-          radius: BorderRadius.all(Radius.circular(10.px)), 
-          overflow: Overflow.clip,
-          justifyContent: JustifyContent.spaceBetween,
+          radius: .all(.circular(10.px)), 
+          overflow: .clip,
+          justifyContent: .spaceBetween,
           backgroundColor: primaryColor,
         ),
         css('a', [
           css('&').styles(
-            display: Display.flex,
+            display: .flex,
             height: 100.percent,
-            padding: Padding.symmetric(horizontal: 2.em),
-            alignItems: AlignItems.center,
+            padding: .symmetric(horizontal: 2.em),
+            alignItems: .center,
             color: Colors.white,
-            fontWeight: FontWeight.w700,
-            textDecoration: const TextDecoration(line: TextDecorationLine.none),
+            fontWeight: .w700,
+            textDecoration: TextDecoration(line: .none),
           ),
           css('&:hover').styles(
             backgroundColor: const Color('#0005'),
           ),
         ]),
         css('div.active', [
-          css('&').styles(position: const Position.relative()),
+          css('&').styles(position: .relative()),
           css('&::before').styles(
             content: '',
-            display: Display.block,
-            position: Position.absolute(bottom: 0.5.em, left: 20.px, right: 20.px),
+            display: .block,
+            position: .absolute(bottom: 0.5.em, left: 20.px, right: 20.px),
             height: 2.px,
-            radius: BorderRadius.circular(1.px),
+            radius: .circular(1.px),
             backgroundColor: Colors.white,
           ),
         ])

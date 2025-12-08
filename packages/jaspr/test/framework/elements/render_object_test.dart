@@ -1,6 +1,7 @@
 @TestOn('vm')
 library;
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
@@ -8,12 +9,12 @@ void main() {
   group('elements', () {
     testComponents('correctly handles empty fragments', (tester) async {
       final component = div([
-        text('A'),
+        Component.text('A'),
         Component.fragment([
-          text('B'),
+          Component.text('B'),
           Component.fragment([]), // empty fragment
         ]),
-        text('C'),
+        Component.text('C'),
       ]);
       tester.pumpComponent(component);
 

@@ -2,8 +2,8 @@
 /// @docImport 'package:jaspr_content/components/sidebar.dart';
 library;
 
-import 'package:jaspr/server.dart' as jaspr;
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../page.dart';
 import '../page_extension/table_of_contents_extension.dart';
@@ -54,8 +54,8 @@ class DocsLayout extends PageLayoutBase {
           div([
             div(classes: 'content-container', [
               div(classes: 'content-header', [
-                if (pageData['title'] case String title) h1([text(title)]),
-                if (pageData['description'] case String description) p([text(description)]),
+                if (pageData['title'] case String title) h1([Component.text(title)]),
+                if (pageData['description'] case String description) p([Component.text(description)]),
                 if (pageData['image'] case String image) img(src: image, alt: pageData['imageAlt'] as String?),
               ]),
               child,
@@ -64,7 +64,7 @@ class DocsLayout extends PageLayoutBase {
             aside(classes: 'toc', [
               if (page.data['toc'] case TableOfContents toc)
                 div([
-                  h3([text('On this page')]),
+                  h3([Component.text('On this page')]),
                   toc.build(),
                 ]),
             ]),
@@ -87,7 +87,6 @@ class DocsLayout extends PageLayoutBase {
         css('&').styles(
           padding: Padding.zero,
           margin: Margin.symmetric(horizontal: Unit.auto),
-          maxWidth: 90.rem,
         ),
         css.media(MediaQuery.all(minWidth: 768.px), [
           css('&').styles(padding: Padding.symmetric(horizontal: 1.25.rem)),
@@ -110,7 +109,7 @@ class DocsLayout extends PageLayoutBase {
             width: 17.rem,
             overflow: Overflow.only(y: Overflow.auto),
             transform: Transform.translate(x: (-100).percent),
-            transition: Transition('transform', duration: 150, curve: Curve.easeInOut),
+            transition: Transition('transform', duration: 150.ms, curve: Curve.easeInOut),
           ),
           css.media(MediaQuery.all(minWidth: 768.px), [css('&').styles(margin: Margin.only(left: (-1.25).rem))]),
           css.media(MediaQuery.all(minWidth: 1024.px), [
@@ -140,12 +139,14 @@ class DocsLayout extends PageLayoutBase {
             css('&').styles(
               padding: Padding.only(top: 2.rem, left: 1.rem, right: 1.rem),
               display: Display.flex,
+              justifyContent: JustifyContent.center,
             ),
             css.media(MediaQuery.all(minWidth: 1024.px), [css('&').styles(padding: Padding.only(left: 4.rem))]),
             css('.content-container', [
               css('&').styles(
                 flex: Flex(grow: 1, shrink: 1, basis: 0.percent),
                 minWidth: Unit.zero,
+                maxWidth: 80.rem,
                 padding: Padding.only(right: Unit.zero),
               ),
               css.media(MediaQuery.all(minWidth: 1280.px), [css('&').styles(padding: Padding.only(right: 3.rem))]),

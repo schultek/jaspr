@@ -21,21 +21,25 @@ abstract class BaseCommand extends Command<int> {
   Logger get logger => _logger ??= Logger(verbose);
   Logger? _logger;
 
-  late final bool verbose = argResults?['verbose'] as bool? ?? false;
+  late final bool verbose = argResults?.flag('verbose') ?? false;
 
   late final Project project = Project(logger);
 
   @override
   @mustCallSuper
   Future<int> run() async {
-    await trackEvent(name, projectName: project.pubspecYaml?['name'], projectMode: project.modeOrNull?.name);
+    await trackEvent(
+      name,
+      projectName: project.pubspecYaml?['name'] as String?,
+      projectMode: project.modeOrNull?.name,
+    );
 
     var cancelCount = 0;
     final cancelSub =
         StreamGroup.merge([
           ProcessSignal.sigint.watch(),
           // SIGTERM is not supported on Windows.
-          Platform.isWindows ? const Stream.empty() : ProcessSignal.sigterm.watch(),
+          Platform.isWindows ? const Stream<void>.empty() : ProcessSignal.sigterm.watch(),
         ]).listen((signal) async {
           cancelCount++;
           if (cancelCount > 1) exit(1);
@@ -94,26 +98,68 @@ abstract class BaseCommand extends Command<int> {
     }
   }
 
-  Future<String> getEntryPoint(String? input, [bool forceInsideLib = false]) async {
-    var entryPoint = input ?? 'lib/main.dart';
-
-    if (!File(entryPoint).absolute.existsSync()) {
-      logger.complete(false);
-      logger.write(
-        "Cannot find entry point. Create a lib/main.dart file, or specify a file using --input.",
-        level: Level.critical,
-      );
-      await shutdown();
-      exit(1);
+  Future<String?> getServerEntryPoint(String? target) async {
+    if (project.requireMode == JasprMode.client) {
+      return null; // No server entry point in client mode.
+    }
+    if (target != null) {
+      if (!target.endsWith('.server.dart')) {
+        logger.write(
+          "Specified entry point '$target' must end in '.server.dart'.",
+          level: Level.critical,
+        );
+        await shutdown();
+        exit(1);
+      }
+      if (!File(target).absolute.existsSync()) {
+        logger.write(
+          "Specified entry point '$target' does not exist.",
+          level: Level.critical,
+        );
+        await shutdown();
+        exit(1);
+      }
+      logger.write("Using server entry point: $target", level: Level.verbose);
+      return target;
     }
 
-    if (forceInsideLib && !entryPoint.startsWith('lib/')) {
-      logger.write("Entry point must be located inside lib/ folder, got '$entryPoint'.", level: Level.critical);
-      await shutdown();
-      exit(1);
-    }
+    final entryPoint = await _findServerEntrypoint();
+    logger.write("Using server entry point: $entryPoint", level: Level.verbose);
 
     return entryPoint;
+  }
+
+  Future<String> _findServerEntrypoint() async {
+    var mainFile = File('lib/main.server.dart');
+    if (await mainFile.absolute.exists()) {
+      return mainFile.path;
+    }
+
+    var binDir = Directory('bin/').absolute;
+    var libDir = Directory('lib/').absolute;
+
+    if (binDir.existsSync()) {
+      await for (var entity in binDir.list(recursive: true)) {
+        if (entity is File && entity.path.endsWith('.server.dart')) {
+          return entity.path;
+        }
+      }
+    }
+
+    if (libDir.existsSync()) {
+      await for (var entity in libDir.list(recursive: true)) {
+        if (entity is File && entity.path.endsWith('.server.dart')) {
+          return entity.path;
+        }
+      }
+    }
+
+    logger.write(
+      'No server entrypoint found in "bin/" or "lib/". Make sure to have at least one "*.server.dart" file (usually "lib/main.server.dart") in your project.',
+      level: Level.critical,
+    );
+    await shutdown();
+    exit(1);
   }
 
   void guardResource(FutureOr<void> Function() fn) {
@@ -165,7 +211,7 @@ abstract class BaseCommand extends Command<int> {
       return exitCode;
     }
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future<void>.delayed(Duration(seconds: 2));
 
     await errSub.cancel();
     await outSub.cancel();
@@ -179,18 +225,6 @@ abstract class BaseCommand extends Command<int> {
     logger.complete(true);
 
     return exitCode;
-  }
-
-  void checkWasmSupport() {
-    var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    var version = project.pubspecYaml?['dev_dependencies']?[package];
-    if (version is! String || !version.startsWith(RegExp(r'\^?4.1.'))) {
-      usageException('Using "--experimental-wasm" requires $package 4.1.0 or newer.');
-    }
-
-    if (project.usesFlutter) {
-      usageException('Using "--experimental-wasm" is not supported together with flutter embedding.');
-    }
   }
 }
 

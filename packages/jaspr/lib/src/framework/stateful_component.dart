@@ -11,7 +11,7 @@ part of 'framework.dart';
 /// building a constellation of other components that describe the user interface
 /// more concretely. The building process continues recursively until the
 /// description of the user interface is fully concrete (e.g., consists
-/// entirely of [DOMComponent]s, which describe concrete DOM elements).
+/// entirely of [DomComponent]s, which describe concrete DOM elements).
 ///
 /// Stateful components are useful when the part of the user interface you are
 /// describing can change dynamically, e.g. due to having an internal
@@ -78,8 +78,8 @@ part of 'framework.dart';
 ///
 ///  * Minimize the number of nodes transitively created by the build method and
 ///    any components it creates. Ideally, a stateful component would only create a
-///    single component, and that component would be a [RenderObjectComponent].
-///    (Obviously this isn't always practical, but the closer a component gets to
+///    single component, and that component would be a [DomComponent].
+///    (Of course this isn't always practical, but the closer a component gets to
 ///    this ideal, the more efficient it will be.)
 ///
 ///  * If a subtree does not change, cache the component that represents that
@@ -103,19 +103,17 @@ part of 'framework.dart';
 ///
 ///  * Avoid changing the depth of any created subtrees or changing the type of
 ///    any components in the subtree. For example, rather than returning either the
-///    child or the child wrapped in an [IgnorePointer], always wrap the child
-///    component in an [IgnorePointer] and control the [IgnorePointer.ignoring]
+///    child or the child wrapped in an `IgnorePointer`, always wrap the child
+///    component in an `IgnorePointer` and control the `IgnorePointer.ignoring`
 ///    property. This is because changing the depth of the subtree requires
 ///    rebuilding, laying out, and painting the entire subtree, whereas just
 ///    changing the property will require the least possible change to the
-///    render tree (in the case of [IgnorePointer], for example, no layout or
+///    render tree (in the case of `IgnorePointer`, for example, no layout or
 ///    repaint is necessary at all).
 ///
 ///  * If the depth must be changed for some reason, consider wrapping the
 ///    common parts of the subtrees in components that have a [GlobalKey] that
-///    remains consistent for the life of the stateful component. (The
-///    [KeyedSubtree] component may be useful for this purpose if no other component
-///    can conveniently be assigned the key.)
+///    remains consistent for the life of the stateful component.
 ///
 /// By convention, component constructors only use named arguments. Also by
 /// convention, the first argument is [key], and the last argument is `child`,
@@ -232,10 +230,6 @@ typedef StateSetter = void Function(VoidCallback fn);
 ///    associated component (e.g., to start implicit animations). The framework
 ///    always calls [build] after calling [didUpdateComponent], which means any
 ///    calls to [setState] in [didUpdateComponent] are redundant.
-///  * During development, if a hot reload occurs (whether initiated from the
-///    command line `flutter` tool by pressing `r`, or from an IDE), the
-///    [reassemble] method is called. This provides an opportunity to
-///    reinitialize any data that was prepared in the [initState] method.
 ///  * If the subtree containing the [State] object is removed from the tree
 ///    (e.g., because the parent built a component with a different [runtimeType]
 ///    or [Component.key]), the framework calls the [deactivate] method. Subclasses
@@ -626,10 +620,10 @@ class StatefulElement extends BuildableElement {
   /// There is a one-to-one relationship between [State] objects and the
   /// [StatefulElement] objects that hold them. The [State] objects are created
   /// by [StatefulElement] in [mount].
-  State? _state;
+  State<StatefulComponent>? _state;
   State get state => _state!;
 
-  Future? _asyncInitState;
+  Future<void>? _asyncInitState;
 
   @override
   void didMount() {
@@ -684,7 +678,7 @@ class StatefulElement extends BuildableElement {
             }
             super.performRebuild();
           })
-          .catchError((e, st) {
+          .onError<Object>((e, st) {
             failRebuild(e, st);
           });
     }
@@ -747,10 +741,10 @@ class StatefulElement extends BuildableElement {
   /// This can happen when the component has dropped out of the tree, but depends
   /// on an [InheritedComponent] that is still in the tree.
   ///
-  /// It is set initially to false, since [_firstBuild] makes the initial call
-  /// on the [state]. When it is true, [build] will call
-  /// `state.didChangeDependencies` and then sets it to false. Subsequent calls
-  /// to [didChangeDependencies] set it to true.
+  /// It is set initially to `false`, since [BuildOwner.performInitialBuild] makes
+  /// the initial call on the [state]. When it is `true`,
+  /// [build] will call [State.didChangeDependencies] and then sets it to `false`.
+  /// Subsequent calls to [didChangeDependencies] set it to `true`.
   bool _didChangeDependencies = false;
 
   @override

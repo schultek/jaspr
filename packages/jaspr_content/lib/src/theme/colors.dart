@@ -106,7 +106,7 @@ class ThemeColor implements Color {
   }
 
   @override
-  operator ==(Object other) {
+  bool operator ==(Object other) {
     return other is ThemeColor && other.light == light && other.dark == dark;
   }
 
@@ -135,7 +135,7 @@ class ColorToken extends ThemeColor {
   }
 
   @override
-  operator ==(Object other) {
+  bool operator ==(Object other) {
     return other is ColorToken && other.name == name && other.light == light && other.dark == dark;
   }
 
@@ -146,7 +146,7 @@ class ColorToken extends ThemeColor {
   String toString() => 'ColorToken($name, light: $light, dark: $dark)';
 }
 
-extension on List<ColorToken> {
+extension ColorTokenExtension on List<ColorToken> {
   List<ColorToken> apply({List<ColorToken>? colors, bool mergeColors = true}) {
     if (mergeColors && colors != null) {
       final map = {for (final color in this) color.name: color, for (final color in colors) color.name: color};
@@ -154,6 +154,11 @@ extension on List<ColorToken> {
     } else {
       return colors ?? this;
     }
+  }
+
+  List<ColorToken> subtract(List<ColorToken> colors) {
+    final names = colors.map((c) => c.name).toSet();
+    return where((c) => !names.contains(c.name)).toList();
   }
 
   List<StyleRule> build() {

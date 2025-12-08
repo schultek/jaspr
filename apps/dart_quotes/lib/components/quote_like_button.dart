@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../data/firebase.dart';
@@ -28,7 +29,7 @@ class QuoteLikeButton extends StatelessComponent {
               JSConfetti.instance.show(emojis: ['🎯', '💙']);
             }
           },
-          [span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []), text(' $count')],
+          [span(classes: "icon-heart${hasLiked ?? false ? '' : '-o'}", []), .text(' $count')],
         );
       },
     );
@@ -38,14 +39,16 @@ class QuoteLikeButton extends StatelessComponent {
   static List<StyleRule> get styles => [
     css('.quote-like-btn', [
       css('&').styles(
-        border: Border.none,
-        outline: Outline(style: OutlineStyle.none),
+        border: .none,
+        outline: .new(style: .none),
         fontSize: 18.px,
         backgroundColor: Colors.transparent,
       ),
-      css('&:hover span').styles(transform: Transform.scale(1.2)),
+      css('&:hover span').styles(transform: .scale(1.2)),
       css('&.active span').styles(color: Colors.blue),
-      css('span').styles(transition: Transition('transform', duration: 300, curve: Curve.ease)),
+      css('span').styles(
+        transition: .new('transform', duration: 300.ms, curve: .ease),
+      ),
     ]),
   ];
 }

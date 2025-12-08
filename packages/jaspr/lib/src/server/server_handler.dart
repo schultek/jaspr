@@ -10,14 +10,14 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../foundation/constants.dart';
-import '../foundation/options.dart';
+import 'options.dart';
 import 'render_functions.dart';
 import 'server_app.dart';
 
 final String? jasprProxyPort = Platform.environment['JASPR_PROXY_PORT'];
 const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 
-final webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
+final String webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
   final executableDir = dirname(Platform.script.toFilePath());
@@ -50,7 +50,7 @@ String? _tryFindRootProjectDir(String startingDir) {
 }
 
 Handler staticFileHandler([http.Client? client]) => jasprProxyPort != null
-    ? proxyHandler('http://localhost:$jasprProxyPort/', client: client)
+    ? createProxyHandler(client)
     : Directory(webDir).existsSync()
     ? createStaticHandler(webDir, defaultDocument: 'index.html')
     : (_) => Response.notFound('');
@@ -117,6 +117,12 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
   };
 }
 
+Handler createProxyHandler(http.Client? client) {
+  final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: client);
+  // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
+  return (req) => handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
+}
+
 // coverage:ignore-start
 
 Handler _sseProxyHandler(http.Client client, String webPort) {
@@ -144,8 +150,8 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
           '\r\n',
         );
 
-      StreamSubscription? serverSseSub;
-      StreamSubscription? reqChannelSub;
+      StreamSubscription<void>? serverSseSub;
+      StreamSubscription<void>? reqChannelSub;
 
       serverSseSub = utf8.decoder
           .bind(serverResponse.stream)

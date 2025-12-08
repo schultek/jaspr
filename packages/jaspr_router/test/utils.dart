@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_router/src/platform/platform.dart';
@@ -5,7 +6,7 @@ import 'package:jaspr_test/jaspr_test.dart';
 
 RouterState findRouter(Element root) {
   RouterState? router;
-  findRouter(Element element) {
+  void findRouter(Element element) {
     if (element is StatefulElement && element.state is RouterState) {
       router = element.state as RouterState;
     } else {
@@ -37,6 +38,9 @@ class MockPlatformRouter implements PlatformRouter {
 
   @override
   final RouteRegistry registry = MockRouteRegistry();
+
+  @override
+  void redirect(BuildContext context, String url) {}
 }
 
 class MockHistoryManager implements HistoryManager {
@@ -75,27 +79,31 @@ class MockRouteRegistry implements RouteRegistry {
 
 Route homeRoute() => Route(
   path: '/',
-  builder: (_, __) => Page(path: 'home'),
+  builder: (_, _) => Page(path: 'home'),
 );
+
 Route route(String path, [List<RouteBase> routes = const [], String? name, RouterRedirect? redirect]) => Route(
   path: path,
   name: name,
   redirect: redirect,
-  builder: (_, s) => Page(path: s.subloc),
+  builder: (_, state) => Page(path: state.subloc),
   routes: routes,
 );
-Route lazyRoute(String path, Future future, [List<RouteBase> routes = const []]) => Route.lazy(
+
+Route lazyRoute(String path, Future<void> future, [List<RouteBase> routes = const []]) => Route.lazy(
   path: path,
-  builder: (_, s) => Page(path: s.subloc),
+  builder: (_, state) => Page(path: state.subloc),
   load: () => future,
   routes: routes,
 );
+
 ShellRoute shellRoute(String name, List<RouteBase> routes) => ShellRoute(
-  builder: (_, s, c) => Page(path: name, child: c),
+  builder: (_, _, child) => Page(path: name, child: child),
   routes: routes,
 );
-ShellRoute lazyShellRoute(String name, Future future, List<RouteBase> routes) => ShellRoute.lazy(
-  builder: (_, s, c) => Page(path: name, child: c),
+
+ShellRoute lazyShellRoute(String name, Future<void> future, List<RouteBase> routes) => ShellRoute.lazy(
+  builder: (_, _, child) => Page(path: name, child: child),
   load: () => future,
   routes: routes,
 );
@@ -110,11 +118,11 @@ class Page extends StatelessComponent {
   Component build(BuildContext context) {
     var label = path.startsWith('/') ? path.substring(1) : path;
     final children = <Component>[];
-    children.add(span([text(label)]));
+    children.add(span([Component.text(label)]));
 
     var state = RouteState.of(context);
     if (state.params.isNotEmpty) {
-      children.add(span([text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]));
+      children.add(span([Component.text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]));
     }
 
     if (child != null) {

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
@@ -25,7 +26,7 @@ class FlutterTarget extends StatelessComponent {
       classes: isHandheld ? 'handheld' : effects.join(' '),
       styles: !isHandheld && rotation != 0
           ? Styles(
-              transform: Transform.combine([Transform.perspective(1000.px), Transform.rotateAxis(y: rotation.deg)]),
+              transform: .combine([.perspective(1000.px), .rotateAxis(y: rotation.deg)]),
             )
           : null,
       loader: loader,
@@ -36,14 +37,14 @@ class FlutterTarget extends StatelessComponent {
       child = div(id: 'handheld', [
         child,
         span(classes: 'imageAttribution', [
-          text('Photo by '),
+          .text('Photo by '),
           a(
             href: 'https://unsplash.com/photos/x9WGMWwp1NM',
-            target: Target.blank,
+            target: .blank,
             attributes: {'rel': 'noopener noreferrer'},
-            [text('Nathana Rebouças')],
+            [.text('Nathana Rebouças')],
           ),
-          text(' on Unsplash'),
+          .text(' on Unsplash'),
         ]),
       ]);
     }

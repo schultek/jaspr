@@ -13,10 +13,10 @@ class CounterWidget extends StatelessWidget {
       home: Material(
         shape: RoundedRectangleBorder(
           side: const BorderSide(color: Color(0xFF01589B)),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: .circular(10),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: .spaceEvenly,
           children: [
             IconButton(
               icon: const Icon(Icons.remove),
@@ -26,10 +26,10 @@ class CounterWidget extends StatelessWidget {
             ),
             const SizedBox(width: 5),
             Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: .center,
               children: [
                 const Text('Flutter Counter'),
-                Text('$count', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('$count', style: TextStyle(fontWeight: .bold)),
               ],
             ),
             const SizedBox(width: 5),

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import 'flutter_embed_view_fallback.dart' as fallback;
@@ -6,9 +7,16 @@ import 'view_constraints.dart';
 import 'widget.dart';
 
 class FlutterEmbedView extends StatefulComponent {
-  const FlutterEmbedView({this.id, this.classes, this.styles, this.constraints, this.loader, this.widget, super.key})
-    : loadLibrary = null,
-      builder = null;
+  const FlutterEmbedView({
+    this.id,
+    this.classes,
+    this.styles,
+    this.constraints,
+    this.loader,
+    this.widget,
+    super.key,
+  }) : loadLibrary = null,
+       builder = null;
 
   const FlutterEmbedView.deferred({
     this.id,
@@ -26,7 +34,7 @@ class FlutterEmbedView extends StatefulComponent {
   final Styles? styles;
   final ViewConstraints? constraints;
   final Component? loader;
-  final Future? loadLibrary;
+  final Future<void>? loadLibrary;
   final Widget? widget;
   final Widget Function()? builder;
 
@@ -35,7 +43,7 @@ class FlutterEmbedView extends StatefulComponent {
   static Future<void> preload() => _libraryFuture;
 
   @override
-  State<StatefulComponent> createState() => FlutterEmbedViewState();
+  State<StatefulComponent> createState() => _FlutterEmbedViewState();
 
   Component _buildFlutter() {
     return flutter.FlutterEmbedView(
@@ -44,6 +52,9 @@ class FlutterEmbedView extends StatefulComponent {
       styles: styles,
       constraints: constraints,
       loader: loader,
+      // Casted to dynamic to work around different widget types
+      // without needing to import the one from Flutter.
+      // ignore: argument_type_not_assignable
       widget: (widget ?? builder?.call()) as dynamic,
     );
   }
@@ -59,9 +70,9 @@ class FlutterEmbedView extends StatefulComponent {
   }
 }
 
-class FlutterEmbedViewState extends State<FlutterEmbedView> {
-  var flutterLoading = true;
-  var libraryLoading = true;
+class _FlutterEmbedViewState extends State<FlutterEmbedView> {
+  bool flutterLoading = true;
+  bool libraryLoading = true;
 
   @override
   void initState() {
@@ -74,8 +85,8 @@ class FlutterEmbedViewState extends State<FlutterEmbedView> {
       });
     });
 
-    if (component.loadLibrary != null) {
-      component.loadLibrary!.whenComplete(() {
+    if (component.loadLibrary case final loadLibrary?) {
+      loadLibrary.whenComplete(() {
         if (!mounted) return;
         setState(() {
           libraryLoading = false;

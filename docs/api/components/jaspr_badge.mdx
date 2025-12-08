@@ -1,0 +1,29 @@
+---
+title: JasprBadge
+description: Displays a "Built with Jaspr" badge.
+---
+
+---
+
+Use the `JasprBadge` component to displays a "Built with Jaspr" badge on your website.
+
+It comes in four variants:
+
+```dart
+JasprBadge.light(); // Light background, dark icon and text
+JasprBadge.dark(); // Dark background, light icon and text
+JasprBadge.lightTwoTone(); // Light background, blue icon, dark text
+JasprBadge.darkTwoTone(); // Dark background, blue icon, light text
+```
+
+![Jaspr Badges Preview](/api/assets/jaspr_badges.png)
+
+## Backlinking
+
+It is recommended to wrap the badge in a link to [https://jaspr.site](https://jaspr.site) to help spread the word about Jaspr.
+
+```dart
+a(href: 'https://jaspr.site', target: Target.blank, [
+  JasprBadge.light(),
+]);
+```

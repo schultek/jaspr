@@ -63,8 +63,8 @@ export class ScopesDomain implements vscode.Disposable {
 
   private async registerFolders() {
     var folders = await findJasprProjectFolders();
-    folders = folders.map((f) => join(f, "lib", 'main.dart'));
-
+   
+    this.statusBarItem?.dispose();
     this.statusBarItem = vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Left,
       1
@@ -79,12 +79,15 @@ export class ScopesDomain implements vscode.Disposable {
       this.updateDiagnostics();
     });
 
+    let didReceiveStatus = false;
+
     this.toolingDaemon.onEvent(
       "scopes.status",
       (results: Record<string, boolean>) => {
         if (!this.statusBarItem) {
           return;
         }
+        didReceiveStatus = true;
         var isBusy = Object.values(results).some((status) => status);
         if (isBusy) {
           this.statusBarItem!.show();
@@ -97,6 +100,13 @@ export class ScopesDomain implements vscode.Disposable {
         }
       }
     );
+
+    setTimeout(() => {
+      if (!didReceiveStatus && this.statusBarItem) {
+        this.statusBarItem.dispose();
+        this.statusBarItem = undefined;
+      }
+    }, 30000);
   }
 
   private updateDiagnostics() {
@@ -149,7 +159,7 @@ export class ScopesDomain implements vscode.Disposable {
             );
 
             let message = `Unsafe import: '${dep.invalidOnServer.uri}' depends on '${dep.invalidOnServer.target}', which is not available on the server.\nTry using a platform-independent library ${messageSuffix}`;
-            if (s.uri === "package:jaspr/browser.dart") {
+            if (s.uri === "package:jaspr/client.dart") {
               message = `Unsafe import: '${s.uri}' is not available on the server.\nTry using 'package:jaspr/jaspr.dart' instead ${messageSuffix}`;
             } else if (
               s.uri === "package:web/web.dart" ||

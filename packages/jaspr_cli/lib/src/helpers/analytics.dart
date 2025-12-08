@@ -55,7 +55,8 @@ Future<void> trackEvent(String command, {String? projectName, String? projectMod
     if (distinctId == null) {
       updateSetting(_analyticsIdSetting, distinctId = randomId());
     }
-    var projectHash = projectName != null ? hash(join(distinctId, projectName)).toString() : null;
+    final projectHash = projectName != null ? hash(join(distinctId, projectName)).toString() : null;
+    final isCI = Platform.environment.containsKey('CI');
 
     await post(
       Uri.parse('https://api-eu.mixpanel.com/track'),
@@ -69,8 +70,9 @@ Future<void> trackEvent(String command, {String? projectName, String? projectMod
             'command': command,
             'mode': projectMode,
             'cli_version': jasprCliVersion,
-            if (projectHash != null) 'project_id': projectHash,
+            'project_id': ?projectHash,
             'os': Platform.operatingSystem,
+            'ci': isCI,
           },
         },
       ]),

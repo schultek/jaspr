@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
@@ -21,10 +22,20 @@ class TableOfContentsExtension implements PageExtension {
     final toc = <TocEntry>[];
     final stack = <TocEntry>[];
 
-    for (final node in nodes) {
+    final toVisit = [...nodes.reversed];
+
+    while (toVisit.isNotEmpty) {
+      final node = toVisit.removeLast();
       if (node is! ElementNode) continue;
+
       final depth = _headerRegex.firstMatch(node.tag)?.group(1);
-      if (depth == null) continue;
+      if (depth == null) {
+        // Not a header, continue searching children.
+        toVisit.addAll(node.children?.reversed ?? []);
+        continue;
+      }
+
+      // Level 0 = h2, Level 1 = h3, etc.
       final level = int.parse(depth) - 2;
       if (level < 0 || level > maxHeaderDepth - 2) continue;
 
@@ -76,7 +87,7 @@ class TableOfContents {
         Builder(
           builder: (context) {
             var route = RouteState.of(context);
-            return a(href: '${route.path}#${entry.id}', [text(entry.text)]);
+            return a(href: '${route.path}#${entry.id}', [Component.text(entry.text)]);
           },
         ),
       ]);

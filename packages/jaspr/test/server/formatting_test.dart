@@ -1,17 +1,22 @@
 @TestOn('vm')
 library;
 
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
 import 'package:meta/meta.dart';
 
-final _ = ''.padLeft(40, '-');
-
 @isTest
-void testOutput(String description, {required Component input, required String output}) {
-  testServer('formats $description', (tester) async {
+void testOutput(
+  String description, {
+  required Component input,
+  required String output,
+  required int lineLength,
+}) {
+  testServer(description, (tester) async {
     tester.pumpComponent(input);
 
+    MarkupRenderObject.maxHtmlLineLength = lineLength;
     var response = await tester.request('/');
 
     expect(response.statusCode, equals(200));
@@ -24,143 +29,149 @@ void testOutput(String description, {required Component input, required String o
 void main() {
   group('markup formatting test', () {
     testOutput(
-      'short content',
+      'formats short content',
       input: div([
-        span([text('A')]),
-        span([text('B')]),
-        span([text('C')]),
+        span([Component.text('A')]),
+        span([Component.text('B')]),
+        span([Component.text('C')]),
       ]),
       output: '<div><span>A</span><span>B</span><span>C</span></div>',
+      lineLength: 50,
     );
 
     testOutput(
-      'block content',
+      'formats block content',
       input: div([
-        span([text('A $_')]),
-        span([text('B $_')]),
-        span([text('C $_')]),
+        span([Component.text('Hello')]),
+        span([Component.text('World')]),
+        span([Component.text('Test')]),
       ]),
       output:
           '<div>\n'
-          '      <span>A $_</span>\n'
-          '      <span>B $_</span>\n'
-          '      <span>C $_</span>\n'
+          '      <span>Hello</span>\n'
+          '      <span>World</span>\n'
+          '      <span>Test</span>\n'
           '    </div>',
+      lineLength: 50,
     );
 
     testOutput(
-      'paragraph content',
+      'formats paragraph content',
       input: p([
-        span([text('A $_ ')]),
-        span([text('B $_')]),
-        span([text(' C $_')]),
-        span([text('D')]),
+        span([Component.text('Hello ')]),
+        span([Component.text('World')]),
+        span([Component.text(' Lorem')]),
+        span([Component.text('Ipsum')]),
       ]),
       output:
           '<p>\n'
-          '      <span>A $_ </span>\n'
-          '      <span>B $_</span>\n'
-          '      <span> C $_</span><span>D</span>\n'
+          '      <span>Hello </span><span>World</span>\n'
+          '      <span> Lorem</span><span>Ipsum</span>\n'
           '    </p>',
+      lineLength: 30,
     );
 
     testOutput(
-      'text content',
+      'formats text content',
       input: p([
-        text('Hello $_ '),
-        b([text('World $_')]),
-        text('C $_'),
+        Component.text('Hello '),
+        b([Component.text('World')]),
+        Component.text('!'),
       ]),
       output:
           '<p>\n'
-          '      Hello $_ \n'
-          '      <b>World $_</b>C $_\n'
+          '      Hello <b>World</b>!\n'
           '    </p>',
+      lineLength: 10,
     );
 
     testOutput(
-      'nested paragraph content',
+      'formats nested paragraph content',
       input: p([
-        span([text('A $_')]),
+        span([Component.text('Lorem ')]),
         em([
-          text('Hello $_ '),
-          b([text('World $_')]),
+          Component.text('Hello '),
+          b([Component.text('World')]),
         ]),
-        span([text('C $_')]),
+        span([Component.text(' Ipsum')]),
       ]),
       output:
           '<p>\n'
-          '      <span>A $_</span><em>Hello $_ \n'
-          '        <b>World $_</b></em><span>C $_</span>\n'
+          '      <span>Lorem </span><em>Hello <b>World</b></em>\n'
+          '      <span> Ipsum</span>\n'
           '    </p>',
+      lineLength: 20,
     );
 
     testOutput(
-      'formatted text',
-      input: p([text('A $_\nB $_\nC')]),
+      'formats formatted text',
+      input: p([Component.text('A\nB\nC')]),
       output:
           '<p>\n'
-          '      A $_\n'
-          '      B $_\n'
+          '      A\n'
+          '      B\n'
           '      C\n'
           '    </p>',
+      lineLength: 30,
     );
 
     testOutput(
-      'unformatted text',
+      'formats unformatted text',
       input: div([
-        span([text('A $_\nB $_\nC')]),
-        b([text('D $_')]),
+        span([Component.text('A\nB\nC')]),
+        b([Component.text('D')]),
       ]),
       output:
           '<div>\n'
-          '      <span>A $_\n'
-          'B $_\n'
+          '      <span>A\n'
+          'B\n'
           'C</span>\n'
-          '      <b>D $_</b>\n'
+          '      <b>D</b>\n'
           '    </div>',
+      lineLength: 30,
     );
 
     testOutput(
-      'with fragments',
+      'formats content with fragments',
       input: div([
-        fragment([
-          p([text('A $_ ')]),
-          fragment([]),
-          fragment([
-            p([text('B $_ ')]),
+        Component.fragment([
+          p([Component.text('Hello ')]),
+          Component.fragment([]),
+          Component.fragment([
+            p([Component.text('World ')]),
             p([
-              fragment([text('C $_ ')]),
+              Component.fragment([Component.text('Test ')]),
             ]),
           ]),
         ]),
         div([
-          fragment([
-            fragment([
-              p([text('D $_ ')]),
-              p([text('E $_ ')]),
+          Component.fragment([
+            Component.fragment([
+              p([Component.text('Lorem ')]),
+              p([Component.text('Ipsum ')]),
             ]),
           ]),
         ]),
       ]),
       output:
           '<div>\n'
-          '      <p>A ---------------------------------------- </p>\n'
-          '      <p>B ---------------------------------------- </p>\n'
-          '      <p>C ---------------------------------------- </p>\n'
+          '      <p>Hello </p>\n'
+          '      <p>World </p>\n'
+          '      <p>Test </p>\n'
           '      <div>\n'
-          '        <p>D ---------------------------------------- </p>\n'
-          '        <p>E ---------------------------------------- </p>\n'
+          '        <p>Lorem </p>\n'
+          '        <p>Ipsum </p>\n'
           '      </div>\n'
           '    </div>',
+      lineLength: 20,
     );
 
     testOutput(
-      'with preformatted html',
+      'formats content with preformatted html',
       input: div([
-        text('\n   '),
-        p([text('\n      '), text('Hello'), text('\n   ')]),
-        text('\n'),
+        Component.text('\n   '),
+        p([Component.text('\n      '), Component.text('Hello'), Component.text('\n   ')]),
+        Component.text('\n'),
       ]),
       output:
           '<div>\n'
@@ -168,6 +179,21 @@ void main() {
           '      Hello\n'
           '   </p>\n'
           '</div>',
+      lineLength: 30,
+    );
+
+    testOutput(
+      'formats empty content',
+      input: div([
+        span([Component.text('')]),
+        Component.text('Hello'),
+        b([]),
+        Component.text(''),
+        Component.fragment([Component.text('')]),
+        Component.fragment([]),
+      ]),
+      output: '<div><span></span>Hello<b></b></div>',
+      lineLength: 30,
     );
   });
 }

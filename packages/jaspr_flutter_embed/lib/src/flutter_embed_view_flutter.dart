@@ -1,12 +1,21 @@
 import 'package:flutter/widgets.dart' as flt;
-import 'package:jaspr/browser.dart';
+import 'package:jaspr/client.dart';
+import 'package:jaspr/dom.dart';
 import 'package:web/web.dart' as web;
 
 import 'run_flutter_app.dart';
 import 'view_constraints.dart';
 
 class FlutterEmbedView extends StatefulComponent {
-  const FlutterEmbedView({this.id, this.classes, this.styles, this.constraints, this.loader, this.widget, super.key});
+  const FlutterEmbedView({
+    this.id,
+    this.classes,
+    this.styles,
+    this.constraints,
+    this.loader,
+    this.widget,
+    super.key,
+  });
 
   final flt.Widget? widget;
   final Component? loader;

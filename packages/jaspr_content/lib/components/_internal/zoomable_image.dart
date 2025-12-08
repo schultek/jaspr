@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' hide Document;
 
@@ -41,7 +42,7 @@ class ZoomableImage extends StatefulComponent {
       css('img').styles(
         position: Position.absolute(),
         cursor: Cursor.zoomOut,
-        transition: Transition('transform', duration: 300),
+        transition: Transition('transform', duration: 300.ms),
         raw: {'transform-origin': 'top left'},
       ),
     ]),
@@ -61,8 +62,8 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
   bool zoomed = false;
   bool isResize = false;
 
-  var sourceOffset = (x: 0.0, y: 0.0, scale: 1.0);
-  var targetOffset = (x: 0.0, y: 0.0, width: 0.0, height: 0.0);
+  ({double scale, double x, double y}) sourceOffset = (x: 0.0, y: 0.0, scale: 1.0);
+  ({double height, double width, double x, double y}) targetOffset = (x: 0.0, y: 0.0, width: 0.0, height: 0.0);
 
   @override
   void initState() {
@@ -168,13 +169,13 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
         src: component.src,
         alt: component.alt ?? component.caption,
         styles: zoomed ? Styles(visibility: Visibility.hidden) : null,
-        events: events<void, void>(
+        events: events<void>(
           onClick: () {
             zoomIn();
           },
         ),
       ),
-      if (component.caption != null) figcaption([text(component.caption!)]),
+      if (component.caption != null) figcaption([Component.text(component.caption!)]),
     ]);
   }
 

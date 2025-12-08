@@ -90,8 +90,8 @@
           "href": "/get_started/cli"
         },
         {
-          "title": "\uD83D\uDCE6 Project Structure",
-          "href": "/get_started/project_structure"
+          "title": "\uD83D\uDCE6 Configuration",
+          "href": "/get_started/configuration"
         },
         {
           "title": "\uD83E\uDDF9 Linting",
@@ -225,6 +225,10 @@
         {
           "title": "FlutterEmbedView",
           "href": "/api/components/flutter_embed_view"
+        },
+        {
+          "title": "JasprBadge",
+          "href": "/api/components/jaspr_badge"
         }
       ]
     },
@@ -436,6 +440,10 @@
           "href": "/content/components/tabs"
         },
         {
+          "title": "FileTree",
+          "href": "/content/components/file_tree"
+        },
+        {
           "title": "DropCap",
           "href": "/content/components/drop_cap"
         },
@@ -449,6 +457,10 @@
       "tab": "releases",
       "group": "Releases",
       "pages": [
+        {
+          "title": "0.22.0",
+          "href": "/releases/v/0.22.0"
+        },
         {
           "title": "0.21.0",
           "href": "/releases/v/0.21.0"
@@ -469,7 +481,7 @@
   "search": {
     "docsearch": {
       "appId": "A6YJMZH2L6",
-      "apiKey": "aa977d1652ca7298a86b1e0527fbd59b",
+      "apiKey": "fc0396527fd1f9eb22ed3197c6fe72fe",
       "indexName": "jaspr"
     }
   }

@@ -4,6 +4,8 @@ part of 'theme.dart';
 class ContentTypography {
   const ContentTypography({required this.styles, required this.rules});
 
+  const ContentTypography.none() : styles = const Styles(), rules = const [];
+
   static final ContentTypography base = _baseContentTypography;
 
   final Styles styles;
@@ -65,7 +67,7 @@ final List<StyleRule> _contentStyles = [
   css('ul > li::marker').styles(color: ContentColors.bullets),
   css('dt').styles(color: ContentColors.headings, fontWeight: FontWeight.w600),
   css('hr').styles(
-    border: Border(color: ContentColors.hr),
+    border: Border.all(color: ContentColors.hr),
     raw: {'border-top-width': '1px'},
   ),
   css('blockquote').styles(
@@ -108,7 +110,7 @@ final List<StyleRule> _contentStyles = [
   ),
   css('pre code').styles(
     backgroundColor: Colors.transparent,
-    border: Border(width: Unit.zero),
+    border: Border.all(width: Unit.zero),
     radius: BorderRadius.circular(Unit.zero),
     padding: Padding.zero,
     fontWeight: FontWeight.inherit,

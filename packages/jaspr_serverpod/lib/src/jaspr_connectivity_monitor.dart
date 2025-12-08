@@ -16,8 +16,8 @@ class JasprConnectivityMonitor extends ConnectivityMonitor {
     });
   }
 
-  late StreamSubscription _onlineSub;
-  late StreamSubscription _offlineSub;
+  late final StreamSubscription<void> _onlineSub;
+  late final StreamSubscription<void> _offlineSub;
 
   @override
   void dispose() {

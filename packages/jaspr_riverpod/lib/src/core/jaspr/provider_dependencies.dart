@@ -10,11 +10,11 @@ class ProviderDependencies {
 
   ProviderContainer? listenedContainer;
 
-  Map<ProviderListenable, ProviderSubscription> watchers = {};
-  Map<ProviderListenable, ProviderSubscription> listeners = {};
+  Map<ProviderListenable<Object?>, ProviderSubscription<Object?>> watchers = {};
+  Map<ProviderListenable<Object?>, ProviderSubscription<Object?>> listeners = {};
 
-  Map<ProviderListenable, ProviderSubscription> oldWatchers = {};
-  Map<ProviderListenable, ProviderSubscription> oldListeners = {};
+  Map<ProviderListenable<Object?>, ProviderSubscription<Object?>> oldWatchers = {};
+  Map<ProviderListenable<Object?>, ProviderSubscription<Object?>> oldListeners = {};
 
   void didRebuild() {
     var oldSubscriptions = [...oldWatchers.values, ...oldListeners.values];
@@ -52,15 +52,14 @@ class ProviderDependencies {
     var container = checkContainer();
 
     if (!watchers.containsKey(target)) {
-      if (oldWatchers.containsKey(target)) {
-        watchers[target] = oldWatchers.remove(target)!;
+      if (oldWatchers.remove(target) case final oldTargetWatcher?) {
+        watchers[target] = oldTargetWatcher;
       } else {
-        // create a new [ProviderSubscription] and add it to the dependencies
-
+        // Create a new [ProviderSubscription] and add it to the dependencies.
         var subscription = container.listen<T>(target, (_, v) {
           if (watchers[target] == null && oldWatchers[target] == null) return;
 
-          // trigger a rebuild for this dependent
+          // Trigger a rebuild for this dependent.
           dependent.markNeedsBuild();
         });
 
@@ -68,7 +67,7 @@ class ProviderDependencies {
       }
     }
 
-    return watchers[target]!.readSafe().valueOrProviderException;
+    return watchers[target]!.readSafe().valueOrProviderException as T;
   }
 
   void listen<T>(

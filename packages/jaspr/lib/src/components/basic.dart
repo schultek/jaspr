@@ -36,11 +36,11 @@ import '../framework/framework.dart';
 /// creating a child directly, without an intervening component, is the
 /// extra [BuildContext] element that the additional component adds. This
 /// is particularly noticeable when the tree contains an inherited
-/// component that is referred to by a method like [Scaffold.of],
-/// which visits the child component's BuildContext ancestors.
+/// component that is referred to by a method like `Scaffold.of`,
+/// which visits the child component's [BuildContext] ancestors.
 ///
 /// In the following example the button's `onPressed` callback is unable
-/// to find the enclosing [ScaffoldState] with [Scaffold.of]:
+/// to find the enclosing `ScaffoldState` with `Scaffold.of`:
 ///
 /// ```dart
 /// Component build(BuildContext context) {
@@ -60,7 +60,7 @@ import '../framework/framework.dart';
 /// ```
 ///
 /// A [Builder] component introduces an additional [BuildContext] element
-/// and so the [Scaffold.of] method succeeds.
+/// and so the `Scaffold.of` method succeeds.
 ///
 /// ```dart
 /// Component build(BuildContext context) {

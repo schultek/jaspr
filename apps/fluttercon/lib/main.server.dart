@@ -1,0 +1,26 @@
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/server.dart';
+
+import 'app.dart';
+import 'main.server.options.dart';
+
+void main() {
+  Jaspr.initializeApp(options: defaultServerOptions);
+
+  runApp(
+    Document(
+      title: 'Fluttercon Berlin 2024',
+      styles: [
+        css.import('fonts/fonts.css'),
+        css('html, body').styles(
+          width: 100.percent,
+          minHeight: 100.vh,
+          padding: .zero,
+          margin: .zero,
+          fontFamily: const .list([FontFamily('Roboto'), FontFamilies.sansSerif]),
+        ),
+      ],
+      body: App(),
+    ),
+  );
+}

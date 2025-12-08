@@ -1,15 +1,13 @@
 include: package:flutter_lints/flutter.yaml
 
-# TODO: Reenable once migrated to analyzer v8.
-#analyzer:
-#  plugins:
-#    - custom_lint
-
 linter:
   rules:
-    sort_pub_dependencies: true
-    prefer_relative_imports: true
     directives_ordering: true
+    prefer_relative_imports: true
+    sort_pub_dependencies: true
+    strict_top_level_inference: true
+    unnecessary_underscores: true
+    use_null_aware_elements: true
 
 formatter:
   page_width: 120

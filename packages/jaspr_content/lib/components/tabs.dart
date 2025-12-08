@@ -1,11 +1,12 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../jaspr_content.dart';
 import '_internal/tab_bar.dart';
 
 /// A tabs component.
-class Tabs implements CustomComponent {
-  const Tabs();
+class Tabs extends CustomComponent {
+  const Tabs() : super.base();
 
   static Component from({String? defaultValue, required List<TabItem> items, Key? key}) {
     return _Tabs(defaultValue: defaultValue, items: items, key: key);
@@ -83,7 +84,7 @@ class TabItem extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return Component.fragment([
-      span(classes: 'tab-item', [text(label)]),
+      span(classes: 'tab-item', [Component.text(label)]),
       child,
     ]);
   }

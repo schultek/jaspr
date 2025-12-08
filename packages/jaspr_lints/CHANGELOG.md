@@ -1,3 +1,8 @@
+## Blocked Unreleased breaking
+
+- **Breaking** Removed `custom_lint` dependency and migrated to new `analysis_server_plugin`.
+  Changes in `analysis_options.yaml` are needed, see [Using plugins](https://github.com/dart-lang/sdk/blob/main/pkg/analysis_server_plugin/doc/using_plugins.md).
+
 ## 0.5.1
 
 - Fixed conflicting analysis error for "Sort children last" quick fix.

@@ -19,7 +19,7 @@ Add the following to the bottom of `pubspec.yaml`:
 ```yaml
 jaspr:
   mode: server
-  dev-command: dart bin/main.dart --apply-migrations
+  port: 8082
 ```
 
 Move everything from `web/static/` up to `web/`:
@@ -30,23 +30,31 @@ rm -d web/static/
 
 > You can also delete the `web/templates/` directory if you don't need it.
 
+Finally rename `lib/server.dart` to `lib/main.server.dart` and delete `bin/main.dart`.
+
 ## Route Setup
 
-Now edit your `lib/server.dart` to initialize Jaspr and use `RootRoute()` for all paths:
+Edit your `lib/main.server.dart` to:
+
+- import `package:jaspr/server.dart`,
+- contain the `main()` method (previously named `run()`),
+- initialize Jaspr and
+- use `RootRoute()` for all paths.
 
 ```dart
-import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart';
 
 // This file will be generated when running `jaspr serve` later.
-import 'jaspr_options.dart';
+import 'main.server.options.dart';
 
 // ... Other imports
 
-void run(List<String> args) async {
+// Renamed from `run` to `main`.
+void main(List<String> args) async {
   
   // ... Other serverpod code
 
-  Jaspr.initializeApp(options: defaultJasprOptions, useIsolates: false);
+  Jaspr.initializeApp(options: defaultServerOptions);
   
   // If you need other special routes, like authentication redirects, 
   // add them here.
@@ -63,13 +71,14 @@ void run(List<String> args) async {
 
 ```
 
-> The 'lib/jaspr_options.dart' file will be generated when you first run `jaspr serve`.
+> The 'lib/main.server.options.dart' file will be generated when you first run `jaspr serve`.
 
 Then change your root route inside `lib/src/web/routes/root.dart` to this:
 
 ```dart
 import 'dart:io';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_serverpod/jaspr_serverpod.dart';
 import 'package:serverpod/serverpod.dart';
@@ -95,6 +104,7 @@ class RootRoute extends JasprRoute {
 Next create the `Home` component inside `lib/components/home.dart`:
 
 ```dart
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 
 import 'counter.dart';
@@ -143,6 +153,7 @@ class Home extends StatelessComponent {
 As well as the `Counter` component in `lib/components/counter.dart`:
 
 ```dart
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 @client
@@ -174,8 +185,53 @@ class _CounterState extends State<Counter> {
 
 > All Jaspr components must be kept outside the `src/` directory to function properly!
 
+## Client Setup
+
+Finally, to setup hydration on the client, create a `lib/main.client.dart` file with the following content:
+
+```dart
+// The entrypoint for the **client** environment.
+//
+// The [main] method will only be executed on the client after loading the page.
+
+// Client-specific Jaspr import.
+import 'package:jaspr/client.dart';
+
+// This file is generated automatically by Jaspr, do not remove or edit.
+import 'main.client.options.dart';
+
+void main() {
+  // Initializes the client environment with the generated default options.
+  Jaspr.initializeApp(
+    options: defaultClientOptions,
+  );
+
+  // Starts the app.
+  //
+  // [ClientApp] automatically loads and renders all components annotated with @client.
+  //
+  // You can wrap this with additional [InheritedComponent]s to share state across multiple
+  // @client components if needed.
+  runApp(
+    const ClientApp(),
+  );
+}
+```
+
 ---
 
 You are now set to run your server and render your website using Serverpod and Jaspr. 
+
+To start **both** the Jaspr development server and run Serverpod in debug mode, use the following command:
+
+```shell
+jaspr serve
+```
+
+To pass command line arguments to your serverpod server (like `--apply-migrations`) add an additional `--` before the arguments:
+
+```shell
+jaspr serve -- --apply-migrations
+```
 
 Check the [Jaspr Docs](https://docs.jaspr.site) and [Serverpod Docs](https://docs.serverpod.dev/) for more information.

@@ -1,6 +1,6 @@
 part of 'framework.dart';
 
-/// A [Key] is an identifier for [Component]s, [Element]s and [SemanticsNode]s.
+/// A [Key] is an identifier for [Component]s and [Element]s.
 ///
 /// A new component will only be used to update an existing element if its key is
 /// the same as the key of the current component associated with the element.
@@ -360,10 +360,11 @@ class GlobalNodeKey<T extends web.Node> extends GlobalKey {
 
   /// The [web.Node] for the component in the tree that currently has this global key.
   ///
-  /// The current node is null if (1) the current environment is not web, (2) there is no component
-  /// in the tree that matches this global key, or (3) its element is not a [RenderObjectElement].
+  /// The current node is null if (1) the current environment is not web, or (2) there is no component
+  /// in the tree that matches this global key.
   T? get currentNode => switch (_currentElement) {
     RenderObjectElement(renderObject: RenderObject(:final T node)) => node,
+    Element(slot: ElementSlot(target: RenderObjectElement(renderObject: RenderObject(:final T node)))) => node,
     _ => null,
   };
 }
