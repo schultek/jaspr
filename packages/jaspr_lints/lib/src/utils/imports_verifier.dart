@@ -98,7 +98,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
 
   void _recordIfExtensionMember(Element? element) {
     if (element != null) {
-      var enclosingElement = element.enclosingElement;
+      final enclosingElement = element.enclosingElement;
       if (enclosingElement is ExtensionElement) {
         _recordUsedExtension(enclosingElement);
       }
@@ -120,9 +120,9 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (importPrefix != null) {
-      var prefixElement = importPrefix.element;
+      final prefixElement = importPrefix.element;
       if (prefixElement is PrefixElement) {
-        var map = usedElements.prefixMap[prefixElement] ??= [];
+        final map = usedElements.prefixMap[prefixElement] ??= [];
         if (element != null) {
           map.add(element);
         }
@@ -137,9 +137,9 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
   bool _recordPrefixMap(SimpleIdentifier identifier, Element element) {
     bool recordIfTargetIsPrefixElement(Expression? target) {
       if (target is SimpleIdentifier) {
-        var targetElement = target.element;
+        final targetElement = target.element;
         if (targetElement is PrefixElement) {
-          List<Element> prefixedElements = usedElements.prefixMap.putIfAbsent(targetElement, () => <Element>[]);
+          final List<Element> prefixedElements = usedElements.prefixMap.putIfAbsent(targetElement, () => <Element>[]);
           prefixedElements.add(element);
           return true;
         }
@@ -147,7 +147,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
       return false;
     }
 
-    var parent = identifier.parent;
+    final parent = identifier.parent;
     if (parent is MethodInvocation && parent.methodName == identifier) {
       return recordIfTargetIsPrefixElement(parent.target);
     }
@@ -160,7 +160,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
   /// Records use of an unprefixed [element].
   void _recordUsedElement(Element element) {
     // Ignore if an unknown library.
-    var containingLibrary = element.library;
+    final containingLibrary = element.library;
     if (containingLibrary == null) {
       return;
     }
@@ -195,7 +195,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
     if (_recordPrefixMap(identifier, element)) {
       return;
     }
-    var enclosingElement = element.enclosingElement;
+    final enclosingElement = element.enclosingElement;
     if (enclosingElement is LibraryElement) {
       _recordUsedElement(element);
     } else if (enclosingElement is ExtensionElement) {
@@ -206,10 +206,10 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
     } else if (element is MultiplyDefinedElement) {
       // If the element is multiply defined then call this method recursively
       // for each of the conflicting elements.
-      List<Element> conflictingElements = element.conflictingElements;
-      int length = conflictingElements.length;
+      final List<Element> conflictingElements = element.conflictingElements;
+      final int length = conflictingElements.length;
       for (int i = 0; i < length; i++) {
-        Element elt = conflictingElements[i];
+        final Element elt = conflictingElements[i];
         _visitIdentifier(identifier, elt);
       }
     }

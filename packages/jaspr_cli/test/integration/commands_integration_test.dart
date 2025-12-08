@@ -17,8 +17,8 @@ import 'variants.dart';
 
 void main() {
   group('commands', () {
-    var dirs = setupTempDirs();
-    var runner = setupRunner();
+    final dirs = setupTempDirs();
+    final runner = setupRunner();
 
     for (var variant in allVariants) {
       test(variant.name, tags: ['cli', variant.tag], () async {
@@ -31,7 +31,7 @@ void main() {
         // Override jaspr dependencies from path.
         await bootstrap(variant, dirs.root());
 
-        var serveResult = runner.run('serve -v', dir: dirs.app, checkExitCode: false);
+        final serveResult = runner.run('serve -v', dir: dirs.app, checkExitCode: false);
 
         // Wait until server is started.
         await Future<void>.delayed(Duration(seconds: 10));
@@ -43,7 +43,7 @@ void main() {
           await Future<void>.delayed(Duration(seconds: 5));
         }
 
-        var paths = variant.resources;
+        final paths = variant.resources;
         for (var path in paths) {
           await expectLater(
             http.get(Uri.parse(p.url.join('http://localhost:8080', path))).then((r) {
@@ -76,17 +76,17 @@ void main() {
 }
 
 Future<void> bootstrap(TestVariant variant, Directory dir) async {
-  var jasprDir = (Process.runSync('git', ['rev-parse', '--show-toplevel'], runInShell: true).stdout as String).trim();
+  final jasprDir = (Process.runSync('git', ['rev-parse', '--show-toplevel'], runInShell: true).stdout as String).trim();
 
-  var overrides = File(p.join(dir.path, 'myapp', 'pubspec_overrides.yaml'));
+  final overrides = File(p.join(dir.path, 'myapp', 'pubspec_overrides.yaml'));
   overrides.createSync();
   overrides.writeAsString(
     jsonEncode({
       'dependency_overrides': {
-        'jaspr': {"path": p.join(jasprDir, 'packages', 'jaspr')},
-        'jaspr_builder': {"path": p.join(jasprDir, 'packages', 'jaspr_builder')},
-        'jaspr_lints': {"path": p.join(jasprDir, 'packages', 'jaspr_lints')},
-        for (var package in variant.packages) p.basename(package): {"path": p.join(jasprDir, package)},
+        'jaspr': {'path': p.join(jasprDir, 'packages', 'jaspr')},
+        'jaspr_builder': {'path': p.join(jasprDir, 'packages', 'jaspr_builder')},
+        'jaspr_lints': {'path': p.join(jasprDir, 'packages', 'jaspr_lints')},
+        for (var package in variant.packages) p.basename(package): {'path': p.join(jasprDir, package)},
       },
     }),
   );
@@ -95,7 +95,7 @@ Future<void> bootstrap(TestVariant variant, Directory dir) async {
 }
 
 TestRunner setupRunner() {
-  TestRunner runner = TestRunner();
+  final TestRunner runner = TestRunner();
 
   setUp(() {
     runner.setup();
@@ -115,7 +115,7 @@ class TestRunner {
     return await IOOverrides.runZoned(
       getCurrentDirectory: dir,
       () async {
-        var res = await runner.run(command.split(' '));
+        final res = await runner.run(command.split(' '));
         if (checkExitCode) {
           expect(res, equals(0));
         }

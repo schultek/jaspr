@@ -36,7 +36,7 @@ void main() {
       expect(find.byType(Child), findsOneComponent);
       expect(find.tag('div'), findsNothing);
 
-      var state = (find.byType(Child).evaluate().first as StatefulElement).state as ChildState;
+      final state = (find.byType(Child).evaluate().first as StatefulElement).state as ChildState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));

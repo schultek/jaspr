@@ -15,8 +15,8 @@ abstract class WrapWithAssist extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     if (node
-        case NamedType(parent: ConstructorName(parent: InstanceCreationExpression node)) ||
-            SimpleIdentifier(parent: ConstructorName(parent: InstanceCreationExpression node))) {
+        case NamedType(parent: ConstructorName(parent: final InstanceCreationExpression node)) ||
+            SimpleIdentifier(parent: ConstructorName(parent: final InstanceCreationExpression node))) {
       if (!isComponentType(node.staticType)) {
         return;
       }
@@ -100,15 +100,15 @@ class RemoveComponent extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     if (node
-        case NamedType(parent: ConstructorName(parent: InstanceCreationExpression node)) ||
-            SimpleIdentifier(parent: ConstructorName(parent: InstanceCreationExpression node))) {
+        case NamedType(parent: ConstructorName(parent: final InstanceCreationExpression node)) ||
+            SimpleIdentifier(parent: ConstructorName(parent: final InstanceCreationExpression node))) {
       if (!isComponentType(node.staticType)) {
         return;
       }
 
       final indent = utils.getLinePrefix(node.offset);
 
-      var children = <AstNode>[
+      final children = <AstNode>[
         for (var arg in node.argumentList.arguments)
           if (arg is NamedExpression)
             if (arg.name.label.name == 'child' && isComponentType(arg.staticType))
@@ -128,8 +128,8 @@ class RemoveComponent extends ResolvedCorrectionProducer {
       if (children.length == 1 && children.single is Expression) {
         await builder.addDartFileEdit(file, (builder) {
           builder.addReplacement(node.sourceRange, (edit) {
-            var child = children.first;
-            var childIndent = utils.getLinePrefix(child.offset);
+            final child = children.first;
+            final childIndent = utils.getLinePrefix(child.offset);
             edit.write(getRangeText(child.sourceRange).reIndent(indent.length - childIndent.length, skipFirst: true));
           });
         });
@@ -137,8 +137,8 @@ class RemoveComponent extends ResolvedCorrectionProducer {
         await builder.addDartFileEdit(file, (builder) {
           builder.addReplacement(node.sourceRange, (edit) {
             for (var child in children) {
-              var childIndent = utils.getLinePrefix(child.offset);
-              var source = getRangeText(
+              final childIndent = utils.getLinePrefix(child.offset);
+              final source = getRangeText(
                 child.sourceRange,
               ).reIndent(indent.length - childIndent.length, skipFirst: true);
 
@@ -175,8 +175,8 @@ class ExtractComponent extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     if (node
-        case NamedType(parent: ConstructorName(parent: InstanceCreationExpression node)) ||
-            SimpleIdentifier(parent: ConstructorName(parent: InstanceCreationExpression node))) {
+        case NamedType(parent: ConstructorName(parent: final InstanceCreationExpression node)) ||
+            SimpleIdentifier(parent: ConstructorName(parent: final InstanceCreationExpression node))) {
       if (!isComponentType(node.staticType)) {
         return;
       }

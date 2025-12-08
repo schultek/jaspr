@@ -44,14 +44,14 @@ class ClientComponentRegistryElement extends ObserverElement {
 
   @override
   void didRebuildElement(Element element) {
-    var binding = this.binding as ServerAppBinding;
+    final binding = this.binding as ServerAppBinding;
 
     if (!_didAddClientScript && binding.options.clientId != null) {
       (binding).addRenderAdapter(ClientScriptAdapter(binding.options.clientId!));
       _didAddClientScript = true;
     }
 
-    var entry = binding.options.clients?[element.component.runtimeType];
+    final entry = binding.options.clients?[element.component.runtimeType];
 
     if (entry == null) {
       return;

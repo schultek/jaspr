@@ -9,7 +9,7 @@ import 'package:universal_web/web.dart';
 void main() {
   group('forms', () {
     testClient('controlled input value', (tester) async {
-      String text = "Hello";
+      String text = 'Hello';
       late void Function(void Function() cb) setState;
 
       tester.pumpComponent(
@@ -26,7 +26,7 @@ void main() {
       expect(node.value, text);
 
       setState(() {
-        text = "World";
+        text = 'World';
       });
 
       await pumpEventQueue();
@@ -87,14 +87,14 @@ void main() {
     });
 
     testClient('controlled select option', (tester) async {
-      String value = "a";
+      String value = 'a';
       late void Function(void Function() cb) setState;
 
       tester.pumpComponent(
         StatefulBuilder(
           builder: (context, set) {
             setState = set;
-            return select(value: value, [option(value: "a", []), option(value: "b", [])]);
+            return select(value: value, [option(value: 'a', []), option(value: 'b', [])]);
           },
         ),
       );
@@ -104,7 +104,7 @@ void main() {
       expect(node.value, value);
 
       setState(() {
-        value = "b";
+        value = 'b';
       });
 
       await pumpEventQueue();

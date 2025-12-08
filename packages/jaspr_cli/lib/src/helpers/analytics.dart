@@ -81,7 +81,7 @@ Future<void> trackEvent(String command, {String? projectName, String? projectMod
 }
 
 String randomId() {
-  var random = Random();
-  var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  final random = Random();
+  final chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   return List.generate(16, (index) => chars[random.nextInt(chars.length)]).join();
 }

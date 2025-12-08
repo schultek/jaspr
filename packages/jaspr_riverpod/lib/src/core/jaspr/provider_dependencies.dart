@@ -17,7 +17,7 @@ class ProviderDependencies {
   Map<ProviderListenable<Object?>, ProviderSubscription<Object?>> oldListeners = {};
 
   void didRebuild() {
-    var oldSubscriptions = [...oldWatchers.values, ...oldListeners.values];
+    final oldSubscriptions = [...oldWatchers.values, ...oldListeners.values];
     for (var subscription in oldSubscriptions) {
       subscription.close();
     }
@@ -29,7 +29,7 @@ class ProviderDependencies {
   }
 
   void deactivate() {
-    var allSubscriptions = [...watchers.values, ...oldWatchers.values, ...listeners.values, ...oldListeners.values];
+    final allSubscriptions = [...watchers.values, ...oldWatchers.values, ...listeners.values, ...oldListeners.values];
     for (var subscription in allSubscriptions) {
       subscription.close();
     }
@@ -41,7 +41,7 @@ class ProviderDependencies {
   }
 
   ProviderContainer checkContainer() {
-    var container = ProviderScope.containerOf(dependent);
+    final container = ProviderScope.containerOf(dependent);
     if (listenedContainer != null && listenedContainer != container) {
       deactivate();
     }
@@ -49,14 +49,14 @@ class ProviderDependencies {
   }
 
   T watch<T>(ProviderListenable<T> target) {
-    var container = checkContainer();
+    final container = checkContainer();
 
     if (!watchers.containsKey(target)) {
       if (oldWatchers.remove(target) case final oldTargetWatcher?) {
         watchers[target] = oldTargetWatcher;
       } else {
         // Create a new [ProviderSubscription] and add it to the dependencies.
-        var subscription = container.listen<T>(target, (_, v) {
+        final subscription = container.listen<T>(target, (_, v) {
           if (watchers[target] == null && oldWatchers[target] == null) return;
 
           // Trigger a rebuild for this dependent.
@@ -76,7 +76,7 @@ class ProviderDependencies {
     void Function(Object error, StackTrace stackTrace)? onError,
     bool fireImmediately = false,
   }) {
-    var container = checkContainer();
+    final container = checkContainer();
 
     // close any existing listeners for the same provider
     if (listeners.containsKey(target)) {
@@ -89,7 +89,7 @@ class ProviderDependencies {
       fireImmediately = false;
     }
 
-    var subscription = container.listen(target, listener, fireImmediately: fireImmediately, onError: onError);
+    final subscription = container.listen(target, listener, fireImmediately: fireImmediately, onError: onError);
 
     listeners[target] = subscription;
   }

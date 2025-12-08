@@ -152,7 +152,7 @@ class StatelessElement extends BuildableElement {
     // which will delay the call to [build()] until resolved during the first build.
 
     if (owner.isFirstBuild && !binding.isClient && component is OnFirstBuild) {
-      var result = (component as OnFirstBuild).onFirstBuild(this);
+      final result = (component as OnFirstBuild).onFirstBuild(this);
       if (result is Future<void>) {
         _asyncFirstBuild = result;
       }

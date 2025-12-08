@@ -74,13 +74,13 @@ class Link extends StatelessComponent {
       events: {
         if (preload)
           'mouseover': (event) {
-            var router = Router.maybeOf(context);
+            final router = Router.maybeOf(context);
             if (router != null) {
               router.preload(to);
             }
           },
         'click': (event) {
-          var router = Router.maybeOf(context);
+          final router = Router.maybeOf(context);
           if (router != null) {
             event.preventDefault();
             if (!replace) {

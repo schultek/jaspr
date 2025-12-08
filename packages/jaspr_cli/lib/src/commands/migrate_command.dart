@@ -80,7 +80,7 @@ class MigrateCommand extends BaseCommand {
     final currentJasprVersion =
         currentVersion ??
         switch (project.pubspecLock) {
-          {'packages': {'jaspr': {'version': String version}}} => version,
+          {'packages': {'jaspr': {'version': final String version}}} => version,
           _ => '',
         };
 
@@ -106,7 +106,7 @@ class MigrateCommand extends BaseCommand {
 
     logger.write('Checking for migrations from $currentJasprVersion to $targetJasprVersion...', level: Level.info);
 
-    var migrations = allMigrations.where((m) {
+    final migrations = allMigrations.where((m) {
       return currentJasprVersion.compareTo(m.minimumJasprVersion) < 0 &&
           targetJasprVersion!.compareTo(m.minimumJasprVersion) >= 0;
     }).toList();
@@ -141,17 +141,17 @@ class MigrateCommand extends BaseCommand {
           final pubspecContent = project.pubspecFile.readAsStringSync();
           final builder = EditBuilder(LineInfo.fromContent(pubspecContent));
 
-          if (pubspecMap.nodes['dependencies'] case YamlMap dependencies) {
-            if (dependencies.nodes['jaspr'] case YamlScalar jasprNode when jasprNode.value != null) {
-              builder.replace(jasprNode.span.start.offset, jasprNode.span.length, "^$targetJasprVersion");
+          if (pubspecMap.nodes['dependencies'] case final YamlMap dependencies) {
+            if (dependencies.nodes['jaspr'] case final YamlScalar jasprNode when jasprNode.value != null) {
+              builder.replace(jasprNode.span.start.offset, jasprNode.span.length, '^$targetJasprVersion');
             }
           }
-          if (pubspecMap.nodes['dev_dependencies'] case YamlMap devDependencies) {
-            if (devDependencies.nodes['jaspr_builder'] case YamlScalar builderNode when builderNode.value != null) {
-              builder.replace(builderNode.span.start.offset, builderNode.span.length, "^$targetJasprVersion");
+          if (pubspecMap.nodes['dev_dependencies'] case final YamlMap devDependencies) {
+            if (devDependencies.nodes['jaspr_builder'] case final YamlScalar builderNode when builderNode.value != null) {
+              builder.replace(builderNode.span.start.offset, builderNode.span.length, '^$targetJasprVersion');
             }
-            if (devDependencies.nodes['jaspr_test'] case YamlScalar testNode when testNode.value != null) {
-              builder.replace(testNode.span.start.offset, testNode.span.length, "^$targetJasprVersion");
+            if (devDependencies.nodes['jaspr_test'] case final YamlScalar testNode when testNode.value != null) {
+              builder.replace(testNode.span.start.offset, testNode.span.length, '^$targetJasprVersion');
             }
           }
 
@@ -177,7 +177,7 @@ class MigrateCommand extends BaseCommand {
       if (result.migrations.isEmpty) {
         continue;
       }
-      StringBuffer output = StringBuffer();
+      final StringBuffer output = StringBuffer();
       output.write('${result.path}\n');
 
       for (final migration in result.migrations) {
@@ -191,7 +191,7 @@ class MigrateCommand extends BaseCommand {
       if (result.warnings.isEmpty) {
         continue;
       }
-      StringBuffer output = StringBuffer();
+      final StringBuffer output = StringBuffer();
       output.write('${result.path}\n');
 
       for (final warning in result.warnings) {

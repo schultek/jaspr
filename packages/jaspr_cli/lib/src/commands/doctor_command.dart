@@ -20,7 +20,7 @@ class DoctorCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
-    var sections = <DoctorSection>[];
+    final sections = <DoctorSection>[];
 
     sections.add((
       name: 'Jaspr CLI',
@@ -35,10 +35,10 @@ class DoctorCommand extends BaseCommand {
     if (project.pubspecYaml != null) {
       String? findDependency(String name, {bool reportMissing = false}) {
         var isDev = false;
-        var dependencies = project.requirePubspecYaml['dependencies'] as Map<Object?, Object?>?;
+        final dependencies = project.requirePubspecYaml['dependencies'] as Map<Object?, Object?>?;
         var dep = dependencies?[name];
         if (dep == null) {
-          var devDependencies = project.requirePubspecYaml['dev_dependencies'] as Map<Object?, Object?>?;
+          final devDependencies = project.requirePubspecYaml['dev_dependencies'] as Map<Object?, Object?>?;
           dep = devDependencies?[name];
           isDev = true;
         }
@@ -53,7 +53,7 @@ class DoctorCommand extends BaseCommand {
         }
       }
 
-      var dependencies = [
+      final dependencies = [
         findDependency('jaspr', reportMissing: true),
         findDependency('jaspr_builder'),
         findDependency('jaspr_web_compilers'),
@@ -77,7 +77,7 @@ class DoctorCommand extends BaseCommand {
     }
 
     for (var s in sections) {
-      var out = StringBuffer('${green.wrap('[✓]')} ${styleBold.wrap(lightBlue.wrap(s.name))!}');
+      final out = StringBuffer('${green.wrap('[✓]')} ${styleBold.wrap(lightBlue.wrap(s.name))!}');
       if (s.details != null) {
         out.write(' (${s.details})');
       }

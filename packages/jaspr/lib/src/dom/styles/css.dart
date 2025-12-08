@@ -124,7 +124,7 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
 
   @override
   String toCss([String indent = '']) {
-    var rules = <String>[];
+    final rules = <String>[];
 
     for (var rule in resolve('')) {
       rules.add(rule.toCss(indent));
@@ -144,7 +144,7 @@ extension SelectorResolve on Selector {
 
 extension StyleRuleResolve on StyleRule {
   List<StyleRule> resolve(String parent) {
-    var self = this;
+    final self = this;
     return switch (self) {
       NestedStyleRule() => self._resolve(parent),
       BlockStyleRule() => [self._resolve(parent)],
@@ -158,9 +158,9 @@ extension StyleRuleResolve on StyleRule {
 
 extension on NestedStyleRule {
   List<StyleRule> _resolve(String parent) {
-    var rules = <StyleRule>[];
+    final rules = <StyleRule>[];
 
-    var selector = _selector.resolve(parent);
+    final selector = _selector.resolve(parent);
 
     if (_styles.properties.isNotEmpty) {
       rules.add(StyleRule(selector: selector, styles: _styles));

@@ -71,16 +71,16 @@ class _Logger implements Logger {
       return;
     }
     if (message.contains('\n')) {
-      var lines = message.split('\n');
+      final lines = message.split('\n');
       for (var l in lines) {
         write(l, tag: tag, level: level, progress: progress);
       }
       return;
     }
 
-    var showAsProgress = !verbose && progress != null && (progress == ProgressState.running || _progress != null);
+    final showAsProgress = !verbose && progress != null && (progress == ProgressState.running || _progress != null);
 
-    String log = '${tag?.format() ?? ''}${level.format(message.trim())}';
+    final String log = '${tag?.format() ?? ''}${level.format(message.trim())}';
 
     if (showAsProgress) {
       _progress ??= logger.progress(log);
@@ -114,12 +114,12 @@ extension ServerLogger on Logger {
     if (!verbose) return;
     //if (serverLog.level < Level.INFO) return;
 
-    var buffer = StringBuffer(serverLog.message);
+    final buffer = StringBuffer(serverLog.message);
     if (serverLog.error != null) {
       buffer.writeln(serverLog.error);
     }
 
-    var log = buffer.toString();
+    final log = buffer.toString();
     if (log.trim().isEmpty) {
       return;
     }

@@ -27,8 +27,8 @@ void testClient(
         web.window.history.replaceState(null, 'Test', location);
       }
 
-      var binding = ClientAppBinding();
-      var tester = ClientTester._(binding);
+      final binding = ClientAppBinding();
+      final tester = ClientTester._(binding);
 
       await binding.runTest(() async {
         await callback(tester);
@@ -105,9 +105,9 @@ class ClientTester {
     void Function(web.Element)? before,
     bool pump = true,
   }) async {
-    var element = _findDomElement(finder);
+    final element = _findDomElement(finder);
 
-    var source = (element.renderObject as DomRenderObject).node;
+    final source = (element.renderObject as DomRenderObject).node;
     if (source.isElement) {
       before?.call(source as web.Element);
       (source as web.Element).dispatchEvent(event);
@@ -120,12 +120,12 @@ class ClientTester {
 
   @optionalTypeArgs
   T? findNode<T extends web.Node>(Finder finder) {
-    var element = _findDomElement(finder);
+    final element = _findDomElement(finder);
     return (element.renderObject as DomRenderObject).node as T?;
   }
 
   DomElement _findDomElement(Finder finder) {
-    var elements = finder.evaluate();
+    final elements = finder.evaluate();
 
     if (elements.isEmpty) {
       throw 'The finder "$finder" could not find any matching components.';
@@ -134,7 +134,7 @@ class ClientTester {
       throw 'The finder "$finder" ambiguously found multiple matching components.';
     }
 
-    var element = elements.single;
+    final element = elements.single;
 
     if (element is DomElement) {
       return element;

@@ -71,7 +71,7 @@ extension AppContext on BuildContext {
     /// Whether the cookie is available from other sites.
     SameSite? sameSite,
   }) {
-    var cookie = Cookie(name, value)
+    final cookie = Cookie(name, value)
       ..expires = expires
       ..maxAge = maxAge
       ..domain = domain
@@ -79,7 +79,7 @@ extension AppContext on BuildContext {
       ..secure = secure
       ..httpOnly = httpOnly
       ..sameSite = sameSite;
-    var cookieHeaders = _binding.responseHeaders[HttpHeaders.setCookieHeader] ??= [];
+    final cookieHeaders = _binding.responseHeaders[HttpHeaders.setCookieHeader] ??= [];
     cookieHeaders.add(cookie.toString());
   }
 

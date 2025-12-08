@@ -4,9 +4,9 @@ part of 'framework.dart';
 mixin ComponentsBinding on AppBinding {
   /// Sets [app] as the new root of the component tree and performs an initial build
   void attachRootComponent(Component app) async {
-    var buildOwner = _rootElement?._owner ?? createRootBuildOwner();
+    final buildOwner = _rootElement?._owner ?? createRootBuildOwner();
 
-    var element = _Root(child: app, rootRenderObject: createRootRenderObject()).createElement();
+    final element = _Root(child: app, rootRenderObject: createRootRenderObject()).createElement();
     element._binding = this;
     element._owner = buildOwner;
 

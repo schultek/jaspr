@@ -80,7 +80,7 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     }
 
     int? exitCode = ExitCode.unavailable.code;
-    var isVersionCommand = topLevelResults['version'] == true;
+    final isVersionCommand = topLevelResults['version'] == true;
     if (isVersionCommand) {
       _logger.info(jasprCliVersion);
       exitCode = ExitCode.success.code;
@@ -122,16 +122,16 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
 }
 
 String wrapBox(String message) {
-  var lines = message.split('\n');
-  var lengths = lines.map((l) => l.replaceAll(RegExp('\x1B\\[\\d+m'), '').length).toList();
-  var maxLength = lengths.reduce(max);
-  var buffer = StringBuffer();
-  var hborder = ''.padLeft(maxLength + 8, '═');
+  final lines = message.split('\n');
+  final lengths = lines.map((l) => l.replaceAll(RegExp('\x1B\\[\\d+m'), '').length).toList();
+  final maxLength = lengths.reduce(max);
+  final buffer = StringBuffer();
+  final hborder = ''.padLeft(maxLength + 8, '═');
   buffer.write('╔$hborder╗\n');
-  for (var (i, l) in lines.indexed) {
-    var pad = (maxLength + 8 - lengths[i]) / 2;
-    var padL = ''.padLeft(pad.floor());
-    var padR = ''.padLeft(pad.ceil());
+  for (final (i, l) in lines.indexed) {
+    final pad = (maxLength + 8 - lengths[i]) / 2;
+    final padL = ''.padLeft(pad.floor());
+    final padR = ''.padLeft(pad.ceil());
     buffer.write('║$padL$l$padR║\n');
   }
   buffer.write('╚$hborder╝');

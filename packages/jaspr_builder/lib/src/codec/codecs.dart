@@ -15,19 +15,19 @@ typedef Codecs = Map<String, CodecElement>;
 
 extension CodecLoader on BuildStep {
   Future<Codecs> loadCodecs() async {
-    var bundle = await loadBundle<CodecElement>('codec', CodecElement.deserialize).toList();
+    final bundle = await loadBundle<CodecElement>('codec', CodecElement.deserialize).toList();
     return {for (final c in bundle) c.name: c};
   }
 }
 
 extension CodecReader on Codecs {
   String getDecoderFor(DartType type, String getter) {
-    var decoder = type.acceptWithArgument(DecoderVisitor(this), getter);
+    final decoder = type.acceptWithArgument(DecoderVisitor(this), getter);
     return decoder ?? getter;
   }
 
   String getEncoderFor(DartType type, String getter) {
-    var encoder = type.acceptWithArgument(EncoderVisitor(this), getter);
+    final encoder = type.acceptWithArgument(EncoderVisitor(this), getter);
     return encoder ?? getter;
   }
 
@@ -48,15 +48,15 @@ class EncoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
   @override
   String? visitInterfaceType(InterfaceType type, String argument, [bool checkNullability = true]) {
     if (type.isDartCoreList) {
-      var nested = type.typeArguments.first.acceptWithArgument(this, 'i');
+      final nested = type.typeArguments.first.acceptWithArgument(this, 'i');
       if (nested != null) {
-        var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+        final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
         return '$argument$nullCheck.map((i) => $nested).toList()';
       }
     } else if (type.isDartCoreMap && type.typeArguments[0].isDartCoreString) {
-      var nested = type.typeArguments[1].acceptWithArgument(this, 'v');
+      final nested = type.typeArguments[1].acceptWithArgument(this, 'v');
       if (nested != null) {
-        var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+        final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
         return '$argument$nullCheck.map((k, v) => MapEntry(k, $nested))';
       }
     } else if (codecs[type.element.name] case final codec?) {
@@ -67,7 +67,7 @@ class EncoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
           return '[[${codec.import}]].${codec.extension}($argument).${codec.encoder}()';
         }
       } else {
-        var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+        final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
         return '$argument$nullCheck.${codec.encoder}()';
       }
     }
@@ -90,12 +90,12 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
   @override
   String? visitInterfaceType(InterfaceType type, String argument) {
     if (type.isDartCoreList) {
-      var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-      var base = '($argument as List<dynamic>$nullCheck)';
+      final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+      final base = '($argument as List<dynamic>$nullCheck)';
       if (type.typeArguments.first is DynamicType) {
         return base;
       }
-      var nested = type.typeArguments.first.acceptWithArgument(this, 'i');
+      final nested = type.typeArguments.first.acceptWithArgument(this, 'i');
       if (nested == 'i') {
         return '$base$nullCheck.cast<${type.typeArguments.first.getDisplayString()}>()';
       } else {
@@ -106,12 +106,12 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
         throw const InvalidParameterException();
       }
 
-      var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-      var base = '($argument as Map<String, dynamic>$nullCheck)';
+      final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+      final base = '($argument as Map<String, dynamic>$nullCheck)';
       if (type.typeArguments[1] is DynamicType) {
         return base;
       }
-      var nested = type.typeArguments[1].acceptWithArgument(this, 'v');
+      final nested = type.typeArguments[1].acceptWithArgument(this, 'v');
       if (nested == 'v') {
         return '$base$nullCheck.cast<String, ${type.typeArguments[1].getDisplayString()}>()';
       } else {
@@ -143,8 +143,8 @@ class PrefixVisitor extends UnifyingTypeVisitor<String> {
     if (codecs[type.element.name] case final codec?) {
       name = '[[${codec.typeImport ?? codec.import}]].$name';
     }
-    var nullable = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-    var args = type.typeArguments.map((t) => t.accept(this));
+    final nullable = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+    final args = type.typeArguments.map((t) => t.accept(this));
     return '$name${args.isEmpty ? '' : '<${args.join(', ')}>'}$nullable';
   }
 }

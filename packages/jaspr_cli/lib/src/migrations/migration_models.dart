@@ -151,8 +151,8 @@ class EditBuilder {
   final List<ChangeRequest> changes = [];
 
   int getLineIndent(AstNode node) {
-    var lineNumber = lineInfo.getLocation(node.offset).lineNumber - 1;
-    var lineOffset = lineInfo.getOffsetOfLine(lineNumber);
+    final lineNumber = lineInfo.getLocation(node.offset).lineNumber - 1;
+    final lineOffset = lineInfo.getOffsetOfLine(lineNumber);
     Token token = node.beginToken;
     while (token.previous != null && token.previous!.offset >= lineOffset) {
       token = token.previous!;

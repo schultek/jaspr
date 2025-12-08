@@ -12,18 +12,18 @@ void main() {
         table([
           thead([
             tr([
-              th([Component.text("Name")]),
-              th([Component.text("Age")]),
+              th([Component.text('Name')]),
+              th([Component.text('Age')]),
             ]),
           ]),
           tbody([
             tr([
-              td([Component.text("Alice")]),
-              td([Component.text("20")]),
+              td([Component.text('Alice')]),
+              td([Component.text('20')]),
             ]),
             tr([
-              td([Component.text("Bob")]),
-              td([Component.text("30")]),
+              td([Component.text('Bob')]),
+              td([Component.text('30')]),
             ]),
             tr([col(span: 2), colgroup(span: 2, [])]),
           ]),

@@ -34,7 +34,7 @@ class ServeCommand extends DevCommand {
 
   @override
   Future<int> runCommand() async {
-    var fakeInput = StreamController<Map<String, Object?>>();
+    final fakeInput = StreamController<Map<String, Object?>>();
     daemon = Daemon(fakeInput.stream, (data) {
       //print(data);
       if (data['event'] == 'client.debugPort') {

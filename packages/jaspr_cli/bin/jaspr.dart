@@ -4,7 +4,7 @@ import 'package:jaspr_cli/src/command_runner.dart';
 
 void main(List<String> args) async {
   try {
-    var result = await JasprCommandRunner().run(args);
+    final result = await JasprCommandRunner().run(args);
     await flushThenExit(result ?? 0);
   } catch (e, stackTrace) {
     stderr.writeln('Error: $e');

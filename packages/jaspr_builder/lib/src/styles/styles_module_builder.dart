@@ -36,7 +36,7 @@ class StylesModuleBuilder implements Builder {
 
   Future<void> generateStylesModule(BuildStep buildStep) async {
     // Performance optimization
-    var file = await buildStep.readAsString(buildStep.inputId);
+    final file = await buildStep.readAsString(buildStep.inputId);
     if (!file.contains('@css')) {
       return;
     }
@@ -45,26 +45,26 @@ class StylesModuleBuilder implements Builder {
       return;
     }
 
-    var library = await buildStep.inputLibrary;
+    final library = await buildStep.inputLibrary;
 
-    var annotated =
+    final annotated =
         [...library.classes, ...library.topLevelVariables]
             .expand<Element>(
               (e) => switch (e) {
-                ClassElement e => [...e.fields, ...e.getters],
-                TopLevelVariableElement e when !e.isSynthetic => [e],
-                TopLevelVariableElement e when e.isSynthetic && e.getter != null => [e.getter!],
+                final ClassElement e => [...e.fields, ...e.getters],
+                final TopLevelVariableElement e when !e.isSynthetic => [e],
+                final TopLevelVariableElement e when e.isSynthetic && e.getter != null => [e.getter!],
                 _ => [],
               },
             )
             .where((element) => stylesChecker.firstAnnotationOfExact(element) != null)
             .where((element) {
-              if (element.enclosingElement case ClassElement clazz when clazz.isPrivate || element.isPrivate) {
+              if (element.enclosingElement case final ClassElement clazz when clazz.isPrivate || element.isPrivate) {
                 log.severe(
                   '@css cannot be used on private classes or members. Failing element: ${clazz.name}.${element.name} in library ${library.firstFragment.source.fullName}.',
                 );
                 return false;
-              } else if (element.enclosingElement case ClassElement clazz
+              } else if (element.enclosingElement case final ClassElement clazz
                   when (element is FieldElement && !element.isStatic) ||
                       (element is GetterElement && !element.isStatic)) {
                 log.severe(
@@ -79,8 +79,8 @@ class StylesModuleBuilder implements Builder {
               }
 
               final type = switch (element) {
-                PropertyAccessorElement e => e.type.returnType,
-                PropertyInducingElement e => e.type,
+                final PropertyAccessorElement e => e.type.returnType,
+                final PropertyInducingElement e => e.type,
                 _ => null,
               };
 
@@ -88,7 +88,7 @@ class StylesModuleBuilder implements Builder {
                   !type.isDartCoreList ||
                   !styleRuleChecker.isAssignableFromType((type as InterfaceType).typeArguments.first)) {
                 final prefix = switch (element.enclosingElement) {
-                  ClassElement(:var name) => '$name.',
+                  ClassElement(:final name) => '$name.',
                   _ => '',
                 };
                 log.severe(
@@ -100,7 +100,7 @@ class StylesModuleBuilder implements Builder {
               return true;
             })
             .map((e) {
-              if (e.enclosingElement case ClassElement clazz) {
+              if (e.enclosingElement case final ClassElement clazz) {
                 return '${clazz.name}.${e.name}';
               } else {
                 return e.name;
@@ -114,9 +114,9 @@ class StylesModuleBuilder implements Builder {
       return;
     }
 
-    var module = StylesModule(elements: annotated, id: buildStep.inputId);
+    final module = StylesModule(elements: annotated, id: buildStep.inputId);
 
-    var outputId = buildStep.inputId.changeExtension('.styles.json');
+    final outputId = buildStep.inputId.changeExtension('.styles.json');
     await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));
   }
 }

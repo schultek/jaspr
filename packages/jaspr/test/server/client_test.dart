@@ -101,7 +101,7 @@ void main() {
     testServer('adds component markers and script', (tester) async {
       tester.pumpComponent(App1());
 
-      var response = await tester.request('/');
+      final response = await tester.request('/');
 
       expect(
         response.body,
@@ -119,7 +119,7 @@ void main() {
     testServer('adds parameters as data', (tester) async {
       tester.pumpComponent(App2(count: 1, label: 'Test'));
 
-      var response = await tester.request('/');
+      final response = await tester.request('/');
 
       expect(
         response.body,
@@ -137,7 +137,7 @@ void main() {
     testServer('adds sync marker inside of component marker', (tester) async {
       tester.pumpComponent(App3());
 
-      var response = await tester.request('/');
+      final response = await tester.request('/');
 
       expect(
         response.body,
@@ -155,7 +155,7 @@ void main() {
     testServer('adds sync marker inside of component marker with preload state', (tester) async {
       tester.pumpComponent(App4());
 
-      var response = await tester.request('/');
+      final response = await tester.request('/');
 
       expect(
         response.body,

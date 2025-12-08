@@ -46,7 +46,7 @@ void main() {
     });
 
     testClient('should find and hydrate marker', (tester) async {
-      var marker = DomValidator.clientMarkerPrefix;
+      final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
           '<div>'
                   '  <p>A</p>'
@@ -85,7 +85,7 @@ void main() {
     });
 
     testClient('should find and hydrate multiple markers with params', (tester) async {
-      var marker = DomValidator.clientMarkerPrefix;
+      final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
           '<div>'
                   '  <!--${marker}app data={"name": "A"}-->'

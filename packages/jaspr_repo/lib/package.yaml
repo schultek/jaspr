@@ -13,7 +13,9 @@ linter:
     directives_ordering: true
     eol_at_end_of_file: true
     missing_code_block_language_in_doc_comment: true
+    prefer_final_locals: true
     prefer_relative_imports: true
+    prefer_single_quotes: true
     sort_pub_dependencies: true
     strict_top_level_inference: true
     type_annotate_public_apis: true

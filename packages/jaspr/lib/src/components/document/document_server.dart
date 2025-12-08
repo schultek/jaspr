@@ -195,7 +195,7 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
 
   @override
   FutureOr<void> prepare() async {
-    var template = await (element as _TemplateDocumentElement)._templateFuture!;
+    final template = await (element as _TemplateDocumentElement)._templateFuture!;
     if (template == null) {
       throw TemplateNotFoundError((element.component as TemplateDocument).name);
     }
@@ -207,8 +207,8 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
   void applyBoundary(ChildListRange range) {
     var curr = range.start.prev!;
     range.remove();
-    var document = parse(template);
-    var target = document.querySelector((element.component as TemplateDocument).attachTo)!;
+    final document = parse(template);
+    final target = document.querySelector((element.component as TemplateDocument).attachTo)!;
 
     final MarkupRenderObject parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
 
@@ -234,7 +234,7 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
         n.children.insertNodeAfter(range);
       } else {
         for (var c in node.nodes) {
-          var o = createTree(c);
+          final o = createTree(c);
           if (o != null) {
             n.children.insertBefore(o);
           }
@@ -245,9 +245,9 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
     }
 
     for (var n in document.nodes) {
-      var o = createTree(n);
+      final o = createTree(n);
       if (o != null) {
-        var next = ChildNodeData(o);
+        final next = ChildNodeData(o);
         curr.insertNext(next);
         curr = next;
       }
@@ -313,11 +313,11 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
       return;
     }
 
-    var binding = (context.binding as ServerAppBinding);
-    var adapter = _attach[binding] ??= AttachAdapter();
+    final binding = (context.binding as ServerAppBinding);
+    final adapter = _attach[binding] ??= AttachAdapter();
     binding.addRenderAdapter(adapter);
 
-    var entry = adapter.entries[item.target] ??= (attributes: {}, children: []);
+    final entry = adapter.entries[item.target] ??= (attributes: {}, children: []);
     if (item.attributes != null) {
       entry.attributes.addAll(item.attributes!);
     }
@@ -334,15 +334,15 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
 
     String? keyFor(MarkupRenderObject n) {
       return switch (n) {
-        MarkupRenderElement(id: String id) when id.isNotEmpty => id,
-        MarkupRenderElement(tag: "title" || "base") => '__${n.tag}',
-        MarkupRenderElement(tag: "meta", attributes: {'name': String name}) => '__meta:$name',
+        MarkupRenderElement(id: final String id) when id.isNotEmpty => id,
+        MarkupRenderElement(tag: 'title' || 'base') => '__${n.tag}',
+        MarkupRenderElement(tag: 'meta', attributes: {'name': final String name}) => '__meta:$name',
         _ => null,
       };
     }
 
     for (final MapEntry(:key, :value) in entries.entries) {
-      var target = switch (key) {
+      final target = switch (key) {
         'html' => html,
         'head' => head,
         'body' => body,
@@ -356,8 +356,8 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
       if (value.children.isNotEmpty) {
         target.children.insertBefore(target.createChildRenderText(r'<!--$-->', true));
 
-        List<MarkupRenderObject> nodes = [];
-        Map<String, (int, int)> indices = {};
+        final List<MarkupRenderObject> nodes = [];
+        final Map<String, (int, int)> indices = {};
 
         void visitRenderObject(MarkupRenderObject o, int depth) {
           if (o is MarkupRenderFragment) {
@@ -367,12 +367,12 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
             return;
           }
 
-          var key = keyFor(o);
+          final key = keyFor(o);
           if (key == null) {
             nodes.add(o);
             return;
           }
-          var index = indices[key];
+          final index = indices[key];
           if (index == null) {
             nodes.add(o);
             indices[key] = (nodes.length - 1, depth);

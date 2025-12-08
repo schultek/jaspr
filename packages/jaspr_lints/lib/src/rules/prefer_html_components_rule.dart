@@ -27,7 +27,7 @@ class PreferHtmlComponentsRule extends AnalysisRule {
 
   @override
   void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
-    var visitor = _HtmlComponentVisitor(this, context);
+    final visitor = _HtmlComponentVisitor(this, context);
     registry.addInstanceCreationExpression(this, visitor);
   }
 }
@@ -51,7 +51,7 @@ class _HtmlComponentVisitor extends SimpleAstVisitor<void> {
       return;
     }
     if (node.constructorName.name?.name == 'element') {
-      var tag = node.argumentList.arguments
+      final tag = node.argumentList.arguments
           .whereType<NamedExpression>()
           .where((n) => n.name.label.name == 'tag')
           .map((n) => n.expression)
@@ -70,7 +70,7 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
   static const _convertComponentKind = FixKind(
     'jaspr.fix.useHtmlComponent',
     DartFixKindPriority.standard,
-    "Convert to {0}() component",
+    'Convert to {0}() component',
   );
 
   ConvertHtmlComponentFix({required super.context});
@@ -89,7 +89,7 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     if (node case ConstructorName(parent: final InstanceCreationExpression node)) {
-      var tag = node.argumentList.arguments
+      final tag = node.argumentList.arguments
           .whereType<NamedExpression>()
           .where((n) => n.name.label.name == 'tag')
           .map((n) => n.expression)
@@ -104,7 +104,7 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
       await builder.addDartFileEdit(file, (builder) {
         for (var argument in node.argumentList.arguments) {
           if (argument is NamedExpression) {
-            var name = argument.name.label.name;
+            final name = argument.name.label.name;
             if (name == 'tag') {
               int end;
               if (argument.endToken.next case final next? when next.lexeme == ',') {
@@ -114,7 +114,7 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
               }
               builder.addDeletion(SourceRange(argument.offset, end - argument.offset));
             } else if (name == 'children') {
-              var end = argument.name.endToken.next?.offset ?? argument.end;
+              final end = argument.name.endToken.next?.offset ?? argument.end;
               builder.addDeletion(SourceRange(argument.name.offset, end - argument.name.offset));
             }
           }

@@ -48,7 +48,7 @@ class FilesystemLoader extends RouteLoaderBase {
       _watcherSub ??= watcherFactory(directory).events.listen((event) {
         // It looks like event.path is relative on most platforms, but an
         // absolute path on Linux. Turn this into the expected relative path.
-        var path = p.normalize(p.relative(event.path));
+        final path = p.normalize(p.relative(event.path));
         if (event.type == ChangeType.MODIFY) {
           invalidateFile(path);
         } else if (event.type == ChangeType.REMOVE) {
@@ -93,7 +93,7 @@ class FilesystemLoader extends RouteLoaderBase {
     }
 
     List<PageSource> loadFiles(Directory dir) {
-      List<PageSource> entities = [];
+      final List<PageSource> entities = [];
       for (final entry in dir.listSync()) {
         final path = entry.path.substring(root.path.length + 1);
         if (entry is File) {

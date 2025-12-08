@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 void main() {
   group('utils', () {
     test('compresses paths correctly', () {
-      var paths = [
+      final paths = [
         'app.dart',
         'counter.dart',
         'counter.state.dart',
@@ -17,7 +17,7 @@ void main() {
         'pages/home.dart',
       ];
 
-      var compressed = compressPaths(paths);
+      final compressed = compressPaths(paths);
 
       expect(compressed, {
         'app.dart': 'app',
@@ -34,7 +34,7 @@ void main() {
     });
 
     test('writes imports with unique prefixes', () {
-      var source =
+      final source =
           ''
           'import \'package:jaspr/jaspr.dart\';\n'
           '[[/]]\n'
@@ -51,7 +51,7 @@ void main() {
           'var j = [[other/pages/about.dart]].About();\n'
           '';
 
-      var result = ImportsWriter().resolve(source);
+      final result = ImportsWriter().resolve(source);
       expect(
         result,
         ''

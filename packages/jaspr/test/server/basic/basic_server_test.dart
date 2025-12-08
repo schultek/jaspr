@@ -18,12 +18,12 @@ void main() {
         ),
       );
 
-      var response = await tester.request('/');
+      final response = await tester.request('/');
 
       expect(response.statusCode, equals(200));
       expect(response.document?.body, isNotNull);
 
-      var appHtml = '<div>App<button>Click Me</button>Count: 101</div>\n';
+      final appHtml = '<div>App<button>Click Me</button>Count: 101</div>\n';
 
       expect(response.document!.body!.innerHtml, equals(appHtml));
     });

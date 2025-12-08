@@ -120,7 +120,7 @@ abstract class MarkupRenderObject extends RenderObject {
     // Keep track of the current line length to only break when necessary (for rule c).
     var currentLineLength = 0;
 
-    for (var (index, child) in childOutput.indexed) {
+    for (final (index, child) in childOutput.indexed) {
       if (allowNewlines) {
         // Allow additional newlines if the child has leading whitespace and the line is too long.
         addNewline |= child.leading && currentLineLength > maxHtmlLineLength;
@@ -185,24 +185,24 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
     bool strictWhitespace = false,
     String indent = '',
   ]) {
-    var output = StringBuffer();
+    final output = StringBuffer();
     var leadingWhitespace = false;
     var trailingWhitespace = false;
 
-    var tag = this.tag.toLowerCase();
+    final tag = this.tag.toLowerCase();
     _domValidator.validateElementName(tag);
     output.write('<$tag');
-    if (id case String id) {
+    if (id case final String id) {
       output.write(' id="${_attributeEscape.convert(id)}"');
     }
-    if (classes case String classes when classes.isNotEmpty) {
+    if (classes case final String classes when classes.isNotEmpty) {
       output.write(' class="${_attributeEscape.convert(classes)}"');
     }
-    if (styles case var styles? when styles.isNotEmpty) {
-      var props = styles.entries.map((e) => '${e.key}: ${e.value}');
+    if (styles case final styles? when styles.isNotEmpty) {
+      final props = styles.entries.map((e) => '${e.key}: ${e.value}');
       output.write(' style="${_attributeEscape.convert(props.join('; '))}"');
     }
-    if (attributes case var attrs? when attrs.isNotEmpty) {
+    if (attributes case final attrs? when attrs.isNotEmpty) {
       for (var attr in attrs.entries) {
         _domValidator.validateAttributeName(attr.key);
         if (attr.value.isNotEmpty) {
@@ -252,12 +252,12 @@ class MarkupRenderText extends MarkupRenderObject implements RenderText {
     bool strictWhitespace = false,
     String indent = '',
   ]) {
-    var output = StringBuffer();
+    final output = StringBuffer();
     var leadingWhitespace = false;
     var trailingWhitespace = false;
 
     if (text.isNotEmpty) {
-      var html = rawHtml == true ? text : _elementEscape.convert(text);
+      final html = rawHtml == true ? text : _elementEscape.convert(text);
       if (strictFormatting) {
         output.write(html);
       } else {

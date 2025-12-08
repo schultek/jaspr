@@ -15,9 +15,9 @@ class Tabs extends CustomComponent {
   @override
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && node.tag == 'Tabs') {
-      var tabs = node.children?.whereType<ElementNode>().where((n) => n.tag == 'TabItem') ?? [];
+      final tabs = node.children?.whereType<ElementNode>().where((n) => n.tag == 'TabItem') ?? [];
       if (tabs.isEmpty) {
-        print("[WARNING] Tabs component requires at least one TabItem child.");
+        print('[WARNING] Tabs component requires at least one TabItem child.');
       }
 
       return _Tabs(

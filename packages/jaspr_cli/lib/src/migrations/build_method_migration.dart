@@ -306,7 +306,7 @@ class BuilderVisitor extends RecursiveAstVisitor<void> {
     if (node.parent case FunctionExpression(
       parent: NamedExpression(
         name: Label(label: SimpleIdentifier(name: 'builder')),
-        parent: ArgumentList(parent: MethodInvocation m),
+        parent: ArgumentList(parent: final MethodInvocation m),
       ),
     )) {
       if (m case MethodInvocation(

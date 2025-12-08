@@ -63,7 +63,7 @@ class DaemonLogger implements Logger {
   void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     message = message.trim();
     if (message.contains('\n')) {
-      var lines = message.split('\n');
+      final lines = message.split('\n');
       for (var l in lines) {
         write(l, tag: tag, level: level, progress: progress);
       }
@@ -71,21 +71,21 @@ class DaemonLogger implements Logger {
     }
 
     if (tag == Tag.server) {
-      const vmUriPrefix = "The Dart VM service is listening on ";
+      const vmUriPrefix = 'The Dart VM service is listening on ';
       if (message.startsWith(vmUriPrefix)) {
         final uri = message.substring(vmUriPrefix.length);
-        event("server.started", {"vmServiceUri": uri});
+        event('server.started', {'vmServiceUri': uri});
         return;
       }
 
-      event("server.log", {'message': message, 'level': level.name});
+      event('server.log', {'message': message, 'level': level.name});
 
       if (level.index < Level.error.index) {
         return;
       }
     }
 
-    String logmessage = '${tag?.format(true) ?? ''}${level.format(message.trim(), true)}';
+    final String logmessage = '${tag?.format(true) ?? ''}${level.format(message.trim(), true)}';
 
     log({'message': logmessage});
   }

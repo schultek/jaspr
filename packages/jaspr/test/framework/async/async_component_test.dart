@@ -10,7 +10,7 @@ import 'async_app.dart';
 void main() {
   group('async component test', () {
     testComponents('should render future with data', (tester) async {
-      var completer = Completer<String>();
+      final completer = Completer<String>();
 
       tester.pumpComponent(FutureTester(completer.future));
 
@@ -23,7 +23,7 @@ void main() {
     });
 
     testComponents('should render future with error', (tester) async {
-      var completer = Completer<String>();
+      final completer = Completer<String>();
 
       tester.pumpComponent(FutureTester(completer.future));
 
@@ -36,7 +36,7 @@ void main() {
     });
 
     testComponents('should render stream', (tester) async {
-      var controller = StreamController<String>();
+      final controller = StreamController<String>();
 
       tester.pumpComponent(StreamTester(controller.stream));
 

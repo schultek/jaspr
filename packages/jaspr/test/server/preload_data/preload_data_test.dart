@@ -11,14 +11,14 @@ void main() {
     testServer('should preload data', (tester) async {
       tester.pumpComponent(Document(body: App()));
 
-      var response = await tester.request('/');
+      final response = await tester.request('/');
 
       expect(response.statusCode, equals(200));
 
-      var body = response.document?.body;
+      final body = response.document?.body;
       expect(body, isNotNull);
 
-      var appHtml = '<div>App<!--\$202--><button>Click Me</button>Count: 202</div>';
+      final appHtml = '<div>App<!--\$202--><button>Click Me</button>Count: 202</div>';
       expect(body!.innerHtml.trim(), equals(appHtml));
     });
   });

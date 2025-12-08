@@ -60,7 +60,7 @@ abstract class BuildableElement extends Element {
           color: Colors.yellow,
           fontSize: Unit.rem(1),
         ),
-        children: [Component.text("Error on building component: $e")],
+        children: [Component.text('Error on building component: $e')],
       );
       binding.reportBuildError(this, e, st);
     } finally {

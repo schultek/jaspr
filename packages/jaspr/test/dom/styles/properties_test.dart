@@ -8,7 +8,7 @@ void main() {
   group('style', () {
     group('combine', () {
       test('combines raw styles', () {
-        var styles = const Styles.combine([
+        final styles = const Styles.combine([
           Styles(raw: {'a': 'b', 'c': 'd'}),
           Styles(raw: {'c': 'e', 'f': 'g'}),
         ]);
@@ -17,7 +17,7 @@ void main() {
       });
 
       test('combines typed styles', () {
-        var styles = const Styles.combine([
+        final styles = const Styles.combine([
           Styles(fontSize: Unit.pixels(12), fontFamily: FontFamily('Roboto')),
           Styles(fontSize: Unit.pixels(14)),
         ]);
@@ -27,10 +27,10 @@ void main() {
     });
 
     group('properties', () {
-      var styles = const Styles(
+      final styles = const Styles(
         all: All.initial,
         // Box Styles
-        content: "test",
+        content: 'test',
         display: Display.inlineBlock,
         position: Position.absolute(top: Unit.pixels(100)),
         zIndex: ZIndex(100),

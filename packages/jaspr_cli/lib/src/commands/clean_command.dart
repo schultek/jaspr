@@ -21,18 +21,18 @@ class CleanCommand extends BaseCommand {
   @override
   Future<int> runCommand() async {
     if (project.pubspecYaml != null) {
-      var genDir = Directory('.dart_tool/jaspr/').absolute;
+      final genDir = Directory('.dart_tool/jaspr/').absolute;
       if (genDir.existsSync()) {
         logger.write('Deleting .dart_tool/jaspr...');
         genDir.deleteSync(recursive: true);
       }
 
-      var chromeDir = Directory('.dart_tool/webdev/chrome_user_data').absolute;
+      final chromeDir = Directory('.dart_tool/webdev/chrome_user_data').absolute;
       if (chromeDir.existsSync()) {
         chromeDir.deleteSync(recursive: true);
       }
 
-      var buildDir = Directory('build/jaspr/').absolute;
+      final buildDir = Directory('build/jaspr/').absolute;
       if (buildDir.existsSync()) {
         logger.write('Deleting build/jaspr...');
         buildDir.deleteSync(recursive: true);
@@ -44,7 +44,7 @@ class CleanCommand extends BaseCommand {
 
     // TODO support windows
     if (Platform.isMacOS || Platform.isLinux) {
-      var pids = await findRunawayProcesses([
+      final pids = await findRunawayProcesses([
         // server, vm, build_runner, flutter
         '8080', '8181', '5467', '5678',
       ]);
@@ -54,7 +54,7 @@ class CleanCommand extends BaseCommand {
         if (argResults!.wasParsed('kill')) {
           kill = argResults!.flag('kill');
           if (kill) {
-            logger.write("Killing ${pids.length} runaway processes.");
+            logger.write('Killing ${pids.length} runaway processes.');
           }
         } else if (stdout.hasTerminal) {
           kill = logger.logger!.confirm('Kill ${pids.length} runaway processes?');
@@ -73,10 +73,10 @@ class CleanCommand extends BaseCommand {
 }
 
 Future<List<int>> findRunawayProcesses(List<String> ports) async {
-  var pids = <int>[];
+  final pids = <int>[];
 
   for (var port in ports) {
-    var proc = await Process.run('lsof', ['-i', ':$port']);
+    final proc = await Process.run('lsof', ['-i', ':$port']);
 
     if (proc.exitCode == 0) {
       pids.addAll(

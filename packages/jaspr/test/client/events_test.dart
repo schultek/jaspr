@@ -61,8 +61,8 @@ void main() {
     });
 
     testClient('handle input text events', (tester) async {
-      String textInput = "";
-      String textChange = "";
+      String textInput = '';
+      String textChange = '';
 
       tester.pumpComponent(
         input<String>(
@@ -72,16 +72,16 @@ void main() {
         ),
       );
 
-      await tester.input(find.tag('input'), value: "Hello");
-      expect(textInput, equals("Hello"));
+      await tester.input(find.tag('input'), value: 'Hello');
+      expect(textInput, equals('Hello'));
 
-      await tester.change(find.tag('input'), value: "World");
-      expect(textChange, equals("World"));
+      await tester.change(find.tag('input'), value: 'World');
+      expect(textChange, equals('World'));
     });
 
     testClient('handle textarea events', (tester) async {
-      String textInput = "";
-      String textChange = "";
+      String textInput = '';
+      String textChange = '';
 
       tester.pumpComponent(
         textarea(
@@ -91,11 +91,11 @@ void main() {
         ),
       );
 
-      await tester.input(find.tag('textarea'), value: "Hello");
-      expect(textInput, equals("Hello"));
+      await tester.input(find.tag('textarea'), value: 'Hello');
+      expect(textInput, equals('Hello'));
 
-      await tester.change(find.tag('textarea'), value: "World");
-      expect(textChange, equals("World"));
+      await tester.change(find.tag('textarea'), value: 'World');
+      expect(textChange, equals('World'));
     });
   });
 }

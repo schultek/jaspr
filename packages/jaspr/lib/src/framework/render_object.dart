@@ -95,7 +95,7 @@ mixin RenderObjectElement on Element {
 
   @override
   void detachRenderObject() {
-    var parent = _parentRenderObjectElement?.renderObject;
+    final parent = _parentRenderObjectElement?.renderObject;
     if (parent != null) {
       parent.remove(renderObject);
       assert(renderObject.parent == null);

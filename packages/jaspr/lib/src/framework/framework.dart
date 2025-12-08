@@ -417,7 +417,7 @@ abstract class Element implements BuildContext {
         if (child._parentChanged || child.slot != newSlot) {
           updateSlotForChild(child, newSlot);
         }
-        var oldComponent = child.component;
+        final oldComponent = child.component;
         child.update(newComponent);
         assert(child.component == newComponent);
         child.didUpdate(oldComponent);
@@ -497,7 +497,7 @@ abstract class Element implements BuildContext {
 
     if (oldChildren.length <= 1 && newComponents.length <= 1) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
-      var newChild = updateChild(oldChild, newComponents.firstOrNull, ElementSlot(0, null));
+      final newChild = updateChild(oldChild, newComponents.firstOrNull, ElementSlot(0, null));
       return [?newChild];
     }
 
@@ -884,7 +884,7 @@ abstract class Element implements BuildContext {
     final bool hadDependencies = (_dependencies != null && _dependencies!.isNotEmpty) || _hadUnsatisfiedDependencies;
     _lifecycleState = _ElementLifecycle.active;
 
-    var parent = _parent!;
+    final parent = _parent!;
     _parentRenderObjectElement = parent is RenderObjectElement ? parent : parent._parentRenderObjectElement;
 
     _dependencies?.clear();

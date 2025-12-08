@@ -63,9 +63,9 @@ class AddStyles extends ResolvedCorrectionProducer {
         .where((m) => m.metadata.where((a) => a.name.name == 'css').isNotEmpty)
         .map(
           (m) => switch (m) {
-            MethodDeclaration(body: BlockFunctionBody body) =>
+            MethodDeclaration(body: final BlockFunctionBody body) =>
               body.block.statements.whereType<ReturnStatement>().firstOrNull?.expression,
-            MethodDeclaration(body: ExpressionFunctionBody body) => body.expression,
+            MethodDeclaration(body: final ExpressionFunctionBody body) => body.expression,
             FieldDeclaration() => m.fields.variables.first.initializer,
             _ => null,
           },
@@ -104,7 +104,7 @@ class AddStyles extends ResolvedCorrectionProducer {
           builder.addInsertion(classesArg.expression.offset, (edit) {
             edit.write("'");
             edit.addSimpleLinkedEdit('className', 'myclass');
-            edit.write(" \${");
+            edit.write(' \${');
           });
           builder.addInsertion(classesArg.expression.end, (edit) {
             edit.write("}'");

@@ -38,7 +38,7 @@ class ClientModuleBuilder implements Builder {
 
   Future<void> generateClientModule(BuildStep buildStep) async {
     // Performance optimization
-    var file = await buildStep.readAsString(buildStep.inputId);
+    final file = await buildStep.readAsString(buildStep.inputId);
     if (!file.contains('@client')) {
       return;
     }
@@ -47,12 +47,12 @@ class ClientModuleBuilder implements Builder {
       return;
     }
 
-    var library = await buildStep.inputLibrary;
-    var reader = LibraryReader(library);
+    final library = await buildStep.inputLibrary;
+    final reader = LibraryReader(library);
 
-    var clients = reader.annotatedWithExact(clientChecker).map((e) => e.element);
+    final clients = reader.annotatedWithExact(clientChecker).map((e) => e.element);
 
-    var annotated = clients.toSet();
+    final annotated = clients.toSet();
 
     if (annotated.isEmpty) {
       return;
@@ -60,11 +60,11 @@ class ClientModuleBuilder implements Builder {
 
     if (annotated.length > 1) {
       log.severe(
-        "Cannot have multiple components annotated with @client in a single library. Failing library: ${library.firstFragment.source.fullName}.",
+        'Cannot have multiple components annotated with @client in a single library. Failing library: ${library.firstFragment.source.fullName}.',
       );
     }
 
-    var element = annotated.first;
+    final element = annotated.first;
 
     if (element is! ClassElement) {
       log.severe(
@@ -80,7 +80,7 @@ class ClientModuleBuilder implements Builder {
       return;
     }
 
-    var codecs = await buildStep.loadCodecs();
+    final codecs = await buildStep.loadCodecs();
     ClientModule module;
 
     try {
@@ -90,7 +90,7 @@ class ClientModuleBuilder implements Builder {
       return;
     }
 
-    var outputId = buildStep.inputId.changeExtension('.client.module.json');
+    final outputId = buildStep.inputId.changeExtension('.client.module.json');
     await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));
   }
 }
@@ -104,7 +104,7 @@ class ClientModule {
   ClientModule({required this.name, required this.id, required this.import, required this.params});
 
   static ClientModule fromElement(ClassElement element, Codecs codecs, BuildStep buildStep) {
-    var params = getParamsFor(element, codecs);
+    final params = getParamsFor(element, codecs);
 
     return ClientModule(
       name: element.name ?? '',
@@ -167,7 +167,7 @@ class ClientParam {
 
 List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
   final constr = e.constructors.first;
-  var params = constr.formalParameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
+  final params = constr.formalParameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
   for (var param in params) {
     if (!param.isInitializingFormal) {
@@ -180,8 +180,8 @@ List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
 
   return params.map((p) {
     try {
-      var decoder = codecs.getDecoderFor(p.type, "p['${p.name}']");
-      var encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
+      final decoder = codecs.getDecoderFor(p.type, "p['${p.name}']");
+      final encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
       return ClientParam(name: p.name ?? '', isNamed: p.isNamed, decoder: decoder, encoder: encoder);
     } on InvalidParameterException catch (_) {
       throw UnsupportedError(

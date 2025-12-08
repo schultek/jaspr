@@ -35,7 +35,7 @@ class ClientsBundleBuilder implements Builder {
   };
 
   Future<void> generateClientsBundle(BuildStep buildStep) async {
-    var modules = await buildStep
+    final modules = await buildStep
         .findAssets(Glob('lib/**.client.module.json'))
         .asyncMap((id) => buildStep.readAsString(id))
         .map((c) => jsonDecode(c))
@@ -43,14 +43,14 @@ class ClientsBundleBuilder implements Builder {
 
     if (modules.isEmpty) return;
 
-    var outputId = AssetId(buildStep.inputId.package, 'lib/clients.bundle.json');
+    final outputId = AssetId(buildStep.inputId.package, 'lib/clients.bundle.json');
     await buildStep.writeAsString(outputId, jsonEncode(modules));
   }
 }
 
 extension ClientsLoader on BuildStep {
   Future<List<ClientModule>> loadClients() async {
-    var bundle = await loadBundle<ClientModule>('clients', ClientModule.deserialize).toList();
+    final bundle = await loadBundle<ClientModule>('clients', ClientModule.deserialize).toList();
     return bundle;
   }
 }

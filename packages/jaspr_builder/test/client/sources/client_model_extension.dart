@@ -25,16 +25,16 @@ final clientModelExtensionSources = {
 
 final clientModelExtensionModuleOutputs = {
   'site|lib/component_model_extension.client.module.json': jsonEncode({
-    "name": "Component",
-    "id": ["site", "lib/component_model_extension.dart"],
-    "import": "package:site/component_model_extension.dart",
-    "params": [
-      {"name": "a", "isNamed": false, "decoder": "p['a']", "encoder": "c.a"},
+    'name': 'Component',
+    'id': ['site', 'lib/component_model_extension.dart'],
+    'import': 'package:site/component_model_extension.dart',
+    'params': [
+      {'name': 'a', 'isNamed': false, 'decoder': "p['a']", 'encoder': 'c.a'},
       {
-        "name": "b",
-        "isNamed": true,
-        "decoder": "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p['b'])",
-        "encoder": "[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()",
+        'name': 'b',
+        'isNamed': true,
+        'decoder': "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p['b'])",
+        'encoder': '[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()',
       },
     ],
   }),

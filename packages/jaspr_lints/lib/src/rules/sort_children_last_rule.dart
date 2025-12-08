@@ -11,7 +11,7 @@ import '../utils.dart';
 class SortChildrenLastRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'sort_children_last',
-    "Sort children last in html components.",
+    'Sort children last in html components.',
   );
 
   SortChildrenLastRule()
@@ -25,7 +25,7 @@ class SortChildrenLastRule extends AnalysisRule {
 
   @override
   void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
-    var visitor = _HtmlComponentVisitor(this, context);
+    final visitor = _HtmlComponentVisitor(this, context);
     registry.addInstanceCreationExpression(this, visitor);
   }
 }
@@ -60,7 +60,7 @@ class SortChildrenLastFix extends ResolvedCorrectionProducer {
   static const _sortChildrenKind = FixKind(
     'jaspr.fix.sortChildrenLast',
     DartFixKindPriority.standard,
-    "Sort children last",
+    'Sort children last',
   );
 
   SortChildrenLastFix({required super.context});
@@ -79,14 +79,14 @@ class SortChildrenLastFix extends ResolvedCorrectionProducer {
       );
 
       await builder.addDartFileEdit(file, (builder) {
-        var nextArg = node.argumentList.arguments[node.argumentList.arguments.indexOf(childrenArg) + 1];
+        final nextArg = node.argumentList.arguments[node.argumentList.arguments.indexOf(childrenArg) + 1];
 
-        var start = childrenArg.end;
-        var argStart = nextArg.offset;
-        var end = node.argumentList.arguments.last.end;
+        final start = childrenArg.end;
+        final argStart = nextArg.offset;
+        final end = node.argumentList.arguments.last.end;
 
-        var divider = getRangeText(SourceRange(start, argStart - start));
-        var args = getRangeText(SourceRange(argStart, end - argStart));
+        final divider = getRangeText(SourceRange(start, argStart - start));
+        final args = getRangeText(SourceRange(argStart, end - argStart));
 
         builder.addInsertion(childrenArg.offset, (edit) {
           edit.write(args);

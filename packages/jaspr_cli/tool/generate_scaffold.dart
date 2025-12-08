@@ -8,9 +8,9 @@ void main() async {
 }
 
 Future<void> generate(String name) async {
-  var scaffoldDir = Directory('tool/$name');
+  final scaffoldDir = Directory('tool/$name');
 
-  var result = await Process.run('mason', 'bundle -t dart -o lib/src/bundles/$name ${scaffoldDir.path}'.split(' '));
+  final result = await Process.run('mason', 'bundle -t dart -o lib/src/bundles/$name ${scaffoldDir.path}'.split(' '));
   stdout.write(result.stdout);
   stderr.write(result.stderr);
 

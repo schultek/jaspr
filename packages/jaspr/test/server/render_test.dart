@@ -15,7 +15,7 @@ void main() {
     });
 
     test('renders component with document structure', () async {
-      var result = await renderComponent(div(id: 'test', []));
+      final result = await renderComponent(div(id: 'test', []));
 
       expect(
         result.body,
@@ -28,7 +28,7 @@ void main() {
     });
 
     test('renders document component', () async {
-      var result = await renderComponent(
+      final result = await renderComponent(
         Document(
           lang: 'en',
           base: '/app',
@@ -58,16 +58,16 @@ void main() {
     });
 
     test('renders standalone component', () async {
-      var result = await renderComponent(div(id: 'test', []), standalone: true);
+      final result = await renderComponent(div(id: 'test', []), standalone: true);
 
       expect(result.body, decodedMatches('<div id="test"></div>\n'));
     });
 
     test('renders component with headers', () async {
-      var result = await renderComponent(
+      final result = await renderComponent(
         Builder(
           builder: (context) {
-            var value = context.headers['x-test'];
+            final value = context.headers['x-test'];
             context.setHeader('x-test2', 'xyz');
             return div(id: 'test', [Component.text(value ?? '')]);
           },
@@ -88,10 +88,10 @@ void main() {
     });
 
     test('renders component with cookies', () async {
-      var result = await renderComponent(
+      final result = await renderComponent(
         Builder(
           builder: (context) {
-            var value = context.cookies['test'];
+            final value = context.cookies['test'];
             context.setCookie('test2', 'xyz');
             return div(id: 'test', [Component.text(value ?? '')]);
           },
@@ -112,10 +112,10 @@ void main() {
     });
 
     test('renders custom text responses', () async {
-      var result = await renderComponent(
+      final result = await renderComponent(
         Builder(
           builder: (context) {
-            var value = context.cookies['test'];
+            final value = context.cookies['test'];
             context.setStatusCode(201, responseBody: 'custom');
             return div(id: 'test', [Component.text(value ?? '')]);
           },
@@ -129,10 +129,10 @@ void main() {
     });
 
     test('renders custom binary responses', () async {
-      var result = await renderComponent(
+      final result = await renderComponent(
         Builder(
           builder: (context) {
-            var value = context.cookies['test'];
+            final value = context.cookies['test'];
             context.setStatusCode(201, responseBody: Uint8List.fromList([1, 2, 3]));
             return div(id: 'test', [Component.text(value ?? '')]);
           },
@@ -149,7 +149,7 @@ void main() {
       await renderComponent(
         Builder(
           builder: (context) {
-            var value = context.cookies['test'];
+            final value = context.cookies['test'];
             expect(() => context.setStatusCode(201, responseBody: DateTime.now()), throwsArgumentError);
             return div(id: 'test', [Component.text(value ?? '')]);
           },

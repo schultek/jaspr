@@ -9,7 +9,7 @@ void main() {
     group('transform', () {
       group('combine', () {
         test('basic', () {
-          var transform = Transform.combine([Transform.scale(2), Transform.translate(x: 100.px)]);
+          final transform = Transform.combine([Transform.scale(2), Transform.translate(x: 100.px)]);
           expect(transform.value, equals('scale(2) translateX(100px)'));
         });
 
@@ -29,12 +29,12 @@ void main() {
       });
 
       test('rotate', () {
-        var transform = Transform.rotate(10.deg);
+        final transform = Transform.rotate(10.deg);
         expect(transform.value, equals('rotate(10deg)'));
       });
 
       test('rotate_axis', () {
-        var transform = Transform.rotateAxis(x: 10.deg, z: 2.turn);
+        final transform = Transform.rotateAxis(x: 10.deg, z: 2.turn);
         expect(transform.value, equals('rotateX(10deg) rotateZ(2turn)'));
       });
 
@@ -50,7 +50,7 @@ void main() {
       });
 
       test('scale', () {
-        var transform = Transform.scale(2);
+        final transform = Transform.scale(2);
         expect(transform.value, equals('scale(2)'));
       });
 
@@ -66,12 +66,12 @@ void main() {
       });
 
       test('matrix', () {
-        var transform = Transform.matrix(1, 2, 3, 4, 5, 6);
+        final transform = Transform.matrix(1, 2, 3, 4, 5, 6);
         expect(transform.value, equals('matrix(1, 2, 3, 4, 5, 6)'));
       });
 
       test('perspective', () {
-        var transform = Transform.perspective(100.px);
+        final transform = Transform.perspective(100.px);
         expect(transform.value, equals('perspective(100px)'));
       });
     });

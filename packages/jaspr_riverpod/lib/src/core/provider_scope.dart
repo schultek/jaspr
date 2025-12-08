@@ -88,7 +88,7 @@ final class ProviderScope extends StatefulComponent {
   }
 
   static _UncontrolledProviderScopeElement _scopeOf(BuildContext context, {bool listen = true}) {
-    var element =
+    final element =
         context.getElementForInheritedComponentOfExactType<UncontrolledProviderScope>()
             as _UncontrolledProviderScopeElement?;
 
