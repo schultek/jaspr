@@ -23,7 +23,7 @@ mixin ComponentsBinding on AppBinding {
 
   /// The [Element] that is at the root of the hierarchy.
   ///
-  /// This is initialized when [runApp] is called.
+  /// This is initialized when `runApp` is called.
   @override
   RenderObjectElement? get rootElement => _rootElement;
   RenderObjectElement? _rootElement;
