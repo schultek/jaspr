@@ -64,7 +64,7 @@ jaspr:
   mode: server
   port: 8080
 ''');
-        
+
         expect(project.pubspecYaml, isNotNull);
         expect(project.requirePubspecYaml, isNotNull);
         expect(() => project.requireJasprDependency, isNot(throwsException));
@@ -116,13 +116,11 @@ dependencies:
     sdk: flutter
 dev_dependencies:
   jaspr_builder: any
-  jaspr_web_compilers: any
 ''');
 
         expect(() => project.requireJasprDependency, isNot(throwsException));
         expect(() => project.preferJasprBuilderDependency, isNot(throwsException));
         expect(project.usesFlutter, isTrue);
-        expect(project.usesJasprWebCompilers, isTrue);
         expect(logger.messages, isEmpty);
         expect(exits, isEmpty);
       });
@@ -146,7 +144,6 @@ name: test
           ),
         );
         expect(project.usesFlutter, isFalse);
-        expect(project.usesJasprWebCompilers, isFalse);
         expect(logger.messages, hasLength(2));
         expect(exits, equals([1]));
       });

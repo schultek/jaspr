@@ -330,8 +330,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--define=build_web_compilers:ddc_modules=use-ui-libraries=true',
         '--define=build_web_compilers:dart2js_modules=use-ui-libraries=true',
         '--define=build_web_compilers:dart2wasm_modules=use-ui-libraries=true',
-        '--define=build_web_compilers:entrypoint=libraries_path="$librariesPath"',
-        '--define=build_web_compilers:entrypoint=silence_unsupported_modules_warnings=true',
+        '--define=build_web_compilers:entrypoint=libraries-path="$librariesPath"',
+        '--define=build_web_compilers:entrypoint=unsafe-allow-unsupported-modules=true',
         '--define=build_web_compilers:sdk_js=use-prebuilt-sdk-from-path="$sdkJsPath"',
         if (compiler == 'dartdevc') ...[
           '--define=build_web_compilers:ddc=ddc-kernel-path="$sdkKernelPath"',

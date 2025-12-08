@@ -64,16 +64,10 @@ class CreateCommand extends BaseCommand {
         'single-page': 'Sets up single-page (client-side) routing.',
       },
     );
-    argParser.addOption(
+    argParser.addFlag(
       'flutter',
       abbr: 'f',
-      help: 'Choose the Flutter support for the project.',
-      allowed: ['none', 'embedded', 'plugins-only'],
-      allowedHelp: {
-        'none': 'No preconfigured Flutter support.',
-        'embedded': 'Sets up an embedded Flutter app inside your site.',
-        'plugins-only': '(Recommended) Enables support for using Flutter web plugins.',
-      },
+      help: 'Whether to set up Flutter web embedding.',
     );
     argParser.addOption(
       'backend',
@@ -111,7 +105,7 @@ class CreateCommand extends BaseCommand {
 
     var useMode = getRenderingMode();
     var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
-    var (useFlutter, usePlugins) = getFlutter();
+    var useFlutter = getFlutter();
     var useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
     var usedPrefixes = {
@@ -124,13 +118,11 @@ class CreateCommand extends BaseCommand {
 
     var updater = PubUpdater();
 
-    var webCompilersPackage = usePlugins ? 'jaspr_web_compilers' : 'build_web_compilers';
-
     var [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_lints'),
-      updater.getLatestVersion(webCompilersPackage),
+      updater.getLatestVersion('build_web_compilers'),
     ]);
 
     var progress = logger.logger!.progress('Generating project...');
@@ -144,7 +136,6 @@ class CreateCommand extends BaseCommand {
         'routing': useRouting,
         'multipage': useMultiPageRouting,
         'flutter': useFlutter,
-        'plugins': usePlugins,
         'server': useMode.useServer,
         'shelf': useBackend == 'shelf',
         'jasprCoreVersion': jasprCoreVersion,
@@ -152,7 +143,6 @@ class CreateCommand extends BaseCommand {
         'jasprFlutterEmbedVersion': jasprFlutterEmbedVersion,
         'jasprRouterVersion': jasprRouterVersion,
         'jasprLintsVersion': jasprLintsVersion,
-        'webCompilersPackage': webCompilersPackage,
         'webCompilersVersion': webCompilersVersion,
       },
       logger: logger.logger,
@@ -198,14 +188,12 @@ class CreateCommand extends BaseCommand {
       jasprRouterVersion,
       jasprContentVersion,
       jasprLintsVersion,
-      jasprWebCompilersVersion,
-      buildWebCompilersVersion,
+      webCompilersVersion,
     ] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_content'),
       updater.getLatestVersion('jaspr_lints'),
-      updater.getLatestVersion('jaspr_web_compilers'),
       updater.getLatestVersion('build_web_compilers'),
     ]);
 
@@ -222,8 +210,7 @@ class CreateCommand extends BaseCommand {
         'jasprRouterVersion': jasprRouterVersion,
         'jasprContentVersion': jasprContentVersion,
         'jasprLintsVersion': jasprLintsVersion,
-        'jasprWebCompilersVersion': jasprWebCompilersVersion,
-        'buildWebCompilersVersion': buildWebCompilersVersion,
+        'webCompilersVersion': webCompilersVersion,
       },
       logger: logger.logger,
     );
@@ -315,21 +302,12 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  (bool, bool) getFlutter() {
-    var opt = argResults!.option('flutter');
+  bool getFlutter() {
+    if (!argResults!.wasParsed('flutter')) {
+      return argResults!.flag('flutter');
+    }
 
-    return switch (opt) {
-      'none' => (false, false),
-      'embedded' => (true, true),
-      'plugins-only' => (false, true),
-      _ => () {
-        var flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
-        var plugins =
-            flutter ||
-            logger.logger!.confirm('Enable support for using Flutter web plugins in your project?', defaultValue: true);
-        return (flutter, plugins);
-      }(),
-    };
+    return logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
   }
 
   String? getBackend() {

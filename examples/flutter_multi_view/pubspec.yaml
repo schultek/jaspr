@@ -19,7 +19,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   jaspr_builder: ^0.22.0-beta.0
-  jaspr_web_compilers: ^4.2.0
+  build_web_compilers: ^4.4.6
 
 jaspr:
   mode: static

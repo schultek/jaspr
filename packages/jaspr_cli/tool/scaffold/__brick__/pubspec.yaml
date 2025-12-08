@@ -16,7 +16,7 @@ dependencies:{{#flutter}}
 
 dev_dependencies:
   build_runner: ^2.10.0
-  {{webCompilersPackage}}: ^{{webCompilersVersion}}
+  build_web_compilers: ^{{webCompilersVersion}}
   jaspr_builder: ^{{jasprBuilderVersion}}{{#flutter}}
   flutter_test:
     sdk: flutter

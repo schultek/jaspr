@@ -99,13 +99,6 @@ class Project {
     }
   }
 
-  bool get usesJasprWebCompilers {
-    return switch (requirePubspecYaml) {
-      {'dev_dependencies': {'jaspr_web_compilers': _}} => true,
-      _ => false,
-    };
-  }
-
   bool get usesFlutter {
     return switch (requirePubspecYaml) {
       {'dependencies': {'flutter': _}} => true,
@@ -213,16 +206,15 @@ class Project {
   }();
 
   void checkWasmSupport() {
-    final package = '${usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
     final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
-    final version = switch (devDependencies?[package]) {
+    final version = switch (devDependencies?['build_web_compilers']) {
       String v => VersionConstraint.parse(v),
       _ => null,
     };
     final minVersion = VersionConstraint.compatibleWith(Version(4, 1, 0));
     if (version == null || !minVersion.allowsAll(version)) {
       logger.write(
-        'Using "--experimental-wasm" requires $package 4.1.0 or newer. '
+        'Using "--experimental-wasm" requires build_web_compilers 4.1.0 or newer. '
         'Please update your version constraint in pubspec.yaml.',
         tag: Tag.cli,
         level: Level.critical,
