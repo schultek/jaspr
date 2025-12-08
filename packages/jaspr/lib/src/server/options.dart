@@ -33,7 +33,7 @@ abstract final class Jaspr {
 /// Global options for configuring Jaspr on the server.
 ///
 /// **DO NOT USE DIRECTLY.**
-/// Use the generated [defaultServerOptions] instead.
+/// Use the generated `defaultServerOptions` instead.
 final class ServerOptions {
   const ServerOptions({this.clientId, this.clients, this.styles});
 
@@ -45,7 +45,7 @@ final class ServerOptions {
 /// The target configuration for a @client component.
 ///
 /// **DO NOT USE DIRECTLY.**
-/// Use the generated [defaultServerOptions] instead.
+/// Use the generated `defaultServerOptions` instead.
 final class ClientTarget<T extends Component> {
   final String name;
   final Map<String, Object?> Function(T component)? params;
