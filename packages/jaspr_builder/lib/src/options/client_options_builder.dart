@@ -138,7 +138,7 @@ Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
 
   final packageConfig = await buildStep.packageConfig;
 
-  final packages = {for (var p in packageConfig.packages) p.name: p};
+  final packages = {for (final p in packageConfig.packages) p.name: p};
 
   final plugins = <String, Plugin>{};
   // If we're in a workspace, only consider packages that are direct dependencies.

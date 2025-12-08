@@ -170,7 +170,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       // 'run',
       if (!release) ...['--enable-vm-service', '--enable-asserts'] else '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
-      for (var define in userDefines.entries) '-D${define.key}=${define.value}',
+      for (final define in userDefines.entries) '-D${define.key}=${define.value}',
     ];
 
     if (debug) {

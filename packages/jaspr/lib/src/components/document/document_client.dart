@@ -81,7 +81,8 @@ class HeadDocument extends StatelessComponent implements Document {
       children: [
         if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (final e in meta!.entries)
+            Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );
@@ -291,7 +292,7 @@ class AttachAdapter {
     if (target.attachAttributes) {
       final Map<String, String> attributes = initialAttributes;
 
-      for (var renderObject in renderObjects) {
+      for (final renderObject in renderObjects) {
         assert(renderObject._target == target);
         if (renderObject._attributes case final attrs?) {
           attributes.addAll(attrs);
@@ -303,7 +304,7 @@ class AttachAdapter {
         attributesToRemove.add(element.attributes.item(i)!.name);
       }
       if (attributes.isNotEmpty) {
-        for (var attr in attributes.entries) {
+        for (final attr in attributes.entries) {
           element.clearOrSetAttribute(attr.key, attr.value);
           attributesToRemove.remove(attr.key);
         }
@@ -320,8 +321,8 @@ class AttachAdapter {
       final Map<String, web.Node> keyedNodes = Map.of(initialKeyedNodes);
       final List<web.Node> children = List.of(initialKeyedNodes.values);
 
-      for (var renderObject in renderObjects) {
-        for (var node in renderObject.children) {
+      for (final renderObject in renderObjects) {
+        for (final node in renderObject.children) {
           final key = keyFor(node);
           if (key != null) {
             final shadowedNode = keyedNodes[key];
@@ -337,7 +338,7 @@ class AttachAdapter {
 
       web.Node? current = attachWindow.$1.nextSibling;
 
-      for (var node in children) {
+      for (final node in children) {
         if (current == null || current == attachWindow.$2) {
           element.insertBefore(node, current);
         } else if (current == node) {

@@ -29,7 +29,7 @@ class FilesystemDataLoader implements DataLoader {
 
   @visibleForTesting
   static void reset() {
-    for (var loader in _instance.values) {
+    for (final loader in _instance.values) {
       loader._watcherSub?.cancel();
       loader._reassembleSub?.cancel();
     }
@@ -59,7 +59,7 @@ class FilesystemDataLoader implements DataLoader {
     if (kDebugMode) {
       _watcherSub ??= watcherFactory(directory).events.listen((event) {
         _data = null;
-        for (var page in _pages) {
+        for (final page in _pages) {
           page.markNeedsRebuild();
         }
         _pages.clear();
@@ -88,7 +88,7 @@ class FilesystemDataLoader implements DataLoader {
   Future<Map<String, Object?>> _loadData(Directory dir) async {
     final data = <String, Object?>{};
     if (await dir.exists()) {
-      await for (var entity in dir.list()) {
+      await for (final entity in dir.list()) {
         if (entity is File) {
           final name = entity.path.split(fileSystem.path.separator).last;
           final key = name.split('.').first;

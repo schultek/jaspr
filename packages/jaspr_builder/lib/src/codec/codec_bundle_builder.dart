@@ -40,7 +40,7 @@ class CodecBundleBuilder implements Builder {
         .map((c) => CodecModule.deserialize(jsonDecode(c) as Map<String, Object?>));
     final bundle = <Map<String, Object?>>[
       await for (final module in modules)
-        for (var element in module.elements) element.serialize(),
+        for (final element in module.elements) element.serialize(),
     ];
 
     if (bundle.isEmpty) return;

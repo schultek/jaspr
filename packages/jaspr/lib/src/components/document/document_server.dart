@@ -233,7 +233,7 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
       if (node == target) {
         n.children.insertNodeAfter(range);
       } else {
-        for (var c in node.nodes) {
+        for (final c in node.nodes) {
           final o = createTree(c);
           if (o != null) {
             n.children.insertBefore(o);
@@ -244,7 +244,7 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
       return n;
     }
 
-    for (var n in document.nodes) {
+    for (final n in document.nodes) {
       final o = createTree(n);
       if (o != null) {
         final next = ChildNodeData(o);
@@ -281,7 +281,8 @@ class HeadDocument extends StatelessComponent implements Document {
       children: [
         if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (final e in meta!.entries)
+            Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );
@@ -382,14 +383,14 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
           }
         }
 
-        for (var e in value.children) {
+        for (final e in value.children) {
           e.$1.remove();
-          for (var n in e.$1) {
+          for (final n in e.$1) {
             visitRenderObject(n, e.$2);
           }
         }
 
-        for (var n in nodes) {
+        for (final n in nodes) {
           target.children.insertBefore(n);
         }
 

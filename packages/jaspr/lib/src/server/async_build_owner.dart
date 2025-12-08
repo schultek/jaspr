@@ -45,7 +45,7 @@ class TaskChain {
 
   void _complete() {
     _done = true;
-    for (var l in _listeners) {
+    for (final l in _listeners) {
       l();
     }
   }

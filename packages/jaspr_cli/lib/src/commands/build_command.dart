@@ -173,7 +173,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '-o',
         './build/jaspr/app$extension',
         '-Djaspr.flags.release=true',
-        for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
+        for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
       ], workingDirectory: Directory.current.path);
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
@@ -224,7 +224,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-Djaspr.flags.release=true',
           '-Djaspr.flags.generate=true',
           '-Djaspr.dev.web=build/jaspr',
-          for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
+          for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
           entryPoint!,
         ],
         environment: {'PORT': serverPort, 'JASPR_PROXY_PORT': '5567'},
@@ -344,7 +344,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         final excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
         final now = DateTime.now().copyWith(millisecond: 0, microsecond: 0).toIso8601String();
 
-        for (var route in generatedRoutes.entries) {
+        for (final route in generatedRoutes.entries) {
           if (excludePattern != null && excludePattern.hasMatch(route.key)) {
             continue;
           }

@@ -64,7 +64,7 @@ class DaemonLogger implements Logger {
     message = message.trim();
     if (message.contains('\n')) {
       final lines = message.split('\n');
-      for (var l in lines) {
+      for (final l in lines) {
         write(l, tag: tag, level: level, progress: progress);
       }
       return;

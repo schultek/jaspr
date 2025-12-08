@@ -209,12 +209,12 @@ class CodecModule {
 
   factory CodecModule.deserialize(Map<String, Object?> map) {
     return CodecModule(
-      elements: [for (var e in map['elements'] as List<Object?>) CodecElement.deserialize(e as Map<String, Object?>)],
+      elements: [for (final e in map['elements'] as List<Object?>) CodecElement.deserialize(e as Map<String, Object?>)],
     );
   }
 
   Map<String, Object?> serialize() => {
-    'elements': [for (var e in elements) e.serialize()],
+    'elements': [for (final e in elements) e.serialize()],
   };
 }
 

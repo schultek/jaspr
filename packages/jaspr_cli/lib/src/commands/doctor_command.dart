@@ -76,12 +76,12 @@ class DoctorCommand extends BaseCommand {
       ));
     }
 
-    for (var s in sections) {
+    for (final s in sections) {
       final out = StringBuffer('${green.wrap('[✓]')} ${styleBold.wrap(lightBlue.wrap(s.name))!}');
       if (s.details != null) {
         out.write(' (${s.details})');
       }
-      for (var i in s.items) {
+      for (final i in s.items) {
         out.write('\n  • $i');
       }
       out.writeln();

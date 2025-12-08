@@ -88,7 +88,7 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
       await Directory('$to/$moveTarget').absolute.create(recursive: true);
 
       final files = Directory('$from/$moveTarget').absolute.list(recursive: true);
-      await for (var file in files) {
+      await for (final file in files) {
         final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
         moveTargets.add(path);
       }

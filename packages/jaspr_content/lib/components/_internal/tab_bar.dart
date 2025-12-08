@@ -55,7 +55,7 @@ class _TabBarState extends State<TabBar> {
   @override
   Component build(BuildContext context) {
     return div(classes: 'tab-bar', [
-      for (var item in component.items.entries)
+      for (final item in component.items.entries)
         button(
           attributes: {if (item.key == value) 'active': ''},
           events: {

@@ -106,7 +106,7 @@ class HtmlDomain extends Domain {
       }
 
       if (paramStrings.isNotEmpty) {
-        for (var param in paramStrings) {
+        for (final param in paramStrings) {
           result += '$param, ';
         }
       }
@@ -114,7 +114,7 @@ class HtmlDomain extends Domain {
       if (attrStrings.isNotEmpty) {
         result += 'attributes: {';
         var isFirst = true;
-        for (var attrString in attrStrings) {
+        for (final attrString in attrStrings) {
           if (!isFirst) {
             result += ', ';
           }
@@ -139,7 +139,7 @@ class HtmlDomain extends Domain {
           result += '[]';
         } else {
           result += '[\n';
-          for (var child in children) {
+          for (final child in children) {
             final childHtml = _convertNode(child, '$indent  ');
             if (childHtml.trim().isEmpty) {
               continue;

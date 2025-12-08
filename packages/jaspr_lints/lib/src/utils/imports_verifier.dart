@@ -107,7 +107,7 @@ class GatherUsedImportedElementsVisitor extends RecursiveAstVisitor<void> {
 
   void _recordPrefixedElement(ImportPrefixReference? importPrefix, Element? element) {
     if (element is MultiplyDefinedElement) {
-      for (var component in element.conflictingElements) {
+      for (final component in element.conflictingElements) {
         _recordPrefixedElement(importPrefix, component);
         return;
       }

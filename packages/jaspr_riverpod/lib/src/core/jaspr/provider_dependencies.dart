@@ -18,7 +18,7 @@ class ProviderDependencies {
 
   void didRebuild() {
     final oldSubscriptions = [...oldWatchers.values, ...oldListeners.values];
-    for (var subscription in oldSubscriptions) {
+    for (final subscription in oldSubscriptions) {
       subscription.close();
     }
 
@@ -30,7 +30,7 @@ class ProviderDependencies {
 
   void deactivate() {
     final allSubscriptions = [...watchers.values, ...oldWatchers.values, ...listeners.values, ...oldListeners.values];
-    for (var subscription in allSubscriptions) {
+    for (final subscription in allSubscriptions) {
       subscription.close();
     }
 

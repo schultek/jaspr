@@ -433,7 +433,7 @@ class InspectDataItem {
               : null;
           if (childInvalidOnClient != null) {
             child.invalidOnClient = child.dir.withTarget(childInvalidOnClient);
-            for (var c in child.item.children) {
+            for (final c in child.item.children) {
               c.invalidOnClient = null;
             }
           }
@@ -445,7 +445,7 @@ class InspectDataItem {
               : null;
           if (childInvalidOnServer != null) {
             child.invalidOnServer = child.dir.withTarget(childInvalidOnServer);
-            for (var c in child.item.children) {
+            for (final c in child.item.children) {
               c.invalidOnServer = null;
             }
           }

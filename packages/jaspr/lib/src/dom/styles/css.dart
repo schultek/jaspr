@@ -126,7 +126,7 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
   String toCss([String indent = '']) {
     final rules = <String>[];
 
-    for (var rule in resolve('')) {
+    for (final rule in resolve('')) {
       rules.add(rule.toCss(indent));
     }
 
@@ -166,7 +166,7 @@ extension on NestedStyleRule {
       rules.add(StyleRule(selector: selector, styles: _styles));
     }
 
-    for (var child in _children) {
+    for (final child in _children) {
       rules.addAll(child.resolve(selector.selector));
     }
 
@@ -182,18 +182,18 @@ extension on BlockStyleRule {
 
 extension on MediaStyleRule {
   StyleRule _resolve(String parent) {
-    return MediaStyleRule(query: query, styles: [for (var style in styles) ...style.resolve(parent)]);
+    return MediaStyleRule(query: query, styles: [for (final style in styles) ...style.resolve(parent)]);
   }
 }
 
 extension on LayerStyleRule {
   StyleRule _resolve(String parent) {
-    return LayerStyleRule(name: name, styles: [for (var style in styles) ...style.resolve(parent)]);
+    return LayerStyleRule(name: name, styles: [for (final style in styles) ...style.resolve(parent)]);
   }
 }
 
 extension on SupportsStyleRule {
   StyleRule _resolve(String parent) {
-    return SupportsStyleRule(condition: condition, styles: [for (var style in styles) ...style.resolve(parent)]);
+    return SupportsStyleRule(condition: condition, styles: [for (final style in styles) ...style.resolve(parent)]);
   }
 }

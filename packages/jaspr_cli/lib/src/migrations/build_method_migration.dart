@@ -143,7 +143,7 @@ class BuildMethodMigration implements Migration {
           if (s is YieldStatement) {
             builder.replace(s.yieldKeyword.offset, s.yieldKeyword.length, 'return');
           } else if (s is Block) {
-            for (var child in s.statements) {
+            for (final child in s.statements) {
               replaceYieldWithReturn(child);
             }
           } else if (s is ForStatement) {
@@ -182,7 +182,7 @@ class BuildMethodMigration implements Migration {
               return;
             }
             builder.replace(s.leftBracket.offset, s.leftBracket.length, '...[');
-            for (var child in s.statements) {
+            for (final child in s.statements) {
               replaceStatementWithElement(child, true);
             }
             builder.replace(s.rightBracket.offset, s.rightBracket.length, ']${addComma ? ',' : ''}');
@@ -217,7 +217,7 @@ class BuildMethodMigration implements Migration {
         } else if (s is ReturnStatement) {
           builder.insert(s.semicolon.offset, ' Component.fragment(children)');
         } else if (s is Block) {
-          for (var child in s.statements) {
+          for (final child in s.statements) {
             replaceYieldAndReturnWithChildren(child);
           }
         } else if (s is ForStatement) {

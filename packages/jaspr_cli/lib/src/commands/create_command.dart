@@ -47,10 +47,10 @@ class CreateCommand extends BaseCommand {
       abbr: 'm',
       help: 'Choose a rendering mode for the project.',
       allowed: [
-        for (var m in RenderingMode.values) m.name,
+        for (final m in RenderingMode.values) m.name,
       ],
       allowedHelp: {
-        for (var v in RenderingMode.values) v.name: '${v.help}.',
+        for (final v in RenderingMode.values) v.name: '${v.help}.',
       },
     );
     argParser.addOption(

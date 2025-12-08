@@ -126,7 +126,7 @@ class ClientModule {
       id: AssetId.deserialize(map['id'] as List<Object?>),
       import: map['import'] as String,
       params: [
-        for (var param in map['params'] as List<Object?>) ClientParam.deserialize(param as Map<String, Object?>),
+        for (final param in map['params'] as List<Object?>) ClientParam.deserialize(param as Map<String, Object?>),
       ],
     );
   }
@@ -135,7 +135,7 @@ class ClientModule {
     'name': name,
     'id': id.serialize(),
     'import': import,
-    'params': [for (var p in params) p.serialize()],
+    'params': [for (final p in params) p.serialize()],
   };
 
   String componentFactory() {
@@ -169,7 +169,7 @@ List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
   final constr = e.constructors.first;
   final params = constr.formalParameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
-  for (var param in params) {
+  for (final param in params) {
     if (!param.isInitializingFormal) {
       throw UnsupportedError(
         'Client components only support initializing formal constructor parameters. '

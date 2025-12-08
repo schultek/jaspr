@@ -148,7 +148,7 @@ class FilesystemLoader extends RouteLoaderBase {
     final fullPath = fileSystem.path.join(directory, source.path);
     final dependencies = {...?dependentSources[fullPath]};
     dependentSources[fullPath]?.clear();
-    for (var dependent in dependencies) {
+    for (final dependent in dependencies) {
       invalidateSource(dependent, rebuild: rebuild);
     }
   }

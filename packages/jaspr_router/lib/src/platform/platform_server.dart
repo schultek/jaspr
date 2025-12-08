@@ -48,7 +48,7 @@ class RouteRegistryImpl implements RouteRegistry {
 
     void registerRoute(RouteBase route, String path) {
       if (route is ShellRoute) {
-        for (var route in route.routes) {
+        for (final route in route.routes) {
           registerRoute(route, path);
         }
       } else if (route is Route) {
@@ -58,17 +58,17 @@ class RouteRegistryImpl implements RouteRegistry {
           'Routes with path parameters are not supported when using static-site generation.',
         );
         paths[p] = route.settings;
-        for (var route in route.routes) {
+        for (final route in route.routes) {
           registerRoute(route, p);
         }
       }
     }
 
-    for (var route in routes) {
+    for (final route in routes) {
       registerRoute(route, '');
     }
 
-    for (var path in paths.entries) {
+    for (final path in paths.entries) {
       await ServerApp.requestRouteGeneration(
         path.key,
         lastMod: path.value?.lastMod?.toIso8601String(),

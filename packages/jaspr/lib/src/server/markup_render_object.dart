@@ -84,7 +84,7 @@ abstract class MarkupRenderObject extends RenderObject {
     childStrictFormatting |=
         firstChild is MarkupRenderText && firstChild.text.contains('\n') && firstChild.text.trim().isEmpty;
 
-    for (var child in children) {
+    for (final child in children) {
       final (html, leading, trailing) = child._renderAndFormat(
         childStrictFormatting,
         childStrictWhitespace,
@@ -203,7 +203,7 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
       output.write(' style="${_attributeEscape.convert(props.join('; '))}"');
     }
     if (attributes case final attrs? when attrs.isNotEmpty) {
-      for (var attr in attrs.entries) {
+      for (final attr in attrs.entries) {
         _domValidator.validateAttributeName(attr.key);
         if (attr.value.isNotEmpty) {
           output.write(' ${attr.key}="${_attributeEscape.convert(attr.value)}"');
@@ -293,7 +293,7 @@ class RootMarkupRenderObject extends MarkupRenderObject {
     var leadingWhitespace = false;
     var trailingWhitespace = false;
 
-    for (var child in children) {
+    for (final child in children) {
       final (html, leading, trailing) = child._renderAndFormat(strictFormatting, strictWhitespace, indent);
       output.writeln(html);
       if (child == children.first) leadingWhitespace = leading;

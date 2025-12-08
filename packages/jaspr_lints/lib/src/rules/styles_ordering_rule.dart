@@ -91,7 +91,7 @@ class _StylesVisitor extends SimpleAstVisitor<void> {
   static Expression? checkOrder(NodeList<Expression> args, List<String?> params) {
     int lastSeenParam = -1;
 
-    for (var argument in args) {
+    for (final argument in args) {
       if (argument is! NamedExpression) {
         continue;
       }

@@ -109,7 +109,7 @@ class RemoveComponent extends ResolvedCorrectionProducer {
       final indent = utils.getLinePrefix(node.offset);
 
       final children = <AstNode>[
-        for (var arg in node.argumentList.arguments)
+        for (final arg in node.argumentList.arguments)
           if (arg is NamedExpression)
             if (arg.name.label.name == 'child' && isComponentType(arg.staticType))
               arg.expression
@@ -136,7 +136,7 @@ class RemoveComponent extends ResolvedCorrectionProducer {
       } else if (node.parent is ListLiteral) {
         await builder.addDartFileEdit(file, (builder) {
           builder.addReplacement(node.sourceRange, (edit) {
-            for (var child in children) {
+            for (final child in children) {
               final childIndent = utils.getLinePrefix(child.offset);
               final source = getRangeText(
                 child.sourceRange,

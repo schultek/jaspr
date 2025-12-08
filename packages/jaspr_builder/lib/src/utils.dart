@@ -53,7 +53,7 @@ Map<String, String> compressPaths(List<String> paths) {
 
   final compressed = <String, String>{};
   final used = <String>{};
-  for (var segment in segments) {
+  for (final segment in segments) {
     var i = segment.length - 1;
     var compressedPath = path.url.withoutExtension(segment.last);
     while (i > 0 && used.contains(compressedPath)) {
@@ -183,7 +183,7 @@ class ImportsWriter {
   String resolve(String source) {
     final imports = <String>{};
     final deferredImports = <String>{};
-    for (var match in _importsRegex.allMatches(source)) {
+    for (final match in _importsRegex.allMatches(source)) {
       final url = match.group(2)!;
       imports.add(url);
       if (match.group(1) != null) {
@@ -193,7 +193,7 @@ class ImportsWriter {
 
     final compressed = compressPaths(imports.toList());
     final prefixes = {
-      for (var url in imports)
+      for (final url in imports)
         url: '_${compressed[url]!.replaceFirst('package:', '\$').replaceAll('/', '_').replaceAll('.', r'$')}',
     };
 
@@ -223,11 +223,11 @@ extension ImportUrl on AssetId {
 extension LoadBundle on BuildStep {
   Stream<T> loadBundle<T>(String name, T Function(Map<String, Object?>) decoder) async* {
     final packages = {inputId.package, ...(await packageConfig).packages.map((p) => p.name)};
-    for (var package in packages) {
+    for (final package in packages) {
       final bundleId = AssetId(package, 'lib/$name.bundle.json');
       if (await canRead(bundleId)) {
         final bundle = jsonDecode(await readAsString(bundleId)) as List<Object?>;
-        for (var element in bundle.cast<Map<String, Object?>>()) {
+        for (final element in bundle.cast<Map<String, Object?>>()) {
           yield decoder(element);
         }
       }

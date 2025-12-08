@@ -16,7 +16,7 @@ abstract class CreateComponentAssist extends ResolvedCorrectionProducer {
     if (node case final CompilationUnit node) {
       var hasJasprImport = false;
 
-      for (var dir in node.directives) {
+      for (final dir in node.directives) {
         if (dir.end > selectionOffset) {
           return;
         }
@@ -25,7 +25,7 @@ abstract class CreateComponentAssist extends ResolvedCorrectionProducer {
         }
       }
 
-      for (var dec in node.declarations) {
+      for (final dec in node.declarations) {
         if (selectionOffset >= dec.offset && selectionEnd <= dec.end) {
           return;
         }
@@ -171,7 +171,7 @@ abstract class ConvertComponentAssist extends ResolvedCorrectionProducer {
 
       MethodDeclaration? buildMethod;
       final List<String> members = [];
-      for (var m in node.members) {
+      for (final m in node.members) {
         if (m is MethodDeclaration && m.name.lexeme == 'build') {
           buildMethod = m;
         } else if (m is FieldDeclaration) {
@@ -228,7 +228,7 @@ class ConvertToAsyncStatelessComponent extends ConvertComponentAssist {
   Future<void> convertComponent(ChangeBuilder builder, ClassDeclaration node, MethodDeclaration? buildMethod) async {
     await builder.addDartFileEdit(file, (builder) {
       if (node.parent case final CompilationUnit unit) {
-        for (var dir in unit.directives) {
+        for (final dir in unit.directives) {
           if (dir is ImportDirective && dir.uri.stringValue == 'package:jaspr/jaspr.dart') {
             builder.addDeletion(dir.sourceRange);
           }

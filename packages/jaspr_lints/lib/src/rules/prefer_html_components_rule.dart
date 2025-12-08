@@ -102,7 +102,7 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
       _tagName = tag;
 
       await builder.addDartFileEdit(file, (builder) {
-        for (var argument in node.argumentList.arguments) {
+        for (final argument in node.argumentList.arguments) {
           if (argument is NamedExpression) {
             final name = argument.name.label.name;
             if (name == 'tag') {

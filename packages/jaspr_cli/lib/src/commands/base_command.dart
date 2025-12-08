@@ -60,7 +60,7 @@ abstract class BaseCommand extends Command<int> {
   Future<void> stop() async {
     final gs = [...guards];
     guards.clear();
-    for (var g in gs) {
+    for (final g in gs) {
       await g();
     }
   }
@@ -139,7 +139,7 @@ abstract class BaseCommand extends Command<int> {
     final libDir = Directory('lib/').absolute;
 
     if (binDir.existsSync()) {
-      await for (var entity in binDir.list(recursive: true)) {
+      await for (final entity in binDir.list(recursive: true)) {
         if (entity is File && entity.path.endsWith('.server.dart')) {
           return entity.path;
         }
@@ -147,7 +147,7 @@ abstract class BaseCommand extends Command<int> {
     }
 
     if (libDir.existsSync()) {
-      await for (var entity in libDir.list(recursive: true)) {
+      await for (final entity in libDir.list(recursive: true)) {
         if (entity is File && entity.path.endsWith('.server.dart')) {
           return entity.path;
         }

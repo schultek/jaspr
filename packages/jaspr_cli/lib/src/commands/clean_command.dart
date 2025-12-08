@@ -61,7 +61,7 @@ class CleanCommand extends BaseCommand {
         }
 
         if (kill) {
-          for (var pid in pids) {
+          for (final pid in pids) {
             Process.killPid(pid);
           }
         }
@@ -75,7 +75,7 @@ class CleanCommand extends BaseCommand {
 Future<List<int>> findRunawayProcesses(List<String> ports) async {
   final pids = <int>[];
 
-  for (var port in ports) {
+  for (final port in ports) {
     final proc = await Process.run('lsof', ['-i', ':$port']);
 
     if (proc.exitCode == 0) {
