@@ -17,6 +17,7 @@ void main() {
 // Generated from packages/jaspr/tool/generate_html.dart
 //
 // dart format off
+// ignore_for_file: prefer_single_quotes
 
 const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
 ''');

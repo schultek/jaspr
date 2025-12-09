@@ -22,7 +22,7 @@ abstract final class Jaspr {
 /// Global options for configuring Jaspr on the client.
 ///
 /// **DO NOT USE DIRECTLY.**
-/// Use the generated [defaultClientOptions] instead.
+/// Use the generated `defaultClientOptions` instead.
 final class ClientOptions {
   const ClientOptions({this.initialize, this.clients = const {}});
 
@@ -33,7 +33,7 @@ final class ClientOptions {
 /// The loader configuration for a @client component.
 ///
 /// **DO NOT USE DIRECTLY.**
-/// Use the generated [defaultClientOptions] instead.
+/// Use the generated `defaultClientOptions` instead.
 final class ClientLoader {
   ClientLoader(this.builder, {this.loader});
 
@@ -61,5 +61,5 @@ final class ClientLoader {
 /// The builder function type for a @client component.
 ///
 /// **DO NOT USE DIRECTLY.**
-/// Use the generated [defaultClientOptions] instead.
+/// Use the generated `defaultClientOptions` instead.
 typedef ClientBuilder = Component Function(Map<String, dynamic> params);
