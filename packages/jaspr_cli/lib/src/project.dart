@@ -70,8 +70,13 @@ class Project {
     final pubspecYaml = requirePubspecYaml;
     if (pubspecYaml case {'dependencies': {'jaspr': final String version}}) {
       final usedVersion = VersionConstraint.parse(version);
-      var minVersion = Version.parse(jasprCoreVersion);
-      if (!minVersion.isPreRelease) minVersion = Version(minVersion.major, minVersion.minor, 0);
+      final currentVersion = Version.parse(jasprCoreVersion);
+      final minVersion = Version(
+        currentVersion.major,
+        currentVersion.minor,
+        0,
+        pre: currentVersion.isPreRelease ? currentVersion.preRelease.map((s) => s is int ? 0 : s).join('.') : null,
+      );
       final requiredVersion = VersionConstraint.compatibleWith(minVersion);
       if (!requiredVersion.allowsAll(usedVersion)) {
         logger.write(

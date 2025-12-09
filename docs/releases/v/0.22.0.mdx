@@ -17,6 +17,7 @@ Version 0.22.0 ships **separate entrypoints for server and client** environments
 - **Reimplemented HTML Components as Classes**: All HTML components have been reimplemented as classes instead of functions, allowing `const` usage.
 - **Allow binary responses**: The `AppContext.setStatusCode` method now accepts binary data for overriding the response body.
 - **Various Styling Improvements**: New CSS properties like `animation` and `quotes`, improved properties like `Transition`, better support for dot-shorthands and more.
+- **Discontinued `jaspr_web_compilers`**: Flutter support can now be enabled through the `--use-flutter-sdk` cli flag with no special dependency.
 
 <Warning>
 Most changes can be **automatically migrated** using the `jaspr migrate` command.
@@ -66,10 +67,6 @@ void main() {
 This surfaces previously hidden functionality of the framework related to the initialization of `@client` components on the client and thereby makes it easier to debug and understand what is happening.
 
 Futher, the new `ClientApp` component may be wrapped with other (Inherited) components to share state across multiple `@client` components, or to run custom initialization logic before calling `runApp`.
-
-### Flutter Plugin Support
-
-Jaspr supports using Flutter web plugins through the `jaspr_web_compilers` package. Part of the required setup logic related to plugins has now moved into the `.client.options.dart` file. To continue using plugins, make sure to use the latest version of `jaspr_web_compilers` together with the new entrypoint system.
 
 ### Changed `browser` library to `client`
 
@@ -156,3 +153,9 @@ The `duration` and `delay` properties of `Transition` now accept `Duration` inst
 ```dart
 transition: Transition('width', duration: 2.seconds, delay: 300.ms),
 ```
+
+## Flutter Support
+
+Jaspr used to support Flutter plugins and Flutter embedding through a custom `build_web_compilers` fork called `jaspr_web_compilers`. A range of changes has been landed upstream and so the fork is no longer needed and has been discontinued. Please replace all dependencies on `jaspr_web_compilers` with `build_web_compilers` and ensure a minimum version of `4.4.6`.
+
+Further, to enable Flutter plugin support pass the `--use-flutter-sdk` flag to the `jaspr serve` and `jaspr build` commands. This is enabled by default when using Flutter embedding.

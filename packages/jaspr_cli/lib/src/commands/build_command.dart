@@ -458,6 +458,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',
+      if (useFlutterSdkOptions) '--define=jaspr_builder:client_options=initialize-flutter-plugins=true',
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
         '--define=build_web_compilers:entrypoint=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',

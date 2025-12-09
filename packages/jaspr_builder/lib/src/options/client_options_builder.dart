@@ -46,10 +46,12 @@ class ClientOptionsBuilder implements Builder {
       buildStep.inputId.path.replaceFirst('.client.dart', '.server.dart'),
     );
 
+    final shouldInitializePlugins = options.config['initialize-flutter-plugins'] as bool? ?? false;
+
     var (clients, sources, plugins) = await (
       buildStep.loadClients(),
       buildStep.loadTransitiveSourcesFor(serverId),
-      loadWebPlugins(buildStep),
+      shouldInitializePlugins ? loadWebPlugins(buildStep) : Future.value(<Plugin>[]),
     ).wait;
 
     if (sources.isNotEmpty) {
