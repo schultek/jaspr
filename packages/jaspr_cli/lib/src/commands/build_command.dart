@@ -11,11 +11,11 @@ import 'package:http/http.dart' as http show Client, Response;
 import 'package:path/path.dart' as p;
 import 'package:webdev/src/daemon_client.dart' as d;
 
-import '../config.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
+import '../project.dart';
 import 'base_command.dart';
 
 class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {

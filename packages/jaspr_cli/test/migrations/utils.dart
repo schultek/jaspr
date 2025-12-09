@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:file/file.dart';
-import 'package:jaspr_cli/src/config.dart';
 import 'package:jaspr_cli/src/logging.dart';
 import 'package:jaspr_cli/src/migrations/migration_models.dart';
+import 'package:jaspr_cli/src/project.dart';
 import 'package:test/test.dart';
 
 void testUnitMigration(

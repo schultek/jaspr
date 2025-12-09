@@ -8,13 +8,13 @@ import 'package:dwds/src/loaders/strategy.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
-import '../config.dart';
 import '../dev/chrome.dart';
 import '../dev/client_workflow.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
+import '../project.dart';
 import 'base_command.dart';
 
 abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {

@@ -5,8 +5,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import '../commands/base_command.dart';
-import '../config.dart';
 import '../logging.dart';
+import '../project.dart';
 
 mixin FlutterHelper on BaseCommand {
   Map<String, String> getFlutterDartDefines(bool useWasm, bool release) {

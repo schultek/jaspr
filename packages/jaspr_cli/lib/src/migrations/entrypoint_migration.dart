@@ -2,7 +2,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:io/ansi.dart';
 
-import '../config.dart';
+import '../project.dart';
 import 'migration_models.dart';
 
 class EntrypointMigration implements Migration {

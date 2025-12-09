@@ -1,6 +1,6 @@
 import 'package:file/memory.dart';
-import 'package:jaspr_cli/src/config.dart';
 import 'package:jaspr_cli/src/logging.dart';
+import 'package:jaspr_cli/src/project.dart';
 import 'package:test/test.dart';
 
 class TestLogger implements Logger {

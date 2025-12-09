@@ -74,7 +74,11 @@ class MigrateCommand extends BaseCommand {
     }
 
     if (currentVersion == null) {
-      ensureInProject(requireJasprMode: false, preferBuilderDependency: false);
+      ensureInProject(
+        requireJasprMode: false,
+        preferBuilderDependency: false,
+        checkJasprDependencyVersion: false,
+      );
     }
 
     final currentJasprVersion =

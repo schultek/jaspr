@@ -7,6 +7,7 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
 import 'logging.dart';
+import 'version.dart';
 
 enum JasprMode { static, server, client }
 
@@ -62,6 +63,24 @@ class Project {
         level: Level.critical,
       );
       _exitFn(1);
+    }
+  }
+
+  void checkJasprDependencyVersion() {
+    final pubspecYaml = requirePubspecYaml;
+    if (pubspecYaml case {'dependencies': {'jaspr': final String version}}) {
+      final usedVersion = VersionConstraint.parse(version);
+      var minVersion = Version.parse(jasprCoreVersion);
+      if (!minVersion.isPreRelease) minVersion = Version(minVersion.major, minVersion.minor, 0);
+      final requiredVersion = VersionConstraint.compatibleWith(minVersion);
+      if (!requiredVersion.allowsAll(usedVersion)) {
+        logger.write(
+          'Incompatible jaspr dependency with version $version found in pubspec.yaml. Please use a minimum version constraint of $minVersion for all core packages.',
+          tag: Tag.cli,
+          level: Level.critical,
+        );
+        _exitFn(1);
+      }
     }
   }
 
