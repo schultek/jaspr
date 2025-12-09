@@ -2,7 +2,7 @@
 
 This example shows how to use flutter plugins with jaspr.
 
-When using the experimental `jaspr_web_compilers` package, you can import _most_ flutter plugins in your jaspr code.
+When using the `--use-flutter-sdk` flag, you can import _most_ flutter plugins in your jaspr code.
 
 ## Overview
 

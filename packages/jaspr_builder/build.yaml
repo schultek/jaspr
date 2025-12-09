@@ -14,7 +14,7 @@ builders:
       - 'clients.bundle.json'
       - 'styles.bundle.json'
     runs_before:
-      - jaspr_web_compilers:entrypoint_bootstrap
+      - build_web_compilers:entrypoint
   client_options:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildClientOptions" ]
@@ -26,7 +26,7 @@ builders:
     required_inputs:
       - 'clients.bundle.json'
     runs_before:
-      - jaspr_web_compilers:entrypoint_bootstrap
+      - build_web_compilers:entrypoint
 # ========================
 # === Client Component ===
 # ========================
@@ -61,7 +61,7 @@ builders:
     auto_apply: root_package
     build_to: cache
     runs_before:
-      - jaspr_web_compilers:entrypoint_bootstrap
+      - build_web_compilers:entrypoint
 # ========================
 # === Styles ===
 # ========================
@@ -97,7 +97,7 @@ builders:
     required_inputs:
       - 'codec.bundle.json'
     runs_before:
-      - jaspr_web_compilers:entrypoint_bootstrap
+      - build_web_compilers:entrypoint
 # ========================
 # === Codec ===
 # ========================
@@ -141,7 +141,7 @@ builders:
     required_inputs:
       - '.imports.json'
     runs_before:
-      - jaspr_web_compilers:entrypoint_bootstrap
+      - build_web_compilers:entrypoint
   stub:
     import: "package:jaspr_builder/builder.dart"
     builder_factories: [ "buildPlatformStubs" ]
@@ -155,4 +155,4 @@ builders:
     required_inputs:
       - '.imports.json'
     runs_before:
-      - jaspr_web_compilers:entrypoint_bootstrap
+      - build_web_compilers:entrypoint

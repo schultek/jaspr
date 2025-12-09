@@ -108,7 +108,6 @@ class Meet extends StatelessComponent {
             
           dev_dependencies:
             jaspr_builder: ^0.21.0
-            jaspr_web_compilers: ^4.2.0
             jaspr_lints: ^0.4.0
 
           jaspr:

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:mason/mason.dart' as m show Logger;
-import 'package:mason/mason.dart';
+import 'package:mason/mason.dart' hide Level;
 import 'package:path/path.dart' as p;
 import 'package:pub_updater/pub_updater.dart';
 
@@ -23,7 +23,6 @@ enum RenderingMode {
   final String help;
 
   bool get useServer => this == server || this == static;
-  String get recommend => this == static ? '(Recommended) ' : '';
 }
 
 class CreateCommand extends BaseCommand {
@@ -47,10 +46,13 @@ class CreateCommand extends BaseCommand {
       abbr: 'm',
       help: 'Choose a rendering mode for the project.',
       allowed: [
-        for (final m in RenderingMode.values) m.name,
+        for (final m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto'],
       ],
       allowedHelp: {
-        for (final v in RenderingMode.values) v.name: '${v.help}.',
+        for (final v in RenderingMode.values) ...{
+          v.name: '${v.help}.',
+          if (v.useServer) '${v.name}:auto': '(Deprecated) ${v.help} with automatic client-side hydration.',
+        },
       },
     );
     argParser.addOption(
@@ -72,7 +74,7 @@ class CreateCommand extends BaseCommand {
       allowedHelp: {
         'none': 'No preconfigured Flutter support.',
         'embedded': 'Sets up an embedded Flutter app inside your site.',
-        'plugins-only': '(Recommended) Enables support for using Flutter web plugins.',
+        'plugins-only': '(Deprecated) Enables support for using Flutter web plugins.',
       },
     );
     argParser.addOption(
@@ -111,7 +113,7 @@ class CreateCommand extends BaseCommand {
 
     final useMode = getRenderingMode();
     final (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
-    final (useFlutter, usePlugins) = getFlutter();
+    final useFlutter = getFlutter();
     final useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
     final usedPrefixes = {
@@ -124,13 +126,11 @@ class CreateCommand extends BaseCommand {
 
     final updater = PubUpdater();
 
-    final webCompilersPackage = usePlugins ? 'jaspr_web_compilers' : 'build_web_compilers';
-
     final [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_lints'),
-      updater.getLatestVersion(webCompilersPackage),
+      updater.getLatestVersion('build_web_compilers'),
     ]);
 
     final progress = logger.logger!.progress('Generating project...');
@@ -144,7 +144,6 @@ class CreateCommand extends BaseCommand {
         'routing': useRouting,
         'multipage': useMultiPageRouting,
         'flutter': useFlutter,
-        'plugins': usePlugins,
         'server': useMode.useServer,
         'shelf': useBackend == 'shelf',
         'jasprCoreVersion': jasprCoreVersion,
@@ -152,7 +151,6 @@ class CreateCommand extends BaseCommand {
         'jasprFlutterEmbedVersion': jasprFlutterEmbedVersion,
         'jasprRouterVersion': jasprRouterVersion,
         'jasprLintsVersion': jasprLintsVersion,
-        'webCompilersPackage': webCompilersPackage,
         'webCompilersVersion': webCompilersVersion,
       },
       logger: logger.logger,
@@ -198,14 +196,12 @@ class CreateCommand extends BaseCommand {
       jasprRouterVersion,
       jasprContentVersion,
       jasprLintsVersion,
-      jasprWebCompilersVersion,
-      buildWebCompilersVersion,
+      webCompilersVersion,
     ] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_content'),
       updater.getLatestVersion('jaspr_lints'),
-      updater.getLatestVersion('jaspr_web_compilers'),
       updater.getLatestVersion('build_web_compilers'),
     ]);
 
@@ -222,8 +218,7 @@ class CreateCommand extends BaseCommand {
         'jasprRouterVersion': jasprRouterVersion,
         'jasprContentVersion': jasprContentVersion,
         'jasprLintsVersion': jasprLintsVersion,
-        'jasprWebCompilersVersion': jasprWebCompilersVersion,
-        'buildWebCompilersVersion': buildWebCompilersVersion,
+        'webCompilersVersion': webCompilersVersion,
       },
       logger: logger.logger,
     );
@@ -279,10 +274,19 @@ class CreateCommand extends BaseCommand {
 
   RenderingMode getRenderingMode() {
     final opt = argResults!.option('mode');
-    return switch (opt) {
-      'client' => RenderingMode.client,
-      'server' => RenderingMode.server,
-      'static' => RenderingMode.static,
+    return switch (opt?.split(':')) {
+      ['client'] => RenderingMode.client,
+      [final m, 'auto'] => () {
+        logger.write(
+          'The ":auto" suffix for "--mode" is deprecated and will be removed in a future release. '
+          'Automatic hydration is enabled by default.',
+          level: Level.warning,
+        );
+
+        return RenderingMode.values.byName(m);
+      }(),
+      [final m] => RenderingMode.values.byName(m),
+
       _ => () {
         final mode = logger.logger!.chooseOne(
           'Select a rendering mode:',
@@ -315,19 +319,23 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  (bool, bool) getFlutter() {
+  bool getFlutter() {
     final opt = argResults!.option('flutter');
 
     return switch (opt) {
-      'none' => (false, false),
-      'embedded' => (true, true),
-      'plugins-only' => (false, true),
+      'none' => false,
+      'embedded' => true,
+      'plugins-only' => () {
+        logger.write(
+          'The "plugins-only" option for "--flutter" is deprecated and will be removed in a future release. '
+          'Use "--use-flutter-sdk" during "jaspr serve" and "jaspr build" instead.',
+          level: Level.warning,
+        );
+        return false;
+      }(),
       _ => () {
         final flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
-        final plugins =
-            flutter ||
-            logger.logger!.confirm('Enable support for using Flutter web plugins in your project?', defaultValue: true);
-        return (flutter, plugins);
+        return flutter;
       }(),
     };
   }

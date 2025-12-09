@@ -165,10 +165,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: "0126ba5111c4b8f5b1f557beb23eb0bd9266f9114199ff42d9270c29c997b1be"
+      sha256: f2fc2635343fa04038aec83532e58f4b206a403694555ad19e495c9ae326b811
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.18"
+    version: "5.1.4"
   build_runner:
     dependency: transitive
     description:
@@ -189,10 +189,10 @@ packages:
     dependency: transitive
     description:
       name: build_web_compilers
-      sha256: "75732844afcadb8e1ec2103acfeb813bb35f4754a8cd89ad9fd3378edb59378b"
+      sha256: "37b1e61ae004124bfbb49079f73ee548d216acc901a58e65b0ffe02baa21cb96"
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.2"
+    version: "4.4.6"
   built_collection:
     dependency: transitive
     description:
@@ -991,14 +991,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  jaspr_web_compilers:
-    dependency: transitive
-    description:
-      name: jaspr_web_compilers
-      sha256: "3b4799d78763ef97e83b28f90b29309a4d5ad11e06cd36d49dfc1acf594bbc32"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.3.2+1"
   jose:
     dependency: transitive
     description:
@@ -1965,5 +1957,5 @@ packages:
     source: hosted
     version: "2.2.2"
 sdks:
-  dart: ">=3.10.0 <3.11.0-z"
+  dart: ">=3.10.0 <3.12.0-z"
   flutter: ">=3.35.0"

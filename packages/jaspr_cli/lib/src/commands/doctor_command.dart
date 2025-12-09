@@ -56,12 +56,11 @@ class DoctorCommand extends BaseCommand {
       final dependencies = [
         findDependency('jaspr', reportMissing: true),
         findDependency('jaspr_builder'),
-        findDependency('jaspr_web_compilers'),
+        findDependency('jaspr_content'),
         findDependency('jaspr_test'),
         findDependency('jaspr_flutter_embed'),
         findDependency('jaspr_riverpod'),
         findDependency('jaspr_router'),
-        findDependency('jaspr_tailwind'),
       ].whereType<String>();
 
       sections.add((
@@ -70,7 +69,6 @@ class DoctorCommand extends BaseCommand {
         items: [
           'Dependencies on core packages:${dependencies.join()}',
           'Rendering mode: ${project.modeOrNull?.name}',
-          'Uses jaspr compilers: ${project.usesJasprWebCompilers}',
           'Uses flutter embedding: ${project.usesFlutter}',
         ],
       ));
