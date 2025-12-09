@@ -26,6 +26,20 @@ To embed a Flutter app into your Jaspr website you need the following setup:
     {{flutter_js}}
     {{flutter_build_config}}
     ```
+
+    And include it as a script in your page:
+
+    ```dart
+    // In server or static mode
+    Document(
+      head: [
+        script(src: "flutter_bootstrap.js", async: true),
+      ]
+    ),
+
+    // Or in client mode, add to index.html:
+    // <script src="flutter_bootstrap.js" async></script>
+    ```
   </Step>
   <Step>
     Add the `FlutterEmbedView` component to your jaspr app like this:
