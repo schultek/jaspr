@@ -8,8 +8,8 @@ import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'utils.dart';
 
-const htmlns = 'http://www.w3.org/1999/xhtml';
-const xmlns = {'svg': 'http://www.w3.org/2000/svg', 'math': 'http://www.w3.org/1998/Math/MathML'};
+const _htmlns = 'http://www.w3.org/1999/xhtml';
+const _xmlns = {'svg': 'http://www.w3.org/2000/svg', 'math': 'http://www.w3.org/1998/Math/MathML'};
 
 abstract class DomRenderObject implements RenderObject {
   @override
@@ -55,7 +55,7 @@ class DomRenderElement extends DomRenderObject
   Map<String, EventBinding>? events;
 
   void _createNode(String tag) {
-    var namespace = xmlns[tag];
+    var namespace = _xmlns[tag];
     if (namespace == null && (parent?.node.isElement ?? false)) {
       namespace = (parent?.node as web.Element).namespaceURI;
     }
@@ -80,7 +80,7 @@ class DomRenderElement extends DomRenderObject
   }
 
   web.Element _createElement(String tag, String? namespace) {
-    if (namespace != null && namespace != htmlns) {
+    if (namespace != null && namespace != _htmlns) {
       return web.document.createElementNS(namespace, tag);
     }
     return web.document.createElement(tag);
@@ -302,17 +302,27 @@ class DomRenderFragment extends DomRenderObject
   DomRenderObject? _lastChild;
 
   web.Node? get firstChildNode {
-    if (_firstChild case final DomRenderFragment c) {
-      return c.firstChildNode;
+    if (_firstChild case final firstChild?) {
+      if (firstChild is DomRenderFragment) {
+        return firstChild.lastChildNode;
+      }
+
+      return firstChild.node;
     }
-    return _firstChild?.node;
+
+    return null;
   }
 
   web.Node? get lastChildNode {
-    if (_lastChild case final DomRenderFragment c) {
-      return c.lastChildNode;
+    if (_lastChild case final lastChild?) {
+      if (lastChild is DomRenderFragment) {
+        return lastChild.lastChildNode;
+      }
+
+      return lastChild.node;
     }
-    return _lastChild?.node;
+
+    return null;
   }
 
   @override
@@ -335,14 +345,15 @@ class DomRenderFragment extends DomRenderObject
       print('Move fragment to $targetNode after $afterNode');
     }
 
-    if (firstChildNode == null) {
+    final originalFirstChildNode = firstChildNode;
+    if (originalFirstChildNode == null) {
       // If fragment is empty, nothing to move.
       return;
     }
 
     assert(lastChildNode != null, 'Non-empty attached fragments must have a valid last child reference.');
 
-    if (firstChildNode!.previousSibling == afterNode && firstChildNode!.parentNode == targetNode) {
+    if (originalFirstChildNode.previousSibling == afterNode && originalFirstChildNode.parentNode == targetNode) {
       return;
     }
 
@@ -353,7 +364,7 @@ class DomRenderFragment extends DomRenderObject
     while (currentNode != null) {
       final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
 
-      // Attach to new parent
+      // Attach to new parent.
       targetNode.insertBefore(currentNode, beforeNode);
 
       beforeNode = currentNode;
@@ -396,7 +407,10 @@ class DomRenderFragment extends DomRenderObject
       currentNode = prevNode;
     }
 
-    assert(firstChildNode == node.childNodes.item(0), 'First child node should be the first child of the fragment.');
+    assert(
+      firstChildNode == node.childNodes.item(0),
+      'First child node should be the first child of the fragment.',
+    );
     assert(
       lastChildNode == node.childNodes.item(node.childNodes.length - 1),
       'Last child node should be the last child of the fragment.',
@@ -505,7 +519,10 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       }
 
       if (child is! DomRenderFragment) {
-        assert(childNode.previousSibling == afterNode, 'Child node should have been placed after the specified node.');
+        assert(
+          childNode.previousSibling == afterNode,
+          'Child node should have been placed after the specified node.',
+        );
       } else if (child.firstChildNode != null) {
         assert(
           child.firstChildNode?.previousSibling == afterNode,

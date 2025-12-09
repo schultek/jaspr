@@ -39,8 +39,8 @@ extension AppContext on BuildContext {
 
   /// Sets the cookie with the given name and value in the response.
   ///
-  /// [name] and [value] must be composed of valid characters according to RFC
-  /// 6265.
+  /// [name] and [value] must be composed of valid characters according to
+  /// RFC 6265.
   void setCookie(
     /// The name of the cookie.
     String name,

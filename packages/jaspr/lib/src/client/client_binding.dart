@@ -30,22 +30,22 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     return pathWithoutOrigin;
   }
 
-  late String attachTarget;
-  late (web.Node, web.Node)? attachBetween;
+  late String _attachTarget;
+  (web.Node, web.Node)? _attachBetween;
 
   @override
   void attachRootComponent(Component app, {String attachTo = 'body', (web.Node, web.Node)? attachBetween}) {
-    attachTarget = attachTo;
-    this.attachBetween = attachBetween;
+    _attachTarget = attachTo;
+    _attachBetween = attachBetween;
     super.attachRootComponent(app);
   }
 
   @override
   RenderObject createRootRenderObject() {
-    if (attachBetween case (final start, final end)) {
+    if (_attachBetween case (final start, final end)) {
       return RootDomRenderObject.between(start, end);
     } else {
-      return RootDomRenderObject(web.document.querySelector(attachTarget)!);
+      return RootDomRenderObject(web.document.querySelector(_attachTarget)!);
     }
   }
 

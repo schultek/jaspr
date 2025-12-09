@@ -19,7 +19,7 @@ final _events = events;
 
 /// Renders a text node.
 ///
-/// Convenience method for `Component.text()`.
+/// Migrate to use [Component.text] directly instead.
 @Deprecated('Use Component.text() instead.')
 Component text(String text, {Key? key}) {
   return Component.text(text, key: key);
@@ -31,15 +31,15 @@ Component text(String text, {Key? key}) {
 /// [cross-site scripting (XSS) attacks](https://owasp.org/www-community/attacks/xss/).
 /// Make sure to sanitize any user input when using this component.
 ///
-/// Convenience method for `RawText()`.
+/// Migrate to use [RawText] directly instead.
 @Deprecated('Use RawText() instead.')
 Component raw(String text, {Key? key}) {
   return RawText(text, key: key);
 }
 
-/// Renders a list of children without any wrapping element.
+/// Renders a list of [children] without any wrapping element.
 ///
-/// Convenience method for `Component.fragment()`.
+/// Migrate to use [Component.fragment] directly instead.
 @Deprecated('Use Component.fragment() instead.')
 Component fragment(List<Component> children, {Key? key}) {
   return Component.fragment(children, key: key);
