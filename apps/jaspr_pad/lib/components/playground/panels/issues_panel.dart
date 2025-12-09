@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -36,8 +37,8 @@ class IssueItem extends StatelessComponent {
         },
       ),
       [
-        i(classes: 'material-icons', [text(issue.kind.name)]),
-        text(issue.message),
+        i(classes: 'material-icons', [.text(issue.kind.name)]),
+        .text(issue.message),
       ],
     );
   }

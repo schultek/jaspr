@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/html.dart' as html;
@@ -89,7 +90,7 @@ class SplitterState extends State<Splitter> {
         ),
       );
     }
-    return fragment(children);
+    return .fragment(children);
   }
 }
 

@@ -12,8 +12,8 @@ import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import 'components/playground/playground.dart';
-import 'jaspr_options.dart';
-import 'main.init.dart';
+import 'main.server.init.dart';
+import 'main.server.options.dart';
 import 'providers/samples_provider.dart';
 import 'server/analyzer.dart';
 import 'server/compiler.dart';
@@ -22,7 +22,7 @@ import 'server/samples.dart';
 import 'server/tutorial.dart';
 
 void main() async {
-  Jaspr.initializeApp(options: defaultJasprOptions);
+  Jaspr.initializeApp(options: defaultServerOptions);
 
   var router = Router();
 

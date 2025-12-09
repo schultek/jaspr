@@ -1,4 +1,5 @@
 // [sample=3] Simple Button
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 void main() {

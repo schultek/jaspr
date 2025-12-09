@@ -30,5 +30,5 @@ class MyComponentState extends State<MyComponent> {
 3. Import the new file in your `main.dart` and use the [Counter] component beneath the `div` component.
    <details>
      <summary>Tip</summary>
-     Use the `Fragment` component to return multiple children.
+     Use the `Component.fragment` constructor to return multiple children.
    </details>

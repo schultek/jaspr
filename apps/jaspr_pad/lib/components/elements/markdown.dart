@@ -1,5 +1,6 @@
 import 'dart:convert' as convert;
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart' hide Document;
 import 'package:markdown/markdown.dart' as md show Text, Element;
 import 'package:markdown/markdown.dart' hide Text, Element;
@@ -85,13 +86,13 @@ class _MarkdownState extends State<Markdown> {
         hljs.highlightAll();
       });
     }
-    return fragment([...buildMarkdown(nodes)]);
+    return .fragment([...buildMarkdown(nodes)]);
   }
 
   Iterable<Component> buildMarkdown(Iterable<Node> nodes) sync* {
     for (var node in nodes) {
       if (node is md.Text) {
-        yield span([raw(node.text)]);
+        yield span([RawText(node.text)]);
       } else if (node is md.Element) {
         yield Component.element(
           tag: node.tag,

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/html.dart' hide Element;
@@ -17,7 +18,7 @@ class MenuItem extends StatelessComponent {
       attributes: {'role': 'menuitem'},
       [
         img(classes: 'mdc-list-item__graphic', src: './pictures/logo_dart.png'),
-        span(classes: 'mdc-list-item__text', [text(label)]),
+        span(classes: 'mdc-list-item__text', [.text(label)]),
       ],
     );
   }
@@ -31,7 +32,7 @@ class Menu extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return text('');
+    return .text('');
   }
 
   @override

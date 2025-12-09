@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_riverpod/legacy.dart';
@@ -33,7 +34,7 @@ class OutputSplitView extends StatelessComponent {
 
     var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
 
-    return fragment([
+    return .fragment([
       if (isClosed) ...[
         child,
         EditorTabs(key: GlobalObjectKey('editor-tabs')),
@@ -94,7 +95,7 @@ class EditorTabs extends StatelessComponent {
                 context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
               },
             ),
-            [text('close')],
+            [.text('close')],
           ),
         ]),
       ]),
@@ -127,7 +128,7 @@ class EditorTab extends StatelessComponent {
           }
         },
       ),
-      [text(label)],
+      [.text(label)],
     );
   }
 }
@@ -140,7 +141,7 @@ class EditorTabWindow extends StatelessComponent {
     var state = context.watch(tabsStateProvider);
     var isTutorial = context.watch(isTutorialProvider);
 
-    return fragment([
+    return .fragment([
       if (isTutorial) Hidden(hidden: state != OutputTabsState.ui, child: OutputPanel()),
       if (state == OutputTabsState.issues)
         IssuesPanel()
