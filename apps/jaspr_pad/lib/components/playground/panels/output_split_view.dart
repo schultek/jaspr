@@ -26,13 +26,13 @@ class OutputSplitView extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     context.listen<List<Issue>>(issuesProvider, (_, issues) {
-      if (issues.where((i) => i.kind == IssueKind.error).isNotEmpty &&
+      if (issues.where((issue) => issue.kind == IssueKind.error).isNotEmpty &&
           context.read(tabsStateProvider) == OutputTabsState.closed) {
         context.read(tabsStateProvider.notifier).state = OutputTabsState.issues;
       }
     });
 
-    var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
+    var isClosed = context.watch(tabsStateProvider.select((state) => state == OutputTabsState.closed));
 
     return .fragment([
       if (isClosed) ...[
@@ -58,7 +58,7 @@ class EditorTabs extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     var isTutorial = context.watch(isTutorialProvider);
-    var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
+    var isClosed = context.watch(tabsStateProvider.select((state) => state == OutputTabsState.closed));
 
     return div(id: 'editor-panel-footer', classes: 'editor-tab-host ${isClosed ? ' border-top' : ''}', [
       div(classes: 'editor-tabs', [
@@ -71,7 +71,7 @@ class EditorTabs extends StatelessComponent {
         div(id: 'console-expand-icon-container', [
           Builder(
             builder: (context) {
-              var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
+              var isConsole = context.watch(tabsStateProvider.select((state) => state == OutputTabsState.console));
               return button(
                 id: 'left-console-clear-button',
                 classes: 'console-clear-icon mdc-icon-button',

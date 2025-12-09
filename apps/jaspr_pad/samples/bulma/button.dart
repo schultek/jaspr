@@ -50,9 +50,9 @@ class IconLabel extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return fragment([
+    return .fragment([
       span(classes: 'icon', [i(classes: 'fas fa-$icon', [])]),
-      span([text(label)]),
+      span([.text(label)]),
     ]);
   }
 }
