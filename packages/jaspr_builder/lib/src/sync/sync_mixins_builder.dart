@@ -35,7 +35,7 @@ class SyncMixinsBuilder implements Builder {
 
   Future<void> generateSyncMixin(BuildStep buildStep) async {
     // Performance optimization
-    var file = await buildStep.readAsString(buildStep.inputId);
+    final file = await buildStep.readAsString(buildStep.inputId);
     if (!file.contains('@sync')) {
       return;
     }
@@ -44,9 +44,9 @@ class SyncMixinsBuilder implements Builder {
       return;
     }
 
-    var library = await buildStep.inputLibrary;
+    final library = await buildStep.inputLibrary;
 
-    var annotated = library.classes
+    final annotated = library.classes
         .map(
           (clazz) => (
             clazz,
@@ -89,7 +89,7 @@ class SyncMixinsBuilder implements Builder {
       return;
     }
 
-    var codecs = await buildStep.loadCodecs();
+    final codecs = await buildStep.loadCodecs();
     String mixins;
 
     try {
@@ -107,7 +107,7 @@ class SyncMixinsBuilder implements Builder {
       $mixins
     ''';
     source = ImportsWriter().resolve(source);
-    var outputId = buildStep.inputId.changeExtension('.sync.dart');
+    final outputId = buildStep.inputId.changeExtension('.sync.dart');
     await buildStep.writeAsFormattedDart(outputId, source);
   }
 
@@ -117,19 +117,19 @@ class SyncMixinsBuilder implements Builder {
 
     final members = fields
         .map((f) {
-          var type = codecs.getPrefixedType(f.type);
-          return """
+          final type = codecs.getPrefixedType(f.type);
+          return '''
         $type get ${f.name};
         set ${f.name}($type ${f.name});
-      """;
+      ''';
         })
         .join('\n');
 
     final decoders = fields
         .map((f) {
           try {
-            var decoder = codecs.getDecoderFor(f.type, "value['${f.name}']");
-            return "${f.name} = $decoder;";
+            final decoder = codecs.getDecoderFor(f.type, "value['${f.name}']");
+            return '${f.name} = $decoder;';
           } on InvalidParameterException catch (_) {
             throw UnsupportedError(
               'Fields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods. '
@@ -141,7 +141,7 @@ class SyncMixinsBuilder implements Builder {
 
     final encoders = fields
         .map((f) {
-          var encoder = codecs.getEncoderFor(f.type, f.name ?? '');
+          final encoder = codecs.getEncoderFor(f.type, f.name ?? '');
           return "'${f.name}': $encoder,";
         })
         .join('\n');

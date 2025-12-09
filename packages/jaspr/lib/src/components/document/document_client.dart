@@ -81,7 +81,8 @@ class HeadDocument extends StatelessComponent implements Document {
       children: [
         if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
         if (meta != null)
-          for (var e in meta!.entries) Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+          for (final e in meta!.entries)
+            Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
         ...?children,
       ],
     );
@@ -119,13 +120,13 @@ class _AttachElement extends MultiChildRenderObjectElement {
 
   @override
   RenderObject createRenderObject() {
-    var AttachDocument(:target, :attributes) = component as AttachDocument;
+    final AttachDocument(:target, :attributes) = component as AttachDocument;
     return AttachRenderObject(target, depth)..attributes = attributes;
   }
 
   @override
   void updateRenderObject(AttachRenderObject renderObject) {
-    var AttachDocument(:target, :attributes) = component as AttachDocument;
+    final AttachDocument(:target, :attributes) = component as AttachDocument;
     renderObject
       ..target = target
       ..attributes = attributes;
@@ -181,7 +182,7 @@ class AttachRenderObject extends DomRenderText {
     child.parent = this;
 
     try {
-      var childNode = child.node;
+      final childNode = child.node;
 
       var afterNode = after?.node;
       if (afterNode == null && children.contains(childNode)) {
@@ -227,13 +228,13 @@ class AttachAdapter {
   late final Map<String, String> initialAttributes = element.attributes.toMap();
 
   late final (web.Node, web.Node) attachWindow = () {
-    var iterator = web.document.createNodeIterator(element, 128);
+    final iterator = web.document.createNodeIterator(element, 128);
 
     web.Node? start, end;
 
     web.Comment? currNode;
     while ((currNode = iterator.nextNode() as web.Comment?) != null) {
-      var value = currNode!.nodeValue ?? '';
+      final value = currNode!.nodeValue ?? '';
       if (value == r'$') {
         start = currNode;
       } else if (value == '/') {
@@ -268,10 +269,10 @@ class AttachAdapter {
   String? keyFor(web.Node node) {
     if (!node.isElement) return null;
     return switch (node as web.Element) {
-      web.Element(id: String id) when id.isNotEmpty => id,
-      web.Element(tagName: "TITLE" || "BASE") => '__${node.tagName}',
-      web.Element(tagName: "META") => switch (node.attributes.getNamedItem("name")) {
-        web.Attr name => '__meta:${name.value}',
+      web.Element(id: final String id) when id.isNotEmpty => id,
+      web.Element(tagName: 'TITLE' || 'BASE') => '__${node.tagName}',
+      web.Element(tagName: 'META') => switch (node.attributes.getNamedItem('name')) {
+        final web.Attr name => '__meta:${name.value}',
         _ => null,
       },
       _ => null,
@@ -289,21 +290,21 @@ class AttachAdapter {
     }
 
     if (target.attachAttributes) {
-      Map<String, String> attributes = initialAttributes;
+      final Map<String, String> attributes = initialAttributes;
 
-      for (var renderObject in renderObjects) {
+      for (final renderObject in renderObjects) {
         assert(renderObject._target == target);
         if (renderObject._attributes case final attrs?) {
           attributes.addAll(attrs);
         }
       }
 
-      var attributesToRemove = <String>{};
+      final attributesToRemove = <String>{};
       for (var i = 0; i < element.attributes.length; i++) {
         attributesToRemove.add(element.attributes.item(i)!.name);
       }
       if (attributes.isNotEmpty) {
-        for (var attr in attributes.entries) {
+        for (final attr in attributes.entries) {
           element.clearOrSetAttribute(attr.key, attr.value);
           attributesToRemove.remove(attr.key);
         }
@@ -317,14 +318,14 @@ class AttachAdapter {
     }
 
     if (target.attachChildren) {
-      Map<String, web.Node> keyedNodes = Map.of(initialKeyedNodes);
-      List<web.Node> children = List.of(initialKeyedNodes.values);
+      final Map<String, web.Node> keyedNodes = Map.of(initialKeyedNodes);
+      final List<web.Node> children = List.of(initialKeyedNodes.values);
 
-      for (var renderObject in renderObjects) {
-        for (var node in renderObject.children) {
-          var key = keyFor(node);
+      for (final renderObject in renderObjects) {
+        for (final node in renderObject.children) {
+          final key = keyFor(node);
           if (key != null) {
-            var shadowedNode = keyedNodes[key];
+            final shadowedNode = keyedNodes[key];
             keyedNodes[key] = node;
             if (shadowedNode != null) {
               children[children.indexOf(shadowedNode)] = node;
@@ -337,7 +338,7 @@ class AttachAdapter {
 
       web.Node? current = attachWindow.$1.nextSibling;
 
-      for (var node in children) {
+      for (final node in children) {
         if (current == null || current == attachWindow.$2) {
           element.insertBefore(node, current);
         } else if (current == node) {
@@ -351,7 +352,7 @@ class AttachAdapter {
       }
 
       while (current != null && current != attachWindow.$2) {
-        var next = current.nextSibling;
+        final next = current.nextSibling;
         current.parentNode?.removeChild(current);
         current = next;
       }

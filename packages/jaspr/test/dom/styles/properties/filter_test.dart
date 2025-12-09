@@ -5,7 +5,7 @@ void main() {
   group('style', () {
     group('filter', () {
       test('outputs all properties', () {
-        var styles = const Styles(
+        final styles = const Styles(
           filter: Filter.list([
             Filter.blur(),
             Filter.brightness(),
@@ -17,7 +17,7 @@ void main() {
             Filter.opacity(),
             Filter.sepia(),
             Filter.saturate(),
-            Filter.url("abc.svg#urltest"),
+            Filter.url('abc.svg#urltest'),
           ]),
           backdropFilter: Filter.list([
             Filter.blur(Unit.rem(0.1)),
@@ -30,7 +30,7 @@ void main() {
             Filter.opacity(0.7),
             Filter.sepia(0.8),
             Filter.saturate(0.9),
-            Filter.url("xyz.svg#urltest"),
+            Filter.url('xyz.svg#urltest'),
           ]),
         );
 
@@ -48,12 +48,12 @@ void main() {
         );
       });
 
-      test("Filter.list does not allow empty list", () {
+      test('Filter.list does not allow empty list', () {
         final filter = Filter.list([]);
         expect(() => filter.value, throwsA(predicate((e) => e == 'Filter.list cannot be empty.')));
       });
 
-      test("Filter.list does not allow non-listable members", () {
+      test('Filter.list does not allow non-listable members', () {
         for (final val in const <Filter>[
           Filter.none,
           Filter.initial,

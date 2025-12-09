@@ -17,6 +17,7 @@ void main() {
 // Generated from packages/jaspr/tool/generate_html.dart
 //
 // dart format off
+// ignore_for_file: prefer_single_quotes
 
 const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
 ''');
@@ -258,7 +259,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                 );
 
                 // Forced tag name
-                final tagValue = data["tag"] ?? tag;
+                final tagValue = data['tag'] ?? tag;
 
                 final content = StringBuffer();
 
@@ -305,7 +306,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                         content.write("''");
                       }
                     } else if (type == 'int' || type == 'double') {
-                      content.write("$nullCheck$name$nullCheck.toString()");
+                      content.write('$nullCheck$name$nullCheck.toString()');
                     } else if (type is String && type.startsWith('enum:')) {
                       content.write('$nullCheck$name$nullCheck.value');
                     } else if (type is String && type.startsWith('css:')) {

@@ -24,8 +24,8 @@ void testComponents(
   test(
     description,
     () async {
-      var binding = TestComponentsBinding(url ?? '/', isClient);
-      var tester = ComponentTester._(binding);
+      final binding = TestComponentsBinding(url ?? '/', isClient);
+      final tester = ComponentTester._(binding);
 
       return binding.runTest(() async {
         await callback(tester);
@@ -65,14 +65,14 @@ class ComponentTester {
 
   /// Simulates [event] on the given element.
   void dispatchEvent(Finder finder, String event, [web.Event? data]) {
-    var renderObject = _findDomElement(finder).renderObject as TestRenderObject;
+    final renderObject = _findDomElement(finder).renderObject as TestRenderObject;
     if (renderObject is TestRenderElement) {
       renderObject.events?[event]?.call(data ?? web.Event(event));
     }
   }
 
   DomElement _findDomElement(Finder finder) {
-    var elements = finder.evaluate();
+    final elements = finder.evaluate();
 
     if (elements.isEmpty) {
       throw 'The finder "$finder" could not find any matching components.';
@@ -81,7 +81,7 @@ class ComponentTester {
       throw 'The finder "$finder" ambiguously found multiple matching components.';
     }
 
-    var element = elements.single;
+    final element = elements.single;
 
     if (element is DomElement) {
       return element;
@@ -170,7 +170,7 @@ class TestRenderObject extends RenderObject {
     if (after == null) {
       children.insert(0, child);
     } else {
-      var index = children.indexOf(after);
+      final index = children.indexOf(after);
       children.insert(index + 1, child);
     }
   }

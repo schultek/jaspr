@@ -2,19 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 
 void main() async {
-  var output = StringBuffer(
+  final output = StringBuffer(
     '// ignore_for_file: directives_ordering\n'
     '// GENERATED FILE - DO NOT MODIFY\n\n',
   );
 
-  var packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
-  var jsonStartIndex = (packages.stdout as String).indexOf('[');
-  var packagesJson = (jsonDecode((packages.stdout as String).substring(jsonStartIndex)) as List<Object?>)
+  final packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
+  final jsonStartIndex = (packages.stdout as String).indexOf('[');
+  final packagesJson = (jsonDecode((packages.stdout as String).substring(jsonStartIndex)) as List<Object?>)
       .cast<Map<String, Object?>>();
 
-  var jasprCliVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_cli')['version'];
-  var jasprVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr')['version'];
-  var jasprBuilderVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_builder')['version'];
+  final jasprCliVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_cli')['version'];
+  final jasprVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr')['version'];
+  final jasprBuilderVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_builder')['version'];
 
   output.writeln(
     'const jasprCliVersion = "$jasprCliVersion";\n'
@@ -22,6 +22,6 @@ void main() async {
     'const jasprBuilderVersion = "$jasprBuilderVersion";',
   );
 
-  var versionsFile = File('lib/src/version.dart');
+  final versionsFile = File('lib/src/version.dart');
   await versionsFile.writeAsString(output.toString());
 }

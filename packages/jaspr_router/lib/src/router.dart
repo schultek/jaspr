@@ -203,7 +203,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
       final m = match.matches[i];
       final hasNext = i < match.matches.length - 1;
 
-      if (m.route case LazyRouteBase r when (!hasNext || r is ShellRoute)) {
+      if (m.route case final LazyRouteBase r when (!hasNext || r is ShellRoute)) {
         final key = m.subloc;
         final l = (routeLoaders[key] ??= RouteLoader.from(r.load()));
         loaders.add(l);
@@ -219,7 +219,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   Component build(BuildContext context) {
     return Component.fragment([
-      if (_matchList?.title case var title?) Document.head(title: title),
+      if (_matchList?.title case final title?) Document.head(title: title),
       component._builder.build(this),
     ]);
   }

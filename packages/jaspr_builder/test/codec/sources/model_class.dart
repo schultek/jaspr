@@ -27,8 +27,8 @@ const modelClassSources = {
 
 final modelClassOutputs = {
   'site|lib/model_class.codec.json': jsonEncode({
-    "elements": [
-      {"name": "ModelA", "decoder": "fromRaw", "encoder": "toRaw", "import": "package:site/model_class.dart"},
+    'elements': [
+      {'name': 'ModelA', 'decoder': 'fromRaw', 'encoder': 'toRaw', 'import': 'package:site/model_class.dart'},
     ],
   }),
 };

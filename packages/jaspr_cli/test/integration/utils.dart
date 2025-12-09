@@ -27,11 +27,11 @@ import 'package:test/test.dart';
 }
 
 Future<void> run(String command, {required Directory dir}) async {
-  var [cmd, ...args] = command.split(' ');
-  var result = await Process.run(cmd, args, runInShell: true, workingDirectory: dir.path);
+  final [cmd, ...args] = command.split(' ');
+  final result = await Process.run(cmd, args, runInShell: true, workingDirectory: dir.path);
 
-  var firstArg = command.indexOf('-');
-  var prefix = command.substring(0, firstArg != -1 ? firstArg : command.length).trim();
+  final firstArg = command.indexOf('-');
+  final prefix = command.substring(0, firstArg != -1 ? firstArg : command.length).trim();
 
   LineSplitter().convert(result.stdout as String).forEach((line) {
     print('<$prefix> $line');

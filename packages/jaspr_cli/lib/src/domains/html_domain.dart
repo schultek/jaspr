@@ -26,17 +26,17 @@ class HtmlDomain extends Domain {
       return '';
     }
     if (node is Text) {
-      var text = node.text;
+      final text = node.text;
       if (text.trim().isEmpty) {
         return '';
       }
-      return "${indent}text(${_escapeString(text)})";
+      return '${indent}text(${_escapeString(text)})';
     } else if (node is Element) {
-      var tagName = node.localName;
-      var attrs = node.attributes;
-      var children = node.nodes;
+      final tagName = node.localName;
+      final attrs = node.attributes;
+      final children = node.nodes;
 
-      var spec = elementSpecs[tagName] as Map<String, Object?>?;
+      final spec = elementSpecs[tagName] as Map<String, Object?>?;
 
       if (spec == null) {
         final attrsString = attrs.isEmpty
@@ -54,8 +54,8 @@ class HtmlDomain extends Domain {
 
       String? idString;
       String? classString;
-      var paramStrings = <String>[];
-      var attrStrings = <String>[];
+      final paramStrings = <String>[];
+      final attrStrings = <String>[];
 
       for (final MapEntry(:key, :value) in attrs.entries) {
         if (key == 'class') {
@@ -68,7 +68,7 @@ class HtmlDomain extends Domain {
             var attrType = attrSpec['type'];
 
             if (attrType == 'string') {
-              paramStrings.add("$attrName: ${_escapeString(value)}");
+              paramStrings.add('$attrName: ${_escapeString(value)}');
               continue;
             }
             if (attrType == 'boolean') {
@@ -79,7 +79,7 @@ class HtmlDomain extends Domain {
               final enumName = attrType.substring(5);
               attrType = enumSpecs[enumName];
             }
-            if (attrType case {'name': String enumName, 'values': Map<String, Object?> enumValues}) {
+            if (attrType case {'name': final String enumName, 'values': final Map<String, Object?> enumValues}) {
               final enumValue = enumValues.entries
                   .where(
                     (e) => ((e.value as Map<String, Object?>?)?['value'] ?? e.key) == value,
@@ -98,15 +98,15 @@ class HtmlDomain extends Domain {
       var result = '$indent${spec['name']}(';
 
       if (idString != null) {
-        result += "id: ${_escapeString(idString)}, ";
+        result += 'id: ${_escapeString(idString)}, ';
       }
 
       if (classString != null) {
-        result += "classes: ${_escapeString(classString)}, ";
+        result += 'classes: ${_escapeString(classString)}, ';
       }
 
       if (paramStrings.isNotEmpty) {
-        for (var param in paramStrings) {
+        for (final param in paramStrings) {
           result += '$param, ';
         }
       }
@@ -114,7 +114,7 @@ class HtmlDomain extends Domain {
       if (attrStrings.isNotEmpty) {
         result += 'attributes: {';
         var isFirst = true;
-        for (var attrString in attrStrings) {
+        for (final attrString in attrStrings) {
           if (!isFirst) {
             result += ', ';
           }
@@ -139,8 +139,8 @@ class HtmlDomain extends Domain {
           result += '[]';
         } else {
           result += '[\n';
-          for (var child in children) {
-            var childHtml = _convertNode(child, '$indent  ');
+          for (final child in children) {
+            final childHtml = _convertNode(child, '$indent  ');
             if (childHtml.trim().isEmpty) {
               continue;
             }
@@ -193,7 +193,7 @@ final enumSpecs = (() {
   for (final element in elementSpecs.values.cast<Map<String, Object?>>()) {
     if (element['attributes'] case final Map<String, Object?> attrs) {
       for (final attr in attrs.values.cast<Map<String, Object?>>()) {
-        if (attr['type'] case <String, Object?>{'name': String _, 'values': Map<String, Object?> type}) {
+        if (attr['type'] case <String, Object?>{'name': String _, 'values': final Map<String, Object?> type}) {
           enums[type['name'] as String] = type;
         }
       }

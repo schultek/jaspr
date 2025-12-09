@@ -17,7 +17,7 @@ void testOutput(
     tester.pumpComponent(input);
 
     MarkupRenderObject.maxHtmlLineLength = lineLength;
-    var response = await tester.request('/');
+    final response = await tester.request('/');
 
     expect(response.statusCode, equals(200));
     expect(response.document?.body, isNotNull);

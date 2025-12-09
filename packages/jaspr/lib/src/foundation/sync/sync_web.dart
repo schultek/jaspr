@@ -7,7 +7,7 @@ import '../../dom/validator.dart';
 final _syncRegex = RegExp('^${DomValidator.syncMarkerPrefixRegex}(.*)\$');
 
 void initSyncState(SyncStateMixin<StatefulComponent, Object?> sync) {
-  var r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
+  final r = (sync.context as Element).parentRenderObjectElement?.renderObject as DomRenderObject?;
   if (r == null) return;
 
   bool isNext = true;
@@ -16,7 +16,7 @@ void initSyncState(SyncStateMixin<StatefulComponent, Object?> sync) {
       return false;
     }
     if (node.isComment) {
-      var value = node.nodeValue ?? '';
+      final value = node.nodeValue ?? '';
       return _syncRegex.hasMatch(value);
     } else {
       isNext = false;
@@ -27,7 +27,7 @@ void initSyncState(SyncStateMixin<StatefulComponent, Object?> sync) {
   if (syncMarker != null) {
     syncMarker.parentNode?.removeChild(syncMarker);
 
-    var data = const DomValidator().unescapeMarkerText(_syncRegex.firstMatch(syncMarker.nodeValue ?? '')!.group(1)!);
+    final data = const DomValidator().unescapeMarkerText(_syncRegex.firstMatch(syncMarker.nodeValue ?? '')!.group(1)!);
     sync.updateState(jsonDecode(data));
   }
 }

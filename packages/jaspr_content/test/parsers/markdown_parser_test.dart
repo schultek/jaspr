@@ -114,7 +114,7 @@ Hello &lt;World&gt;
       });
     });
 
-    group("HTML in Markdown", () {
+    group('HTML in Markdown', () {
       test('should parse embedded HTML within markdown', () {
         final nodes = parseMarkdown('''
 # Hello World

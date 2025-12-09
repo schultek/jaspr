@@ -66,7 +66,7 @@ void main() {
 
     group('spacing', () {
       test('base', () {
-        var insets = Spacing.inherit;
+        final insets = Spacing.inherit;
 
         expect(insets.styles, equals({'': 'inherit'}));
 
@@ -77,7 +77,7 @@ void main() {
       });
 
       test('from ltrm', () {
-        var insets = Spacing.fromLTRB(10.px, 20.px, 30.px, 40.px);
+        final insets = Spacing.fromLTRB(10.px, 20.px, 30.px, 40.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(20.px));
@@ -88,7 +88,7 @@ void main() {
       });
 
       test('only', () {
-        var insets = Spacing.only(left: 10.px, bottom: 40.px);
+        final insets = Spacing.only(left: 10.px, bottom: 40.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(0.px));
@@ -99,7 +99,7 @@ void main() {
       });
 
       test('all', () {
-        var insets = Spacing.all(10.px);
+        final insets = Spacing.all(10.px);
 
         expect(insets.left, equals(10.px));
         expect(insets.top, equals(10.px));

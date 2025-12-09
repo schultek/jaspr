@@ -51,7 +51,7 @@ class HeadingAnchorsExtension implements PageExtension {
         ComponentNode(
           Builder(
             builder: (context) {
-              var route = RouteState.of(context);
+              final route = RouteState.of(context);
               return a(href: '${route.path}#$id', [Component.text('#')]);
             },
           ),

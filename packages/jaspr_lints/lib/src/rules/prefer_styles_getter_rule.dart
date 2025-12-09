@@ -11,7 +11,7 @@ import '../utils.dart';
 class PreferStylesGetterRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'prefer_styles_getter',
-    "Prefer using a getter over a variable declaration for style rules to support hot-reload.",
+    'Prefer using a getter over a variable declaration for style rules to support hot-reload.',
   );
 
   PreferStylesGetterRule()
@@ -25,7 +25,7 @@ class PreferStylesGetterRule extends AnalysisRule {
 
   @override
   void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
-    var visitor = _StylesVisitor(this, context);
+    final visitor = _StylesVisitor(this, context);
     registry.addVariableDeclarationList(this, visitor);
   }
 }
@@ -68,7 +68,7 @@ class ReplaceWithGetterFix extends ResolvedCorrectionProducer {
   static const _replaceWithGetterKind = FixKind(
     'jaspr.fix.replaceWithGetter',
     DartFixKindPriority.standard,
-    "Replace with getter",
+    'Replace with getter',
   );
 
   ReplaceWithGetterFix({required super.context});

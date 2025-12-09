@@ -14,10 +14,10 @@ import 'package:source_gen/source_gen.dart';
 import 'package:yaml/yaml.dart' as yaml;
 
 const String generationHeader =
-    "// dart format off\n"
-    "// ignore_for_file: type=lint\n\n"
-    "// GENERATED FILE, DO NOT MODIFY\n"
-    "// Generated with jaspr_builder\n\n";
+    '// dart format off\n'
+    '// ignore_for_file: type=lint\n\n'
+    '// GENERATED FILE, DO NOT MODIFY\n'
+    '// Generated with jaspr_builder\n\n';
 
 final formatter = DartFormatter(languageVersion: DartFormatter.latestLanguageVersion);
 
@@ -37,7 +37,7 @@ final TypeChecker stateChecker = TypeChecker.typeNamed(State, inPackage: 'jaspr'
 final TypeChecker importChecker = TypeChecker.typeNamed(Import, inPackage: 'jaspr');
 
 Map<String, String> compressPaths(List<String> paths) {
-  var segments = paths.map((p) => p.split('/')).toList();
+  final segments = paths.map((p) => p.split('/')).toList();
   segments.sort((a, b) {
     if (a.length != b.length) {
       return a.length - b.length;
@@ -51,9 +51,9 @@ Map<String, String> compressPaths(List<String> paths) {
     return c;
   });
 
-  var compressed = <String, String>{};
-  var used = <String>{};
-  for (var segment in segments) {
+  final compressed = <String, String>{};
+  final used = <String>{};
+  for (final segment in segments) {
     var i = segment.length - 1;
     var compressedPath = path.url.withoutExtension(segment.last);
     while (i > 0 && used.contains(compressedPath)) {
@@ -68,7 +68,7 @@ Map<String, String> compressPaths(List<String> paths) {
 
 int compareSegments(Iterable<String> a, Iterable<String> b) {
   if (a.length > 1 && b.length > 1) {
-    var comp = a.first.compareTo(b.first);
+    final comp = a.first.compareTo(b.first);
     if (comp == 0) {
       return compareSegments(a.skip(1), b.skip(1));
     } else {
@@ -102,9 +102,9 @@ class ImportEntry {
         throw StateError('Import "$url" does not export symbol "$name".');
       }
 
-      List<String> details = [];
+      final List<String> details = [];
 
-      if (element case ExtensionElement ext) {
+      if (element case final ExtensionElement ext) {
         for (final child in ext.children) {
           if (child.isSynthetic || child.isPrivate || child.name == null) continue;
           if (child is ExecutableElement && child.isStatic) continue;
@@ -183,7 +183,7 @@ class ImportsWriter {
   String resolve(String source) {
     final imports = <String>{};
     final deferredImports = <String>{};
-    for (var match in _importsRegex.allMatches(source)) {
+    for (final match in _importsRegex.allMatches(source)) {
       final url = match.group(2)!;
       imports.add(url);
       if (match.group(1) != null) {
@@ -193,13 +193,13 @@ class ImportsWriter {
 
     final compressed = compressPaths(imports.toList());
     final prefixes = {
-      for (var url in imports)
+      for (final url in imports)
         url: '_${compressed[url]!.replaceFirst('package:', '\$').replaceAll('/', '_').replaceAll('.', r'$')}',
     };
 
     return source
         .replaceAllMapped(_importsRegex, (match) {
-          var url = match.group(2)!;
+          final url = match.group(2)!;
           return prefixes[url]!;
         })
         .replaceFirst(
@@ -222,12 +222,12 @@ extension ImportUrl on AssetId {
 
 extension LoadBundle on BuildStep {
   Stream<T> loadBundle<T>(String name, T Function(Map<String, Object?>) decoder) async* {
-    var packages = {inputId.package, ...(await packageConfig).packages.map((p) => p.name)};
-    for (var package in packages) {
-      var bundleId = AssetId(package, 'lib/$name.bundle.json');
+    final packages = {inputId.package, ...(await packageConfig).packages.map((p) => p.name)};
+    for (final package in packages) {
+      final bundleId = AssetId(package, 'lib/$name.bundle.json');
       if (await canRead(bundleId)) {
-        var bundle = jsonDecode(await readAsString(bundleId)) as List<Object?>;
-        for (var element in bundle.cast<Map<String, Object?>>()) {
+        final bundle = jsonDecode(await readAsString(bundleId)) as List<Object?>;
+        for (final element in bundle.cast<Map<String, Object?>>()) {
           yield decoder(element);
         }
       }

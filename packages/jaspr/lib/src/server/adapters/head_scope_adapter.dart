@@ -7,7 +7,7 @@ abstract class HeadScopeAdapter extends RenderAdapter {
 
   @override
   void apply(MarkupRenderObject root) {
-    var html = root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node ?? root;
+    final html = root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node ?? root;
     var head = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'head')?.node;
 
     bool needsInsert = false;
@@ -16,7 +16,7 @@ abstract class HeadScopeAdapter extends RenderAdapter {
       needsInsert = true;
     }
 
-    var didApply = applyHead(head);
+    final didApply = applyHead(head);
     if (didApply && needsInsert) {
       html.children.insertAfter(head);
     }

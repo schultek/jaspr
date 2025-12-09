@@ -71,7 +71,7 @@ void autoMockChildren(MockRenderObject renderObject) {
 
 void verifyNoMoreRenderInteractions(MockRenderObject root) {
   verifyNoMoreInteractions(root);
-  for (var child in root.children) {
+  for (final child in root.children) {
     verifyNoMoreRenderInteractions(child);
   }
 }

@@ -9,7 +9,7 @@ import '../logging.dart';
 
 mixin FlutterHelper on BaseCommand {
   Map<String, String> getFlutterDartDefines(bool useWasm, bool release) {
-    var flutterDefines = <String, String>{};
+    final flutterDefines = <String, String>{};
 
     flutterDefines['dart.vm.product'] = '$release';
     flutterDefines['FLUTTER_WEB_USE_SKWASM'] = '$useWasm';
@@ -21,7 +21,7 @@ mixin FlutterHelper on BaseCommand {
   Future<Process> serveFlutter(String flutterPort, bool wasm) async {
     await _ensureTarget();
 
-    var flutterProcess = await Process.start(
+    final flutterProcess = await Process.start(
       'flutter',
       [
         'run',
@@ -44,7 +44,7 @@ mixin FlutterHelper on BaseCommand {
   Future<void> buildFlutter(bool wasm) async {
     await _ensureTarget();
 
-    var flutterProcess = await Process.start(
+    final flutterProcess = await Process.start(
       'flutter',
       [
         'build',
@@ -58,9 +58,9 @@ mixin FlutterHelper on BaseCommand {
       workingDirectory: Directory.current.path,
     );
 
-    var target = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
+    final target = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
 
-    var moveTargets = ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'];
+    final moveTargets = ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'];
 
     await watchProcess('flutter build', flutterProcess, tag: Tag.flutter);
 
@@ -68,7 +68,7 @@ mixin FlutterHelper on BaseCommand {
   }
 
   Future<void> _ensureTarget() async {
-    var flutterTarget = File('.dart_tool/jaspr/flutter_target.dart').absolute;
+    final flutterTarget = File('.dart_tool/jaspr/flutter_target.dart').absolute;
     if (!await flutterTarget.exists()) {
       await flutterTarget.create(recursive: true);
     }
@@ -77,18 +77,18 @@ mixin FlutterHelper on BaseCommand {
 }
 
 Future<void> copyFiles(String from, String to, [List<String> targets = const ['']]) async {
-  var moveTargets = [...targets];
+  final moveTargets = [...targets];
 
-  var moves = <Future<void>>[];
+  final moves = <Future<void>>[];
   while (moveTargets.isNotEmpty) {
-    var moveTarget = moveTargets.removeAt(0);
-    var file = File('$from/$moveTarget').absolute;
-    var isDir = file.statSync().type == FileSystemEntityType.directory;
+    final moveTarget = moveTargets.removeAt(0);
+    final file = File('$from/$moveTarget').absolute;
+    final isDir = file.statSync().type == FileSystemEntityType.directory;
     if (isDir) {
       await Directory('$to/$moveTarget').absolute.create(recursive: true);
 
-      var files = Directory('$from/$moveTarget').absolute.list(recursive: true);
-      await for (var file in files) {
+      final files = Directory('$from/$moveTarget').absolute.list(recursive: true);
+      await for (final file in files) {
         final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
         moveTargets.add(path);
       }

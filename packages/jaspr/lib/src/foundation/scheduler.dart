@@ -27,9 +27,9 @@ mixin SchedulerBinding {
   }
 
   void _flushPostFrameCallbacks() {
-    var localPostFrameCallbacks = List<VoidCallback>.of(_postFrameCallbacks);
+    final localPostFrameCallbacks = List<VoidCallback>.of(_postFrameCallbacks);
     _postFrameCallbacks.clear();
-    for (var callback in localPostFrameCallbacks) {
+    for (final callback in localPostFrameCallbacks) {
       callback();
     }
   }

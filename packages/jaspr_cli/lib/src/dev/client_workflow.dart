@@ -36,7 +36,7 @@ class ClientWorkflow {
   ) async {
     var cancelled = false;
 
-    var op = CancelableOperation<ClientWorkflow?>.fromFuture(
+    final op = CancelableOperation<ClientWorkflow?>.fromFuture(
       Future(() async {
         final workingDirectory = Directory.current.path;
         final targetPorts = {'web': int.parse(targetPort)};
@@ -100,15 +100,15 @@ Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<Strin
   try {
     logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
     return await connectClient(workingDirectory, buildOptions, (serverLog) {
-      var level = _mapBuilderLevel(toLoggingLevel(serverLog.level));
+      final level = _mapBuilderLevel(toLoggingLevel(serverLog.level));
       if (!logger.verbose && level.index < Level.info.index) return;
 
-      var buffer = StringBuffer(serverLog.message);
+      final buffer = StringBuffer(serverLog.message);
       if (serverLog.error != null) {
         buffer.writeln(serverLog.error);
       }
 
-      var log = buffer.toString().trim();
+      final log = buffer.toString().trim();
       if (log.isEmpty) {
         return;
       }

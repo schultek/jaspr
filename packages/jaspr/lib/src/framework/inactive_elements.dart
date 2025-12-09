@@ -17,7 +17,7 @@ class _InactiveElements {
     final List<Element> elements = _elements.toList()..sort(Element._sort);
     _elements.clear();
 
-    for (var e in elements.reversed) {
+    for (final e in elements.reversed) {
       _unmount(e);
     }
     assert(_elements.isEmpty);

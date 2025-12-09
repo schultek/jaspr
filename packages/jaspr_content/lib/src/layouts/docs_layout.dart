@@ -54,15 +54,15 @@ class DocsLayout extends PageLayoutBase {
           div([
             div(classes: 'content-container', [
               div(classes: 'content-header', [
-                if (pageData['title'] case String title) h1([Component.text(title)]),
-                if (pageData['description'] case String description) p([Component.text(description)]),
-                if (pageData['image'] case String image) img(src: image, alt: pageData['imageAlt'] as String?),
+                if (pageData['title'] case final String title) h1([Component.text(title)]),
+                if (pageData['description'] case final String description) p([Component.text(description)]),
+                if (pageData['image'] case final String image) img(src: image, alt: pageData['imageAlt'] as String?),
               ]),
               child,
               if (footer case final footer?) div(classes: 'content-footer', [footer]),
             ]),
             aside(classes: 'toc', [
-              if (page.data['toc'] case TableOfContents toc)
+              if (page.data['toc'] case final TableOfContents toc)
                 div([
                   h3([Component.text('On this page')]),
                   toc.build(),

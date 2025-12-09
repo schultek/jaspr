@@ -19,12 +19,12 @@ mixin ProxyHelper on BaseCommand {
     bool redirectNotFound = false,
     void Function(Object?)? onMessage,
   }) async {
-    var client = http.Client();
-    var webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
-    var flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
-    var allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
+    final client = http.Client();
+    final webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
+    final flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
+    final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
 
-    var cascade = Cascade().add(_sseProxyHandler(client, webPort, logger)).add((req) async {
+    final cascade = Cascade().add(_sseProxyHandler(client, webPort, logger)).add((req) async {
       if (req.url.path == r'$jasprMessageHandler') {
         onMessage?.call(jsonDecode(await req.readAsString()));
         return Response.ok(null);
@@ -33,7 +33,7 @@ mixin ProxyHelper on BaseCommand {
       // Each proxyHandler will read the body, so we have to duplicate the stream beforehand,
       // or else this will throw.
       // This is also the reason why Cascade() won't work here.
-      var body = req.read().asBroadcastStream();
+      final body = req.read().asBroadcastStream();
 
       if (flutterHandler != null && req.url.path == 'flutter_bootstrap.js') {
         return await flutterHandler(req.change(body: body));
@@ -48,7 +48,7 @@ mixin ProxyHelper on BaseCommand {
         var basePath = req.headers['jaspr_base_path'] ?? '/';
         if (!basePath.endsWith('/')) basePath += '/';
         if (!basePath.startsWith('/')) basePath = '/$basePath';
-        var body = await res.readAsString();
+        final body = await res.readAsString();
         // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<webPort>/$dwdsSseHandler";'
         return res.change(body: body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort$basePath'));
       }
@@ -74,7 +74,7 @@ mixin ProxyHelper on BaseCommand {
       return res;
     });
 
-    var server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
+    final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
 
     guardResource(() async {
       client.close();
@@ -86,7 +86,7 @@ mixin ProxyHelper on BaseCommand {
 }
 
 Handler _sseProxyHandler(http.Client client, String webPort, Logger logger) {
-  var serverUri = Uri.parse('http://localhost:$webPort');
+  final serverUri = Uri.parse('http://localhost:$webPort');
 
   Future<Response> createSseConnection(Request req) async {
     final serverReq =

@@ -15,7 +15,7 @@ class ImportsModuleBuilder implements Builder {
   FutureOr<void> build(BuildStep buildStep) async {
     try {
       // Performance optimization
-      var file = await buildStep.readAsString(buildStep.inputId);
+      final file = await buildStep.readAsString(buildStep.inputId);
       if (!file.contains('@Import')) {
         return;
       }
@@ -24,17 +24,17 @@ class ImportsModuleBuilder implements Builder {
         return;
       }
 
-      var lib = await buildStep.resolver.libraryFor(buildStep.inputId, allowSyntaxErrors: true);
+      final lib = await buildStep.resolver.libraryFor(buildStep.inputId, allowSyntaxErrors: true);
 
-      var outputId = buildStep.inputId.changeExtension('.imports.json');
-      var partId = buildStep.inputId.changeExtension('.imports.dart');
+      final outputId = buildStep.inputId.changeExtension('.imports.json');
+      final partId = buildStep.inputId.changeExtension('.imports.dart');
 
-      var import = lib.firstFragment.libraryImports
+      final import = lib.firstFragment.libraryImports
           .cast<ElementDirective>()
           .followedBy(lib.firstFragment.libraryExports)
           .where((ElementDirective e) => importChecker.firstAnnotationOf(e) != null)
           .where((ElementDirective e) {
-            var uri = e.uri;
+            final uri = e.uri;
             if (uri is DirectiveUriWithRelativeUriString && uri.relativeUriString == path.basename(partId.path)) {
               return true;
             }

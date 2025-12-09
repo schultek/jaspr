@@ -34,18 +34,18 @@ class CodecBundleBuilder implements Builder {
   };
 
   Future<void> generateCodecBundle(BuildStep buildStep) async {
-    var modules = buildStep
+    final modules = buildStep
         .findAssets(Glob('lib/**.codec.json'))
         .asyncMap((id) => buildStep.readAsString(id))
         .map((c) => CodecModule.deserialize(jsonDecode(c) as Map<String, Object?>));
-    var bundle = <Map<String, Object?>>[
+    final bundle = <Map<String, Object?>>[
       await for (final module in modules)
-        for (var element in module.elements) element.serialize(),
+        for (final element in module.elements) element.serialize(),
     ];
 
     if (bundle.isEmpty) return;
 
-    var outputId = AssetId(buildStep.inputId.package, 'lib/codec.bundle.json');
+    final outputId = AssetId(buildStep.inputId.package, 'lib/codec.bundle.json');
     await buildStep.writeAsString(outputId, jsonEncode(bundle));
   }
 }

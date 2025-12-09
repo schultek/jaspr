@@ -36,7 +36,7 @@ class CodecModuleBuilder implements Builder {
 
   Future<void> generateCodecModule(BuildStep buildStep) async {
     // Performance optimization
-    var file = await buildStep.readAsString(buildStep.inputId);
+    final file = await buildStep.readAsString(buildStep.inputId);
     if (!file.contains('@decoder') && !file.contains('@encoder')) {
       return;
     }
@@ -45,18 +45,18 @@ class CodecModuleBuilder implements Builder {
       return;
     }
 
-    var library = await buildStep.inputLibrary;
+    final library = await buildStep.inputLibrary;
     final libName = library.firstFragment.source.fullName;
 
     MethodElement? findEncoderForElement(InterfaceElement element) {
-      var candidates = element.methods.where((m) => encoderChecker.firstAnnotationOfExact(m) != null);
+      final candidates = element.methods.where((m) => encoderChecker.firstAnnotationOfExact(m) != null);
       if (candidates.isEmpty) return null;
       if (candidates.length > 1) {
         log.severe(
           'Cannot have multiple methods annotated with @encoder in a single class. Failing element: ${element.name} in $libName.',
         );
       }
-      var candidate = candidates.first;
+      final candidate = candidates.first;
       if (candidate.isPrivate) {
         log.severe(
           '@encoder cannot be used on private methods. Failing element: ${element.name}.${candidate.name}() in library $libName.',
@@ -79,7 +79,7 @@ class CodecModuleBuilder implements Builder {
     }
 
     ExecutableElement? findDecoderForElement(InterfaceElement element) {
-      var candidates = element.methods
+      final candidates = element.methods
           .cast<ExecutableElement>()
           .followedBy(element.constructors)
           .where((m) => decoderChecker.firstAnnotationOfExact(m) != null);
@@ -89,7 +89,7 @@ class CodecModuleBuilder implements Builder {
           'Cannot have multiple members annotated with @decoder in a single class. Failing element: ${element.name} in $libName.',
         );
       }
-      var candidate = candidates.first;
+      final candidate = candidates.first;
       if (candidate.isPrivate) {
         log.severe(
           '@decoder cannot be used on private members. Failing element: ${element.name}.${candidate.name}() in library $libName.',
@@ -123,10 +123,10 @@ class CodecModuleBuilder implements Builder {
       return candidate;
     }
 
-    var annotated = [...library.classes, ...library.extensionTypes]
+    final annotated = [...library.classes, ...library.extensionTypes]
         .map<(InterfaceElement, ExecutableElement, MethodElement)?>((element) {
-          var decoder = findDecoderForElement(element);
-          var encoder = findEncoderForElement(element);
+          final decoder = findDecoderForElement(element);
+          final encoder = findEncoderForElement(element);
 
           if (decoder == null && encoder == null) {
             return null;
@@ -184,9 +184,9 @@ class CodecModuleBuilder implements Builder {
       return;
     }
 
-    var module = CodecModule.fromElements(annotated, buildStep);
+    final module = CodecModule.fromElements(annotated, buildStep);
 
-    var outputId = buildStep.inputId.changeExtension('.codec.json');
+    final outputId = buildStep.inputId.changeExtension('.codec.json');
     await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));
   }
 }
@@ -201,18 +201,20 @@ class CodecModule {
     BuildStep buildStep,
   ) {
     return CodecModule(
-      elements: [for (var (element, decoder, encoder) in elements) CodecElement.fromElement(element, decoder, encoder)],
+      elements: [
+        for (final (element, decoder, encoder) in elements) CodecElement.fromElement(element, decoder, encoder),
+      ],
     );
   }
 
   factory CodecModule.deserialize(Map<String, Object?> map) {
     return CodecModule(
-      elements: [for (var e in map['elements'] as List<Object?>) CodecElement.deserialize(e as Map<String, Object?>)],
+      elements: [for (final e in map['elements'] as List<Object?>) CodecElement.deserialize(e as Map<String, Object?>)],
     );
   }
 
   Map<String, Object?> serialize() => {
-    'elements': [for (var e in elements) e.serialize()],
+    'elements': [for (final e in elements) e.serialize()],
   };
 }
 
@@ -235,7 +237,7 @@ class CodecElement {
 
   factory CodecElement.fromElement(InterfaceElement element, ExecutableElement decoder, MethodElement encoder) {
     if (element is ExtensionTypeElement) {
-      var typeElement = element.representation.type.element!;
+      final typeElement = element.representation.type.element!;
       if (element.library.exportNamespace.get2(typeElement.name!) == typeElement) {
         return CodecElement(
           name: element.representation.type.getDisplayString(),
@@ -245,7 +247,7 @@ class CodecElement {
           import: element.library.firstFragment.source.uri.toString(),
         );
       } else {
-        var import = element.library.firstFragment.importedLibraries
+        final import = element.library.firstFragment.importedLibraries
             .where((l) => l.exportNamespace.get2(typeElement.name!) == typeElement)
             .firstOrNull;
 

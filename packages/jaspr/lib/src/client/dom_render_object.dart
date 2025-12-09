@@ -65,7 +65,7 @@ class DomRenderElement extends DomRenderObject
     });
     if (retakeNode != null) {
       if (kVerboseMode) {
-        print("Hydrate html node: $retakeNode");
+        print('Hydrate html node: $retakeNode');
       }
       node = retakeNode as web.Element;
 
@@ -75,7 +75,7 @@ class DomRenderElement extends DomRenderObject
 
     node = _createElement(tag, namespace);
     if (kVerboseMode) {
-      web.console.log("Create html node: $node".toJS);
+      web.console.log('Create html node: $node'.toJS);
     }
   }
 
@@ -231,13 +231,13 @@ class DomRenderText extends DomRenderObject implements RenderText {
 
     if (retakeNode != null) {
       if (kVerboseMode) {
-        print("Hydrate text node: $retakeNode");
+        print('Hydrate text node: $retakeNode');
       }
       node = retakeNode as web.Text;
       if (node.textContent != text) {
         node.textContent = text;
         if (kVerboseMode) {
-          print("Update text node: $text");
+          print('Update text node: $text');
         }
       }
       return;
@@ -245,7 +245,7 @@ class DomRenderText extends DomRenderObject implements RenderText {
 
     node = web.Text(text);
     if (kVerboseMode) {
-      print("Create text node: $text");
+      print('Create text node: $text');
     }
   }
 
@@ -254,7 +254,7 @@ class DomRenderText extends DomRenderObject implements RenderText {
     if (node.textContent != text) {
       node.textContent = text;
       if (kVerboseMode) {
-        print("Update text node: $text");
+        print('Update text node: $text');
       }
     }
   }
@@ -302,14 +302,14 @@ class DomRenderFragment extends DomRenderObject
   DomRenderObject? _lastChild;
 
   web.Node? get firstChildNode {
-    if (_firstChild case DomRenderFragment c) {
+    if (_firstChild case final DomRenderFragment c) {
       return c.firstChildNode;
     }
     return _firstChild?.node;
   }
 
   web.Node? get lastChildNode {
-    if (_lastChild case DomRenderFragment c) {
+    if (_lastChild case final DomRenderFragment c) {
       return c.lastChildNode;
     }
     return _lastChild?.node;
@@ -332,7 +332,7 @@ class DomRenderFragment extends DomRenderObject
     assert(isAttached, 'Cannot move fragment that is not attached to a parent.');
 
     if (kVerboseMode) {
-      print("Move fragment to $targetNode after $afterNode");
+      print('Move fragment to $targetNode after $afterNode');
     }
 
     if (firstChildNode == null) {
@@ -371,7 +371,7 @@ class DomRenderFragment extends DomRenderObject
     assert(isAttached, 'Cannot remove fragment that is not attached to a parent.');
 
     if (kVerboseMode) {
-      print("Remove fragment $node from ${parent.node}");
+      print('Remove fragment $node from ${parent.node}');
     }
 
     if (firstChildNode == null) {
@@ -495,7 +495,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       }
 
       if (kVerboseMode) {
-        print("Attach node $childNode to $targetNode after $afterNode ($after)");
+        print('Attach node $childNode to $targetNode after $afterNode ($after)');
       }
 
       if (afterNode == null) {
@@ -531,7 +531,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     }
 
     if (kVerboseMode) {
-      print("Remove child ${child.node} of $node");
+      print('Remove child ${child.node} of $node');
     }
 
     assert(node == child.node.parentNode, 'Child node must be a child of this element.');
@@ -562,7 +562,7 @@ mixin HydratableDomRenderObject on DomRenderObject {
   @override
   void finalize() {
     if (kVerboseMode && toHydrate.isNotEmpty) {
-      print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
+      print('Clear ${toHydrate.length} nodes not hydrated ($toHydrate)');
     }
     for (final node in toHydrate) {
       node.parentNode!.removeChild(node);
@@ -594,13 +594,13 @@ extension AttributeOperation on web.Element {
     if (value == null) {
       if (!hasAttribute(name)) return;
       if (kVerboseMode) {
-        print("Remove attribute: $name");
+        print('Remove attribute: $name');
       }
       removeAttribute(name);
     } else {
       if (getAttribute(name) == value) return;
       if (kVerboseMode) {
-        print("Update attribute: $name - $value");
+        print('Update attribute: $name - $value');
       }
       setAttribute(name, value);
     }

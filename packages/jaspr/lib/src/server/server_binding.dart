@@ -62,17 +62,17 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       await completer.future;
     }
 
-    var root = rootElement!.renderObject as MarkupRenderObject;
-    var adapters = [..._adapters.reversed, GlobalStylesAdapter(this), if (!standalone) DocumentAdapter()];
+    final root = rootElement!.renderObject as MarkupRenderObject;
+    final adapters = [..._adapters.reversed, GlobalStylesAdapter(this), if (!standalone) DocumentAdapter()];
 
-    for (var adapter in adapters.reversed) {
-      var r = adapter.prepare();
+    for (final adapter in adapters.reversed) {
+      final r = adapter.prepare();
       if (r is Future) {
         await r;
       }
     }
 
-    for (var adapter in adapters) {
+    for (final adapter in adapters) {
       adapter.apply(root);
     }
 

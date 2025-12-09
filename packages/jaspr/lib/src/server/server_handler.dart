@@ -64,7 +64,7 @@ Handler createHandler(
   List<Pattern>? allowedRenderPaths,
 }) {
   client ??= http.Client();
-  var staticHandler = fileHandler ?? staticFileHandler(client);
+  final staticHandler = fileHandler ?? staticFileHandler(client);
 
   var cascade = Cascade();
 
@@ -112,7 +112,7 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
       headers: req.headers,
       protocolVersion: req.protocolVersion,
     );
-    var response = await proxyHandler(indexRequest);
+    final response = await proxyHandler(indexRequest);
     return response.statusCode == 200 ? response.readAsString() : null;
   };
 }
@@ -126,7 +126,7 @@ Handler createProxyHandler(http.Client? client) {
 // coverage:ignore-start
 
 Handler _sseProxyHandler(http.Client client, String webPort) {
-  var serverUri = Uri.parse('http://localhost:$webPort');
+  final serverUri = Uri.parse('http://localhost:$webPort');
 
   Future<Response> createSseConnection(Request req) async {
     final serverReq =

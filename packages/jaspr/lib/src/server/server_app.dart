@@ -31,10 +31,10 @@ final class ServerApp {
   static http.Client? _client;
 
   void _run() async {
-    var isFirstStartup = _server == null;
+    final isFirstStartup = _server == null;
 
-    var lock = _runLock = Object();
-    var (client, server) = await _createServer();
+    final lock = _runLock = Object();
+    final (client, server) = await _createServer();
 
     if (_runLock != lock) {
       server.close(force: true);
@@ -63,9 +63,9 @@ final class ServerApp {
   }
 
   Future<(http.Client, HttpServer)> _createServer() async {
-    var port = int.parse(Platform.environment['PORT'] ?? '8080');
-    var client = http.Client();
-    var handler = createHandler((_, render) => render(_setup), client: client);
+    final port = int.parse(Platform.environment['PORT'] ?? '8080');
+    final client = http.Client();
+    final handler = createHandler((_, render) => render(_setup), client: client);
     return (client, await shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true));
   }
 

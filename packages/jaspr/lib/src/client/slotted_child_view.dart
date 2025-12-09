@@ -140,7 +140,7 @@ class SlottedChildViewElement extends MultiChildRenderObjectElement {
   }
 
   static void _clearEventListeners(Element e) {
-    if (e case RenderObjectElement(renderObject: DomRenderElement r)) {
+    if (e case RenderObjectElement(renderObject: final DomRenderElement r)) {
       r.events?.forEach((type, binding) {
         binding.clear();
       });

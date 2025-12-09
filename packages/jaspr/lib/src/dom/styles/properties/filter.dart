@@ -98,7 +98,7 @@ abstract class _FilterWithPercentage implements _ListableFilter {
 
   /// The css value
   @override
-  String get value => "$_name(${_percentage.numstr})";
+  String get value => '$_name(${_percentage.numstr})';
 }
 
 class _BlurFilter implements _ListableFilter {
@@ -108,7 +108,7 @@ class _BlurFilter implements _ListableFilter {
 
   /// The css value
   @override
-  String get value => "blur(${_length.value})";
+  String get value => 'blur(${_length.value})';
 }
 
 class _BrightnessFilter extends _FilterWithPercentage {
@@ -152,7 +152,7 @@ class _HueRotateFilter implements _ListableFilter {
 
   /// The css value
   @override
-  String get value => "hue-rotate(${_angle.value})";
+  String get value => 'hue-rotate(${_angle.value})';
 }
 
 class _InvertFilter extends _FilterWithPercentage {
@@ -178,5 +178,5 @@ class _UrlFilter implements _ListableFilter {
 
   /// The css value
   @override
-  String get value => "url($_url)";
+  String get value => 'url($_url)';
 }

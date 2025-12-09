@@ -59,7 +59,7 @@ class RouteBuilder {
 
       return _callRouteBuilder(state, route, loaders);
     } else if (route is ShellRoute) {
-      var child = _buildRecursive(matchList, startIndex + 1, loaders);
+      final child = _buildRecursive(matchList, startIndex + 1, loaders);
 
       return _callShellRouteBuilder(state, route, loaders, child: child);
     }
@@ -103,10 +103,10 @@ class RouteBuilder {
     Component child = Builder(builder: (c) => builder(c, state));
 
     if (route is LazyRoute) {
-      var l = loaders[state.subloc] ??= RouteLoader.from(route.load());
+      final l = loaders[state.subloc] ??= RouteLoader.from(route.load());
 
       if (l.isPending) {
-        var c = child;
+        final c = child;
         child = FutureBuilder(
           future: l.future,
           builder: (context, snapshot) {
@@ -137,9 +137,9 @@ class RouteBuilder {
     Component routeChild = Builder(builder: (c) => builder(c, state, child));
 
     if (route is LazyShellRoute) {
-      var l = loaders[state.subloc] ??= RouteLoader.from(route.load());
+      final l = loaders[state.subloc] ??= RouteLoader.from(route.load());
       if (l.isPending) {
-        var c = routeChild;
+        final c = routeChild;
         routeChild = FutureBuilder(
           future: l.future,
           builder: (context, snapshot) {

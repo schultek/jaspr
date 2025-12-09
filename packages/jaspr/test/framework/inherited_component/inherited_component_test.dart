@@ -51,7 +51,7 @@ void main() {
       // phase 1: inherited component should be mounted
       expect(find.text('Inherited value: 0'), findsOneComponent);
 
-      var state = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
+      final state = (find.byType(MyChildComponent).evaluate().first as StatefulElement).state as MyChildState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));
