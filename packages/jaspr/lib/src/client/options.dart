@@ -48,13 +48,18 @@ final class ClientLoader {
   /// The returned [Future] is cached for future calls, so the [loader] is only called once.
   /// Once loaded, the [builder] is returned directly on subsequent calls.
   FutureOr<ClientBuilder> get loadedBuilder {
-    _loadedBuilder ??= loader != null
-        ? loader!().then((_) {
-            _loadedBuilder = builder;
-            return builder;
-          })
-        : builder;
-    return _loadedBuilder!;
+    if (_loadedBuilder case final alreadyLoadedBuilder?) {
+      return alreadyLoadedBuilder;
+    }
+
+    final FutureOr<ClientBuilder>? newLoadedBuilder;
+    if (loader case final loader?) {
+      newLoadedBuilder = loader().then((_) => _loadedBuilder = builder);
+    } else {
+      newLoadedBuilder = builder;
+    }
+
+    return _loadedBuilder = newLoadedBuilder;
   }
 }
 
