@@ -138,7 +138,7 @@ void main() {
       expect(divElement.childNodes.item(3)?.textContent, equals('Some text'));
       expect(divElement.childNodes.item(4)?.textContent, equals('End'));
 
-      print("MOVE");
+      print('MOVE');
       component.updateChild(
         div([
           Component.text('Start'),

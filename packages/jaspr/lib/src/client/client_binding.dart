@@ -14,7 +14,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   bool get isClient => true;
 
   static final String _baseOrigin = () {
-    var base = web.document.querySelector('head>base') as web.HTMLBaseElement?;
+    final base = web.document.querySelector('head>base') as web.HTMLBaseElement?;
     return base?.href ?? web.window.location.origin;
   }();
 
@@ -42,7 +42,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   RenderObject createRootRenderObject() {
-    if (attachBetween case (var start, var end)) {
+    if (attachBetween case (final start, final end)) {
       return RootDomRenderObject.between(start, end);
     } else {
       return RootDomRenderObject(web.document.querySelector(attachTarget)!);

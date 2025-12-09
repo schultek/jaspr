@@ -168,8 +168,8 @@ class _BackgroundPosition implements BackgroundPosition {
 
   @override
   String get value {
-    var x = [if (alignX != null) alignX!.name, if (offsetX != null) offsetX!.value];
-    var y = [if (alignY != null) alignY!.name, if (offsetY != null) offsetY!.value];
+    final x = [if (alignX != null) alignX!.name, if (offsetX != null) offsetX!.value];
+    final y = [if (alignY != null) alignY!.name, if (offsetY != null) offsetY!.value];
     if (x.isEmpty) {
       x.add('left');
     } else if (x.length == 1 && y.length == 2 && alignX == null) {

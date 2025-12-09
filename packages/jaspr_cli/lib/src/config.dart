@@ -69,7 +69,7 @@ class Project {
     if (requirePubspecYaml case {'dev_dependencies': {'jaspr_builder': _}}) {
       // ok
     } else {
-      var log = logger.logger;
+      final log = logger.logger;
       if (log == null) {
         logger.write(
           'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.',
@@ -77,12 +77,12 @@ class Project {
           level: Level.warning,
         );
       } else {
-        var result = log.confirm(
+        final result = log.confirm(
           'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
           defaultValue: true,
         );
         if (result) {
-          var result = io.Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
+          final result = io.Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
           if (result.exitCode != 0) {
             log.err(result.stderr as String?);
             logger.write(
@@ -107,7 +107,7 @@ class Project {
   }
 
   YamlMap get _requireJasprOptions {
-    var configYaml = requirePubspecYaml['jaspr'];
+    final configYaml = requirePubspecYaml['jaspr'];
     if (configYaml == null) {
       logger.write('Missing \'jaspr\' options in pubspec.yaml.', tag: Tag.cli, level: Level.critical);
       _exitFn(1);
@@ -120,22 +120,22 @@ class Project {
   }
 
   JasprMode? get modeOrNull {
-    var configYaml = pubspecYaml?['jaspr'];
+    final configYaml = pubspecYaml?['jaspr'];
     if (configYaml is! YamlMap) {
       return null;
     }
-    var modeYaml = configYaml['mode'];
+    final modeYaml = configYaml['mode'];
     if (modeYaml is! String) {
       return null;
     }
-    var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
+    final modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     return modeOrNull;
   }
 
   JasprMode get requireMode {
-    var configYaml = _requireJasprOptions;
+    final configYaml = _requireJasprOptions;
 
-    var modeYaml = configYaml['mode'];
+    final modeYaml = configYaml['mode'];
     if (modeYaml == null) {
       logger.write(
         '\'jaspr.mode\' option in pubspec.yaml is required but missing.',
@@ -144,7 +144,7 @@ class Project {
       );
       _exitFn(1);
     }
-    var modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
+    final modeOrNull = JasprMode.values.where((v) => v.name == modeYaml).firstOrNull;
     if (modeOrNull == null) {
       logger.write(
         '\'jaspr.mode\' in pubspec.yaml must be one of ${JasprMode.values.map((v) => v.name).join(', ')}.',
@@ -157,9 +157,9 @@ class Project {
   }
 
   String? get port {
-    var configYaml = _requireJasprOptions;
+    final configYaml = _requireJasprOptions;
 
-    var portYaml = configYaml['port'];
+    final portYaml = configYaml['port'];
     if (portYaml != null) {
       if (portYaml is int) {
         return portYaml.toString();
@@ -176,13 +176,13 @@ class Project {
   }
 
   late final YamlMap? pubspecLock = () {
-    var pubspecLockPath = 'pubspec.lock';
+    final pubspecLockPath = 'pubspec.lock';
     var pubspecLockFile = _fs.file(pubspecLockPath).absolute;
 
     if (!pubspecLockFile.existsSync() && pubspecYaml?['resolution'] == 'workspace') {
       var n = 1;
       while (n < 5) {
-        var parent = path.dirname(path.dirname(pubspecLockFile.path));
+        final parent = path.dirname(path.dirname(pubspecLockFile.path));
         if (parent == pubspecLockFile.path) {
           break;
         }
@@ -208,7 +208,7 @@ class Project {
   void checkWasmSupport() {
     final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
     final version = switch (devDependencies?['build_web_compilers']) {
-      String v => VersionConstraint.parse(v),
+      final String v => VersionConstraint.parse(v),
       _ => null,
     };
     final minVersion = VersionConstraint.compatibleWith(Version(4, 1, 0));
@@ -228,6 +228,28 @@ class Project {
         tag: Tag.cli,
         level: Level.critical,
       );
+      _exitFn(1);
+    }
+  }
+
+  void checkFlutterBuildSupport(bool useFlag) {
+    final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
+    final version = switch (devDependencies?['build_web_compilers']) {
+      final String v => VersionConstraint.parse(v),
+      _ => null,
+    };
+    final minVersion = VersionConstraint.compatibleWith(Version(4, 4, 6));
+    if (version == null || !minVersion.allowsAll(version)) {
+      logger.write(
+        useFlag
+            ? 'Using "--use-flutter-sdk" requires build_web_compilers 4.4.6 or newer. '
+                  'Please update your version constraint in pubspec.yaml.'
+            : 'Flutter embedding requires build_web_compilers 4.4.6 or newer. '
+                  'Please update your version constraint in pubspec.yaml.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
+
       _exitFn(1);
     }
   }

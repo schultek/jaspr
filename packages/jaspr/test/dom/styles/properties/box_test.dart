@@ -13,14 +13,14 @@ void main() {
       });
 
       test('all', () {
-        var okBorder = Border.all(style: BorderStyle.dashed, color: Colors.blue, width: 2.px);
+        final okBorder = Border.all(style: BorderStyle.dashed, color: Colors.blue, width: 2.px);
         expect(okBorder.styles, equals({'border': 'dashed blue 2px'}));
 
         expect(() => Border.all(style: null, color: null, width: null), throwsAssertionError);
       });
 
       test('only', () {
-        var border = Border.only(
+        final border = Border.only(
           left: BorderSide.groove(color: Colors.black, width: 2.pt),
         );
 
@@ -31,7 +31,7 @@ void main() {
       });
 
       test('symmetric', () {
-        var border = Border.symmetric(
+        final border = Border.symmetric(
           vertical: BorderSide.solid(color: Colors.blue),
           horizontal: BorderSide.dashed(width: 2.pt),
         );
@@ -49,7 +49,7 @@ void main() {
       });
 
       test('symmetric only', () {
-        var border = Border.symmetric(vertical: BorderSide.dotted(color: Colors.blue));
+        final border = Border.symmetric(vertical: BorderSide.dotted(color: Colors.blue));
 
         expect(
           border.styles,
@@ -63,7 +63,7 @@ void main() {
       });
 
       test('none', () {
-        var border = Border.none;
+        final border = Border.none;
 
         expect(border.styles, equals({'border': 'none'}));
       });
@@ -71,30 +71,30 @@ void main() {
 
     group('border-radius', () {
       test('all', () {
-        var radius = BorderRadius.all(Radius.circular(20.px));
+        final radius = BorderRadius.all(Radius.circular(20.px));
         expect(radius.styles, equals({'border-radius': '20px'}));
 
-        var radius2 = BorderRadius.all(Radius.elliptical(20.px, Unit.zero));
+        final radius2 = BorderRadius.all(Radius.elliptical(20.px, Unit.zero));
         expect(radius2.styles, equals({'border-radius': '20px / 0'}));
       });
 
       test('only single', () {
-        var radius = BorderRadius.only(topLeft: Radius.circular(20.px));
+        final radius = BorderRadius.only(topLeft: Radius.circular(20.px));
         expect(radius.styles, equals({'border-top-left-radius': '20px'}));
       });
 
       test('only double circle', () {
-        var radius = BorderRadius.only(topLeft: Radius.circular(20.px), topRight: Radius.circular(10.px));
+        final radius = BorderRadius.only(topLeft: Radius.circular(20.px), topRight: Radius.circular(10.px));
         expect(radius.styles, equals({'border-top-left-radius': '20px', 'border-top-right-radius': '10px'}));
       });
 
       test('only double mixed', () {
-        var radius = BorderRadius.only(topLeft: Radius.circular(20.px), topRight: Radius.elliptical(10.px, 5.px));
+        final radius = BorderRadius.only(topLeft: Radius.circular(20.px), topRight: Radius.elliptical(10.px, 5.px));
         expect(radius.styles, equals({'border-top-left-radius': '20px', 'border-top-right-radius': '10px 5px'}));
       });
 
       test('only all mixed', () {
-        var radius = BorderRadius.only(
+        final radius = BorderRadius.only(
           topLeft: Radius.circular(20.px),
           topRight: Radius.elliptical(10.px, 5.pt),
           bottomLeft: Radius.elliptical(Unit.zero, 25.px),
@@ -163,7 +163,7 @@ void main() {
       });
 
       test('all', () {
-        var styles = Styles(
+        final styles = Styles(
           shadow: BoxShadow(
             offsetX: 1.rem,
             offsetY: 2.rem,
@@ -176,7 +176,7 @@ void main() {
       });
 
       test('inset', () {
-        var styles = Styles(
+        final styles = Styles(
           shadow: BoxShadow.inset(
             offsetX: 1.rem,
             offsetY: 2.rem,

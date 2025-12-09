@@ -74,7 +74,7 @@ class RSSOutput extends SecondaryOutput {
   }
 
   /// The standard date format for dates within an RSS feed.
-  static final rssDateFormat = DateFormat("dd MMM yyyy");
+  static final rssDateFormat = DateFormat('dd MMM yyyy');
 
   static RSSItem _defaultItemBuilder(Page page) {
     final pageData = page.data.page;

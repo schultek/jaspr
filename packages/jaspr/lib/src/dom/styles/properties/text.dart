@@ -312,30 +312,30 @@ enum TextTransform {
 /// Read more: [MDN `font-weight`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight)
 enum FontWeight {
   /// Normal font weight. Same as 400.
-  normal("normal"),
+  normal('normal'),
 
   /// Bold font weight. Same as 700.
-  bold("bold"),
+  bold('bold'),
 
   /// One relative font weight heavier than the parent element.
   ///
   /// Note that only four font weights are considered for relative weight calculation.
-  bolder("bolder"),
+  bolder('bolder'),
 
   /// One relative font weight lighter than the parent element.
   ///
   /// Note that only four font weights are considered for relative weight calculation.
-  lighter("lighter"),
+  lighter('lighter'),
 
-  w100("100"),
-  w200("200"),
-  w300("300"),
-  w400("400"),
-  w500("500"),
-  w600("600"),
-  w700("700"),
-  w800("800"),
-  w900("900"),
+  w100('100'),
+  w200('200'),
+  w300('300'),
+  w400('400'),
+  w500('500'),
+  w600('600'),
+  w700('700'),
+  w800('800'),
+  w900('900'),
 
   inherit('inherit'),
   initial('initial'),

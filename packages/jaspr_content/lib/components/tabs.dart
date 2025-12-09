@@ -15,15 +15,15 @@ class Tabs extends CustomComponent {
   @override
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && node.tag == 'Tabs') {
-      var tabs = node.children?.whereType<ElementNode>().where((n) => n.tag == 'TabItem') ?? [];
+      final tabs = node.children?.whereType<ElementNode>().where((n) => n.tag == 'TabItem') ?? [];
       if (tabs.isEmpty) {
-        print("[WARNING] Tabs component requires at least one TabItem child.");
+        print('[WARNING] Tabs component requires at least one TabItem child.');
       }
 
       return _Tabs(
         defaultValue: node.attributes['defaultValue'],
         items: [
-          for (var tab in tabs)
+          for (final tab in tabs)
             TabItem(
               label: tab.attributes['label'] ?? '',
               value: tab.attributes['value'] ?? '',
@@ -56,9 +56,9 @@ class _Tabs extends StatelessComponent {
   Component build(BuildContext context) {
     final initialValue = defaultValue ?? items.first.value;
     return div(classes: 'tabs', [
-      TabBar(initialValue: initialValue, items: {for (var item in items) item.value: item.label}),
+      TabBar(initialValue: initialValue, items: {for (final item in items) item.value: item.label}),
       div([
-        for (var item in items)
+        for (final item in items)
           div(
             classes: 'tab-content',
             attributes: {'data-tab': item.value, 'label': item.label, if (item.value == initialValue) 'active': ''},

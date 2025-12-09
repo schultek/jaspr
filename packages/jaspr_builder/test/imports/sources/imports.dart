@@ -30,33 +30,33 @@ const conflictingImportsSources = {
 final importsModuleOutput = {
   'site|lib/target.imports.json': jsonEncode([
     {
-      "url": "dart:html",
-      "platform": 0,
-      "elements": [
-        {"name": "window", "type": 2, "details": <String>[]},
-        {"name": "Window", "type": 0, "details": <String>[]},
+      'url': 'dart:html',
+      'platform': 0,
+      'elements': [
+        {'name': 'window', 'type': 2, 'details': <String>[]},
+        {'name': 'Window', 'type': 0, 'details': <String>[]},
       ],
     },
     {
-      "url": "dart:io",
-      "platform": 1,
-      "elements": [
-        {"name": "HttpServer", "type": 0, "details": <String>[]},
+      'url': 'dart:io',
+      'platform': 1,
+      'elements': [
+        {'name': 'HttpServer', 'type': 0, 'details': <String>[]},
       ],
     },
     {
-      "url": "dart:collection",
-      "platform": 1,
-      "elements": [
+      'url': 'dart:collection',
+      'platform': 1,
+      'elements': [
         {
-          "name": "IterableExtensions",
-          "type": 1,
-          "details": [
-            "dynamic get indexed => null;",
-            "dynamic get firstOrNull => null;",
-            "dynamic get lastOrNull => null;",
-            "dynamic get singleOrNull => null;",
-            "dynamic get elementAtOrNull => null;",
+          'name': 'IterableExtensions',
+          'type': 1,
+          'details': [
+            'dynamic get indexed => null;',
+            'dynamic get firstOrNull => null;',
+            'dynamic get lastOrNull => null;',
+            'dynamic get singleOrNull => null;',
+            'dynamic get elementAtOrNull => null;',
           ],
         },
       ],
@@ -64,20 +64,20 @@ final importsModuleOutput = {
   ]),
   'site|lib/other.imports.json': jsonEncode([
     {
-      "url": "dart:html",
-      "platform": 0,
-      "elements": [
-        {"name": "window", "type": 2, "details": <String>[]},
-        {"name": "Window", "type": 0, "details": <String>[]},
-        {"name": "Document", "type": 0, "details": <String>[]},
+      'url': 'dart:html',
+      'platform': 0,
+      'elements': [
+        {'name': 'window', 'type': 2, 'details': <String>[]},
+        {'name': 'Window', 'type': 0, 'details': <String>[]},
+        {'name': 'Document', 'type': 0, 'details': <String>[]},
       ],
     },
     {
-      "url": "dart:io",
-      "platform": 1,
-      "elements": [
-        {"name": "HttpServer", "type": 0, "details": <String>[]},
-        {"name": "HttpHeaders", "type": 0, "details": <String>[]},
+      'url': 'dart:io',
+      'platform': 1,
+      'elements': [
+        {'name': 'HttpServer', 'type': 0, 'details': <String>[]},
+        {'name': 'HttpHeaders', 'type': 0, 'details': <String>[]},
       ],
     },
   ]),
@@ -86,10 +86,10 @@ final importsModuleOutput = {
 final conflictingImportsModuleOutput = {
   'site|lib/conflict.imports.json': jsonEncode([
     {
-      "url": "package:jaspr/client.dart",
-      "platform": 0,
-      "elements": [
-        {"name": "Document", "type": 0, "details": <String>[]},
+      'url': 'package:jaspr/client.dart',
+      'platform': 0,
+      'elements': [
+        {'name': 'Document', 'type': 0, 'details': <String>[]},
       ],
     },
   ]),

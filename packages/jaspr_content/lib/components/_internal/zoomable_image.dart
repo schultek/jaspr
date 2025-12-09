@@ -101,11 +101,11 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
   }
 
   void updateImageOffset(bool isResize) {
-    var sourceRect = imageKey.currentNode?.getBoundingClientRect();
+    final sourceRect = imageKey.currentNode?.getBoundingClientRect();
     if (sourceRect == null) return;
 
-    var sourceAspect = sourceRect.width / sourceRect.height;
-    var windowAspect = window.innerWidth / window.innerHeight;
+    final sourceAspect = sourceRect.width / sourceRect.height;
+    final windowAspect = window.innerWidth / window.innerHeight;
 
     final sourceScale =
         windowAspect >

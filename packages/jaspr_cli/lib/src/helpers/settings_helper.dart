@@ -26,7 +26,7 @@ Map<String, Object?>? _loadSettings() {
     return null;
   }
   try {
-    var str = settingsFile!.readAsStringSync();
+    final str = settingsFile!.readAsStringSync();
     return jsonDecode(str) as Map<String, Object?>;
   } catch (_) {
     return null;
@@ -75,7 +75,7 @@ final File? settingsFile = () {
 /// This can return null under some conditions, including when the user's home
 /// directory does not exist.
 Directory? getSettingsDirectory() {
-  var dir = homeDir;
+  final dir = homeDir;
   if (dir == null) {
     return null;
   }
@@ -84,9 +84,9 @@ Directory? getSettingsDirectory() {
 
 /// Return the user's home directory for the current platform.
 Directory? get homeDir {
-  var envKey = Platform.operatingSystem == 'windows' ? 'APPDATA' : 'HOME';
-  var home = Platform.environment[envKey] ?? '.';
+  final envKey = Platform.operatingSystem == 'windows' ? 'APPDATA' : 'HOME';
+  final home = Platform.environment[envKey] ?? '.';
 
-  var dir = Directory(home).absolute;
+  final dir = Directory(home).absolute;
   return dir.existsSync() ? dir : null;
 }

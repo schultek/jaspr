@@ -44,9 +44,9 @@ abstract class PageLayoutBase implements PageLayout {
     final pageTitleBase = pageData['titleBase'] ?? siteData['titleBase'];
 
     final title = switch ((pageTitle, pageTitleBase)) {
-      (String title, String base) => '$title | $base',
-      (String title, _) => title,
-      (_, String base) => base,
+      (final String title, final String base) => '$title | $base',
+      (final String title, _) => title,
+      (_, final String base) => base,
       _ => '',
     };
 
@@ -68,7 +68,7 @@ abstract class PageLayoutBase implements PageLayout {
     if (keywords case final keys?) {
       yield meta(name: 'keywords', content: keys is List ? keys.join(', ') : keys.toString());
     }
-    if (metaData case Map<String, Object?> metaData?) {
+    if (metaData case final Map<String, Object?> metaData?) {
       for (final MapEntry(key: name, value: content) in metaData.entries) {
         yield meta(name: name, content: content as String?);
       }
@@ -80,7 +80,7 @@ abstract class PageLayoutBase implements PageLayout {
     if (image case final img?) {
       yield meta(attributes: {'property': 'og:image'}, content: img.toString());
     }
-    if (metaData case List<Object?> metaData?) {
+    if (metaData case final List<Object?> metaData?) {
       for (final item in metaData) {
         if (item is Map<Object?, Object?>) {
           yield meta(attributes: item.cast());
@@ -94,14 +94,14 @@ abstract class PageLayoutBase implements PageLayout {
   @override
   Component buildLayout(Page page, Component child) {
     final lang = switch (page.data) {
-      {'page': {'lang': String lang}} => lang,
-      {'site': {'lang': String lang}} => lang,
+      {'page': {'lang': final String lang}} => lang,
+      {'site': {'lang': final String lang}} => lang,
       _ => null,
     };
 
     final base = switch (page.data) {
-      {'site': {'base': String base}} => base,
-      {'site': {'base': bool base}} => base ? '/' : null,
+      {'site': {'base': final String base}} => base,
+      {'site': {'base': final bool base}} => base ? '/' : null,
       _ => '/',
     };
 

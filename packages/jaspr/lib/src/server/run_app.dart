@@ -40,19 +40,19 @@ typedef ResponseLike = ({int statusCode, Uint8List body, Map<String, List<String
 Future<ResponseLike> renderComponent(Component app, {Request? request, bool standalone = false}) async {
   _checkInitialized('renderComponent');
   request ??= Request('GET', Uri.parse('https://0.0.0.0/'));
-  var fileLoader = proxyFileLoader(request, staticFileHandler());
+  final fileLoader = proxyFileLoader(request, staticFileHandler());
   return render(_createSetup(app), request, fileLoader, standalone);
 }
 
 void _checkInitialized(String method) {
   if (!Jaspr.isInitialized) {
-    stderr.write("Error: Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method()");
+    stderr.write('Error: Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method()');
     exit(-1);
   }
 }
 
 SetupFunction _createSetup(Component app) {
-  var options = Jaspr.options;
+  final options = Jaspr.options;
   return (binding) {
     binding.initializeOptions(options);
     binding.attachRootComponent(app);

@@ -50,7 +50,7 @@ class MarkdownParser implements PageParser {
   /// This also handles html blocks inside the parsed markdown content.
   static List<Node> buildNodes(Iterable<md.Node> markdownNodes) {
     final root = ElementNode('_', {}, []);
-    List<ElementNode> stack = [root];
+    final List<ElementNode> stack = [root];
     List<Node> currentNodes = root.children!;
 
     for (final node in markdownNodes) {
@@ -122,7 +122,7 @@ class JasprHtmlBlockSyntax extends md.HtmlBlockSyntax {
   md.Node parse(md.BlockParser parser) {
     final childLines = parseChildLines(parser);
 
-    var text = childLines.map((e) => e.content).join('\n').trimRight();
+    final text = childLines.map((e) => e.content).join('\n').trimRight();
     return HtmlText(text);
   }
 }

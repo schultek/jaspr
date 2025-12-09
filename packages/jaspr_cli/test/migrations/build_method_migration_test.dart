@@ -432,7 +432,7 @@ class MyComponent extends StatelessComponent {
           expectedOutput: source,
           expectedWarnings: [
             matchesWarning(
-              "Cannot migrate MyComponent.build(): Only build methods using sync* or async* can be migrated automatically",
+              'Cannot migrate MyComponent.build(): Only build methods using sync* or async* can be migrated automatically',
             ),
           ],
         );
@@ -452,7 +452,7 @@ class MyComponent extends StatelessComponent {
           expectedOutput: source,
           expectedWarnings: [
             matchesWarning(
-              "Cannot migrate MyComponent.build(): Only build methods using sync* or async* can be migrated automatically",
+              'Cannot migrate MyComponent.build(): Only build methods using sync* or async* can be migrated automatically',
             ),
           ],
         );

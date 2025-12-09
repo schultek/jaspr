@@ -13,9 +13,9 @@ class ClientEntrypointBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
-      var source = await generateEntrypoint(buildStep);
+      final source = await generateEntrypoint(buildStep);
       if (source != null) {
-        var outputId = AssetId(buildStep.inputId.package, buildStep.inputId.path.replaceFirst('lib/', 'web/'));
+        final outputId = AssetId(buildStep.inputId.package, buildStep.inputId.path.replaceFirst('lib/', 'web/'));
         await buildStep.writeAsFormattedDart(outputId, source);
       }
     } catch (e, st) {

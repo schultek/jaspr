@@ -123,10 +123,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   Future<int> runCommand() async {
     ensureInProject();
 
-    logger.write("Building jaspr for ${project.requireMode.name} rendering mode.");
+    logger.write('Building jaspr for ${project.requireMode.name} rendering mode.');
 
-    var dir = Directory('build/jaspr').absolute;
-    var webDir = project.requireMode == JasprMode.server ? Directory('build/jaspr/web').absolute : dir;
+    final dir = Directory('build/jaspr').absolute;
+    final webDir = project.requireMode == JasprMode.server ? Directory('build/jaspr/web').absolute : dir;
 
     final entryPoint = await getServerEntryPoint(input);
 
@@ -135,8 +135,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
     webDir.createSync(recursive: true);
 
-    var indexHtml = File('web/index.html').absolute;
-    var targetIndexHtml = File('${webDir.path}/index.html').absolute;
+    final indexHtml = File('web/index.html').absolute;
+    final targetIndexHtml = File('${webDir.path}/index.html').absolute;
 
     var dummyIndex = false;
     var dummyTargetIndex = false;
@@ -153,7 +153,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       });
     }
 
-    var webResult = _buildWeb();
+    final webResult = _buildWeb();
     var flutterResult = Future<void>.value();
 
     await webResult;
@@ -164,7 +164,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     bool hasBuildError = false;
 
-    var serverDefines = getServerDartDefines();
+    final serverDefines = getServerDartDefines();
 
     if (project.requireMode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
@@ -177,24 +177,24 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         _ => '',
       };
 
-      var process = await Process.start('dart', [
+      final process = await Process.start('dart', [
         'compile',
         compileTarget,
         entryPoint!,
         '-o',
         './build/jaspr/app$extension',
         '-Djaspr.flags.release=true',
-        for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
+        for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
       ], workingDirectory: Directory.current.path);
 
       await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
     } else if (project.requireMode == JasprMode.static) {
       logger.write('Generating static site...', progress: ProgressState.running);
 
-      Map<String, ({String? lastmod, String? changefreq, double? priority})?> generatedRoutes = {};
-      List<String> queuedRoutes = [];
+      final Map<String, ({String? lastmod, String? changefreq, double? priority})?> generatedRoutes = {};
+      final List<String> queuedRoutes = [];
 
-      var serverStartedCompleter = Completer<void>();
+      final serverStartedCompleter = Completer<void>();
       final serverPort = project.port ?? '8080';
 
       await startProxy(
@@ -202,7 +202,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         webPort: '0',
         serverPort: serverPort,
         onMessage: (message) {
-          if (message case {'route': String route}) {
+          if (message case {'route': final String route}) {
             if (!serverStartedCompleter.isCompleted) {
               serverStartedCompleter.complete();
             }
@@ -219,13 +219,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         },
       );
 
-      var serverPid = File('.dart_tool/jaspr/server.pid').absolute;
+      final serverPid = File('.dart_tool/jaspr/server.pid').absolute;
       if (!serverPid.existsSync()) {
         serverPid.createSync(recursive: true);
       }
       serverPid.writeAsStringSync('');
 
-      var process = await Process.start(
+      final process = await Process.start(
         Platform.executable,
         [
           // Use direct `dart` entry point for now due to
@@ -235,7 +235,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           '-Djaspr.flags.release=true',
           '-Djaspr.flags.generate=true',
           '-Djaspr.dev.web=build/jaspr',
-          for (var define in serverDefines.entries) '-D${define.key}=${define.value}',
+          for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
           entryPoint!,
         ],
         environment: {'PORT': serverPort, 'JASPR_PROXY_PORT': '5567'},
@@ -263,7 +263,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       final httpClient = http.Client();
 
       while (queuedRoutes.isNotEmpty) {
-        var route = queuedRoutes.removeLast();
+        final route = queuedRoutes.removeLast();
 
         logger.write(
           'Generating route "$route" (${generatedRoutes.length - queuedRoutes.length}/${generatedRoutes.length})...',
@@ -293,7 +293,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           continue;
         }
 
-        var file = File(
+        final file = File(
           p.url.join(
             'build/jaspr',
             route.startsWith('/') ? route.substring(1) : route,
@@ -304,7 +304,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         file.createSync(recursive: true);
         file.writeAsBytesSync(response.bodyBytes);
 
-        if (response.headers['jaspr-sitemap-data'] case String data) {
+        if (response.headers['jaspr-sitemap-data'] case final String data) {
           if (data == 'false') {
             generatedRoutes[route] = null;
           } else {
@@ -343,7 +343,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (sitemapDomain != null) {
         logger.write('Generating sitemap.xml...');
 
-        var content = StringBuffer();
+        final content = StringBuffer();
         content.writeln('<?xml version="1.0" encoding="UTF-8"?>');
         content.writeln('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
 
@@ -352,10 +352,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           domain = 'https://$domain';
         }
 
-        var excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
-        var now = DateTime.now().copyWith(millisecond: 0, microsecond: 0).toIso8601String();
+        final excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
+        final now = DateTime.now().copyWith(millisecond: 0, microsecond: 0).toIso8601String();
 
-        for (var route in generatedRoutes.entries) {
+        for (final route in generatedRoutes.entries) {
           if (excludePattern != null && excludePattern.hasMatch(route.key)) {
             continue;
           }
@@ -376,7 +376,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         }
         content.writeln('</urlset>');
 
-        var sitemap = File(p.url.join('build/jaspr', 'sitemap.xml')).absolute;
+        final sitemap = File(p.url.join('build/jaspr', 'sitemap.xml')).absolute;
         sitemap.createSync(recursive: true);
         sitemap.writeAsStringSync(content.toString());
       }
@@ -411,9 +411,14 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
 
-    var dartDefines = getClientDartDefines();
+    final dartDefines = getClientDartDefines();
     if (project.usesFlutter) {
       dartDefines.addAll(getFlutterDartDefines(useWasm, true));
+    }
+
+    final useFlutterSdkOptions = useFlutterSdk || project.usesFlutter;
+    if (useFlutterSdkOptions) {
+      project.checkFlutterBuildSupport(useFlutterSdk);
     }
 
     final args = [
@@ -423,9 +428,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ...argResults!.multiOption('extra-wasm-compiler-option')
       else
         ...argResults!.multiOption('extra-js-compiler-option'),
-      if (useWasm && (useFlutterSdk || project.usesFlutter))
+      if (useWasm && useFlutterSdkOptions)
         '--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
-
       for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
     ];
@@ -457,14 +461,14 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
         '--define=build_web_compilers:entrypoint=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
-        if (useFlutterSdk || project.usesFlutter) ...additionalFlutterBuildArgs(),
+        if (useFlutterSdkOptions) ...additionalFlutterBuildArgs(),
         if (includeSourceMaps) ...[
           '--define=build_web_compilers:dart2js_archive_extractor=filter_outputs=false',
           '--define=build_web_compilers:dart_source_cleanup=enabled=false',
         ],
       ],
     ], logger.writeServerLog);
-    OutputLocation outputLocation = OutputLocation(
+    final OutputLocation outputLocation = OutputLocation(
       (b) => b
         ..output = 'build/jaspr${project.requireMode == JasprMode.server ? '/web' : ''}'
         ..useSymlinks = false
@@ -484,7 +488,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var exitCode = 0;
     var gotBuildStart = false;
     await for (final result in client.buildResults) {
-      var targetResult = result.results.firstWhereOrNull((buildResult) => buildResult.target == 'web');
+      final targetResult = result.results.firstWhereOrNull((buildResult) => buildResult.target == 'web');
       if (targetResult == null) continue;
       // We ignore any builds that happen before we get a `started` event,
       // because those could be stale (from some other client).
@@ -498,7 +502,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         exitCode = 1;
       }
 
-      var error = targetResult.error ?? '';
+      final error = targetResult.error ?? '';
       if (error.isNotEmpty) {
         logger.complete(false);
         logger.write(error, level: Level.error);

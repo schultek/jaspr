@@ -17,8 +17,8 @@ class CloseIcon extends StatelessComponent {
     return _Icon(
       size: size,
       children: [
-        path(d: "M18 6 6 18", []),
-        path(d: "m6 6 12 12", []),
+        path(d: 'M18 6 6 18', []),
+        path(d: 'm6 6 12 12', []),
       ],
     );
   }
@@ -147,8 +147,8 @@ class CopyIcon extends StatelessComponent {
     return _Icon(
       size: size,
       children: [
-        rect(width: "14", height: "14", x: "8", y: "8", attributes: {'rx': "2", 'ry': "2"}, []),
-        path(d: "M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2", []),
+        rect(width: '14', height: '14', x: '8', y: '8', attributes: {'rx': '2', 'ry': '2'}, []),
+        path(d: 'M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2', []),
       ],
     );
   }
@@ -179,7 +179,7 @@ class _Icon extends StatelessComponent {
     return svg(
       width: size?.px,
       height: size?.px,
-      viewBox: "0 0 24 24",
+      viewBox: '0 0 24 24',
       attributes: {
         'fill': 'none',
         'stroke': 'currentColor',

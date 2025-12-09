@@ -138,7 +138,7 @@ class ScopesDomain extends Domain {
         final packagesContent = context.contextRoot.packagesFile?.readAsStringSync();
         final packagesJson = jsonDecode(packagesContent ?? '{}');
         if (packagesJson case {
-          'packages': List<Object?> packages,
+          'packages': final List<Object?> packages,
         } when packages.cast<Map<String, Object?>>().any((p) => p['name'] == 'jaspr_web_compilers')) {
           usesJasprWebCompilers = true;
         }
@@ -319,8 +319,8 @@ class InspectData {
     }
 
     if (libraries.containsKey(path)) {
-      var data = libraries[path]!;
-      bool hasChangedScopes =
+      final data = libraries[path]!;
+      final bool hasChangedScopes =
           clientScopeRoots.any((e) => !data.clientScopeRoots.contains(e)) ||
           serverScopeRoots.any((e) => !data.serverScopeRoots.contains(e));
       if (hasChangedScopes) {
@@ -408,13 +408,13 @@ class InspectDataItem {
     final dependencies = await resolveDependencies(library);
 
     for (final (:lib, :dir, :onClient, :onServer) in dependencies) {
-      var child = await data.inspectLibrary(
+      final child = await data.inspectLibrary(
         lib,
         this,
         onClient ? clientScopeRoots : {},
         onServer ? serverScopeRoots : {},
       );
-      var dep = InspectItemDependency(child, dir, onClient, onServer);
+      final dep = InspectItemDependency(child, dir, onClient, onServer);
       dep.invalidOnClient = onClient && data.isServerLib(lib) ? dir : null;
       dep.invalidOnServer = onServer && data.isClientLib(lib) ? dir : null;
       children.add(dep);
@@ -428,24 +428,24 @@ class InspectDataItem {
     for (final child in children) {
       if (child.item.components.isEmpty) {
         if (child.invalidOnClient == null) {
-          var childInvalidOnClient = child.onClient
+          final childInvalidOnClient = child.onClient
               ? child.item.children.map((c) => c.invalidOnClient).nonNulls.firstOrNull
               : null;
           if (childInvalidOnClient != null) {
             child.invalidOnClient = child.dir.withTarget(childInvalidOnClient);
-            for (var c in child.item.children) {
+            for (final c in child.item.children) {
               c.invalidOnClient = null;
             }
           }
         }
 
         if (child.invalidOnServer == null) {
-          var childInvalidOnServer = child.onServer
+          final childInvalidOnServer = child.onServer
               ? child.item.children.map((c) => c.invalidOnServer).nonNulls.firstOrNull
               : null;
           if (childInvalidOnServer != null) {
             child.invalidOnServer = child.dir.withTarget(childInvalidOnServer);
-            for (var c in child.item.children) {
+            for (final c in child.item.children) {
               c.invalidOnServer = null;
             }
           }
@@ -475,7 +475,7 @@ class InspectDataItem {
 
     LibraryElement? getBaseLibraryForDirective(NamespaceDirective directive) {
       bool matchesUri(ElementDirective d) => switch (d.uri) {
-        DirectiveUriWithRelativeUriString uri => uri.relativeUriString == directive.uri.stringValue,
+        final DirectiveUriWithRelativeUriString uri => uri.relativeUriString == directive.uri.stringValue,
         _ => false,
       };
       if (directive is ImportDirective) {
@@ -490,7 +490,7 @@ class InspectDataItem {
       if (uri == null) return null;
       final absolutePath = library.session.uriConverter.uriToPath(library.uri.resolve(uri));
       if (absolutePath == null) return null;
-      var lib2 = await library.session.getResolvedLibrary(absolutePath);
+      final lib2 = await library.session.getResolvedLibrary(absolutePath);
       if (lib2 is ResolvedLibraryResult) {
         return lib2.element;
       }

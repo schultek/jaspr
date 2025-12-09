@@ -22,9 +22,9 @@ abstract class JasprRoute extends Route {
   Future<Component> build(Session session, HttpRequest request);
 
   Future<Response> _handleRenderCall(Request request, FutureOr<Response> Function(Component) render) async {
-    var session = request.context['session'] as Session;
-    var req = request.context['request'] as HttpRequest;
-    var component = await build(session, req);
+    final session = request.context['session'] as Session;
+    final req = request.context['request'] as HttpRequest;
+    final component = await build(session, req);
     return render(InheritedSession(session: session, child: component));
   }
 

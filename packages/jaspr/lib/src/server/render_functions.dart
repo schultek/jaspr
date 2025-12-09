@@ -27,24 +27,24 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
   final RequestLike r = (url: url, headers: Headers.from(request.headersAll));
 
   if (!Jaspr.useIsolates) {
-    var binding = ServerAppBinding(r, loadFile: loadFile);
+    final binding = ServerAppBinding(r, loadFile: loadFile);
     setup(binding);
     final body = await binding.render(standalone: standalone);
     return (statusCode: binding.responseStatusCode, body: body, headers: binding.responseHeaders);
   }
 
-  var resultCompleter = Completer<ResponseLike>.sync();
+  final resultCompleter = Completer<ResponseLike>.sync();
 
-  var port = ReceivePort();
-  var errorPort = ReceivePort();
+  final port = ReceivePort();
+  final errorPort = ReceivePort();
 
-  var errorSub = errorPort.listen((message) {
+  final errorSub = errorPort.listen((message) {
     if (message case [final Object error, final String stack]) {
       resultCompleter.completeError(error, StackTrace.fromString(stack));
     }
   });
 
-  var sub = port.listen((message) async {
+  final sub = port.listen((message) async {
     if (message is ResponseLike) {
       resultCompleter.complete(message);
     } else if (message is _LoadFileRequest) {
@@ -53,7 +53,7 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
   });
 
   try {
-    var message = _RenderMessage(setup, r, standalone, port.sendPort);
+    final message = _RenderMessage(setup, r, standalone, port.sendPort);
     await Isolate.spawn(_render, message, onError: errorPort.sendPort);
 
     return await resultCompleter.future;
@@ -68,7 +68,7 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
 void _render(_RenderMessage message) async {
   ReceivePort? receivePort;
 
-  var binding = ServerAppBinding(
+  final binding = ServerAppBinding(
     message.request,
     loadFile: (name) {
       receivePort ??= ReceivePort();
@@ -78,7 +78,7 @@ void _render(_RenderMessage message) async {
   );
   message.setup(binding);
 
-  var body = await binding.render(standalone: message.standalone);
+  final body = await binding.render(standalone: message.standalone);
   final ResponseLike response = (statusCode: binding.responseStatusCode, body: body, headers: binding.responseHeaders);
   message.sendPort.send(response);
 }

@@ -44,31 +44,31 @@ class HistoryManagerImpl implements HistoryManager {
 class RouteRegistryImpl implements RouteRegistry {
   @override
   Future<void> registerRoutes(List<RouteBase> routes) async {
-    Map<String, RouteSettings?> paths = {};
+    final Map<String, RouteSettings?> paths = {};
 
     void registerRoute(RouteBase route, String path) {
       if (route is ShellRoute) {
-        for (var route in route.routes) {
+        for (final route in route.routes) {
           registerRoute(route, path);
         }
       } else if (route is Route) {
-        var p = path + (path.endsWith('/') || route.path.startsWith('/') ? '' : '/') + route.path;
+        final p = path + (path.endsWith('/') || route.path.startsWith('/') ? '' : '/') + route.path;
         assert(
           route.pathParams.isEmpty,
           'Routes with path parameters are not supported when using static-site generation.',
         );
         paths[p] = route.settings;
-        for (var route in route.routes) {
+        for (final route in route.routes) {
           registerRoute(route, p);
         }
       }
     }
 
-    for (var route in routes) {
+    for (final route in routes) {
       registerRoute(route, '');
     }
 
-    for (var path in paths.entries) {
+    for (final path in paths.entries) {
       await ServerApp.requestRouteGeneration(
         path.key,
         lastMod: path.value?.lastMod?.toIso8601String(),

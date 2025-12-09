@@ -79,25 +79,25 @@ class ImportsStubsBuilder implements Builder {
     }
 
     if (!vmImports.isEmpty) {
-      await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'), """
+      await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_vm.dart'), '''
         // ignore_for_file: directives_ordering, deprecated_member_use
         
         ${vmImports.imports}
         ${vmImports.exports}
 
         ${vmImports.stubs}
-      """);
+      ''');
     }
 
     if (!webImports.isEmpty) {
-      await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_web.dart'), """
+      await buildStep.writeAsFormattedDart(AssetId(buildStep.inputId.package, 'lib/generated/imports/_web.dart'), '''
         // ignore_for_file: directives_ordering, deprecated_member_use
 
         ${webImports.imports}
         ${webImports.exports}
 
         ${webImports.stubs}
-      """);
+      ''');
     }
 
     if (stubs.isNotEmpty) {
@@ -132,7 +132,7 @@ class PlatformImports {
     for (final element in elements) {
       if (_uniqueNames[element.name] case final existingImport? when existingImport != url) {
         throw Exception(
-          "Cannot import ${element.name} from $url, because it is also imported from $existingImport. "
+          'Cannot import ${element.name} from $url, because it is also imported from $existingImport. '
           'Names imported via @Import must be unique for each platform across the project.',
         );
       }
@@ -156,6 +156,6 @@ class PlatformImports {
       if (names.isNotEmpty) "export '$url' show ${names.join(', ')};",
   ].join('\n');
   String get stubs => [
-    for (final name in _stubbedNames.toList()..sort()) "typedef ${name}OrStubbed = $name;",
+    for (final name in _stubbedNames.toList()..sort()) 'typedef ${name}OrStubbed = $name;',
   ].join('\n');
 }

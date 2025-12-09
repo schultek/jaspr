@@ -30,7 +30,7 @@ class FileTree extends CustomComponent {
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && node.tag == 'FileTree') {
       if (node.children case [ElementNode(tag: 'ul', :final children)]) {
-        List<FileTreeItem> items = [];
+        final List<FileTreeItem> items = [];
 
         for (final child in children ?? <Node>[]) {
           items.add(buildFileTreeItem(child, builder));
@@ -49,13 +49,13 @@ class FileTree extends CustomComponent {
 
   FileTreeItem buildFileTreeItem(Node node, NodesBuilder builder) {
     if (node case ElementNode(tag: 'li', :final children)) {
-      List<Node> nodes = [...children ?? <Node>[]];
+      final List<Node> nodes = [...children ?? <Node>[]];
 
       String? name;
-      List<Node> comment = [];
+      final List<Node> comment = [];
       bool isOpen = true;
       bool isHighlighted = false;
-      List<FileTreeItem> subItems = [];
+      final List<FileTreeItem> subItems = [];
 
       if (nodes case [..._, ElementNode(tag: 'ul', :final children)]) {
         for (final subChild in children ?? <Node>[]) {

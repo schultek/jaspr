@@ -17,18 +17,18 @@ abstract class ConvertToPlatformImport extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    if (node case ImportDirective node) {
+    if (node case final ImportDirective node) {
       var fileName = unitResult.libraryFragment.source.shortName;
       if (fileName.endsWith('.dart')) fileName = fileName.substring(0, fileName.length - 5);
 
-      ImportDirective? importTarget = unit.directives
+      final ImportDirective? importTarget = unit.directives
           .whereType<ImportDirective>()
           .where((d) => d.uri.stringValue == '$fileName.imports.dart')
           .firstOrNull;
 
       var elements = <Element>[];
-      if (node.libraryImport case var libraryElement?) {
-        var visitor = GatherUsedImportedElementsVisitor(unit.declaredFragment!.element);
+      if (node.libraryImport case final libraryElement?) {
+        final visitor = GatherUsedImportedElementsVisitor(unit.declaredFragment!.element);
         unit.accept(visitor);
         elements = visitor.usedElements.elements
             .followedBy(visitor.usedElements.usedExtensions)
@@ -36,10 +36,10 @@ abstract class ConvertToPlatformImport extends ResolvedCorrectionProducer {
             .toList();
       }
 
-      var show = elements.map((e) => '#${e.name}').join(', ');
+      final show = elements.map((e) => '#${e.name}').join(', ');
 
       await builder.addDartFileEdit(file, (builder) {
-        var annotation = '@Import.on$platform(\'${node.uri.stringValue}\', show: [$show])\n';
+        final annotation = '@Import.on$platform(\'${node.uri.stringValue}\', show: [$show])\n';
 
         if (importTarget != null) {
           builder.addSimpleInsertion(importTarget.importKeyword.offset, annotation);

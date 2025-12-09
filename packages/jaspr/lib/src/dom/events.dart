@@ -46,8 +46,8 @@ Map<String, EventCallback> events<V>({
 
 void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
   return (e) {
-    var target = e.target;
-    var value = switch (target) {
+    final target = e.target;
+    final value = switch (target) {
       web.HTMLInputElement() when target.isHtmlInputElement => () {
         final targetType = target.type;
         final type = InputType.values.where((v) => v.name == targetType).firstOrNull;

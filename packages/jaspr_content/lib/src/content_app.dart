@@ -127,7 +127,7 @@ class ContentApp extends AsyncStatelessComponent {
 
   void _overrideGlobalOptions() {
     if (Jaspr.useIsolates) {
-      print("[Warning] ContentApp only supports non-isolate rendering. Disabling isolate rendering.");
+      print('[Warning] ContentApp only supports non-isolate rendering. Disabling isolate rendering.');
       // For caching to work correctly we need to disable isolate rendering.
       Jaspr.initializeApp(options: Jaspr.options, useIsolates: false);
     }

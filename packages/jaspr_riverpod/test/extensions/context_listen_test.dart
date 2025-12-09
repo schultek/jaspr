@@ -38,7 +38,7 @@ void main() {
     });
 
     testComponents('re-listens on rebuild', (tester) async {
-      List<int> wasCalledWith = [];
+      final List<int> wasCalledWith = [];
 
       tester.pumpComponent(
         providerApp((context) {
@@ -64,7 +64,7 @@ void main() {
     });
 
     testComponents('un-listens on dispose', (tester) async {
-      List<int> wasCalledWith = [];
+      final List<int> wasCalledWith = [];
 
       tester.pumpComponent(
         providerApp((context) {
@@ -117,7 +117,7 @@ void main() {
     });
 
     testComponents('omitting closes an active listener', (tester) async {
-      List<int> wasCalledWith = [];
+      final List<int> wasCalledWith = [];
 
       late Element element;
       var shouldListen = true;

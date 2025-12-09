@@ -19,7 +19,7 @@ void testServer(
   test(
     description,
     () async {
-      var tester = ServerTester._();
+      final tester = ServerTester._();
       tester._start();
       await callback(tester);
     },
@@ -68,7 +68,7 @@ class ServerTester {
   final _LateComponent _comp = _LateComponent();
 
   void _start() {
-    var options = Jaspr.options;
+    final options = Jaspr.options;
     _handler = ServerApp.createTestHandler(
       (r, render) => render((binding) {
         binding.initializeOptions(options);

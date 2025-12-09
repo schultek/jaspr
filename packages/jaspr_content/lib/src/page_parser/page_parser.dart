@@ -76,8 +76,8 @@ extension NodeExtension on Node {
   /// Recursively gets the inner text of the node.
   String get innerText {
     return switch (this) {
-      TextNode n => n.text,
-      ElementNode n => n.children?.map((n) => n.innerText).join() ?? '',
+      final TextNode n => n.text,
+      final ElementNode n => n.children?.map((n) => n.innerText).join() ?? '',
       ComponentNode _ => '',
     };
   }

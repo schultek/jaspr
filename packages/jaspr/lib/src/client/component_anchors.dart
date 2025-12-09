@@ -26,12 +26,12 @@ class ClientComponentAnchor extends ComponentAnchor {
       : {};
 
   Future<void> resolve() async {
-    var r = await builder;
+    final r = await builder;
     builder = r;
   }
 
   Component build() {
-    assert(builder is ClientBuilder, "ClientComponentAnchor was not resolved before calling build()");
+    assert(builder is ClientBuilder, 'ClientComponentAnchor was not resolved before calling build()');
     return (builder as ClientBuilder)(params);
   }
 }
@@ -45,8 +45,8 @@ List<ClientComponentAnchor> extractClientAnchors(
 }) {
   nodes ??= [?web.document.body];
 
-  List<ComponentAnchor> anchors = [];
-  List<ClientComponentAnchor> clientAnchors = [];
+  final List<ComponentAnchor> anchors = [];
+  final List<ClientComponentAnchor> clientAnchors = [];
 
   web.Comment? currNode;
   for (final rootNode in nodes) {
@@ -60,7 +60,7 @@ List<ClientComponentAnchor> extractClientAnchors(
       if (_clientStartRegex.firstMatch(value) case final match?) {
         assert(
           anchors.isEmpty,
-          "Found nested client component anchor, which is not allowed.",
+          'Found nested client component anchor, which is not allowed.',
         );
 
         final name = match.group(1)!;
@@ -75,13 +75,13 @@ List<ClientComponentAnchor> extractClientAnchors(
         final name = match.group(1)!;
         assert(
           anchors.isNotEmpty && anchors.last.name == name,
-          "Found client component end anchor without matching start anchor.",
+          'Found client component end anchor without matching start anchor.',
         );
 
         final comp = anchors.removeLast() as ClientComponentAnchor;
 
         final start = comp.startNode;
-        assert(start.parentNode == currNode.parentNode, "Found client component anchors with different parent nodes.");
+        assert(start.parentNode == currNode.parentNode, 'Found client component anchors with different parent nodes.');
 
         comp.endNode = currNode;
         comp.builder = byName(name);
