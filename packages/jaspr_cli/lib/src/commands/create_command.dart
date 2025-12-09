@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:mason/mason.dart' as m show Logger;
-import 'package:mason/mason.dart';
+import 'package:mason/mason.dart' hide Level;
 import 'package:path/path.dart' as p;
 import 'package:pub_updater/pub_updater.dart';
 
@@ -23,7 +23,6 @@ enum RenderingMode {
   final String help;
 
   bool get useServer => this == server || this == static;
-  String get recommend => this == static ? '(Recommended) ' : '';
 }
 
 class CreateCommand extends BaseCommand {
@@ -47,10 +46,13 @@ class CreateCommand extends BaseCommand {
       abbr: 'm',
       help: 'Choose a rendering mode for the project.',
       allowed: [
-        for (var m in RenderingMode.values) m.name,
+        for (var m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto'],
       ],
       allowedHelp: {
-        for (var v in RenderingMode.values) v.name: '${v.help}.',
+        for (var v in RenderingMode.values) ...{
+          v.name: '${v.help}.',
+          if (v.useServer) '${v.name}:auto': '(Deprecated) ${v.help} with automatic client-side hydration.',
+        },
       },
     );
     argParser.addOption(
@@ -64,10 +66,16 @@ class CreateCommand extends BaseCommand {
         'single-page': 'Sets up single-page (client-side) routing.',
       },
     );
-    argParser.addFlag(
+    argParser.addOption(
       'flutter',
       abbr: 'f',
-      help: 'Whether to set up Flutter web embedding.',
+      help: 'Choose the Flutter support for the project.',
+      allowed: ['none', 'embedded', 'plugins-only'],
+      allowedHelp: {
+        'none': 'No preconfigured Flutter support.',
+        'embedded': 'Sets up an embedded Flutter app inside your site.',
+        'plugins-only': '(Deprecated) Enables support for using Flutter web plugins.',
+      },
     );
     argParser.addOption(
       'backend',
@@ -266,10 +274,19 @@ class CreateCommand extends BaseCommand {
 
   RenderingMode getRenderingMode() {
     var opt = argResults!.option('mode');
-    return switch (opt) {
-      'client' => RenderingMode.client,
-      'server' => RenderingMode.server,
-      'static' => RenderingMode.static,
+    return switch (opt?.split(':')) {
+      ['client'] => RenderingMode.client,
+      [var m, 'auto'] => () {
+        logger.write(
+          'The ":auto" suffix for "--mode" is deprecated and will be removed in a future release. '
+          'Automatic hydration is enabled by default.',
+          level: Level.warning,
+        );
+
+        return RenderingMode.values.byName(m);
+      }(),
+      [var m] => RenderingMode.values.byName(m),
+
       _ => () {
         var mode = logger.logger!.chooseOne(
           'Select a rendering mode:',
@@ -303,11 +320,24 @@ class CreateCommand extends BaseCommand {
   }
 
   bool getFlutter() {
-    if (!argResults!.wasParsed('flutter')) {
-      return argResults!.flag('flutter');
-    }
+    var opt = argResults!.option('flutter');
 
-    return logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
+    return switch (opt) {
+      'none' => false,
+      'embedded' => true,
+      'plugins-only' => () {
+        logger.write(
+          'The "plugins-only" option for "--flutter" is deprecated and will be removed in a future release. '
+          'Use "--use-flutter-sdk" during "jaspr serve" and "jaspr build" instead.',
+          level: Level.warning,
+        );
+        return false;
+      }(),
+      _ => () {
+        var flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
+        return flutter;
+      }(),
+    };
   }
 
   String? getBackend() {
