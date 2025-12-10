@@ -6,9 +6,9 @@ import 'package:args/command_runner.dart';
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 
-import '../config.dart';
 import '../helpers/analytics.dart';
 import '../logging.dart';
+import '../project.dart';
 
 abstract class BaseCommand extends Command<int> {
   Set<FutureOr<void> Function()> guards = {};
@@ -83,6 +83,7 @@ abstract class BaseCommand extends Command<int> {
     bool requireJasprDependency = true,
     bool requireJasprMode = true,
     bool preferBuilderDependency = true,
+    bool checkJasprDependencyVersion = true,
   }) {
     if (requirePubspecYaml) {
       project.requirePubspecYaml;
@@ -95,6 +96,9 @@ abstract class BaseCommand extends Command<int> {
     }
     if (preferBuilderDependency) {
       project.preferJasprBuilderDependency;
+    }
+    if (checkJasprDependencyVersion) {
+      project.checkJasprDependencyVersion();
     }
   }
 

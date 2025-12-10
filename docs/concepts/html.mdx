@@ -5,9 +5,9 @@ description: How to write concise html markup in Jaspr.
 
 ---
 
-With jaspr, you write html as part of your component tree. Each html tag (like `div`, `p`, `img`, etc.) has an assigned method you can use (reps. `div()`, `p()`, `img()`, etc.).
+With jaspr, you write HTML as part of your component tree. Each HTML tag (like `div`, `p`, `img`, etc.) has an assigned component you can use (resp. `div()`, `p()`, `img()`, etc.).
 
-Let's look at the following html snippet:
+Let's look at the following HTML snippet:
 
 ```html
 <div>
@@ -16,44 +16,50 @@ Let's look at the following html snippet:
 </div>
 ```
 
-Within a jaspr component, this can be represented as such:
+Within a Jaspr component, this can be represented as such:
 
 ```dart
 div([
-  h1([text('This is a title')]),
-  p([text('Hello '), b([text('World!')])]),
+  h1([.text('This is a title')]),
+  p([.text('Hello '), b([.text('World!')])]),
 ]);
 ```
 
-The special `text()` method does not add a html tag but renders plain text inside other elements.
+The `.text()` is the dot-shorthands version of `Component.text()`, which does not add a HTML tag but renders plain text inside other elements.
 
 ## HTML utilities
-
-There exist methods for the most common html tags, like `div`, `a`, `p`, `img` as well as more special tags like
+  
+There exist components for the most common HTML tags, like `div`, `a`, `p`, `img` as well as more special tags like
 `video`, `form`, `input` and others.
 
 <Info>
 If you want support for a tag that does not have such a method yet, please don't hesitate to open an issue on github.
 </Info>
 
-Each method has the following signature:
+These components are available under the `package:jaspr/dom.dart` library, and each component is defined like this:
 
 ```dart
-Component <tagname>(List<Component> children, {
-  Key? key,
-  String? id,
-  String? classes,
-  Styles? styles,
-  Map<String, String>? attributes,
-  Map<String, EventCallback>? events,
-});
+class <tagname> extends Component {
+  const <tagname>(
+    List<Component> children, {
+    String? id,
+    String? classes,
+    Styles? styles,
+    Map<String, String>? attributes,
+    Map<String, EventCallback>? events,
+    Key? key,
+  });
+}
 ```
 
-In addition to these parameters some methods have tag-specific attributes, like `img(src: "...")` or `a(href: "...")`.
+In addition to these common properties some components support tag-specific properties, like `img(src: "...")` or `a(href: "...")`.
+
+<Info>
 
 For readability, it is recommended to put the list of child components last in the parameter list:
-`div(id: "main", [text('Hello World')])` is more readable than `div([text('Hello World')], id: "main")`.
+`div(id: "main", [.text('Hello World')])` is more readable than `div([.text('Hello World')], id: "main")`.
 In case of no children specify an empty list (`[]`). Some tags also omit this parameter, like `img`.
+</Info>
 
 [Try it out on JasprPad](https://playground.jaspr.site/?sample=html)
 
@@ -63,7 +69,7 @@ Finally, here are some more examples of this syntax. You can switch between the 
 
 <CodeGroup title="Paragraph with rich text">
   ```dart
-    p([text('This is some '),b([text('html')]),text(' content.')])
+    p([.text('This is some '),b([.text('html')]),.text(' content.')])
   ```
   ```html
     <p>This is some <b>html</b> content.</p>
@@ -72,7 +78,7 @@ Finally, here are some more examples of this syntax. You can switch between the 
 
 <CodeGroup title="Heading with blue text">
     ```dart
-    h1(styles: Styles.text(color: Colors.blue), [text('Hello Jaspr!')])
+    h1(styles: Styles(color: Colors.blue), [.text('Hello Jaspr!')])
     ```
     ```html
     <h1 style="color: blue;">Hello Jaspr!</h1>
@@ -81,7 +87,7 @@ Finally, here are some more examples of this syntax. You can switch between the 
 
 <CodeGroup title="Anchor with an image">
   ```dart
-    a(href: "https://github.com/schultek/jaspr", target: Target.blank, [
+    a(href: "https://github.com/schultek/jaspr", target: .blank, [
       img(src: "https://playground.jaspr.site/jaspr-192.png"),
     ])
   ```
@@ -95,8 +101,8 @@ Finally, here are some more examples of this syntax. You can switch between the 
 <CodeGroup title="Select input">
   ```dart
     select([
-      option(value: 'test', [text('Select me!')]),
-      option(value: 'other', selected: true, [text('Or me!')])
+      option(value: 'test', [.text('Select me!')]),
+      option(value: 'other', selected: true, [.text('Or me!')])
     ])
   ```
   ```html

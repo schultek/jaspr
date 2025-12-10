@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -18,7 +19,7 @@ class PlaygroundHeader extends StatelessComponent {
     return header(classes: 'mdc-elevation--z4', [
       div(classes: 'header-title', [
         img(classes: 'logo', src: "jaspr-192.png", alt: "JasprPad Logo"),
-        span([text('JasprPad')]),
+        span([.text('JasprPad')]),
       ]),
       div(styles: Styles(whiteSpace: WhiteSpace.noWrap), [
         Button(
@@ -63,7 +64,7 @@ class PlaygroundHeader extends StatelessComponent {
       Builder(
         builder: (context) {
           var name = context.watch(projectNameProvider);
-          return div(classes: 'header-gist-name', [text(name ?? '')]);
+          return div(classes: 'header-gist-name', [.text(name ?? '')]);
         },
       ),
       Button(

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -14,7 +15,7 @@ class ConsolePanel extends StatelessComponent {
       classes: 'console custom-scrollbar',
       styles: Styles(display: Display.flex, flexDirection: FlexDirection.column),
       [
-        for (var msg in messages) span(styles: Styles(width: Unit.zero), [raw(msg)]),
+        for (var msg in messages) span(styles: Styles(width: Unit.zero), [RawText(msg)]),
       ],
     );
   }

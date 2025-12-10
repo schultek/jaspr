@@ -62,7 +62,7 @@ Finally, link the generated `styles.css` in your document, or otherwise add it t
 
 In **static** or **server** mode:
 
-```dart title="lib/main.dart"
+```dart title="lib/main.server.dart"
 import 'package:jaspr/server.dart';
 
 import './app.dart';
@@ -120,8 +120,8 @@ class SimpleCard extends StatelessComponent {
         img(classes: 'h-12 w-12', src: '/img/logo.svg', alt: '$title Logo'),
       ]),
       div([
-        div(classes: 'text-xl font-medium text-black', [text(title)]),
-        p(classes: 'text-slate-500', [text(message)]),
+        div(classes: 'text-xl font-medium text-black', [.text(title)]),
+        p(classes: 'text-slate-500', [.text(message)]),
       ])
     ]);
   }

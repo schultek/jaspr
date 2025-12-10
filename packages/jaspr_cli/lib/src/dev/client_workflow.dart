@@ -10,8 +10,6 @@ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:build_daemon/client.dart';
 import 'package:build_daemon/data/build_target.dart';
-import 'package:build_daemon/data/server_log.dart' show toLoggingLevel;
-import 'package:logging/logging.dart' as l;
 
 import 'package:webdev/src/command/configuration.dart';
 import 'package:webdev/src/daemon_client.dart';
@@ -99,22 +97,7 @@ class ClientWorkflow {
 Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<String> buildOptions, Logger logger) async {
   try {
     logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
-    return await connectClient(workingDirectory, buildOptions, (serverLog) {
-      final level = _mapBuilderLevel(toLoggingLevel(serverLog.level));
-      if (!logger.verbose && level.index < Level.info.index) return;
-
-      final buffer = StringBuffer(serverLog.message);
-      if (serverLog.error != null) {
-        buffer.writeln(serverLog.error);
-      }
-
-      final log = buffer.toString().trim();
-      if (log.isEmpty) {
-        return;
-      }
-
-      logger.write(log, tag: Tag.builder, level: level);
-    });
+    return await connectClient(workingDirectory, buildOptions, logger.writeServerLog);
   } on OptionsSkew {
     logger.write(
       'Incompatible options with current running build daemon.\n\n'
@@ -125,18 +108,6 @@ Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<Strin
       progress: ProgressState.completed,
     );
     return null;
-  }
-}
-
-Level _mapBuilderLevel(l.Level builderLevel) {
-  if (builderLevel.value < l.Level.INFO.value) {
-    return Level.verbose;
-  } else if (builderLevel.value == l.Level.INFO.value) {
-    return Level.debug;
-  } else if (builderLevel.value < l.Level.SEVERE.value) {
-    return Level.warning;
-  } else {
-    return Level.error;
   }
 }
 

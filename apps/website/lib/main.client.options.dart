@@ -37,7 +37,7 @@ import 'package:website/pages/home/5_community/components/sponsors_list.dart'
 ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
     'header': ClientLoader(
-      (p) => _header.Header(showHome: p['showHome']),
+      (p) => _header.Header(showHome: p['showHome'] as bool),
       loader: _header.loadLibrary,
     ),
     'install_command': ClientLoader(

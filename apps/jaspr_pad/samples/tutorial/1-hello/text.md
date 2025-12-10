@@ -27,10 +27,10 @@ Most components also take a list of `children`, since html elements usually can 
 
 ## 🔎 Text / text
 
-The `text` component renders a plain text node.
+The `Component.text` constructor renders a plain text node.
 
 A text node in html is just some standalone string, that is placed inside another html element. 
-Therefore the `text` component also only receives a single string to render to the page.
+Therefore the `Component.text` constructor also only receives a single string to render to the page.
 
 > As usual for web, styling is done through a combination of CSS attributes, either in a 
 > **Stylesheet** or inline though the **`styles` attribute** of the parent elements.

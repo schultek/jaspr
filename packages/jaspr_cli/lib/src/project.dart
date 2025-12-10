@@ -7,8 +7,11 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
 import 'logging.dart';
+import 'version.dart';
 
 enum JasprMode { static, server, client }
+
+enum FlutterMode { embedded, plugins, none }
 
 extension JasprModeExtension on JasprMode {
   bool get isServerOrStatic => this == JasprMode.server || this == JasprMode.static;
@@ -65,6 +68,29 @@ class Project {
     }
   }
 
+  void checkJasprDependencyVersion() {
+    final pubspecYaml = requirePubspecYaml;
+    if (pubspecYaml case {'dependencies': {'jaspr': final String version}}) {
+      final usedVersion = VersionConstraint.parse(version);
+      final currentVersion = Version.parse(jasprCoreVersion);
+      final minVersion = Version(
+        currentVersion.major,
+        currentVersion.minor,
+        0,
+        pre: currentVersion.isPreRelease ? currentVersion.preRelease.map((s) => s is int ? 0 : s).join('.') : null,
+      );
+      final requiredVersion = VersionConstraint.compatibleWith(minVersion);
+      if (!requiredVersion.allowsAll(usedVersion)) {
+        logger.write(
+          'Incompatible jaspr dependency with version $version found in pubspec.yaml. Please use a minimum version constraint of $minVersion for all core packages.',
+          tag: Tag.cli,
+          level: Level.critical,
+        );
+        _exitFn(1);
+      }
+    }
+  }
+
   void get preferJasprBuilderDependency {
     if (requirePubspecYaml case {'dev_dependencies': {'jaspr_builder': _}}) {
       // ok
@@ -97,13 +123,6 @@ class Project {
         }
       }
     }
-  }
-
-  bool get usesFlutter {
-    return switch (requirePubspecYaml) {
-      {'dependencies': {'flutter': _}} => true,
-      _ => false,
-    };
   }
 
   YamlMap get _requireJasprOptions {
@@ -148,6 +167,27 @@ class Project {
     if (modeOrNull == null) {
       logger.write(
         '\'jaspr.mode\' in pubspec.yaml must be one of ${JasprMode.values.map((v) => v.name).join(', ')}.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
+      _exitFn(1);
+    }
+    return modeOrNull;
+  }
+
+  FlutterMode get flutterMode {
+    final configYaml = pubspecYaml?['jaspr'];
+    if (configYaml is! YamlMap) {
+      return FlutterMode.none;
+    }
+    final modeYaml = configYaml['flutter'];
+    if (modeYaml is! String) {
+      return FlutterMode.none;
+    }
+    final modeOrNull = FlutterMode.values.where((v) => v.name == modeYaml).firstOrNull;
+    if (modeOrNull == null) {
+      logger.write(
+        '\'jaspr.flutter\' in pubspec.yaml must be one of ${FlutterMode.values.map((v) => v.name).join(', ')}.',
         tag: Tag.cli,
         level: Level.critical,
       );
@@ -222,7 +262,7 @@ class Project {
       _exitFn(1);
     }
 
-    if (usesFlutter) {
+    if (flutterMode == FlutterMode.embedded) {
       logger.write(
         'Using "--experimental-wasm" is currently not supported together with Flutter embedding.',
         tag: Tag.cli,
@@ -232,7 +272,7 @@ class Project {
     }
   }
 
-  void checkFlutterBuildSupport(bool useFlag) {
+  void checkFlutterBuildSupport() {
     final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
     final version = switch (devDependencies?['build_web_compilers']) {
       final String v => VersionConstraint.parse(v),
@@ -241,11 +281,8 @@ class Project {
     final minVersion = VersionConstraint.compatibleWith(Version(4, 4, 6));
     if (version == null || !minVersion.allowsAll(version)) {
       logger.write(
-        useFlag
-            ? 'Using "--use-flutter-sdk" requires build_web_compilers 4.4.6 or newer. '
-                  'Please update your version constraint in pubspec.yaml.'
-            : 'Flutter embedding requires build_web_compilers 4.4.6 or newer. '
-                  'Please update your version constraint in pubspec.yaml.',
+        'Using "jaspr.flutter=${flutterMode.name}" in pubspec.yaml requires build_web_compilers 4.4.6 or newer. '
+        'Please update your version constraint in pubspec.yaml.',
         tag: Tag.cli,
         level: Level.critical,
       );

@@ -29,11 +29,11 @@ final clientModelExtensionModuleOutputs = {
     'id': ['site', 'lib/component_model_extension.dart'],
     'import': 'package:site/component_model_extension.dart',
     'params': [
-      {'name': 'a', 'isNamed': false, 'decoder': "p['a']", 'encoder': 'c.a'},
+      {'name': 'a', 'isNamed': false, 'decoder': "p['a'] as String", 'encoder': 'c.a'},
       {
         'name': 'b',
         'isNamed': true,
-        'decoder': "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p['b'])",
+        'decoder': "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p['b'] as Map<String, dynamic>)",
         'encoder': '[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()',
       },
     ],

@@ -23,10 +23,10 @@ class App extends StatelessComponent {
       // Redirect to the signup page.
       context.setHeader('Location', '/signup');
       context.setStatusCode(307, responseBody: 'Need to sign up.');
-      return text('');
+      return .empty(); // No need to render anything else.
     }
 
-    return p([text('Hello, World!')]);
+    return p([.text('Hello, World!')]);
   }
 }
 ```

@@ -3,10 +3,7 @@ import 'dart:math';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_riverpod/legacy.dart';
 
-/// A provider that preloads its value on the server, and syncs with the client.
-///
-/// The create function of a SyncProvider is only executed on the server, and
-/// never on the client. Instead the synced value is returned.
+/// A provider that loads the initial count value asynchronously.
 final initialCountProvider = FutureProvider<int>((ref) async {
   return Random().nextInt(100);
 });

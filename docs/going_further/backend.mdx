@@ -37,7 +37,7 @@ maintained by the Dart team.
 Since jaspr used shelf internally, it is pretty straightforward to built a custom backend for jaspr using
 shelf. 
 
-```dart title="lib/main.dart"
+```dart title="lib/main.server.dart"
 void main() async {
   var handler = serveApp((request, render) {
     // Optionally do something with `request`

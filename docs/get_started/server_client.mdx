@@ -15,10 +15,10 @@ As a result, some or your components will be:
 
 - **only rendered on the server**
 - **rendered both on the server and client** 
-- **only rendered on the client** (almost never happens though).
+- **only rendered on the client** (only rarely needed).
 
 <Info>
-  The terms "server" and "client" in this context refer to the environment in which the code is executed, not the actual hardware running it. Specifically, the "server" environment is the same whether you run it on your local machine (during development), a CI pipeline (in "static" mode) or an actual webserver (in "server" mode).
+  The terms "server" and "client" in this context refer to the environment in which the code is executed, not the actual hardware running it. Specifically, the "server" environment is the same whether you run it on your local machine (during development), a CI pipeline (during building in "static" mode) or an actual webserver (at runtime in "server" mode).
 </Info>
 
 Learning about and understanding the differences between these environments, and what causes a component to be rendered in which environment is crucial to building a successful app with Jaspr.
@@ -53,11 +53,12 @@ To write components that works in one or both environments, you need to understa
 
 By default, you can reason about your components as follows:
 
-1. Your apps entrypoint is `main.dart`. This is only executed on the server. Hence all components that are rendered from there (the root `Document` component and all its descendents) are rendered on the server.
+1. Your apps server entrypoint is `main.server.dart`. This is only executed on the server, hence all components that are rendered from there (the root `Document` component and all its descendents) are rendered on the server.
 2. Go through the component tree top down, starting at the root component and moving downwards through its descendents.
 3. Any component annotated with `@client` is a client component. In addition to being rendered on the server, it is also attached as a root component on the client. This means:
   - It will be rendered both on the server and client.
   - All of its descendents are also rendered both on the server and client.
+2. Additionally, your apps client entrypoint is `main.client.dart`. This is only executed on the client and automatically includes all `@client` components.
 
 To find out if a particular component is rendered on the server or client, you can turn this around and move up the tree:
 

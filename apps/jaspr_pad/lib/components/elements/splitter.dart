@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/html.dart' as html;
@@ -36,7 +37,7 @@ class SplitterState extends State<Splitter> {
     if (sizes.length != component.children.length) {
       sizes = List.filled(component.children.length, 100 / component.children.length);
     }
-    splitPairs = List.generate(component.children.length - 1, (i) => SplitPair(this, i));
+    splitPairs = List.generate(component.children.length - 1, (index) => SplitPair(this, index));
   }
 
   void adjustSizes(double offset, int index) {
@@ -89,7 +90,7 @@ class SplitterState extends State<Splitter> {
         ),
       );
     }
-    return fragment(children);
+    return .fragment(children);
   }
 }
 

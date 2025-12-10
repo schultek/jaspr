@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_riverpod/legacy.dart';
@@ -51,7 +52,7 @@ class Dialog extends StatelessComponent {
   Component build(BuildContext context) {
     return div(classes: 'mdc-dialog__container', [
       div(classes: 'mdc-dialog__surface', [
-        h2(classes: 'mdc-dialog__title', [text(title)]),
+        h2(classes: 'mdc-dialog__title', [.text(title)]),
         div(classes: 'mdc-dialog__content', [content]),
         footer(classes: 'mdc-dialog__actions', actions),
       ]),
@@ -120,7 +121,7 @@ class DialogState extends State<DialogSlot> {
         classes: 'mdc-dialog',
         attributes: {'role': 'alertdialog', 'aria-modal': 'true'},
         [
-          if (state != null) state.builder(context) else Dialog(content: text(''), title: '', actions: []),
+          if (state != null) state.builder(context) else Dialog(content: .text(''), title: '', actions: []),
           div(classes: 'mdc-dialog__scrim', []),
         ],
       ),

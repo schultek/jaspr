@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../adapters/html.dart';
-import '../main.init.dart';
+import '../main.server.init.dart';
 import '../models/api_models.dart';
 import '../models/sample.dart';
 import '../models/tutorial.dart';

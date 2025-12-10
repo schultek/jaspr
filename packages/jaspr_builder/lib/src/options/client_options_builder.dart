@@ -36,7 +36,7 @@ class ClientOptionsBuilder implements Builder {
   };
 
   Future<void> generateClientOptions(BuildStep buildStep) async {
-    final mode = await buildStep.loadProjectMode(options, buildStep);
+    final (mode, flutter) = await buildStep.loadProjectMode(options, buildStep);
     if (mode != 'static' && mode != 'server') {
       return;
     }
@@ -46,10 +46,12 @@ class ClientOptionsBuilder implements Builder {
       buildStep.inputId.path.replaceFirst('.client.dart', '.server.dart'),
     );
 
+    final shouldInitializePlugins = flutter == 'embedded' || flutter == 'plugins';
+
     var (clients, sources, plugins) = await (
       buildStep.loadClients(),
       buildStep.loadTransitiveSourcesFor(serverId),
-      loadWebPlugins(buildStep),
+      shouldInitializePlugins ? loadWebPlugins(buildStep) : Future.value(<Plugin>[]),
     ).wait;
 
     if (sources.isNotEmpty) {

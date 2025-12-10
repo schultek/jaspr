@@ -27,4 +27,5 @@ dev_dependencies:
 
 jaspr:
   mode: static
+  flutter: embedded
 

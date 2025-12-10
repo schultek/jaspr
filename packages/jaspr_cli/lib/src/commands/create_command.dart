@@ -8,6 +8,7 @@ import 'package:pub_updater/pub_updater.dart';
 import '../bundles/bundles.dart';
 import '../bundles/scaffold/scaffold_bundle.dart';
 import '../logging.dart';
+import '../project.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -74,7 +75,7 @@ class CreateCommand extends BaseCommand {
       allowedHelp: {
         'none': 'No preconfigured Flutter support.',
         'embedded': 'Sets up an embedded Flutter app inside your site.',
-        'plugins-only': '(Deprecated) Enables support for using Flutter web plugins.',
+        'plugins-only': 'Enables support for using Flutter web plugins.',
       },
     );
     argParser.addOption(
@@ -113,14 +114,14 @@ class CreateCommand extends BaseCommand {
 
     final useMode = getRenderingMode();
     final (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
-    final useFlutter = getFlutter();
+    final useFlutterMode = getFlutter();
     final useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
     final usedPrefixes = {
       if (useMode.useServer) 'server',
       if (useMode == RenderingMode.client) 'client',
       if (useRouting) 'routing',
-      if (useFlutter) 'flutter',
+      if (useFlutterMode == FlutterMode.embedded) 'flutter',
       if (useMode.useServer) useBackend ?? 'base',
     };
 
@@ -143,7 +144,8 @@ class CreateCommand extends BaseCommand {
         'mode': useMode.name,
         'routing': useRouting,
         'multipage': useMultiPageRouting,
-        'flutter': useFlutter,
+        'flutter': useFlutterMode == FlutterMode.embedded,
+        'plugins': useFlutterMode == FlutterMode.plugins,
         'server': useMode.useServer,
         'shelf': useBackend == 'shelf',
         'jasprCoreVersion': jasprCoreVersion,
@@ -319,23 +321,26 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  bool getFlutter() {
+  FlutterMode getFlutter() {
     final opt = argResults!.option('flutter');
 
     return switch (opt) {
-      'none' => false,
-      'embedded' => true,
-      'plugins-only' => () {
-        logger.write(
-          'The "plugins-only" option for "--flutter" is deprecated and will be removed in a future release. '
-          'Use "--use-flutter-sdk" during "jaspr serve" and "jaspr build" instead.',
-          level: Level.warning,
-        );
-        return false;
-      }(),
+      'none' => FlutterMode.none,
+      'embedded' => FlutterMode.embedded,
+      'plugins-only' => FlutterMode.plugins,
       _ => () {
         final flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
-        return flutter;
+        if (flutter) {
+          return FlutterMode.embedded;
+        }
+        final plugins = logger.logger!.confirm(
+          'Enable support for using Flutter web plugins in your project?',
+          defaultValue: false,
+        );
+        if (plugins) {
+          return FlutterMode.plugins;
+        }
+        return FlutterMode.none;
       }(),
     };
   }

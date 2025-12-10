@@ -85,22 +85,22 @@ If the template isn't the right fit for you, it's also very easy to get started 
     ````
     
   </Step>
-  <Step title="Update main.dart">
+  <Step title="Update main.server.dart">
 
-    Remove all files in `lib/` except for `main.dart` and `jaspr_options.dart`.
+    Remove all files in `lib/` except for `main.server.dart` and `main.server.options.dart`.
 
-    Open the `lib/main.dart` file in your project. This is where you will set up the `jaspr_content` package to load and render your content.
+    Open the `lib/main.server.dart` file in your project. This is where you will set up the `jaspr_content` package to load and render your content.
 
-    Replace the contents of `lib/main.dart` with the following code:
+    Replace the contents of `lib/main.server.dart` with the following code:
 
-    ```dart title="lib/main.dart"
+    ```dart title="lib/main.server.dart"
     import 'package:jaspr/jaspr.dart';
     import 'package:jaspr_content/jaspr_content.dart';
 
-    import 'jaspr_options.dart';
+    import 'main.server.options.dart';
 
     void main() {
-      Jaspr.initializeApp(options: defaultJasprOptions);
+      Jaspr.initializeApp(options: defaultServerOptions);
 
       runApp(ContentApp(
         parsers: [
@@ -136,19 +136,23 @@ So far we have only seen a very minimal setup for `ContentApp` and there is lots
 
 - Add one of the provided [layouts](/content/concepts/page_layouts) or create your own. For example, [DocsLayout](/content/layouts/docs_layout) provides a beautiful documentation layout with a header, sidebar and table of contents *(Similar to the docs you are reading right now)*.
 
-  ```dart title="lib/main.dart"
-  layouts: [
-    DocsLayout()
-  ],
+  ```dart
+  ContentApp(
+    layouts: [
+      DocsLayout()
+    ],
+  ),
   ```
 
 - Use custom components like [Callout](/content/components/callout) or [CodeBlock](/content/components/code_block) in your content files.
 
-  ```dart title="lib/main.dart"
-  components: [
-    Callout(), // Callout boxes, like <Info>, <Warning>, <Success> and <Error>
-    CodeBlock(), // Code block with syntax highlighting and copy button
-  ],
+  ```dart
+  ContentApp(
+    components: [
+      Callout(), // Callout boxes, like <Info>, <Warning>, <Success> and <Error>
+      CodeBlock(), // Code block with syntax highlighting and copy button
+    ],
+  ),
   ```
 
   ````markdown title="content/index.md"
@@ -172,8 +176,10 @@ So far we have only seen a very minimal setup for `ContentApp` and there is lots
   
 - Add a template engine like `MustacheTemplateEngine` to enable using a templating syntax in your markdown files. This allows you to use variables and conditionals in your content.
 
-  ```dart title="lib/main.dart"
-  templateEngine: MustacheTemplateEngine(),
+  ```dart
+  ContentApp(
+    templateEngine: MustacheTemplateEngine(),
+  ),
   ```
 
   ```markdown title="content/index.md"

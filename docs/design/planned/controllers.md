@@ -37,19 +37,21 @@ class UsersPage extends StatelessComponent {
       build: (BuildContext context, AsyncValue<List<User>> userState) {
         return userState.when(
           data: (List<User> users) {
-            return Text('Users: ${users.length}');
-            return Button(
-              child: Text('Add new'),
-              onPressed: () {
-                controller.dispatch(UserRequest.newUser('Tom'));
-              },
-            );
+            return div([
+              .text('Users: ${users.length}');
+              Button(
+                child: .text('Add new'),
+                onPressed: () {
+                  controller.dispatch(UserRequest.newUser('Tom'));
+                },
+              ),
+            ]);
           },
           loading: () {
-            return Text('Loading...');
+            return .text('Loading...');
           },
           error: (e) {
-            return Text('Error: $e');
+            return .text('Error: $e');
           },
         );
       },

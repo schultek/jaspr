@@ -8,7 +8,7 @@ class HomePage extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return Component.fragment([
+    return .fragment([
       header([
         img(src: 'images/quote.jpg', alt: "Quote symbol", width: 100),
         h1([.text('Dart Quotes')]),

@@ -32,7 +32,7 @@ ClientOptions get defaultClientOptions => ClientOptions(
       loader: _counter.loadLibrary,
     ),
     'hello': ClientLoader(
-      (p) => _hello.Hello(name: p['name']),
+      (p) => _hello.Hello(name: p['name'] as String),
       loader: _hello.loadLibrary,
     ),
   },

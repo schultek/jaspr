@@ -4,22 +4,22 @@
 // GENERATED FILE, DO NOT MODIFY
 // Generated with jaspr_builder
 
-import 'package:jaspr/server.dart';
+import 'package:jaspr/client.dart';
 
-/// Default [ServerOptions] for use with your Jaspr project.
+/// Default [ClientOptions] for use with your Jaspr project.
 ///
 /// Use this to initialize Jaspr **before** calling [runApp].
 ///
 /// Example:
 /// ```dart
-/// import 'counter.server.options.dart';
+/// import 'main.client.options.dart';
 ///
 /// void main() {
 ///   Jaspr.initializeApp(
-///     options: defaultServerOptions,
+///     options: defaultClientOptions,
 ///   );
 ///
 ///   runApp(...);
 /// }
 /// ```
-ServerOptions get defaultServerOptions => ServerOptions();
+ClientOptions get defaultClientOptions => ClientOptions();

@@ -10,6 +10,6 @@ class Counter extends StatefulComponent {
 class _CounterState extends State<Counter> {
   @override
   Component build(BuildContext context) {
-    return text('Counter');
+    return .text('Counter');
   }
 }

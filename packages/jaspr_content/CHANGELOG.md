@@ -1,6 +1,7 @@
-## 0.4.5-beta.0
+## Unreleased 0.4.5
 
-- `jaspr` upgraded to `0.22.0-beta.0`
+- Ensure `context.page` and `context.pages` is only called on the server.
+- `jaspr` upgraded to `0.22.0`
 
 ## 0.4.4
 

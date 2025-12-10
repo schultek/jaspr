@@ -19,7 +19,7 @@ class MarkdownPage extends StatelessComponent {
     final content = file.readAsStringSync();
     final html = markdownToHtml(content);
 
-    return Component.fragment([
+    return .fragment([
       Header(showHome: true),
       main_(classes: 'markdown-content', [RawText(html)]),
       Footer(),

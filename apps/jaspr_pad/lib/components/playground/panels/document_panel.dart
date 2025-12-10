@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -12,7 +13,7 @@ class DocumentPanel extends StatelessComponent {
   Component build(BuildContext context) {
     var info = context.watch(activeDocumentationProvider);
     if (info == null) {
-      return text('');
+      return .text('');
     }
     return _DocumentHintMarkdown(info);
   }

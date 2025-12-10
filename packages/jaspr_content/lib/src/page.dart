@@ -366,7 +366,20 @@ extension PageContext on BuildContext {
   /// Returns the current [Page] that this component is being built for.
   ///
   /// The page should not be modified, otherwise it could lead to unexpected behavior.
-  Page get page => dependOnInheritedComponentOfExactType<_InheritedPage>()!.page;
+  Page get page {
+    if (kIsWeb) {
+      throw UnsupportedError(
+        'context.page is not supported on the client any only allowed to be called on the server.\n'
+        'Wrap the call with a !kIsWeb check or move it out of any client component.',
+      );
+    }
+
+    final comp = dependOnInheritedComponentOfExactType<_InheritedPage>();
+    if (comp == null) {
+      throw StateError('No Page object found in context. Make sure you are inside a page rendered by ContentApp.');
+    }
+    return comp.page;
+  }
 
   /// Returns the list of all pages that are being built.
   ///
@@ -374,7 +387,20 @@ extension PageContext on BuildContext {
   /// Otherwise, it will only contain the pages that have been built so far.
   ///
   /// The list should not be modified, otherwise it could lead to unexpected behavior.
-  List<Page> get pages => dependOnInheritedComponentOfExactType<_InheritedPage>()!.pages;
+  List<Page> get pages {
+    if (kIsWeb) {
+      throw UnsupportedError(
+        'context.pages is not supported on the client any only allowed to be called on the server.\n'
+        'Wrap the call with a !kIsWeb check or move it out of any client component.',
+      );
+    }
+
+    final comp = dependOnInheritedComponentOfExactType<_InheritedPage>();
+    if (comp == null) {
+      throw StateError('No Page objects found in context. Make sure you are inside a page rendered by ContentApp.');
+    }
+    return comp.pages;
+  }
 }
 
 class _InheritedPage extends InheritedComponent {
