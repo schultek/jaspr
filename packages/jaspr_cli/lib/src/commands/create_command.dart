@@ -335,7 +335,7 @@ class CreateCommand extends BaseCommand {
         }
         final plugins = logger.logger!.confirm(
           'Enable support for using Flutter web plugins in your project?',
-          defaultValue: true,
+          defaultValue: false,
         );
         if (plugins) {
           return FlutterMode.plugins;
