@@ -17,9 +17,9 @@ void main() async {
   final jasprBuilderVersion = packagesJson.firstWhere((p) => p['name'] == 'jaspr_builder')['version'];
 
   output.writeln(
-    'const jasprCliVersion = "$jasprCliVersion";\n'
-    'const jasprCoreVersion = "$jasprVersion";\n'
-    'const jasprBuilderVersion = "$jasprBuilderVersion";',
+    'const jasprCliVersion = \'$jasprCliVersion\';\n'
+    'const jasprCoreVersion = \'$jasprVersion\';\n'
+    'const jasprBuilderVersion = \'$jasprBuilderVersion\';',
   );
 
   final versionsFile = File('lib/src/version.dart');

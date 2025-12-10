@@ -1,6 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../constants/texts.dart';
 import '../constants/theme.dart';
 
 class Banner extends StatelessComponent {
@@ -13,12 +14,9 @@ class Banner extends StatelessComponent {
       attributes: {'role': 'alert'},
       [
         p([
-          .text(
-            'Jaspr 0.21.0 is out! This release is all about improving component syntax and reducing complexity. ',
-          ),
-          a(classes: 'animated-underline', href: 'https://docs.jaspr.site/releases/v/0.21.0', target: .blank, [
-            .text('Learn more'),
-          ]),
+          .text(bannerText.$1),
+          a(classes: 'animated-underline', href: bannerLink, target: .blank, [.text(bannerText.$2)]),
+          .text(bannerText.$3),
         ]),
       ],
     );

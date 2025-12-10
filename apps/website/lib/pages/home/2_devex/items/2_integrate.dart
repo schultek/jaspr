@@ -4,6 +4,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../../../components/code_window/code_block.dart';
+import '../../../../constants/texts.dart';
 import '../components/devex_box.dart';
 
 class Integrate extends StatelessComponent {
@@ -24,18 +25,19 @@ class Integrate extends StatelessComponent {
       preview: div([
         CodeBlock(
           scroll: false,
-          source: '''
+          source:
+              '''
             name: my_awesome_website
 
             dependencies:
-              cloud_firestore: ^5.6.2
-              dart_mappable: ^4.3.0
+              cloud_firestore: ^6.1.0
+              dart_mappable: ^4.6.0
               http: ^1.3.0
-              intl: ^0.19.0
-              jaspr: ^0.19.0
+              intl: ^0.20.1
+              jaspr: ^$latestCoreVersion
               logging: ^1.3.0
-              riverpod: ^2.6.1
-              shared_preferences: ^2.4.0
+              riverpod: ^3.0.1
+              shared_preferences: ^2.5.0
             ''',
           language: 'yaml',
         ),
