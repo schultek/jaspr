@@ -24,12 +24,11 @@ The main features are:
 - **Various Styling Improvements**: New CSS properties like `animation` and `quotes`, improved properties like `Transition`, better support for dot-shorthands and more.
 
 
-<Warning>
+<Success>
 Most changes can be **automatically migrated** using the `jaspr migrate` command.
 
-While using the beta, provide the target version manually using `jaspr migrate --target-version=0.22.0`.
 If you are on latest Dart and want the migrations to use dot-shorthands, additionally add `--feature=dot-shorthands`.
-</Warning>
+</Success>
 
 ---
 
@@ -41,10 +40,6 @@ The project can now contain separate entrypoints for server and client environme
 - `<file>.client.dart` (in all modes)
 
 The generated global options file (previously `jaspr_options.dart`) is now generated as `<file>.server.options.dart` alongside the entrypoint, and an additional `<file>.client.options.dart` is generated for client-side code.
-
-<Info>
-All needed changes can be automatically applied using the `jaspr migrate` command.
-</Info>
 
 ### Client Initialization
 
@@ -79,9 +74,9 @@ The `package:jaspr/browser.dart` library has been renamed to `package:jaspr/clie
 
 ### Migration
 
-<Info>
+<Success>
 After upgrading Jaspr CLI to `0.22.0`, you can use the `jaspr migrate` command to **automatically migrate your code** to the new entrypoint system.
-</Info>
+</Success>
 
 In case you need or want to migrate your code manually, rename `lib/main.dart` to `lib/main.server.dart` and create a new `lib/main.client.dart` file with the content shown above. Additionally, rename all `package:jaspr/browser.dart` imports to `package:jaspr/client.dart`.
 
@@ -119,9 +114,9 @@ RawText('<div>Raw HTML</div>');
 
 ### Migration
 
-<Info>
+<Success>
 After upgrading Jaspr CLI to `0.22.0`, you can use the `jaspr migrate` command to **automatically migrate (most of) your code** to the new entrypoint system.
-</Info>
+</Success>
 
 In case you need or want to migrate your code manually, add new `package:jaspr/dom.dart` imports where needed. 
 
