@@ -1,4 +1,4 @@
-## Unreleased 0.6.0
+## 0.6.0
 
 - `jaspr` upgraded to `0.22.0`
 - Updated documentation to reflect latest project requirements.

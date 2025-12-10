@@ -1,4 +1,4 @@
-## Unreleased 0.22.0
+## 0.22.0
 
 - **Breaking** Changed project entrypoint conventions:
 

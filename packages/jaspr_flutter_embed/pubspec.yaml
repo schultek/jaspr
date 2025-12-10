@@ -1,6 +1,6 @@
 name: jaspr_flutter_embed
 description: Flutter element embedding bindings for jaspr.
-version: 0.4.9
+version: 0.4.10
 homepage: https://jaspr.site
 repository: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
@@ -21,5 +21,5 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  jaspr: ^0.22.0-beta.0
+  jaspr: ^0.22.0
   web: ^1.0.0
