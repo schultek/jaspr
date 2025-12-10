@@ -89,16 +89,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       negatable: true,
       defaultsTo: true,
     );
-
-    argParser.addFlag(
-      'use-flutter-sdk',
-      help:
-          'Use the installed Flutter SDK to compile the app. This enables support for using '
-          'Flutter web plugins and Flutter embedding.\n'
-          'This is automatically enabled when depending on flutter in pubspec.yaml.',
-      negatable: false,
-      defaultsTo: false,
-    );
     addDartDefineArgs();
   }
 
@@ -117,7 +107,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final sitemapDomain = argResults!.option('sitemap-domain');
   late final sitemapExclude = argResults!.option('sitemap-exclude');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
-  late final useFlutterSdk = argResults!.flag('use-flutter-sdk');
 
   @override
   Future<int> runCommand() async {
@@ -140,7 +129,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     var dummyIndex = false;
     var dummyTargetIndex = false;
-    if (project.usesFlutter && !indexHtml.existsSync()) {
+    if (project.flutterMode == FlutterMode.embedded && !indexHtml.existsSync()) {
       dummyIndex = true;
       dummyTargetIndex = true;
       indexHtml
@@ -158,7 +147,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     await webResult;
 
-    if (project.usesFlutter) {
+    if (project.flutterMode == FlutterMode.embedded) {
       flutterResult = buildFlutter(useWasm);
     }
 
@@ -412,13 +401,12 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
 
     final dartDefines = getClientDartDefines();
-    if (project.usesFlutter) {
+    if (project.flutterMode == FlutterMode.embedded) {
       dartDefines.addAll(getFlutterDartDefines(useWasm, true));
     }
 
-    final useFlutterSdkOptions = useFlutterSdk || project.usesFlutter;
-    if (useFlutterSdkOptions) {
-      project.checkFlutterBuildSupport(useFlutterSdk);
+    if (project.flutterMode != FlutterMode.none) {
+      project.checkFlutterBuildSupport();
     }
 
     final args = [
@@ -428,7 +416,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ...argResults!.multiOption('extra-wasm-compiler-option')
       else
         ...argResults!.multiOption('extra-js-compiler-option'),
-      if (useWasm && useFlutterSdkOptions)
+      if (useWasm && project.flutterMode != FlutterMode.none)
         '--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
       for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
@@ -458,11 +446,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',
-      if (useFlutterSdkOptions) '--define=jaspr_builder:client_options=initialize-flutter-plugins=true',
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
         '--define=build_web_compilers:entrypoint=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
-        if (useFlutterSdkOptions) ...additionalFlutterBuildArgs(),
+        if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
         if (includeSourceMaps) ...[
           '--define=build_web_compilers:dart2js_archive_extractor=filter_outputs=false',
           '--define=build_web_compilers:dart_source_cleanup=enabled=false',

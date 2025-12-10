@@ -15,7 +15,7 @@ class QuoteLikeButton extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseService.instance.getQuoteById(id),
+      stream: kIsWeb ? FirebaseService.instance.getQuoteById(id) : null,
       builder: (context, snapshot) {
         int count = snapshot.data?.likes.length ?? initialCount;
         bool? hasLiked = snapshot.data?.likes.contains(FirebaseService.instance.getUserId());

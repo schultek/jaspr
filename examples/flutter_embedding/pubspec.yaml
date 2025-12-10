@@ -25,10 +25,11 @@ dev_dependencies:
     sdk: flutter
   jaspr_builder: ^0.22.0-beta.0
 
+jaspr:
+  mode: server
+  flutter: embedded
+
 flutter:
   uses-material-design: true
   assets:
     - assets/dash.png
-
-jaspr:
-  mode: server

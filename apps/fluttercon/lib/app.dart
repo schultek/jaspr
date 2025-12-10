@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart';
+// import 'package:http/http.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
@@ -14,11 +14,12 @@ import 'pages/session.dart';
 class App extends AsyncStatelessComponent {
   @override
   Future<Component> build(BuildContext context) async {
-    final response = await get(
-      Uri.parse('https://sessionize.com/api/v2/${Platform.environment['FLUTTERCON_SESSIONIZE_ID']}/view/Sessions'),
-    );
+    // final response = await get(
+    //   Uri.parse('https://sessionize.com/api/v2/${Platform.environment['FLUTTERCON_SESSIONIZE_ID']}/view/Sessions'),
+    // );
+    // final [{"sessions": sessionsJson}] = jsonDecode(response.body) as List;
+    final sessionsJson = jsonDecode(File('sessions.json').readAsStringSync());
 
-    final [{"sessions": sessionsJson}] = jsonDecode(response.body) as List;
     final sessions = (sessionsJson as List).map((sessionMap) => SessionMapper.fromMap(sessionMap)).toList();
 
     return Router(

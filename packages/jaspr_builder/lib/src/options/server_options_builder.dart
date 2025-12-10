@@ -41,7 +41,7 @@ class ServerOptionsBuilder implements Builder {
       '// Generated with jaspr_builder\n';
 
   Future<void> generateServerOptions(BuildStep buildStep) async {
-    final mode = await buildStep.loadProjectMode(options, buildStep);
+    final (mode, _) = await buildStep.loadProjectMode(options, buildStep);
     if (mode != 'static' && mode != 'server') {
       return;
     }

@@ -23,6 +23,7 @@ dev_dependencies:
 
 jaspr:
   mode: static
+  flutter: embedded
 
 flutter:
   uses-material-design: true

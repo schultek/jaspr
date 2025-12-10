@@ -252,11 +252,12 @@ extension LoadBundle on BuildStep {
     }).toSet();
   }
 
-  Future<String?> loadProjectMode(BuilderOptions options, BuildStep buildStep) async {
+  Future<(String?, String?)> loadProjectMode(BuilderOptions options, BuildStep buildStep) async {
     final pubspecYaml = await readAsString(AssetId(inputId.package, 'pubspec.yaml'));
     final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
     final mode = jasprConfig?['mode'] as String?;
+    final flutter = jasprConfig?['flutter'] as String?;
 
-    return mode;
+    return (mode, flutter);
   }
 }

@@ -69,7 +69,7 @@ class DoctorCommand extends BaseCommand {
         items: [
           'Dependencies on core packages:${dependencies.join()}',
           'Rendering mode: ${project.modeOrNull?.name}',
-          'Uses flutter embedding: ${project.usesFlutter}',
+          'Flutter mode: ${project.flutterMode.name}',
         ],
       ));
     }

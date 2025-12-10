@@ -11,6 +11,8 @@ import 'version.dart';
 
 enum JasprMode { static, server, client }
 
+enum FlutterMode { embedded, plugins, none }
+
 extension JasprModeExtension on JasprMode {
   bool get isServerOrStatic => this == JasprMode.server || this == JasprMode.static;
 }
@@ -123,13 +125,6 @@ class Project {
     }
   }
 
-  bool get usesFlutter {
-    return switch (requirePubspecYaml) {
-      {'dependencies': {'flutter': _}} => true,
-      _ => false,
-    };
-  }
-
   YamlMap get _requireJasprOptions {
     final configYaml = requirePubspecYaml['jaspr'];
     if (configYaml == null) {
@@ -172,6 +167,27 @@ class Project {
     if (modeOrNull == null) {
       logger.write(
         '\'jaspr.mode\' in pubspec.yaml must be one of ${JasprMode.values.map((v) => v.name).join(', ')}.',
+        tag: Tag.cli,
+        level: Level.critical,
+      );
+      _exitFn(1);
+    }
+    return modeOrNull;
+  }
+
+  FlutterMode get flutterMode {
+    final configYaml = pubspecYaml?['jaspr'];
+    if (configYaml is! YamlMap) {
+      return FlutterMode.none;
+    }
+    final modeYaml = configYaml['flutter'];
+    if (modeYaml is! String) {
+      return FlutterMode.none;
+    }
+    final modeOrNull = FlutterMode.values.where((v) => v.name == modeYaml).firstOrNull;
+    if (modeOrNull == null) {
+      logger.write(
+        '\'jaspr.flutter\' in pubspec.yaml must be one of ${FlutterMode.values.map((v) => v.name).join(', ')}.',
         tag: Tag.cli,
         level: Level.critical,
       );
@@ -246,7 +262,7 @@ class Project {
       _exitFn(1);
     }
 
-    if (usesFlutter) {
+    if (flutterMode == FlutterMode.embedded) {
       logger.write(
         'Using "--experimental-wasm" is currently not supported together with Flutter embedding.',
         tag: Tag.cli,
@@ -256,7 +272,7 @@ class Project {
     }
   }
 
-  void checkFlutterBuildSupport(bool useFlag) {
+  void checkFlutterBuildSupport() {
     final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
     final version = switch (devDependencies?['build_web_compilers']) {
       final String v => VersionConstraint.parse(v),
@@ -265,11 +281,8 @@ class Project {
     final minVersion = VersionConstraint.compatibleWith(Version(4, 4, 6));
     if (version == null || !minVersion.allowsAll(version)) {
       logger.write(
-        useFlag
-            ? 'Using "--use-flutter-sdk" requires build_web_compilers 4.4.6 or newer. '
-                  'Please update your version constraint in pubspec.yaml.'
-            : 'Flutter embedding requires build_web_compilers 4.4.6 or newer. '
-                  'Please update your version constraint in pubspec.yaml.',
+        'Using "jaspr.flutter=${flutterMode.name}" in pubspec.yaml requires build_web_compilers 4.4.6 or newer. '
+        'Please update your version constraint in pubspec.yaml.',
         tag: Tag.cli,
         level: Level.critical,
       );

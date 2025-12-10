@@ -130,7 +130,7 @@ extension ServerLogger on Logger {
         log.contains('transitive libraries have sdk dependencies that not supported on this platform') &&
         log.contains('flutter|lib')) {
       write(
-        'Failed to compile some libraries with a dependency on the Flutter SDK. Try running with `--use-flutter-sdk`.',
+        'Failed to compile some libraries with a dependency on the Flutter SDK. Try setting `jaspr.flutter` to `plugins` in your `pubspec.yaml` file.',
         tag: Tag.cli,
         level: Level.error,
       );

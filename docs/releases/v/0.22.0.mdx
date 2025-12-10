@@ -5,19 +5,24 @@ description: Release notes and breaking changes.
 
 ---
 
-## TLDR / Overview
+## Overview
 
-Version 0.22.0 ships **separate entrypoints for server and client** environments to decrease magic in the framework and make it more transparent what is happening under the hood. It also splits all DOM related APIs into a **separate library** for better modularity and reimplements all **HTML components as classes** instead of functions.
+Version 0.22.0 is all about **reducing magic** in the framework and making it more **expressive and modular**.
 
-**TL;DR**
+The main features are:
 
 - **Separate Entrypoints:** Each project can now contain a `main.server.dart` (in server and static mode) and `main.client.dart` (in all modes) file. Related APIs are updated to reflect this.
+
 - **Improved @client initialization**: Any `@client` component is now initialized by using the new `ClientApp` component in `main.client.dart`, which can be wrapped with other components for sharing state, running custom initialization logic and more.
+
 - **New `package:jaspr/dom.dart` library**: All DOM related APIs (HTML components, `Styles`, `css`, etc.) have been moved into a separate library for better modularity.
+
 - **Reimplemented HTML Components as Classes**: All HTML components have been reimplemented as classes instead of functions, allowing `const` usage.
-- **Allow binary responses**: The `AppContext.setStatusCode` method now accepts binary data for overriding the response body.
+
+- **Discontinued `jaspr_web_compilers`**: Flutter support can now be enabled through the `jaspr.flutter` config option in `pubspec.yaml`.
+
 - **Various Styling Improvements**: New CSS properties like `animation` and `quotes`, improved properties like `Transition`, better support for dot-shorthands and more.
-- **Discontinued `jaspr_web_compilers`**: Flutter support can now be enabled through the `--use-flutter-sdk` cli flag with no special dependency.
+
 
 <Warning>
 Most changes can be **automatically migrated** using the `jaspr migrate` command.
@@ -84,7 +89,7 @@ In case you need or want to migrate your code manually, rename `lib/main.dart` t
 
 The goal of this change is to reduce the "magic" in the framework and make it more transparent what is happening under the hood. This comes with the added benefit of enabling custom initialization logic, and sharing state across multiple `@client` components, a feature that was frequently requested.
 
-This change also allowed to move parts of the `jaspr_web_compilers` package (fork of `build_web_compilers`) into the main Jaspr framework, which will make it easier to maintain the fork in the future and starts work towards removing the need for the fork altogether in the future.
+Also it is now possible to debug and inspect the client-side hydration process more easily, as the `ClientApp` component is now explicitly visible in the code.
 
 ## DOM APIs
 
@@ -128,9 +133,16 @@ The new library reduces the "pollution" of the global namespace when importing `
 
 The class components allow for using `const` on html component trees, which can improve performance. Also this makes the overall code more consistent and aligned with best-practices for writing components. As an exception to the general rule, the HTML  components continue to use lowercase names to keep the familiar html-like syntax and differentiate them to other components.
 
-## Binary Responses
+## Flutter Support
 
-The `context.setStatusCode` method now allows binary data (`Uint8List`) for overriding the response body. Respectively, the related `ResponseLike.body` property (returned from `renderComponent()`) is now a `Uint8List` instead of a `String`.
+Jaspr used to support Flutter plugins and Flutter embedding through a custom `build_web_compilers` fork called `jaspr_web_compilers`. A range of changes has been landed upstream and so the fork is no longer needed and has been discontinued. Please replace all dependencies on `jaspr_web_compilers` with `build_web_compilers` and ensure a minimum version of `4.4.6`.
+
+To continue using Flutter embedding or plugins, add the following to your `pubspec.yaml`:
+
+```yaml
+jaspr:
+  flutter: embedded # or 'plugins' for plugin support
+```
 
 ## New and Improved CSS Properties
 
@@ -141,21 +153,14 @@ Animation animation
 Quotes quotes
 ```
 
-Also added:
-
-- `Curve.linearFn()` easing function
-- `Gap.row()` and `Gap.column()` constructors.
-- `Flex.grow()`, `Flex.shrink()` and `Flex.basis()` constructors.
-- `Border.all()` constructor.
-
-The `duration` and `delay` properties of `Transition` now accept `Duration` instead of `double`. For convenience, `ms` and `seconds` extensions to `int` are added for simple conversion:
+Also the `duration` and `delay` properties of `Transition` now accept `Duration` instead of `double`. For convenience, `ms` and `seconds` extensions to `int` are added for simple conversion:
 
 ```dart
 transition: Transition('width', duration: 2.seconds, delay: 300.ms),
 ```
 
-## Flutter Support
+Additionally, some APIs were improved for better ergonomics when using dot-shorthands:
 
-Jaspr used to support Flutter plugins and Flutter embedding through a custom `build_web_compilers` fork called `jaspr_web_compilers`. A range of changes has been landed upstream and so the fork is no longer needed and has been discontinued. Please replace all dependencies on `jaspr_web_compilers` with `build_web_compilers` and ensure a minimum version of `4.4.6`.
-
-Further, to enable Flutter plugin support pass the `--use-flutter-sdk` flag to the `jaspr serve` and `jaspr build` commands. This is enabled by default when using Flutter embedding.
+- `Gap.row()` and `Gap.column()` constructors.
+- `Flex.grow()`, `Flex.shrink()` and `Flex.basis()` constructors.
+- `Border.all()` constructor.

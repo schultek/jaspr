@@ -20,6 +20,14 @@ To embed a Flutter app into your Jaspr website you need the following setup:
     ```
   </Step>
   <Step>
+    Set the `jaspr.flutter` option in your `pubspec.yaml` to `embedded`:
+
+    ```yaml
+    jaspr:
+      flutter: embedded
+    ```
+  </Step>
+  <Step>
     Create the file `web/flutter_bootstrap.js` with the following content:
 
     ```js
@@ -44,32 +52,63 @@ To embed a Flutter app into your Jaspr website you need the following setup:
   <Step>
     Add the `FlutterEmbedView` component to your jaspr app like this:
 
-    ```dart
-    import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
+    <Tabs defaultValue="server">
+      <TabItem label="static / server mode" value="server">
+        ```dart
+        import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
-    // import your flutter app widget
-    import 'my_flutter_app.dart';
+        // Import your Flutter app widget, but only on web.
+        @Import.onWeb('my_flutter_app.dart', show: [#MyFlutterApp]);
+        import '<current_filename>.imports.dart';
 
-    // this can be any jaspr component
-    class JasprApp extends StatelessComponent {
-      JasprApp({super.key});
+        // This can be any Jaspr component
+        class JasprApp extends StatelessComponent {
+          JasprApp({super.key});
 
-      Component build(BuildContext context) {
-        // this is a normal jaspr component
-        return FlutterEmbedView(
-          // provide an optional loader component that will be displayed while the flutter app loads
-          loader: MyCustomLoader(),
-          // provide your flutter app widget
-          widget: MyFlutterApp(
-            // provide any widget properties or callbacks
-            // this way you can pass and share state between jaspr and flutter
-            // without needing js interop
-            title: 'My Embedded Flutter App',
-          ),
-        );
-      }
-    }
-    ```
+          Component build(BuildContext context) {
+            // This is a normal Jaspr component.
+            return FlutterEmbedView(
+              // Provide an optional loader component that will be displayed while the Flutter app loads.
+              loader: MyCustomLoader(),
+              // Provide your Flutter app widget.
+              widget: kIsWeb ? MyFlutterApp(
+                // Provide any widget properties or callbacks.
+                // You can pass and share state between Jaspr and Flutter without needing js interop.
+                title: 'My Embedded Flutter App',
+              ) : null,
+            );
+          }
+        }
+        ```
+      </TabItem>
+      <TabItem label="client mode" value="client">
+        ```dart
+        import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
+
+        // Import your flutter app widget.
+        import 'my_flutter_app.dart';
+
+        // This can be any Jaspr component.
+        class JasprApp extends StatelessComponent {
+          JasprApp({super.key});
+
+          Component build(BuildContext context) {
+            // This is a normal Jaspr component.
+            return FlutterEmbedView(
+              // Provide an optional loader component that will be displayed while the Flutter app loads.
+              loader: MyCustomLoader(),
+              // Provide your Flutter app widget.
+              widget: MyFlutterApp(
+                // Provide any widget properties or callbacks.
+                // You can pass and share state between Jaspr and Flutter without needing js interop.
+                title: 'My Embedded Flutter App',
+              ),
+            );
+          }
+        }
+        ```
+      </TabItem>
+    </Tabs>
   </Step>
   <Step>
     Finally, run your jaspr app as normal using `jaspr serve` or `jaspr build`.

@@ -24,7 +24,9 @@ dev_dependencies:
   lints: ^5.0.0{{/flutter}}
 
 jaspr:
-  mode: {{mode}}
-{{#flutter}}
+  mode: {{mode}}{{#plugins}}
+  flutter: plugins{{/plugins}}{{#flutter}}
+  flutter: embedded
+
 flutter:
   uses-material-design: true{{/flutter}}

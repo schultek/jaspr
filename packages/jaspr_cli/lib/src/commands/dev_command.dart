@@ -54,15 +54,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       defaultsTo: true,
     );
     argParser.addFlag(
-      'use-flutter-sdk',
-      help:
-          'Use the installed Flutter SDK to compile the app. This enables support for using '
-          'Flutter web plugins and Flutter embedding.\n'
-          'This is automatically enabled when depending on flutter in pubspec.yaml.',
-      negatable: false,
-      defaultsTo: false,
-    );
-    argParser.addFlag(
       'skip-server',
       help:
           'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
@@ -82,7 +73,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final port = argResults!.option('port') ?? project.port ?? '8080';
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
-  late final useFlutterSdk = argResults!.flag('use-flutter-sdk');
   late final skipServer = argResults!.flag('skip-server');
 
   bool get launchInChrome;
@@ -117,7 +107,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     handleClientWorkflow(workflow);
 
-    if (project.usesFlutter) {
+    if (project.flutterMode == FlutterMode.embedded) {
       final flutterProcess = await serveFlutter(flutterPort, useWasm);
 
       workflow.serverManager.servers.first.buildResults.where((event) => event.status == BuildStatus.succeeded).listen((
@@ -132,7 +122,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       proxyPort,
       webPort: webPort,
       serverPort: port,
-      flutterPort: project.usesFlutter ? flutterPort : null,
+      flutterPort: project.flutterMode == FlutterMode.embedded ? flutterPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
     );
 
@@ -295,13 +285,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         : 'dartdevc';
 
     final dartDefines = getClientDartDefines();
-    if (project.usesFlutter) {
+    if (project.flutterMode == FlutterMode.embedded) {
       dartDefines.addAll(getFlutterDartDefines(useWasm, release));
     }
 
-    final useFlutterSdkOptions = useFlutterSdk || project.usesFlutter;
-    if (useFlutterSdkOptions) {
-      project.checkFlutterBuildSupport(useFlutterSdk);
+    if (project.flutterMode != FlutterMode.none) {
+      project.checkFlutterBuildSupport();
     }
 
     final ddcDefines = [
@@ -312,7 +301,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final dart2jsDefines = [
       '"-Djaspr.flags.release=$release"',
       if (!release) '"--enable-asserts"',
-      if (useWasm && useFlutterSdkOptions)
+      if (useWasm && project.flutterMode != FlutterMode.none)
         '"--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}"',
       for (final e in dartDefines.entries) '"-D${e.key}=${e.value}"',
     ].join(',');
@@ -349,7 +338,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final buildArgs = [
       if (release) '--release',
       '--delete-conflicting-outputs',
-      if (useFlutterSdkOptions) '--define=jaspr_builder:client_options=initialize-flutter-plugins=true',
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:ddc=generate-full-dill=true',
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
@@ -357,7 +345,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           'dartdevc' => '--define=build_web_compilers:ddc=environment={$ddcDefines}',
           _ => '--define=build_web_compilers:entrypoint=${compiler}_args=[$dart2jsDefines]',
         },
-        if (useFlutterSdkOptions) ...additionalFlutterBuildArgs(),
+        if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
       ],
     ];
 

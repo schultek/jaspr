@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
@@ -45,6 +44,8 @@ class ScopesDomain extends Domain {
     final entryPaths = <String>[];
     final serverEntrypointGlob = Glob('**/*.server.dart');
 
+    var allowServerLibsInClient = false;
+
     for (final folder in folders) {
       try {
         final pubspecFile = io.File(path.join(folder, 'pubspec.yaml'));
@@ -59,6 +60,10 @@ class ScopesDomain extends Domain {
         } else {
           logger.write('Scopes not available in client mode.');
           continue;
+        }
+
+        if (pubspecYaml case {'jaspr': {'flutter': 'embedded' || 'plugins'}}) {
+          allowServerLibsInClient = true;
         }
       } catch (e) {
         logger.write('Failed to read pubspec.yaml in $folder: $e');
@@ -93,7 +98,7 @@ class ScopesDomain extends Domain {
               // Recreate all scopes if an entrypoint is added or removed.
               registerScopes(params);
             } else if (path.endsWith('.dart')) {
-              _reanalyze(path, entryPaths);
+              _reanalyze(path, entryPaths, allowServerLibsInClient);
             } else if (path.endsWith('pubspec.yaml') ||
                 path.endsWith('pubspec.lock') ||
                 path.endsWith('package_config.json')) {
@@ -106,18 +111,23 @@ class ScopesDomain extends Domain {
     }
 
     for (final context in _collection!.contexts) {
-      analyze(context, entryPaths);
+      analyze(context, entryPaths, allowServerLibsInClient);
     }
   }
 
-  void _reanalyze(String path, List<String> entryPaths) {
+  void _reanalyze(String path, List<String> entryPaths, bool allowServerLibsInClient) {
     for (final context in _collection!.contexts) {
       context.changeFile(path);
-      analyze(context, entryPaths, true);
+      analyze(context, entryPaths, allowServerLibsInClient, true);
     }
   }
 
-  Future<void> analyze(AnalysisContext context, List<String> entryPaths, [bool awaitPendingChanges = false]) async {
+  Future<void> analyze(
+    AnalysisContext context,
+    List<String> entryPaths,
+    bool allowServerLibsInClient, [
+    bool awaitPendingChanges = false,
+  ]) async {
     final rootPath = context.contextRoot.root.path;
 
     final targets = entryPaths.where((e) => e.startsWith(rootPath)).toList();
@@ -131,19 +141,6 @@ class ScopesDomain extends Domain {
         await context.applyPendingFileChanges();
         sw.stop();
         logger.write('Applied pending changes in ${sw.elapsedMilliseconds}ms');
-      }
-
-      bool usesJasprWebCompilers = false;
-      try {
-        final packagesContent = context.contextRoot.packagesFile?.readAsStringSync();
-        final packagesJson = jsonDecode(packagesContent ?? '{}');
-        if (packagesJson case {
-          'packages': final List<Object?> packages,
-        } when packages.cast<Map<String, Object?>>().any((p) => p['name'] == 'jaspr_web_compilers')) {
-          usesJasprWebCompilers = true;
-        }
-      } catch (_) {
-        // Ignore errors in reading packages file.
       }
 
       logger.write('Analyzing $rootPath...');
@@ -176,7 +173,7 @@ class ScopesDomain extends Domain {
         return;
       }
 
-      final inspectData = await InspectData.analyze(libraries, usesJasprWebCompilers, logger);
+      final inspectData = await InspectData.analyze(libraries, allowServerLibsInClient, logger);
       _inspectedData[context] = inspectData;
       emitScopes();
     } on InconsistentAnalysisException catch (_) {
@@ -277,9 +274,13 @@ class ScopesDomain extends Domain {
 }
 
 class InspectData {
-  InspectData._(this.usesJasprWebCompilers, this.logger);
-  static Future<InspectData> analyze(List<LibraryElement> libraries, bool usesJasprWebCompilers, Logger logger) async {
-    final inspectData = InspectData._(usesJasprWebCompilers, logger);
+  InspectData._(this.allowServerLibsInClient, this.logger);
+  static Future<InspectData> analyze(
+    List<LibraryElement> libraries,
+    bool allowServerLibsInClient,
+    Logger logger,
+  ) async {
+    final inspectData = InspectData._(allowServerLibsInClient, logger);
 
     for (final root in libraries) {
       final mainFunction = root.topLevelFunctions.where((e) => e.name == 'main').firstOrNull?.firstFragment;
@@ -299,7 +300,7 @@ class InspectData {
     return inspectData;
   }
 
-  final bool usesJasprWebCompilers;
+  final bool allowServerLibsInClient;
   final Logger logger;
   Map<String, InspectDataItem> libraries = {};
 
@@ -313,7 +314,8 @@ class InspectData {
 
     if (library.isInSdk ||
         library.identifier.startsWith('package:jaspr/') ||
-        library.identifier.startsWith('package:web/')) {
+        library.identifier.startsWith('package:web/') ||
+        library.identifier.startsWith('package:flutter/')) {
       // Skip SDK and framework libraries.
       return libraries[path] ??= InspectDataItem(library, parent, this);
     }
@@ -379,12 +381,13 @@ class InspectData {
         lib.identifier == 'dart:js_interop_unsafe' ||
         lib.identifier == 'dart:html' ||
         lib.identifier == 'dart:js' ||
-        lib.identifier == 'dart:js_util';
+        lib.identifier == 'dart:js_util' ||
+        lib.identifier.startsWith('package:flutter/');
   }
 
   bool isServerLib(LibraryElement lib) {
     return lib.identifier == 'package:jaspr/server.dart' ||
-        (!usesJasprWebCompilers && lib.identifier == 'dart:io') ||
+        (!allowServerLibsInClient && lib.identifier == 'dart:io') ||
         lib.identifier == 'dart:ffi' ||
         lib.identifier == 'dart:isolate' ||
         lib.identifier == 'dart:mirrors';
@@ -459,7 +462,8 @@ class InspectDataItem {
   ) async {
     if (library.isInSdk ||
         library.identifier.startsWith('package:jaspr/') ||
-        library.identifier.startsWith('package:web/')) {
+        library.identifier.startsWith('package:web/') ||
+        library.identifier.startsWith('package:flutter/')) {
       // Skip SDK and framework libraries.
       return [];
     }
