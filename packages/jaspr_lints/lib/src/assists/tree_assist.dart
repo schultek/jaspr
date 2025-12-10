@@ -1,6 +1,5 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-// ignore: depend_on_referenced_packages
 import 'package:analyzer_plugin/protocol/protocol_common.dart' show LinkedEditSuggestionKind;
 
 import '../assist.dart';
