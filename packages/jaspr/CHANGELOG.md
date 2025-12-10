@@ -1,27 +1,19 @@
-## Unreleased 0.22.0-beta.2
-
-- Add `dl`, `dt`, and `dd` dom components to `package:jaspr/dom.dart`.
-
-## 0.22.0-beta.1
-
-- Changed build extensions to use `.options.dart` instead of `.g.dart`.
-
-## 0.22.0-beta.0
+## Unreleased 0.22.0
 
 - **Breaking** Changed project entrypoint conventions:
 
   - Any server entrypoint file must now end in `.server.dart` (e.g. `lib/main.server.dart`).
-  - The generated server-side options file is now generated alongside the server entrypoint (e.g. as `lib/main.server.g.dart`) containing `defaultServerOptions`.
+  - The generated server-side options file is now generated alongside the server entrypoint (e.g. as `lib/main.server.options.dart`) containing `defaultServerOptions`.
   - `Jaspr.initializeApp()` now requires the `package:jaspr/server.dart` import.
 
   - The project can contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering (also available in **client** mode).
-  - A new client-side Jaspr options file is generated alongside the client entrypoint (e.g. as `lib/main.client.g.dart`) containing `defaultClientOptions`.
+  - A new client-side Jaspr options file is generated alongside the client entrypoint (e.g. as `lib/main.client.options.dart`) containing `defaultClientOptions`.
   - Added a new `ClientApp` component that should be used inside the client entrypoint like this:
     ```dart
     // This file is lib/main.client.dart
 
     import 'package:jaspr/client.dart';
-    import 'main.client.g.dart';
+    import 'main.client.options.dart';
 
     void main() {
       Jaspr.initializeApp(
@@ -62,12 +54,20 @@
   RawText('<div>Raw HTML</div>');
   ```
 
+- Added `dl`, `dt`, and `dd` html components to `package:jaspr/dom.dart`.
+
 - **Breaking** Removed deprecated `package:jaspr/ui.dart` library. 
 
 - **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`.
 
 - Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`. 
   This can still be overridden using the `--port` flag. If neither is set, the default port stays `8080`.
+
+- Added support for `jaspr.flutter` option in `pubspec.yaml` to specify either support for Flutter embedding with `'embedded'` or support for Flutter plugins with `'plugins'`.
+
+  This replaces the dependency on `jaspr_web_compilers` package, which is now discontinued. Instead, make sure to depend on `build_web_compilers` with a minimum version constraint of `4.4.6` or higher.
+
+- **Breaking**: Removed `jaspr analyze` command, as the latest version of `jaspr_lints` can now be used directly with `dart analyze`.  
 
 - **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
 - Allow binary responses in `AppContext.setStatusCode`.
