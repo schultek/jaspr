@@ -232,7 +232,7 @@ class GlobalObjectKey extends GlobalKey {
 
   @override
   String toString() {
-    String selfType = objectRuntimeType(this, 'GlobalObjectKey');
+    final String selfType = objectRuntimeType(this, 'GlobalObjectKey');
     return '[$selfType ${describeIdentity(value)}]';
   }
 }

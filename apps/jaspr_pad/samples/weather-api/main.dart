@@ -1,4 +1,5 @@
 // [sample=5] Weather Api
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import 'api.dart';
@@ -30,7 +31,7 @@ class _AppState extends State<App> {
 
   @override
   Component build(BuildContext context) {
-    return fragment([
+    return .fragment([
       SearchBar(
         placeholder: 'Enter Location',
         onSearch: (value) {
@@ -43,9 +44,9 @@ class _AppState extends State<App> {
           if (snapshot.hasData) {
             return SimpleWeather(snapshot.data!);
           } else if (snapshot.hasError) {
-            return text('Error: ${snapshot.error}');
+            return .text('Error: ${snapshot.error}');
           } else {
-            return text('Loading');
+            return .text('Loading');
           }
         },
       ),
@@ -63,8 +64,8 @@ class SimpleWeather extends StatelessComponent {
     return div(classes: 'weather', [
       img(src: weather.condition.icon),
       div(classes: 'info', [
-        h1([text('${weather.temp}°')]),
-        span([text('${weather.location.name}, ${weather.location.country}')]),
+        h1([.text('${weather.temp}°')]),
+        span([.text('${weather.location.name}, ${weather.location.country}')]),
       ]),
     ]);
   }
@@ -89,7 +90,7 @@ class SearchBarState extends State<SearchBar> {
       input(
         type: InputType.text,
         attributes: {if (component.placeholder != null) 'placeholder': component.placeholder!},
-        onInput: (value) {
+        onInput: (String value) {
           setState(() => search = value);
         },
       ),
@@ -97,7 +98,7 @@ class SearchBarState extends State<SearchBar> {
         onClick: () {
           component.onSearch(search);
         },
-        [text('Search')],
+        [.text('Search')],
       ),
     ]);
   }

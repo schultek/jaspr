@@ -16,7 +16,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   bool get isClient => true;
 
   static final String _baseOrigin = () {
-    var base = web.document.querySelector('head>base') as web.HTMLBaseElement?;
+    final base = web.document.querySelector('head>base') as web.HTMLBaseElement?;
     return base?.href ?? web.window.location.origin;
   }();
 
@@ -32,22 +32,22 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     return pathWithoutOrigin;
   }
 
-  late String attachTarget;
-  late (web.Node, web.Node)? attachBetween;
+  late String _attachTarget;
+  (web.Node, web.Node)? _attachBetween;
 
   @override
   void attachRootComponent(Component app, {String attachTo = 'body', (web.Node, web.Node)? attachBetween}) {
-    attachTarget = attachTo;
-    this.attachBetween = attachBetween;
+    _attachTarget = attachTo;
+    _attachBetween = attachBetween;
     super.attachRootComponent(app);
   }
 
   @override
   RenderObject createRootRenderObject() {
-    if (attachBetween case (var start, var end)) {
+    if (_attachBetween case (final start, final end)) {
       return RootDomRenderObject.between(start, end);
     } else {
-      return RootDomRenderObject(web.document.querySelector(attachTarget)!);
+      return RootDomRenderObject(web.document.querySelector(_attachTarget)!);
     }
   }
 
@@ -89,6 +89,6 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     final sw = Stopwatch()..start();
     updatePage(body);
     sw.stop();
-    print("Page reloaded in ${sw.elapsedMilliseconds}ms");
+    print('Page reloaded in ${sw.elapsedMilliseconds}ms');
   }
 }

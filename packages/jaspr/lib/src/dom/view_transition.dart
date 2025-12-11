@@ -16,7 +16,7 @@ mixin ViewTransitionMixin<T extends StatefulComponent> on State<T> {
       return;
     }
 
-    var transition = startViewTransition(() {
+    final transition = startViewTransition(() {
       setState(callback);
     });
 

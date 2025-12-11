@@ -45,7 +45,7 @@ abstract class MultiChildElement extends Element {
   void performRebuild() {
     _dirty = false;
 
-    var newComponents = buildChildren();
+    final newComponents = buildChildren();
     _children = updateChildren(_children ?? [], newComponents, forgottenChildren: _forgottenChildren);
     _forgottenChildren.clear();
   }

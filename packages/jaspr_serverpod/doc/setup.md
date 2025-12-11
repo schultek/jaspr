@@ -10,7 +10,7 @@ Inside your Serverpod `..._server` package perform the following setup steps:
 Add all the necessary dependencies to Jaspr and related packages:
 
 - `dart pub add jaspr jaspr_serverpod`
-- `dart pub add --dev build_runner jaspr_web_compilers jaspr_builder`
+- `dart pub add --dev build_runner build_web_compilers jaspr_builder`
 
 ## Project Setup
 

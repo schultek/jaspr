@@ -20,9 +20,9 @@ class App extends StatelessComponent {
     final sessionCookie = context.cookies['session'];
 
     if (isValid(sessionCookie)) {
-      return p([text('Welcome back!')]);
+      return p([.text('Welcome back!')]);
     } else {
-      return p([text('Please log in.')]);
+      return p([.text('Please log in.')]);
     }
   }
 }
@@ -42,7 +42,7 @@ class App extends StatelessComponent {
       context.setCookie('session', '1234');
     }
 
-    return p([text('Hello, World!')]);
+    return p([.text('Hello, World!')]);
   }
 }
 ```

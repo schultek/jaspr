@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../../adapters/html.dart';
@@ -62,15 +63,15 @@ class ButtonState extends State<Button> {
         events: {'click': (e) => component.onPressed()},
         [
           if (component.label != null && component.iconAffinity == IconAffinity.right)
-            span(classes: 'mdc-button__label', [text(component.label!)]),
+            span(classes: 'mdc-button__label', [.text(component.label!)]),
           if (component.label != null && component.icon != null)
             i(
               classes: 'material-icons mdc-button__icon',
               attributes: {if (component.hideIcon) 'aria-hidden': 'true'},
-              [text(component.icon!)],
+              [.text(component.icon!)],
             ),
-          if (component.label == null && component.icon != null) text(component.icon!),
-          if (component.label != null && component.iconAffinity == IconAffinity.left) text(component.label!),
+          if (component.label == null && component.icon != null) .text(component.icon!),
+          if (component.label != null && component.iconAffinity == IconAffinity.left) .text(component.label!),
         ],
       ),
     );

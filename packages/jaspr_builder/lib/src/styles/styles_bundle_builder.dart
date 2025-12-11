@@ -35,7 +35,7 @@ class StylesBundleBuilder implements Builder {
   };
 
   Future<void> generateStylesBundle(BuildStep buildStep) async {
-    var modules = await buildStep
+    final modules = await buildStep
         .findAssets(Glob('lib/**.styles.json'))
         .asyncMap((id) => buildStep.readAsString(id))
         .map((c) => jsonDecode(c))
@@ -43,14 +43,14 @@ class StylesBundleBuilder implements Builder {
 
     if (modules.isEmpty) return;
 
-    var outputId = AssetId(buildStep.inputId.package, 'lib/styles.bundle.json');
+    final outputId = AssetId(buildStep.inputId.package, 'lib/styles.bundle.json');
     await buildStep.writeAsString(outputId, jsonEncode(modules));
   }
 }
 
 extension StylesLoader on BuildStep {
   Future<List<StylesModule>> loadStyles() async {
-    var bundle = await loadBundle<StylesModule>('styles', StylesModule.deserialize).toList();
+    final bundle = await loadBundle<StylesModule>('styles', StylesModule.deserialize).toList();
     return bundle;
   }
 }

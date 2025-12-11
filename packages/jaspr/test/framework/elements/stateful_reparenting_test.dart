@@ -37,7 +37,7 @@ void main() {
 
   group('stateful reparenting test', () {
     testComponents('should keep state on reparenting', (tester) async {
-      var component = FakeComponent(
+      final component = FakeComponent(
         child: InheritedData(child: MyStatefulComponent(key: myKey)),
       );
       tester.pumpComponent(component);
@@ -46,7 +46,7 @@ void main() {
       expect(find.byType(MyStatefulComponent), findsOneComponent);
       expect(find.tag('div'), findsNothing);
 
-      var state = (find.byType(MyStatefulComponent).evaluate().first as StatefulElement).state as MyState;
+      final state = (find.byType(MyStatefulComponent).evaluate().first as StatefulElement).state as MyState;
 
       // lifecycle: state should be initialized and built a first time
       expect(state.lifecycle, equals(['initState', 'didChangeDependencies', 'build']));

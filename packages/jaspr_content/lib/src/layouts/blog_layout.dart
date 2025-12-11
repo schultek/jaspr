@@ -58,16 +58,16 @@ class BlogLayout extends PageLayoutBase {
         main_([
           div(classes: 'content-container', [
             div(classes: 'post-header', [
-              if (pageData['title'] case String title) h1([Component.text(title)]),
+              if (pageData['title'] case final String title) h1([Component.text(title)]),
               div(classes: 'post-info', [
-                if (pageData['authorImage'] case String authorImage) img(src: authorImage, alt: 'Author image'),
+                if (pageData['authorImage'] case final String authorImage) img(src: authorImage, alt: 'Author image'),
                 div([
                   span([Component.text(pageData['author'] as String? ?? 'Unknown')]),
                   span([
                     Component.text(
                       [
-                        if (pageData['readTime'] case String readTime) '$readTime read',
-                        if (pageData['date'] case String date) date,
+                        if (pageData['readTime'] case final String readTime) '$readTime read',
+                        if (pageData['date'] case final String date) date,
                       ].join(' • '),
                     ),
                   ]),
@@ -76,7 +76,7 @@ class BlogLayout extends PageLayoutBase {
             ]),
             hr(),
             child,
-            if (pageData['tags'] case List<Object?> tags)
+            if (pageData['tags'] case final List<Object?> tags)
               div(classes: 'post-tags', [
                 for (final tag in tags) span([Component.text(tag.toString())]),
               ]),

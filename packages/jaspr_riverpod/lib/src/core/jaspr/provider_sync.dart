@@ -71,7 +71,7 @@ mixin SyncScopeMixin on State<ProviderScope>
       return Future.value();
     }
     final futures = <Future<void>>[];
-    for (var s in component.sync) {
+    for (final s in component.sync) {
       final provider = (s as _ProviderSync).provider;
       final Object? value;
       if (provider is $FutureModifier) {
@@ -101,7 +101,7 @@ mixin SyncScopeMixin on State<ProviderScope>
     if (value == null) {
       return;
     }
-    for (var s in component.sync) {
+    for (final s in component.sync) {
       if (!value.containsKey((s as _ProviderSync).id)) {
         continue;
       }

@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -93,9 +94,9 @@ class ButtonTab extends Tab {
                   margin: Margin.only(right: this.label.isNotEmpty ? 4.px : null),
                   fontSize: 20.px,
                 ),
-                [text(icon)],
+                [.text(icon)],
               ),
-              text(this.label),
+              .text(this.label),
             ],
           ),
         ]),
@@ -123,7 +124,7 @@ class Tab extends StatelessComponent {
       attributes: {'role': 'tab', 'tabindex': '$index', if (selected) 'aria-selected': "true"},
       [
         span(classes: 'mdc-tab__content', [
-          span(classes: 'mdc-tab__text-label', [text(label)]),
+          span(classes: 'mdc-tab__text-label', [.text(label)]),
         ]),
         span(classes: 'mdc-tab-indicator ${selected ? ' mdc-tab-indicator--active' : ''}', [
           span(classes: 'mdc-tab-indicator__content mdc-tab-indicator__content--underline', []),

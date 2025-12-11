@@ -6,14 +6,15 @@ import 'dart:io';
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 
-import '../config.dart';
 import '../dev/chrome.dart';
 import '../dev/client_workflow.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
+import '../project.dart';
 import 'base_command.dart';
 
 abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
@@ -22,7 +23,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'input',
       abbr: 'i',
       help:
-          'Specify the entry file for the server app. Must end in ".server.dart".\nDefaults to the first found "*.server.dart" file in the project.',
+          'Specify the entry file for the server app. Must end in ".server.dart".\n'
+          'Defaults to the first found "*.server.dart" file in the project.',
     );
     argParser.addOption(
       'mode',
@@ -82,22 +84,22 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   Future<int> runCommand() async {
     ensureInProject();
 
-    logger.write("Running jaspr in ${project.requireMode.name} rendering mode.");
+    logger.write('Running jaspr in ${project.requireMode.name} rendering mode.');
 
-    var proxyPort = project.requireMode == JasprMode.client ? port : '5567';
-    var flutterPort = '5678';
-    var webPort = '5467';
+    final proxyPort = project.requireMode == JasprMode.client ? port : '5567';
+    final flutterPort = '5678';
+    final webPort = '5467';
 
     final entryPoint = await getServerEntryPoint(input);
 
     if (entryPoint != null && !entryPoint.startsWith('lib/')) {
       logger.write(
-        "Entry point is not located inside lib/ folder, disabling server-side hot-reload.",
+        'Entry point is not located inside lib/ folder, disabling server-side hot-reload.',
         level: Level.warning,
       );
     }
 
-    var workflow = await _runClient(webPort);
+    final workflow = await _runClient(webPort);
     if (workflow == null) {
       await stop();
       return 1;
@@ -105,8 +107,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     handleClientWorkflow(workflow);
 
-    if (project.usesFlutter) {
-      var flutterProcess = await serveFlutter(flutterPort, useWasm);
+    if (project.flutterMode == FlutterMode.embedded) {
+      final flutterProcess = await serveFlutter(flutterPort, useWasm);
 
       workflow.serverManager.servers.first.buildResults.where((event) => event.status == BuildStatus.succeeded).listen((
         event,
@@ -120,7 +122,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       proxyPort,
       webPort: webPort,
       serverPort: port,
-      flutterPort: project.usesFlutter ? flutterPort : null,
+      flutterPort: project.flutterMode == FlutterMode.embedded ? flutterPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
     );
 
@@ -147,30 +149,30 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   Future<int> _runServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
-    logger.write("Starting server...", tag: Tag.cli, progress: ProgressState.running);
+    logger.write('Starting server...', tag: Tag.cli, progress: ProgressState.running);
 
     final useHotReload = entryPoint.startsWith('lib/') && !release;
 
-    var serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
+    final serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
     if (useHotReload && !serverTarget.existsSync()) {
       serverTarget.createSync(recursive: true);
     }
 
-    var serverPid = File('.dart_tool/jaspr/server.pid').absolute;
+    final serverPid = File('.dart_tool/jaspr/server.pid').absolute;
     if (!serverPid.existsSync()) {
       serverPid.createSync(recursive: true);
     }
     serverPid.writeAsStringSync('');
 
-    var userDefines = getServerDartDefines();
+    final userDefines = getServerDartDefines();
 
-    var args = [
+    final args = [
       // Use direct `dart` entry point for now due to
       // https://github.com/dart-lang/sdk/issues/61373.
       // 'run',
       if (!release) ...['--enable-vm-service', '--enable-asserts'] else '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
-      for (var define in userDefines.entries) '-D${define.key}=${define.value}',
+      for (final define in userDefines.entries) '-D${define.key}=${define.value}',
     ];
 
     if (debug) {
@@ -178,7 +180,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     if (useHotReload) {
-      var import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
+      final import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
       serverTarget.writeAsStringSync(serverEntrypoint(import));
 
       args.add(serverTarget.path);
@@ -187,7 +189,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     args.addAll(argResults!.rest);
-    var process = await Process.start(
+    final process = await Process.start(
       Platform.executable,
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
@@ -196,7 +198,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
 
-    var serverFuture = watchProcess(
+    final serverFuture = watchProcess(
       'server',
       process,
       tag: Tag.server,
@@ -268,7 +270,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
 
-    var configuration = Configuration(
+    final configuration = Configuration(
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
       debug: launchInChrome,
       debugExtension: launchInChrome,
@@ -276,35 +278,78 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       autoRun: autoRun,
     );
 
-    var package = '${project.usesJasprWebCompilers ? 'jaspr' : 'build'}_web_compilers';
-    var compiler = useWasm
+    final compiler = useWasm
         ? 'dart2wasm'
         : release
         ? 'dart2js'
         : 'dartdevc';
 
-    var dartDefines = getClientDartDefines();
-    if (project.usesFlutter) {
+    final dartDefines = getClientDartDefines();
+    if (project.flutterMode == FlutterMode.embedded) {
       dartDefines.addAll(getFlutterDartDefines(useWasm, release));
     }
 
-    var dartdevcDefines = dartDefines.entries.map((e) => ',"${e.key}":"${e.value}"').join();
-    var dart2jsDefines = dartDefines.entries.map((e) => ',"-D${e.key}=${e.value}"').join();
+    if (project.flutterMode != FlutterMode.none) {
+      project.checkFlutterBuildSupport();
+    }
+
+    final ddcDefines = [
+      '"jaspr.flags.verbose":$debug',
+      for (final e in dartDefines.entries) '"${e.key}":"${e.value}"',
+    ].join(',');
+
+    final dart2jsDefines = [
+      '"-Djaspr.flags.release=$release"',
+      if (!release) '"--enable-asserts"',
+      if (useWasm && project.flutterMode != FlutterMode.none)
+        '"--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}"',
+      for (final e in dartDefines.entries) '"-D${e.key}=${e.value}"',
+    ].join(',');
+
+    List<String> additionalFlutterBuildArgs() {
+      final sdkKernelPath = p.url.join(
+        'kernel',
+        flutterVersion.compareTo('3.32.0') >= 0 ? 'ddc_outline.dill' : 'ddc_outline_sound.dill',
+      );
+      final librariesPath = p.join(webSdkDir, 'libraries.json');
+      final sdkJsPath = p.join(
+        webSdkDir,
+        'kernel',
+        flutterVersion.compareTo('3.32.0') >= 0 ? 'amd-canvaskit' : 'amd-canvaskit-sound',
+      );
+      return [
+        '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
+        '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
+        '--define=build_web_compilers:ddc=use-ui-libraries=true',
+        '--define=build_web_compilers:ddc_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:dart2js_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:dart2wasm_modules=use-ui-libraries=true',
+        '--define=build_web_compilers:entrypoint=libraries-path="$librariesPath"',
+        '--define=build_web_compilers:entrypoint=unsafe-allow-unsupported-modules=true',
+        '--define=build_web_compilers:sdk_js=use-prebuilt-sdk-from-path="$sdkJsPath"',
+        if (compiler == 'dartdevc') ...[
+          '--define=build_web_compilers:ddc=ddc-kernel-path="$sdkKernelPath"',
+          '--define=build_web_compilers:ddc=libraries-path="$librariesPath"',
+          '--define=build_web_compilers:ddc=platform-sdk="$webSdkDir"',
+        ],
+      ];
+    }
 
     final buildArgs = [
       if (release) '--release',
+      '--delete-conflicting-outputs',
       if (managedBuildOptions) ...[
-        '--define',
-        '$package:ddc=generate-full-dill=true',
-        '--delete-conflicting-outputs',
-        '--define=$package:entrypoint=compiler=$compiler',
-        if (compiler == 'dartdevc') '--define=$package:ddc=environment={"jaspr.flags.verbose":$debug$dartdevcDefines}',
-        if (compiler != 'dartdevc')
-          '--define=$package:entrypoint=${compiler}_args=["-Djaspr.flags.release=$release"$dart2jsDefines${!release ? ',"--enable-asserts"' : ''}]',
+        '--define=build_web_compilers:ddc=generate-full-dill=true',
+        '--define=build_web_compilers:entrypoint=compiler=$compiler',
+        switch (compiler) {
+          'dartdevc' => '--define=build_web_compilers:ddc=environment={$ddcDefines}',
+          _ => '--define=build_web_compilers:entrypoint=${compiler}_args=[$dart2jsDefines]',
+        },
+        if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
       ],
     ];
 
-    var workflow = await ClientWorkflow.start(configuration, buildArgs, webPort, logger, guardResource);
+    final workflow = await ClientWorkflow.start(configuration, buildArgs, webPort, logger, guardResource);
     if (workflow == null) {
       return null;
     }
@@ -314,9 +359,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       await workflow.shutDown();
     });
 
-    var buildCompleter = Completer<void>();
+    final buildCompleter = Completer<void>();
 
-    var timer = Timer(Duration(seconds: 20), () {
+    final timer = Timer(Duration(seconds: 20), () {
       if (!buildCompleter.isCompleted) {
         logger.write(
           'Building web assets... (This takes longer for the initial build)',

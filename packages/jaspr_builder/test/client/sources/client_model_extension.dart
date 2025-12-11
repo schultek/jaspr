@@ -23,24 +23,21 @@ final clientModelExtensionSources = {
   ...codecBundleOutputs,
 };
 
+final clientModelExtensionModuleData = {
+  'name': 'Component',
+  'id': ['site', 'lib/component_model_extension.dart'],
+  'import': 'package:site/component_model_extension.dart',
+  'params': [
+    {'name': 'a', 'isNamed': false, 'decoder': "p.get<String>('a')", 'encoder': 'c.a'},
+    {
+      'name': 'b',
+      'isNamed': true,
+      'decoder': "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p.get<Map<String, dynamic>>('b'))",
+      'encoder': '[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()',
+    },
+  ],
+};
+
 final clientModelExtensionModuleOutputs = {
-  'site|lib/component_model_extension.client.module.json': jsonEncode({
-    "name": "Component",
-    "id": ["site", "lib/component_model_extension.dart"],
-    "import": "package:site/component_model_extension.dart",
-    "params": [
-      {
-        "name": "a",
-        "isNamed": false,
-        "decoder": "p.get<String>('a')",
-        "encoder": "c.a",
-      },
-      {
-        "name": "b",
-        "isNamed": true,
-        "decoder": "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p.get<Map<String, dynamic>>('b'))",
-        "encoder": "[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()",
-      },
-    ],
-  }),
+  'site|lib/component_model_extension.client.module.json': jsonEncode(clientModelExtensionModuleData),
 };

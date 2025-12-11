@@ -42,12 +42,12 @@ class ClientComponentAnchor extends ComponentAnchor {
       : {};
 
   Future<void> resolve() async {
-    var r = await (Future.value(builder), Future.wait(serverAnchors.values.map((a) => a.resolve()))).wait;
+    final r = await (Future.value(builder), Future.wait(serverAnchors.values.map((a) => a.resolve()))).wait;
     builder = r.$1;
   }
 
   Component build() {
-    assert(builder is ClientBuilder, "ClientComponentAnchor was not resolved before calling build()");
+    assert(builder is ClientBuilder, 'ClientComponentAnchor was not resolved before calling build()');
     return StatefulBuilder(
       key: GlobalObjectKey(key),
       builder: (context, setState) {
@@ -64,7 +64,7 @@ class ClientComponentAnchor extends ComponentAnchor {
   }
 
   void rebuild(String? data, Map<String, ServerComponentAnchor> serverAnchors) {
-    assert(_setState != null, "ClientComponentAnchor was not built before calling rebuild()");
+    assert(_setState != null, 'ClientComponentAnchor was not built before calling rebuild()');
     _setState!(() {
       this.data = data;
       this.serverAnchors.clear();
@@ -124,7 +124,7 @@ class ServerComponentAnchor extends ComponentAnchor {
       key: UniqueKey(),
       nodes: nodes,
       slots: [
-        for (var client in clientAnchors) client.createSlot(),
+        for (final client in clientAnchors) client.createSlot(),
       ],
     );
   }
@@ -147,9 +147,9 @@ List<ClientComponentAnchor> extractAnchors({
 }) {
   nodes ??= [?web.document.body];
 
-  List<ComponentAnchor> anchors = [];
-  List<ClientComponentAnchor> clientAnchors = [];
-  Map<String, int> clientKeyCounters = {};
+  final List<ComponentAnchor> anchors = [];
+  final List<ClientComponentAnchor> clientAnchors = [];
+  final Map<String, int> clientKeyCounters = {};
 
   web.Comment? currNode;
   for (final rootNode in nodes) {
@@ -163,7 +163,7 @@ List<ClientComponentAnchor> extractAnchors({
       if (_clientStartRegex.firstMatch(value) case final match?) {
         assert(
           anchors.isEmpty || anchors.last is ServerComponentAnchor,
-          "Found directly nested client component anchor, which is not allowed.",
+          'Found directly nested client component anchor, which is not allowed.',
         );
 
         final name = match.group(1)!;
@@ -173,7 +173,7 @@ List<ClientComponentAnchor> extractAnchors({
         final resolvedKey = key != null
             ? '@$name#$key'
             : (() {
-                var count = clientKeyCounters[name] ?? -1;
+                final count = clientKeyCounters[name] ?? -1;
                 clientKeyCounters[name] = count + 1;
                 return '@$name-${anchors.length}-$count';
               })();
@@ -187,13 +187,13 @@ List<ClientComponentAnchor> extractAnchors({
         final name = match.group(1)!;
         assert(
           anchors.isNotEmpty && anchors.last.name == name,
-          "Found client component end anchor without matching start anchor.",
+          'Found client component end anchor without matching start anchor.',
         );
 
         final comp = anchors.removeLast() as ClientComponentAnchor;
 
         final start = comp.startNode;
-        assert(start.parentNode == currNode.parentNode, "Found client component anchors with different parent nodes.");
+        assert(start.parentNode == currNode.parentNode, 'Found client component anchors with different parent nodes.');
 
         comp.endNode = currNode;
         comp.builder = getClientByName(name);
@@ -212,10 +212,10 @@ List<ClientComponentAnchor> extractAnchors({
 
       // Find server start anchor.
       if (_serverStartRegex.firstMatch(value) case final match?) {
-        assert(anchors.isNotEmpty, "Found non-nested server component anchor, which is not allowed.");
+        assert(anchors.isNotEmpty, 'Found non-nested server component anchor, which is not allowed.');
         assert(
           anchors.last is ClientComponentAnchor,
-          "Found directly nested server component anchor, which is not allowed.",
+          'Found directly nested server component anchor, which is not allowed.',
         );
 
         final name = match.group(1)!;
@@ -231,20 +231,20 @@ List<ClientComponentAnchor> extractAnchors({
 
       // Find server end anchor.
       if (_serverEndRegex.firstMatch(value) case final match?) {
-        var name = match.group(1)!;
+        final name = match.group(1)!;
         assert(
           anchors.isNotEmpty && anchors.last.name == name,
-          "Found server component end anchor without matching start anchor.",
+          'Found server component end anchor without matching start anchor.',
         );
 
         final comp = anchors.removeLast() as ServerComponentAnchor;
 
         final start = comp.startNode;
-        assert(start.parentNode == currNode.parentNode, "Found server component anchors with different parent nodes.");
+        assert(start.parentNode == currNode.parentNode, 'Found server component anchors with different parent nodes.');
 
         comp.endNode = currNode;
 
-        assert(anchors.isNotEmpty, "Found server component without ancestor client component.");
+        assert(anchors.isNotEmpty, 'Found server component without ancestor client component.');
         (anchors.last as ClientComponentAnchor).serverAnchors[name] = comp;
 
         continue;
@@ -271,12 +271,12 @@ void updateElement(web.Element currentNode, web.Element newNode) {
   final attributesToRemove = <String>{};
 
   for (var i = 0; i < currentAttributes.length; i++) {
-    var attr = currentAttributes.item(i)!;
+    final attr = currentAttributes.item(i)!;
     attributesToRemove.add(attr.name);
   }
 
   for (var i = 0; i < newAttributes.length; i++) {
-    var attr = newAttributes.item(i)!;
+    final attr = newAttributes.item(i)!;
     attributesToRemove.remove(attr.name);
 
     if (currentAttributes.getNamedItem(attr.name)?.name != attr.value) {
@@ -284,7 +284,7 @@ void updateElement(web.Element currentNode, web.Element newNode) {
     }
   }
 
-  for (var attrName in attributesToRemove) {
+  for (final attrName in attributesToRemove) {
     currentNode.removeAttribute(attrName);
   }
 
@@ -356,12 +356,12 @@ void updateChildren(web.Element currentNode, web.Element newNode) {
   }
 
   while (currentChildIndex < currentChildren.length) {
-    var currentChild = currentChildren.item(currentChildIndex)!;
+    final currentChild = currentChildren.item(currentChildIndex)!;
     currentNode.removeChild(currentChild);
   }
 
   while (newChildIndex < newChildren.length) {
-    var newChild = newChildren.item(newChildIndex)!;
+    final newChild = newChildren.item(newChildIndex)!;
     currentNode.appendChild(newChild);
   }
 }

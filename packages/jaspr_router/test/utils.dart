@@ -116,11 +116,11 @@ class Page extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    var label = path.startsWith('/') ? path.substring(1) : path;
+    final label = path.startsWith('/') ? path.substring(1) : path;
     final children = <Component>[];
     children.add(span([Component.text(label)]));
 
-    var state = RouteState.of(context);
+    final state = RouteState.of(context);
     if (state.params.isNotEmpty) {
       children.add(span([Component.text(state.params.entries.map((e) => '${e.key}=${e.value}').join(','))]));
     }

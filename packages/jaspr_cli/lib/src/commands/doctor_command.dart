@@ -20,7 +20,7 @@ class DoctorCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
-    var sections = <DoctorSection>[];
+    final sections = <DoctorSection>[];
 
     sections.add((
       name: 'Jaspr CLI',
@@ -35,10 +35,10 @@ class DoctorCommand extends BaseCommand {
     if (project.pubspecYaml != null) {
       String? findDependency(String name, {bool reportMissing = false}) {
         var isDev = false;
-        var dependencies = project.requirePubspecYaml['dependencies'] as Map<Object?, Object?>?;
+        final dependencies = project.requirePubspecYaml['dependencies'] as Map<Object?, Object?>?;
         var dep = dependencies?[name];
         if (dep == null) {
-          var devDependencies = project.requirePubspecYaml['dev_dependencies'] as Map<Object?, Object?>?;
+          final devDependencies = project.requirePubspecYaml['dev_dependencies'] as Map<Object?, Object?>?;
           dep = devDependencies?[name];
           isDev = true;
         }
@@ -53,15 +53,14 @@ class DoctorCommand extends BaseCommand {
         }
       }
 
-      var dependencies = [
+      final dependencies = [
         findDependency('jaspr', reportMissing: true),
         findDependency('jaspr_builder'),
-        findDependency('jaspr_web_compilers'),
+        findDependency('jaspr_content'),
         findDependency('jaspr_test'),
         findDependency('jaspr_flutter_embed'),
         findDependency('jaspr_riverpod'),
         findDependency('jaspr_router'),
-        findDependency('jaspr_tailwind'),
       ].whereType<String>();
 
       sections.add((
@@ -70,18 +69,17 @@ class DoctorCommand extends BaseCommand {
         items: [
           'Dependencies on core packages:${dependencies.join()}',
           'Rendering mode: ${project.modeOrNull?.name}',
-          'Uses jaspr compilers: ${project.usesJasprWebCompilers}',
-          'Uses flutter embedding: ${project.usesFlutter}',
+          'Flutter mode: ${project.flutterMode.name}',
         ],
       ));
     }
 
-    for (var s in sections) {
-      var out = StringBuffer('${green.wrap('[✓]')} ${styleBold.wrap(lightBlue.wrap(s.name))!}');
+    for (final s in sections) {
+      final out = StringBuffer('${green.wrap('[✓]')} ${styleBold.wrap(lightBlue.wrap(s.name))!}');
       if (s.details != null) {
         out.write(' (${s.details})');
       }
-      for (var i in s.items) {
+      for (final i in s.items) {
         out.write('\n  • $i');
       }
       out.writeln();

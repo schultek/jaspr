@@ -1,6 +1,6 @@
 import 'package:file/memory.dart';
-import 'package:jaspr_cli/src/config.dart';
 import 'package:jaspr_cli/src/logging.dart';
+import 'package:jaspr_cli/src/project.dart';
 import 'package:test/test.dart';
 
 class TestLogger implements Logger {
@@ -63,14 +63,16 @@ dependencies:
 jaspr:
   mode: server
   port: 8080
+  flutter: embedded
 ''');
-        
+
         expect(project.pubspecYaml, isNotNull);
         expect(project.requirePubspecYaml, isNotNull);
         expect(() => project.requireJasprDependency, isNot(throwsException));
         expect(project.modeOrNull, equals(JasprMode.server));
         expect(project.requireMode, equals(JasprMode.server));
         expect(project.port, equals('8080'));
+        expect(project.flutterMode, equals(FlutterMode.embedded));
         expect(logger.messages, isEmpty);
         expect(exits, isEmpty);
       });
@@ -104,6 +106,21 @@ jaspr:
         expect(logger.messages, contains('\'jaspr.port\' in pubspec.yaml must be an integer.'));
         expect(exits, equals([1]));
       });
+
+      test('with invalid flutter mode causes exit', () {
+        fs.file('pubspec.yaml').writeAsStringSync('''
+name: test
+dependencies:
+  jaspr: any
+jaspr:
+  mode: client
+  flutter: unknown
+''');
+
+        expect(() => project.flutterMode, throwsStateError);
+        expect(logger.messages, contains('\'jaspr.flutter\' in pubspec.yaml must be one of embedded, plugins, none.'));
+        expect(exits, equals([1]));
+      });
     });
 
     group('dependencies', () {
@@ -116,13 +133,11 @@ dependencies:
     sdk: flutter
 dev_dependencies:
   jaspr_builder: any
-  jaspr_web_compilers: any
 ''');
 
         expect(() => project.requireJasprDependency, isNot(throwsException));
         expect(() => project.preferJasprBuilderDependency, isNot(throwsException));
-        expect(project.usesFlutter, isTrue);
-        expect(project.usesJasprWebCompilers, isTrue);
+        expect(project.flutterMode, FlutterMode.none);
         expect(logger.messages, isEmpty);
         expect(exits, isEmpty);
       });
@@ -145,8 +160,7 @@ name: test
             'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.',
           ),
         );
-        expect(project.usesFlutter, isFalse);
-        expect(project.usesJasprWebCompilers, isFalse);
+        expect(project.flutterMode, FlutterMode.none);
         expect(logger.messages, hasLength(2));
         expect(exits, equals([1]));
       });

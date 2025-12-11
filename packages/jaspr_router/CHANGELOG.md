@@ -1,6 +1,6 @@
-## 0.8.1-beta.0
+## 0.8.1
 
-- `jaspr` upgraded to `0.22.0-beta.0`
+- `jaspr` upgraded to `0.22.0`
 
 ## 0.8.0
 

@@ -3,6 +3,7 @@ import 'package:jaspr/jaspr.dart';
 
 import '../../../components/code_window/code_window.dart';
 import '../../../components/link_button.dart';
+import '../../../constants/texts.dart';
 import '../../../constants/theme.dart';
 import 'components/modes_animation.dart';
 
@@ -95,7 +96,8 @@ class Meet extends StatelessComponent {
           CodeWindow(
             name: 'pubspec.yaml',
             inactiveName: 'main.dart',
-            source: '''
+            source:
+                '''
           name: my_awesome_website
           description: A new Jaspr site.
 
@@ -103,13 +105,13 @@ class Meet extends StatelessComponent {
             sdk: ^3.10.0
 
           dependencies:  
-            jaspr: ^0.21.0
-            jaspr_router: ^0.8.0
+            jaspr: ^$latestCoreVersion
+            jaspr_content: ^$latestContentVersion
+            jaspr_router: ^$latestRouterVersion
             
           dev_dependencies:
-            jaspr_builder: ^0.21.0
-            jaspr_web_compilers: ^4.2.0
-            jaspr_lints: ^0.4.0
+            jaspr_builder: ^$latestCoreVersion
+            jaspr_lints: ^$latestLintsVersion
 
           jaspr:
             mode: static

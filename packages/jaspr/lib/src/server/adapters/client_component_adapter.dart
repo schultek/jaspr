@@ -52,7 +52,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   }
 
   String? getData() {
-    var data = target.dataFor(
+    final data = target.dataFor(
       element.component,
       encode: (o) {
         if (o is Component) {
@@ -65,7 +65,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   }
 
   String getDataForServerComponent(Component component, Element parent) {
-    if (registry.serverComponents[component] case var s?) {
+    if (registry.serverComponents[component] case final s?) {
       return 's${DomValidator.clientMarkerPrefix}$s';
     }
 
@@ -85,13 +85,13 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
     findElementFromContext(parent);
 
     if (element == null) {
-      print("Warning: Component parameter not used in build method. This will result in empty html on the client.");
+      print('Warning: Component parameter not used in build method. This will result in empty html on the client.');
 
       registry.serverComponents[component] = 0;
       return 's${DomValidator.clientMarkerPrefix}_';
     }
 
-    var s = registry.serverComponents[component] = registry.serverElementNum++;
+    final s = registry.serverComponents[component] = registry.serverElementNum++;
     registry.serverElements[s] = element;
 
     binding.addRenderAdapter(ServerComponentAdapter(s, element!));

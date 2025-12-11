@@ -1,4 +1,5 @@
 // [sample=1] Inherited Counter
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 void main() {
@@ -34,7 +35,7 @@ class _AppState extends State<App> {
         onClick: () {
           setState(() => count++);
         },
-        [text('Press Me')],
+        [.text('Press Me')],
       ),
     ]);
   }
@@ -46,6 +47,6 @@ class CountLabel extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     var count = context.dependOnInheritedComponentOfExactType<InheritedCount>()!.count;
-    return text('Count is $count');
+    return .text('Count is $count');
   }
 }

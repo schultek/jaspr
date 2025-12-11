@@ -1,5 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'dart:io';
 
 import 'package:analyzer/dart/ast/ast.dart';
@@ -26,8 +24,8 @@ bool isComponentType(DartType? type) {
 
 bool isStylesType(DartType? type) {
   if (type == null || type is! InterfaceType) return false;
-  var name = type.element.name;
-  var lib = type.element.library;
+  final name = type.element.name;
+  final lib = type.element.library;
 
   return lib.identifier == 'package:jaspr/src/dom/styles/styles.dart' && name == 'Styles';
 }
@@ -39,8 +37,8 @@ bool isComponentListType(DartType? type) {
 }
 
 int getLineIndent(LineInfo lineInfo, AstNode node) {
-  var lineNumber = lineInfo.getLocation(node.offset).lineNumber - 1;
-  var lineOffset = lineInfo.getOffsetOfLine(lineNumber);
+  final lineNumber = lineInfo.getLocation(node.offset).lineNumber - 1;
+  final lineOffset = lineInfo.getOffsetOfLine(lineNumber);
   Token token = node.beginToken;
   while (token.previous != null && token.previous!.offset >= lineOffset) {
     token = token.previous!;
@@ -75,8 +73,8 @@ class IsComponentVisitor extends UnifyingTypeVisitor<bool> {
 
   @override
   bool visitInterfaceType(InterfaceType type) {
-    var name = type.element.name;
-    var lib = type.element.library;
+    final name = type.element.name;
+    final lib = type.element.library;
 
     if (lib.identifier == 'package:jaspr/src/framework/framework.dart') {
       if (name == 'Component') return true;
@@ -93,7 +91,7 @@ class IsComponentVisitor extends UnifyingTypeVisitor<bool> {
 
 extension Indent on String {
   String reIndent(int delta, {bool skipFirst = false}) {
-    var lines = split('\n');
+    final lines = split('\n');
     for (var i = 0; i < lines.length; i++) {
       if (i == 0 && skipFirst) continue;
       if (delta > 0) {
@@ -107,11 +105,11 @@ extension Indent on String {
 }
 
 YamlMap? readJasprConfig(String filePath) {
-  var segments = path.split(filePath);
+  final segments = path.split(filePath);
   while (segments.length > 1) {
-    var pubspecFile = File(path.joinAll([...segments, 'pubspec.yaml']));
+    final pubspecFile = File(path.joinAll([...segments, 'pubspec.yaml']));
     if (pubspecFile.existsSync()) {
-      var pubspecData = loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
+      final pubspecData = loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
       return pubspecData['jaspr'] as YamlMap?;
     }
     segments.removeLast();

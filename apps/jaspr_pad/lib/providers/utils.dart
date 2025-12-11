@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:dart_mappable/dart_mappable.dart';
 
-import '../main.init.dart';
+import '../main.server.init.dart';
 
 void Function(void Function()) _debounce<T>(Duration duration) {
   Timer? timer;

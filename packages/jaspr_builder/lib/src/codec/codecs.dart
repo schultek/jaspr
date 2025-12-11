@@ -15,19 +15,19 @@ typedef Codecs = Map<String, CodecElement>;
 
 extension CodecLoader on BuildStep {
   Future<Codecs> loadCodecs() async {
-    var bundle = await loadBundle<CodecElement>('codec', CodecElement.deserialize).toList();
+    final bundle = await loadBundle<CodecElement>('codec', CodecElement.deserialize).toList();
     return {for (final c in bundle) c.name: c};
   }
 }
 
 extension CodecReader on Codecs {
   String getDecoderFor(DartType type, String getter, bool allowComponent) {
-    var decoder = type.acceptWithArgument(DecoderVisitor(this, allowComponent), '__PARAM__');
-    return decoder.decoder.replaceAll('__PARAM__', getter.replaceAll('__CAST__', decoder.cast));
+    final decoder = type.acceptWithArgument(DecoderVisitor(this, allowComponent), getter);
+    return decoder.decoder.replaceAll('__CAST__', decoder.cast);
   }
 
   String getEncoderFor(DartType type, String getter) {
-    var encoder = type.acceptWithArgument(EncoderVisitor(this), getter);
+    final encoder = type.acceptWithArgument(EncoderVisitor(this), getter);
     return encoder ?? getter;
   }
 
@@ -48,15 +48,15 @@ class EncoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
   @override
   String? visitInterfaceType(InterfaceType type, String argument, [bool checkNullability = true]) {
     if (type.isDartCoreList) {
-      var nested = type.typeArguments.first.acceptWithArgument(this, 'i');
+      final nested = type.typeArguments.first.acceptWithArgument(this, 'i');
       if (nested != null) {
-        var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+        final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
         return '$argument$nullCheck.map((i) => $nested).toList()';
       }
     } else if (type.isDartCoreMap && type.typeArguments[0].isDartCoreString) {
-      var nested = type.typeArguments[1].acceptWithArgument(this, 'v');
+      final nested = type.typeArguments[1].acceptWithArgument(this, 'v');
       if (nested != null) {
-        var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+        final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
         return '$argument$nullCheck.map((k, v) => MapEntry(k, $nested))';
       }
     } else if (codecs[type.element.name] case final codec?) {
@@ -67,7 +67,7 @@ class EncoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
           return '[[${codec.import}]].${codec.extension}($argument).${codec.encoder}()';
         }
       } else {
-        var nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+        final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
         return '$argument$nullCheck.${codec.encoder}()';
       }
     }
@@ -75,7 +75,10 @@ class EncoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
   }
 }
 
-typedef DecoderResult = ({String cast, String decoder});
+typedef DecoderResult = ({
+  String decoder,
+  String cast,
+});
 
 class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, String> {
   DecoderVisitor(this.codecs, this.allowComponent);
@@ -88,49 +91,64 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, Stri
     if (!type.isDartPrimitive) {
       throw const InvalidParameterException();
     }
-    return (cast: type.getDisplayString(), decoder: argument);
+    return (decoder: argument, cast: type.getDisplayString());
   }
 
   @override
   DecoderResult visitInterfaceType(InterfaceType type, String argument) {
     if (type.isDartCoreList) {
       final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-      if (type.typeArguments.first is DynamicType) {
-        return (cast: 'List<dynamic>$nullCheck', decoder: argument);
+      if (type.typeArguments.first
+          case DynamicType() || DartType(isDartCoreObject: true, nullabilitySuffix: NullabilitySuffix.question)) {
+        return (decoder: argument, cast: 'List<Object?>$nullCheck');
       }
       final nested = type.typeArguments.first.acceptWithArgument(this, 'i');
-      var decoder = '$argument$nullCheck';
-      decoder += '$nullCheck.cast<${nested.cast}>()';
+      final nestedNullCheck =
+          !nested.cast.endsWith('?') && type.typeArguments.first.nullabilitySuffix == NullabilitySuffix.question
+          ? '?'
+          : '';
+      var decoder = argument.endsWith(' as __CAST__') ? '($argument)$nullCheck' : '$argument$nullCheck';
+      decoder += '.cast<${nested.cast}$nestedNullCheck>()';
       if (nested.decoder != 'i') {
         decoder += '.map((i) => ${nested.decoder}).toList()';
       }
-      return (cast: 'List<dynamic>$nullCheck', decoder: decoder);
+      return (decoder: decoder, cast: 'List<Object?>$nullCheck');
     } else if (type.isDartCoreMap) {
       if (!type.typeArguments.first.isDartCoreString) {
         throw const InvalidParameterException();
       }
 
       final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-      if (type.typeArguments[1] is DynamicType) {
-        return (cast: 'Map<String, dynamic>$nullCheck', decoder: argument);
+      if (type.typeArguments[1]
+          case DynamicType() || DartType(isDartCoreObject: true, nullabilitySuffix: NullabilitySuffix.question)) {
+        return (decoder: argument, cast: 'Map<String, Object?>$nullCheck');
       }
       final nested = type.typeArguments[1].acceptWithArgument(this, 'v');
-      var decoder = '$argument$nullCheck';
-      decoder += '$nullCheck.cast<String, ${nested.cast}>()';
+      final nestedNullCheck =
+          !nested.cast.endsWith('?') && type.typeArguments[1].nullabilitySuffix == NullabilitySuffix.question
+          ? '?'
+          : '';
+      var decoder = argument.endsWith(' as __CAST__') ? '($argument)$nullCheck' : '$argument$nullCheck';
+      decoder += '.cast<String, ${nested.cast}$nestedNullCheck>()';
       if (nested.decoder != 'v') {
         decoder += '.map((k, v) => MapEntry(k, ${nested.decoder}))';
       }
-      return (cast: 'Map<String, dynamic>$nullCheck', decoder: decoder);
+      return (decoder: decoder, cast: 'Map<String, Object?>$nullCheck');
     } else if (codecs[type.element.name] case final codec?) {
       final decoderCall = '[[${codec.import}]].${codec.extension ?? codec.name}.${codec.decoder}';
+      final argRaw = argument.endsWith(' as __CAST__')
+          ? argument.substring(0, argument.length - ' as __CAST__'.length)
+          : argument;
+
       final decoder = type.nullabilitySuffix == NullabilitySuffix.question
-          ? '$argument != null ? $decoderCall($argument!) : null'
+          ? '$argRaw != null ? $decoderCall($argument) : null'
           : '$decoderCall($argument)';
 
-      return (cast: codec.rawType, decoder: decoder);
-    } else if (allowComponent && type.element.name == 'Component' &&
+      return (decoder: decoder, cast: codec.rawType);
+    } else if (allowComponent &&
+        type.element.name == 'Component' &&
         type.element.library.identifier == 'package:jaspr/src/framework/framework.dart') {
-      return (cast: 'String', decoder: 'p.mount($argument)');
+      return (decoder: 'p.mount($argument)', cast: 'String');
     }
     return super.visitInterfaceType(type, argument);
   }
@@ -151,8 +169,8 @@ class PrefixVisitor extends UnifyingTypeVisitor<String> {
     if (codecs[type.element.name] case final codec?) {
       name = '[[${codec.typeImport ?? codec.import}]].$name';
     }
-    var nullable = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-    var args = type.typeArguments.map((t) => t.accept(this));
+    final nullable = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
+    final args = type.typeArguments.map((t) => t.accept(this));
     return '$name${args.isEmpty ? '' : '<${args.join(', ')}>'}$nullable';
   }
 }

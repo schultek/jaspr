@@ -101,7 +101,7 @@ abstract class RouteLoaderBase implements RouteLoader {
   Future<List<RouteBase>> _buildRoutes() async {
     final sources = _sources ??= await loadPageSources();
 
-    List<RouteBase> routes = [];
+    final List<RouteBase> routes = [];
     for (final source in sources) {
       if (source.path.isEmpty || source.private) {
         continue;
@@ -236,7 +236,7 @@ abstract class PageSource {
     );
     newPage.apply(data: builtData);
 
-    var child = Page.wrap(
+    final child = Page.wrap(
       newPage,
       loader._eager ? UnmodifiableListView(RouteLoader._pages) : [],
       await newPage.render(),

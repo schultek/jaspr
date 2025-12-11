@@ -23,10 +23,10 @@ final class RawText extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    var fragment = web.document.createElement('template') as web.HTMLTemplateElement;
+    final fragment = web.document.createElement('template') as web.HTMLTemplateElement;
     fragment.innerHTML = text.toJS;
     return Component.fragment([
-      for (var node in fragment.content.childNodes.toIterable()) _RawNode(node, key: ValueKey(node)),
+      for (final node in fragment.content.childNodes.toIterable()) _RawNode(node, key: ValueKey(node)),
     ]);
   }
 }

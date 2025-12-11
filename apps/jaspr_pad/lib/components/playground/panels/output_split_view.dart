@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_riverpod/legacy.dart';
@@ -25,15 +26,15 @@ class OutputSplitView extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     context.listen<List<Issue>>(issuesProvider, (_, issues) {
-      if (issues.where((i) => i.kind == IssueKind.error).isNotEmpty &&
+      if (issues.where((issue) => issue.kind == IssueKind.error).isNotEmpty &&
           context.read(tabsStateProvider) == OutputTabsState.closed) {
         context.read(tabsStateProvider.notifier).state = OutputTabsState.issues;
       }
     });
 
-    var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
+    var isClosed = context.watch(tabsStateProvider.select((state) => state == OutputTabsState.closed));
 
-    return fragment([
+    return .fragment([
       if (isClosed) ...[
         child,
         EditorTabs(key: GlobalObjectKey('editor-tabs')),
@@ -57,7 +58,7 @@ class EditorTabs extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     var isTutorial = context.watch(isTutorialProvider);
-    var isClosed = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.closed));
+    var isClosed = context.watch(tabsStateProvider.select((state) => state == OutputTabsState.closed));
 
     return div(id: 'editor-panel-footer', classes: 'editor-tab-host ${isClosed ? ' border-top' : ''}', [
       div(classes: 'editor-tabs', [
@@ -70,7 +71,7 @@ class EditorTabs extends StatelessComponent {
         div(id: 'console-expand-icon-container', [
           Builder(
             builder: (context) {
-              var isConsole = context.watch(tabsStateProvider.select((s) => s == OutputTabsState.console));
+              var isConsole = context.watch(tabsStateProvider.select((state) => state == OutputTabsState.console));
               return button(
                 id: 'left-console-clear-button',
                 classes: 'console-clear-icon mdc-icon-button',
@@ -94,7 +95,7 @@ class EditorTabs extends StatelessComponent {
                 context.read(tabsStateProvider.notifier).state = OutputTabsState.closed;
               },
             ),
-            [text('close')],
+            [.text('close')],
           ),
         ]),
       ]),
@@ -127,7 +128,7 @@ class EditorTab extends StatelessComponent {
           }
         },
       ),
-      [text(label)],
+      [.text(label)],
     );
   }
 }
@@ -140,7 +141,7 @@ class EditorTabWindow extends StatelessComponent {
     var state = context.watch(tabsStateProvider);
     var isTutorial = context.watch(isTutorialProvider);
 
-    return fragment([
+    return .fragment([
       if (isTutorial) Hidden(hidden: state != OutputTabsState.ui, child: OutputPanel()),
       if (state == OutputTabsState.issues)
         IssuesPanel()

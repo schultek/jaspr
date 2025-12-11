@@ -33,15 +33,15 @@ const modelExtensionSources = {
 
 final modelExtensionOutputs = {
   'site|lib/model_extension.codec.json': jsonEncode({
-    "elements": [
+    'elements': [
       {
-        "name": "ModelB",
-        "extension": "ModelBCodec",
-        "decoder": "fromRaw",
-        "encoder": "toRaw",
-        "rawType": "Map<String, dynamic>",
-        "import": "package:site/model_extension.dart",
-        "typeImport": "package:site/model_type.dart",
+        'name': 'ModelB',
+        'extension': 'ModelBCodec',
+        'decoder': 'fromRaw',
+        'encoder': 'toRaw',
+        'rawType': 'Map<String, dynamic>',
+        'import': 'package:site/model_extension.dart',
+        'typeImport': 'package:site/model_type.dart',
       },
     ],
   }),

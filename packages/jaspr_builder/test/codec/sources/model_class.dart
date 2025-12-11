@@ -27,13 +27,13 @@ const modelClassSources = {
 
 final modelClassOutputs = {
   'site|lib/model_class.codec.json': jsonEncode({
-    "elements": [
+    'elements': [
       {
-        "name": "ModelA",
-        "decoder": "fromRaw",
-        "encoder": "toRaw",
-        "rawType": "Map<String, dynamic>",
-        "import": "package:site/model_class.dart",
+        'name': 'ModelA',
+        'decoder': 'fromRaw',
+        'encoder': 'toRaw',
+        'rawType': 'Map<String, dynamic>',
+        'import': 'package:site/model_class.dart',
       },
     ],
   }),

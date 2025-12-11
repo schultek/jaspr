@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 @client
@@ -21,7 +22,7 @@ class MiniCounterState extends State<MiniCounter> {
             count++;
           });
         },
-        [text("Count: $count")],
+        [.text("Count: $count")],
       ),
     ]);
   }

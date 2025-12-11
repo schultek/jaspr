@@ -21,7 +21,7 @@ void testAgainstDto(MyDto src, {required Set<Key> expectedRebuilds}) {
 void main() {
   group('inherited model test', () {
     testComponents('should update dependencies only', (tester) async {
-      var controller = tester.pumpTestComponent(App());
+      final controller = tester.pumpTestComponent(App());
       Future<void> rebuildThenTestAgainstDto(MyDto src, {required Set<Key> expectedRebuilds}) async {
         await controller.rebuildWith(src);
         testAgainstDto(src, expectedRebuilds: expectedRebuilds);

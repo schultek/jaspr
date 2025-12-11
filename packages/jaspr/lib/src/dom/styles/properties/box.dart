@@ -12,20 +12,20 @@ enum Display {
   /// descendant elements also have their display turned off. To have an element
   /// take up the space that it would normally take, but without actually rendering
   /// anything, use the [Visibility] property instead.
-  none("none"),
+  none('none'),
 
   /// The element generates a block box, generating line breaks both before and after
   /// the element when in the normal flow.
-  block("block"),
+  block('block'),
 
   /// The element generates one or more inline boxes that do not generate line breaks
   /// before or after themselves. In normal flow, the next element will be on the same
   /// line if there is space.
-  inline("inline"),
+  inline('inline'),
 
   /// The element generates a block box that will be flowed with surrounding content as
   /// if it were a single inline box (behaving much like a replaced element would).
-  inlineBlock("inline-block"),
+  inlineBlock('inline-block'),
 
   /// The element behaves like a block-level element and lays out its content according
   /// to the flexbox model.
@@ -328,7 +328,7 @@ class _OnlyBorderRadius implements BorderRadius {
   @override
   Map<String, String> get styles {
     if (topLeft != null && topRight != null && bottomRight != null && bottomLeft != null) {
-      var values = [topLeft!, topRight!, bottomRight!, bottomLeft!].map((r) => r._values).toList();
+      final values = [topLeft!, topRight!, bottomRight!, bottomLeft!].map((r) => r._values).toList();
       if (values.every((v) => v.length == 1)) {
         return {'border-radius': values.map((v) => v.first).join(' ')};
       } else {

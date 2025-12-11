@@ -59,7 +59,7 @@ void main() {
           find.descendant(of: find.byComponent(component), matching: find.tag('div')).evaluate().first
               as MultiChildElement;
 
-      var elements1 = divElement.children.whereType<ChildElement>().toList();
+      final elements1 = divElement.children.whereType<ChildElement>().toList();
       expect(elements1.map((e) => e.component.num), equals([1, 2, 3]));
 
       // phase 2 (2): children should be reordered
@@ -69,7 +69,7 @@ void main() {
       expect(find.textContaining('Child'), findsNComponents(1));
 
       // all elements should be reused
-      var elements2 = divElement.children.whereType<ChildElement>().toList();
+      final elements2 = divElement.children.whereType<ChildElement>().toList();
       expect(elements2, equals([elements1[1]]));
 
       // phase 3 (3, 2): children should be reordered
@@ -79,7 +79,7 @@ void main() {
       expect(find.textContaining('Child'), findsNComponents(2));
 
       // first element should be created and second element reused
-      var elements3 = divElement.children.whereType<ChildElement>().toList();
+      final elements3 = divElement.children.whereType<ChildElement>().toList();
       expect(elements3[0].component.num, equals(3));
       expect(elements3[1], equals(elements1[1]));
 
@@ -96,7 +96,7 @@ void main() {
       expect(find.textContaining('Child'), findsNComponents(3));
 
       // first element should be created and other elements reused
-      var elements4 = divElement.children.whereType<ChildElement>().toList();
+      final elements4 = divElement.children.whereType<ChildElement>().toList();
       expect(elements4[0].component.num, equals(1));
       expect(elements4.skip(1), equals([elements3[0], elements1[1]]));
     });

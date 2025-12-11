@@ -23,19 +23,21 @@ final clientModelClassSources = {
   ...codecBundleOutputs,
 };
 
+final clientModelClassModuleData = {
+  'name': 'Component',
+  'id': ['site', 'lib/component_model_class.dart'],
+  'import': 'package:site/component_model_class.dart',
+  'params': [
+    {'name': 'a', 'isNamed': false, 'decoder': "p.get<String>('a')", 'encoder': 'c.a'},
+    {
+      'name': 'b',
+      'isNamed': true,
+      'decoder': "[[package:site/model_class.dart]].ModelA.fromRaw(p.get<Map<String, dynamic>>('b'))",
+      'encoder': 'c.b.toRaw()',
+    },
+  ],
+};
+
 final clientModelClassModuleOutputs = {
-  'site|lib/component_model_class.client.module.json': jsonEncode({
-    "name": "Component",
-    "id": ["site", "lib/component_model_class.dart"],
-    "import": "package:site/component_model_class.dart",
-    "params": [
-      {"name": "a", "isNamed": false, "decoder": "p.get<String>('a')", "encoder": "c.a"},
-      {
-        "name": "b",
-        "isNamed": true,
-        "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p.get<Map<String, dynamic>>('b'))",
-        "encoder": "c.b.toRaw()",
-      },
-    ],
-  }),
+  'site|lib/component_model_class.client.module.json': jsonEncode(clientModelClassModuleData),
 };

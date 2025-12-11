@@ -1,15 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
 import '../commands/base_command.dart';
-import '../config.dart';
 import '../logging.dart';
+import '../project.dart';
 
 mixin FlutterHelper on BaseCommand {
   Map<String, String> getFlutterDartDefines(bool useWasm, bool release) {
-    var flutterDefines = <String, String>{};
+    final flutterDefines = <String, String>{};
 
     flutterDefines['dart.vm.product'] = '$release';
     flutterDefines['FLUTTER_WEB_USE_SKWASM'] = '$useWasm';
@@ -21,7 +22,7 @@ mixin FlutterHelper on BaseCommand {
   Future<Process> serveFlutter(String flutterPort, bool wasm) async {
     await _ensureTarget();
 
-    var flutterProcess = await Process.start(
+    final flutterProcess = await Process.start(
       'flutter',
       [
         'run',
@@ -44,7 +45,7 @@ mixin FlutterHelper on BaseCommand {
   Future<void> buildFlutter(bool wasm) async {
     await _ensureTarget();
 
-    var flutterProcess = await Process.start(
+    final flutterProcess = await Process.start(
       'flutter',
       [
         'build',
@@ -58,9 +59,9 @@ mixin FlutterHelper on BaseCommand {
       workingDirectory: Directory.current.path,
     );
 
-    var target = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
+    final target = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
 
-    var moveTargets = ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'];
+    final moveTargets = ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'];
 
     await watchProcess('flutter build', flutterProcess, tag: Tag.flutter);
 
@@ -68,7 +69,7 @@ mixin FlutterHelper on BaseCommand {
   }
 
   Future<void> _ensureTarget() async {
-    var flutterTarget = File('.dart_tool/jaspr/flutter_target.dart').absolute;
+    final flutterTarget = File('.dart_tool/jaspr/flutter_target.dart').absolute;
     if (!await flutterTarget.exists()) {
       await flutterTarget.create(recursive: true);
     }
@@ -77,18 +78,18 @@ mixin FlutterHelper on BaseCommand {
 }
 
 Future<void> copyFiles(String from, String to, [List<String> targets = const ['']]) async {
-  var moveTargets = [...targets];
+  final moveTargets = [...targets];
 
-  var moves = <Future<void>>[];
+  final moves = <Future<void>>[];
   while (moveTargets.isNotEmpty) {
-    var moveTarget = moveTargets.removeAt(0);
-    var file = File('$from/$moveTarget').absolute;
-    var isDir = file.statSync().type == FileSystemEntityType.directory;
+    final moveTarget = moveTargets.removeAt(0);
+    final file = File('$from/$moveTarget').absolute;
+    final isDir = file.statSync().type == FileSystemEntityType.directory;
     if (isDir) {
       await Directory('$to/$moveTarget').absolute.create(recursive: true);
 
-      var files = Directory('$from/$moveTarget').absolute.list(recursive: true);
-      await for (var file in files) {
+      final files = Directory('$from/$moveTarget').absolute.list(recursive: true);
+      await for (final file in files) {
         final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
         moveTargets.add(path);
       }
@@ -99,3 +100,45 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
 
   await moves.wait;
 }
+
+final flutterInfo = (() {
+  final result = Process.runSync(
+    'flutter',
+    ['doctor', '--version', '--machine'],
+    stdoutEncoding: utf8,
+    runInShell: true,
+  );
+  if (result.exitCode < 0) {
+    throw UnsupportedError(
+      'Calling "flutter doctor" resulted in: "${result.stderr}". '
+      'Make sure flutter is installed and setup correctly.',
+    );
+  }
+  final Map<String, Object?> output;
+  try {
+    output = jsonDecode(result.stdout as String) as Map<String, Object?>;
+  } catch (e) {
+    throw UnsupportedError(
+      'Could not find flutter web sdk. '
+      'Calling "flutter doctor" resulted in: "${result.stdout}". '
+      'Make sure flutter is installed and setup correctly. '
+      'If you think this is a bug, open an issue at https://github.com/schultek/jaspr/issues',
+    );
+  }
+  return output;
+})();
+final webSdkDir = (() {
+  final webSdkPath = p.join(flutterInfo['flutterRoot'] as String, 'bin', 'cache', 'flutter_web_sdk');
+  if (!Directory(webSdkPath).existsSync()) {
+    Process.runSync('flutter', ['precache', '--web'], runInShell: true);
+  }
+  if (!Directory(webSdkPath).existsSync()) {
+    throw UnsupportedError(
+      'Could not find flutter web sdk in $webSdkPath. '
+      'Make sure flutter is installed and setup correctly. '
+      'If you think this is a bug, open an issue at https://github.com/schultek/jaspr/issues',
+    );
+  }
+  return webSdkPath;
+})();
+final flutterVersion = flutterInfo['flutterVersion'] as String;

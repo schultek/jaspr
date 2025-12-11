@@ -1,45 +1,15 @@
 import 'dart:convert';
 
+import 'client_basic.dart';
+import 'client_model_class.dart';
+import 'client_model_extension.dart';
+import 'client_with_server_components.dart';
+
 final clientBundleOutputs = {
   'site|lib/clients.bundle.json': jsonEncode([
-    {
-      "name": "Component",
-      "id": ["site", "lib/component_basic.dart"],
-      "import": "package:site/component_basic.dart",
-      "params": [
-        {"name": "a", "isNamed": false, "decoder": "p.get<String>('a')", "encoder": "c.a"},
-        {"name": "b", "isNamed": true, "decoder": "p.get<int>('b')", "encoder": "c.b"},
-        {"name": "c", "isNamed": true, "decoder": "p.get<double?>('c')", "encoder": "c.c"},
-        {"name": "d", "isNamed": true, "decoder": "p.get<bool>('d')", "encoder": "c.d"},
-      ],
-    },
-    {
-      "name": "Component",
-      "id": ["site", "lib/component_model_class.dart"],
-      "import": "package:site/component_model_class.dart",
-      "params": [
-        {"name": "a", "isNamed": false, "decoder": "p.get<String>('a')", "encoder": "c.a"},
-        {
-          "name": "b",
-          "isNamed": true,
-          "decoder": "[[package:site/model_class.dart]].ModelA.fromRaw(p.get<Map<String, dynamic>>('b'))",
-          "encoder": "c.b.toRaw()",
-        },
-      ],
-    },
-    {
-      "name": "Component",
-      "id": ["site", "lib/component_model_extension.dart"],
-      "import": "package:site/component_model_extension.dart",
-      "params": [
-        {"name": "a", "isNamed": false, "decoder": "p.get<String>('a')", "encoder": "c.a"},
-        {
-          "name": "b",
-          "isNamed": true,
-          "decoder": "[[package:site/model_extension.dart]].ModelBCodec.fromRaw(p.get<Map<String, dynamic>>('b'))",
-          "encoder": "[[package:site/model_extension.dart]].ModelBCodec(c.b).toRaw()",
-        },
-      ],
-    },
+    clientWithServerComponentsModuleData,
+    clientBasicModuleData,
+    clientModelClassModuleData,
+    clientModelExtensionModuleData,
   ]),
 };

@@ -93,7 +93,7 @@ class DomApiUsageVisitor extends RecursiveAstVisitor<void> {
     } else if (_domClasses.contains(node.methodName.name) && node.target == null) {
       _useDomApis = true;
       return;
-    } else if (node.target case SimpleIdentifier id when _domClasses.contains(id.name)) {
+    } else if (node.target case final SimpleIdentifier id when _domClasses.contains(id.name)) {
       _useDomApis = true;
       return;
     }

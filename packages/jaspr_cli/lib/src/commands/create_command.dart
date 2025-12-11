@@ -1,13 +1,14 @@
 import 'dart:io';
 
 import 'package:mason/mason.dart' as m show Logger;
-import 'package:mason/mason.dart';
+import 'package:mason/mason.dart' hide Level;
 import 'package:path/path.dart' as p;
 import 'package:pub_updater/pub_updater.dart';
 
 import '../bundles/bundles.dart';
 import '../bundles/scaffold/scaffold_bundle.dart';
 import '../logging.dart';
+import '../project.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -23,7 +24,6 @@ enum RenderingMode {
   final String help;
 
   bool get useServer => this == server || this == static;
-  String get recommend => this == static ? '(Recommended) ' : '';
 }
 
 class CreateCommand extends BaseCommand {
@@ -47,10 +47,13 @@ class CreateCommand extends BaseCommand {
       abbr: 'm',
       help: 'Choose a rendering mode for the project.',
       allowed: [
-        for (var m in RenderingMode.values) m.name,
+        for (final m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto'],
       ],
       allowedHelp: {
-        for (var v in RenderingMode.values) v.name: '${v.help}.',
+        for (final v in RenderingMode.values) ...{
+          v.name: '${v.help}.',
+          if (v.useServer) '${v.name}:auto': '(Deprecated) ${v.help} with automatic client-side hydration.',
+        },
       },
     );
     argParser.addOption(
@@ -72,7 +75,7 @@ class CreateCommand extends BaseCommand {
       allowedHelp: {
         'none': 'No preconfigured Flutter support.',
         'embedded': 'Sets up an embedded Flutter app inside your site.',
-        'plugins-only': '(Recommended) Enables support for using Flutter web plugins.',
+        'plugins-only': 'Enables support for using Flutter web plugins.',
       },
     );
     argParser.addOption(
@@ -86,7 +89,7 @@ class CreateCommand extends BaseCommand {
 
   @override
   String get invocation {
-    return "jaspr create [arguments] <directory>";
+    return 'jaspr create [arguments] <directory>';
   }
 
   @override
@@ -102,39 +105,37 @@ class CreateCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
-    var (dir, name) = getTargetDirectory();
+    final (dir, name) = getTargetDirectory();
 
-    var template = argResults!.option('template');
+    final template = argResults!.option('template');
     if (template != null) {
       return await createFromTemplate(template, dir, name);
     }
 
-    var useMode = getRenderingMode();
-    var (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
-    var (useFlutter, usePlugins) = getFlutter();
-    var useBackend = useMode == RenderingMode.server ? getBackend() : null;
+    final useMode = getRenderingMode();
+    final (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
+    final useFlutterMode = getFlutter();
+    final useBackend = useMode == RenderingMode.server ? getBackend() : null;
 
-    var usedPrefixes = {
+    final usedPrefixes = {
       if (useMode.useServer) 'server',
       if (useMode == RenderingMode.client) 'client',
       if (useRouting) 'routing',
-      if (useFlutter) 'flutter',
+      if (useFlutterMode == FlutterMode.embedded) 'flutter',
       if (useMode.useServer) useBackend ?? 'base',
     };
 
-    var updater = PubUpdater();
+    final updater = PubUpdater();
 
-    var webCompilersPackage = usePlugins ? 'jaspr_web_compilers' : 'build_web_compilers';
-
-    var [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
+    final [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_lints'),
-      updater.getLatestVersion(webCompilersPackage),
+      updater.getLatestVersion('build_web_compilers'),
     ]);
 
-    var progress = logger.logger!.progress('Generating project...');
-    var generator = await MasonGenerator.fromBundle(scaffoldBundle);
+    final progress = logger.logger!.progress('Generating project...');
+    final generator = await MasonGenerator.fromBundle(scaffoldBundle);
     final files = await generator.generate(
       ScaffoldGeneratorTarget(dir, usedPrefixes),
       vars: {
@@ -143,8 +144,8 @@ class CreateCommand extends BaseCommand {
         'mode': useMode.name,
         'routing': useRouting,
         'multipage': useMultiPageRouting,
-        'flutter': useFlutter,
-        'plugins': usePlugins,
+        'flutter': useFlutterMode == FlutterMode.embedded,
+        'plugins': useFlutterMode == FlutterMode.plugins,
         'server': useMode.useServer,
         'shelf': useBackend == 'shelf',
         'jasprCoreVersion': jasprCoreVersion,
@@ -152,7 +153,6 @@ class CreateCommand extends BaseCommand {
         'jasprFlutterEmbedVersion': jasprFlutterEmbedVersion,
         'jasprRouterVersion': jasprRouterVersion,
         'jasprLintsVersion': jasprLintsVersion,
-        'webCompilersPackage': webCompilersPackage,
         'webCompilersVersion': webCompilersVersion,
       },
       logger: logger.logger,
@@ -160,7 +160,7 @@ class CreateCommand extends BaseCommand {
     progress.complete('Generated ${files.length} file(s)');
 
     if (runPubGet) {
-      var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+      final process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
 
       await watchProcess(
         'pub',
@@ -176,7 +176,7 @@ class CreateCommand extends BaseCommand {
       'Created project $name! In order to get started, run the following commands:\n\n',
     );
 
-    var relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
+    final relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
     if (relativePath != '.') {
       logger.write('  cd $relativePath\n');
     }
@@ -191,26 +191,24 @@ class CreateCommand extends BaseCommand {
       usageException('Template "$template" not found.');
     }
 
-    var updater = PubUpdater();
+    final updater = PubUpdater();
 
-    var [
+    final [
       jasprFlutterEmbedVersion,
       jasprRouterVersion,
       jasprContentVersion,
       jasprLintsVersion,
-      jasprWebCompilersVersion,
-      buildWebCompilersVersion,
+      webCompilersVersion,
     ] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_content'),
       updater.getLatestVersion('jaspr_lints'),
-      updater.getLatestVersion('jaspr_web_compilers'),
       updater.getLatestVersion('build_web_compilers'),
     ]);
 
-    var progress = logger.logger!.progress('Generating project from template "$template"...');
-    var generator = await MasonGenerator.fromBundle(bundle);
+    final progress = logger.logger!.progress('Generating project from template "$template"...');
+    final generator = await MasonGenerator.fromBundle(bundle);
     final files = await generator.generate(
       DirectoryGeneratorTarget(dir),
       vars: {
@@ -222,15 +220,14 @@ class CreateCommand extends BaseCommand {
         'jasprRouterVersion': jasprRouterVersion,
         'jasprContentVersion': jasprContentVersion,
         'jasprLintsVersion': jasprLintsVersion,
-        'jasprWebCompilersVersion': jasprWebCompilersVersion,
-        'buildWebCompilersVersion': buildWebCompilersVersion,
+        'webCompilersVersion': webCompilersVersion,
       },
       logger: logger.logger,
     );
     progress.complete('Generated ${files.length} file(s)');
 
     if (runPubGet) {
-      var process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+      final process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
 
       await watchProcess(
         'pub',
@@ -246,7 +243,7 @@ class CreateCommand extends BaseCommand {
       'Created project $name! In order to get started, run the following commands:\n\n',
     );
 
-    var relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
+    final relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
     if (relativePath != '.') {
       logger.write('  cd $relativePath\n');
     }
@@ -256,11 +253,11 @@ class CreateCommand extends BaseCommand {
   }
 
   (Directory, String) getTargetDirectory() {
-    var targetPath = argResults!.rest.firstOrNull ?? logger.logger!.prompt('Specify a target directory:');
+    final targetPath = argResults!.rest.firstOrNull ?? logger.logger!.prompt('Specify a target directory:');
 
-    var directory = Directory(targetPath).absolute;
-    var dir = p.basenameWithoutExtension(p.normalize(directory.path));
-    var name = dir.replaceAll('-', '_');
+    final directory = Directory(targetPath).absolute;
+    final dir = p.basenameWithoutExtension(p.normalize(directory.path));
+    final name = dir.replaceAll('-', '_');
 
     if (directory.existsSync()) {
       if (targetPath != '.') {
@@ -278,13 +275,22 @@ class CreateCommand extends BaseCommand {
   }
 
   RenderingMode getRenderingMode() {
-    var opt = argResults!.option('mode');
-    return switch (opt) {
-      'client' => RenderingMode.client,
-      'server' => RenderingMode.server,
-      'static' => RenderingMode.static,
+    final opt = argResults!.option('mode');
+    return switch (opt?.split(':')) {
+      ['client'] => RenderingMode.client,
+      [final m, 'auto'] => () {
+        logger.write(
+          'The ":auto" suffix for "--mode" is deprecated and will be removed in a future release. '
+          'Automatic hydration is enabled by default.',
+          level: Level.warning,
+        );
+
+        return RenderingMode.values.byName(m);
+      }(),
+      [final m] => RenderingMode.values.byName(m),
+
       _ => () {
-        var mode = logger.logger!.chooseOne(
+        final mode = logger.logger!.chooseOne(
           'Select a rendering mode:',
           choices: RenderingMode.values,
           display: (o) => '${o.name}: ${o.help}.',
@@ -295,15 +301,15 @@ class CreateCommand extends BaseCommand {
   }
 
   (bool, bool) getRouting(bool useServer) {
-    var opt = argResults!.option('routing');
+    final opt = argResults!.option('routing');
 
     return switch (opt) {
       'none' => (false, false),
       'single-page' => (true, false),
-      'multi-page' => !useServer ? usageException("Cannot use multi-page routing in client mode.") : (true, true),
+      'multi-page' => !useServer ? usageException('Cannot use multi-page routing in client mode.') : (true, true),
       _ => () {
-        var routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
-        var multiPage = routing && useServer
+        final routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
+        final multiPage = routing && useServer
             ? logger.logger!.confirm(
                 '(Recommended) Use multi-page (server-side) routing? '
                 '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
@@ -315,37 +321,44 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  (bool, bool) getFlutter() {
-    var opt = argResults!.option('flutter');
+  FlutterMode getFlutter() {
+    final opt = argResults!.option('flutter');
 
     return switch (opt) {
-      'none' => (false, false),
-      'embedded' => (true, true),
-      'plugins-only' => (false, true),
+      'none' => FlutterMode.none,
+      'embedded' => FlutterMode.embedded,
+      'plugins-only' => FlutterMode.plugins,
       _ => () {
-        var flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
-        var plugins =
-            flutter ||
-            logger.logger!.confirm('Enable support for using Flutter web plugins in your project?', defaultValue: true);
-        return (flutter, plugins);
+        final flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
+        if (flutter) {
+          return FlutterMode.embedded;
+        }
+        final plugins = logger.logger!.confirm(
+          'Enable support for using Flutter web plugins in your project?',
+          defaultValue: false,
+        );
+        if (plugins) {
+          return FlutterMode.plugins;
+        }
+        return FlutterMode.none;
       }(),
     };
   }
 
   String? getBackend() {
-    var opt = argResults!.option('backend');
+    final opt = argResults!.option('backend');
 
     return switch (opt) {
       'none' => null,
-      String b => b,
+      final String b => b,
       null => () {
-        var backend = logger.logger!.confirm(
+        final backend = logger.logger!.confirm(
           'Use a custom backend package or framework for the server part of your project?',
           defaultValue: false,
         );
         if (!backend) return null;
 
-        var b = logger.logger!
+        final b = logger.logger!
             .chooseOne(
               'Select a backend framework:',
               choices: [
@@ -381,9 +394,9 @@ class ScaffoldGeneratorTarget extends DirectoryGeneratorTarget {
     m.Logger? logger,
     OverwriteRule? overwriteRule,
   }) async {
-    var filename = p.basename(path);
+    final filename = p.basename(path);
     if (filename.contains('#')) {
-      var [prefix, ...] = filename.split('#');
+      final [prefix, ...] = filename.split('#');
 
       if (!prefixes.contains(prefix)) {
         return GeneratedFile.skipped(path: path);

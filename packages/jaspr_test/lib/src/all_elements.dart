@@ -12,7 +12,7 @@ Iterable<Element> collectAllElementsFrom(Element element) {
 
 extension CollectIterator<E> on Iterator<E> {
   Iterable<E> collect() {
-    var l = <E>[];
+    final l = <E>[];
     while (moveNext()) {
       l.add(current);
     }

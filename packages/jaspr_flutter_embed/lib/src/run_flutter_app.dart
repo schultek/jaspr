@@ -19,10 +19,10 @@ Future<FlutterApp> _flutterApp = Future(() {
 
   flutter!.loader!.didCreateEngineInitializer = (EngineInitializer engineInitializer) {
     return Future(() async {
-      var engine = await engineInitializer
+      final engine = await engineInitializer
           .initializeEngine(InitializeEngineOptions(multiViewEnabled: true, renderer: 'canvaskit'))
           .toDart;
-      var app = await engine.runApp().toDart;
+      final app = await engine.runApp().toDart;
       completer.complete(app);
     }).toJS;
   }.toJS;
@@ -39,14 +39,14 @@ Future<FlutterApp> _flutterApp = Future(() {
 Future<void> preloadEngine() => _flutterApp;
 
 Future<int> addView(Element target, ViewConstraints? constraints, flt.Widget widget) async {
-  var app = await _flutterApp;
-  var id = app.addView(ViewOptions(hostElement: target, viewConstraints: constraints));
+  final app = await _flutterApp;
+  final id = app.addView(ViewOptions(hostElement: target, viewConstraints: constraints));
   _viewWidgets[id] = widget;
   return id;
 }
 
 Future<void> removeView(int viewId) async {
-  var app = await _flutterApp;
+  final app = await _flutterApp;
   app.removeView(viewId);
 }
 

@@ -50,13 +50,18 @@ final class ClientLoader {
   /// The returned [Future] is cached for future calls, so the [loader] is only called once.
   /// Once loaded, the [builder] is returned directly on subsequent calls.
   FutureOr<ClientBuilder> get loadedBuilder {
-    _loadedBuilder ??= loader != null
-        ? loader!().then((_) {
-            _loadedBuilder = builder;
-            return builder;
-          })
-        : builder;
-    return _loadedBuilder!;
+    if (_loadedBuilder case final alreadyLoadedBuilder?) {
+      return alreadyLoadedBuilder;
+    }
+
+    final FutureOr<ClientBuilder>? newLoadedBuilder;
+    if (loader case final loader?) {
+      newLoadedBuilder = loader().then((_) => _loadedBuilder = builder);
+    } else {
+      newLoadedBuilder = builder;
+    }
+
+    return _loadedBuilder = newLoadedBuilder;
   }
 }
 
@@ -74,17 +79,17 @@ class ClientParams {
 
   Component mount(String sId) {
     assert(sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
-    var s = serverComponents[sId.substring(2)];
-    if (s != null) {
-      return s.build();
+    final serverAnchor = serverComponents[sId.substring(2)];
+    if (serverAnchor != null) {
+      return serverAnchor.build();
     } else {
-      return const Component.text("");
+      return const Component.text('');
     }
   }
 
   T get<T>(String key) {
     if (_params[key] is! T) {
-      print("$key is not $T: ${_params[key]}");
+      print('$key is not $T: ${_params[key]}');
     }
     return _params[key] as T;
   }

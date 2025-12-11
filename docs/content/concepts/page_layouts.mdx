@@ -140,7 +140,7 @@ The `TableOfContentsExtension` generates a table of contents based on the headin
 
 First, ensure the extension is added to your `ContentApp`:
 
-```dart title="lib/main.dart"
+```dart
 ContentApp(
   // ...
   extensions: [
@@ -166,7 +166,7 @@ Component buildBody(Page page, Component child) {
       aside(classes: 'toc', [
         if (page.data['toc'] case TableOfContents toc)
           div([
-            h3([text('On this page')]),
+            h3([.text('On this page')]),
             toc.build(), // Renders the ToC as an unstyled <ul> list
           ]),
       ]),

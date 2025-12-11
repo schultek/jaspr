@@ -71,16 +71,16 @@ class _Logger implements Logger {
       return;
     }
     if (message.contains('\n')) {
-      var lines = message.split('\n');
-      for (var l in lines) {
+      final lines = message.split('\n');
+      for (final l in lines) {
         write(l, tag: tag, level: level, progress: progress);
       }
       return;
     }
 
-    var showAsProgress = !verbose && progress != null && (progress == ProgressState.running || _progress != null);
+    final showAsProgress = !verbose && progress != null && (progress == ProgressState.running || _progress != null);
 
-    String log = '${tag?.format() ?? ''}${level.format(message.trim())}';
+    final String log = '${tag?.format() ?? ''}${level.format(message.trim())}';
 
     if (showAsProgress) {
       _progress ??= logger.progress(log);
@@ -111,20 +111,30 @@ class _Logger implements Logger {
 
 extension ServerLogger on Logger {
   void writeServerLog(s.ServerLog serverLog) {
-    if (!verbose) return;
-    //if (serverLog.level < Level.INFO) return;
+    final level = serverLog.level.toLevel();
+    if (!verbose && level.index < Level.info.index) return;
 
-    var buffer = StringBuffer(serverLog.message);
+    final buffer = StringBuffer(serverLog.message);
     if (serverLog.error != null) {
       buffer.writeln(serverLog.error);
     }
 
-    var log = buffer.toString();
-    if (log.trim().isEmpty) {
+    final log = buffer.toString().trim();
+    if (log.isEmpty) {
       return;
     }
 
-    write(log, tag: Tag.builder, level: serverLog.level.toLevel());
+    write(log, tag: Tag.builder, level: level);
+
+    if (log.startsWith('build_web_compilers:entrypoint') &&
+        log.contains('transitive libraries have sdk dependencies that not supported on this platform') &&
+        log.contains('flutter|lib')) {
+      write(
+        'Failed to compile some libraries with a dependency on the Flutter SDK. Try setting `jaspr.flutter` to `plugins` in your `pubspec.yaml` file.',
+        tag: Tag.cli,
+        level: Level.error,
+      );
+    }
   }
 }
 
@@ -146,7 +156,9 @@ extension LevelFormat on Level {
 
 extension on s.Level {
   Level toLevel() {
-    if (this < s.Level.INFO) {
+    if (this < s.Level.CONFIG) {
+      return Level.verbose;
+    } else if (this < s.Level.INFO) {
       return Level.debug;
     } else if (this < s.Level.WARNING) {
       return Level.info;

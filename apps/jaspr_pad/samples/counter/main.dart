@@ -1,4 +1,5 @@
 // [sample=0] Counter
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 void main() {
@@ -18,12 +19,12 @@ class _AppState extends State<App> {
   @override
   Component build(BuildContext context) {
     return div([
-      text('Count is $count'),
+      .text('Count is $count'),
       button(
         onClick: () {
           setState(() => count++);
         },
-        [text('Press Me')],
+        [.text('Press Me')],
       ),
     ]);
   }

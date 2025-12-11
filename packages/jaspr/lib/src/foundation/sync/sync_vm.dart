@@ -4,7 +4,7 @@ import '../../../server.dart';
 import '../../dom/validator.dart';
 
 void initSyncState(SyncStateMixin<StatefulComponent, Object?> element) {
-  if (element.context.binding case ServerAppBinding b) {
+  if (element.context.binding case final ServerAppBinding b) {
     b.addRenderAdapter(SyncAdapter(element, element.context as Element));
   }
 }
@@ -16,9 +16,9 @@ class SyncAdapter extends ElementBoundaryAdapter {
 
   @override
   void applyBoundary(ChildListRange range) {
-    var value = sync.getState();
+    final value = sync.getState();
     if (value == null) return;
-    var data = const DomValidator().escapeMarkerText(jsonEncode(value));
+    final data = const DomValidator().escapeMarkerText(jsonEncode(value));
     range.start.insertNext(ChildNodeData(MarkupRenderText('<!--${DomValidator.syncMarkerPrefix}$data-->', true)));
   }
 }

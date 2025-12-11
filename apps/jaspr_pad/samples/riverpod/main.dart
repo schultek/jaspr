@@ -1,4 +1,5 @@
 // [sample=2] Jaspr Riverpod
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -24,14 +25,14 @@ class App extends StatelessComponent {
       Builder(
         builder: (context) {
           var count = context.watch(counterProvider);
-          return text('Count is $count');
+          return .text('Count is $count');
         },
       ),
       button(
         onClick: () {
           context.read(counterProvider.notifier).increment();
         },
-        [text('Press Me')],
+        [.text('Press Me')],
       ),
     ]);
   }

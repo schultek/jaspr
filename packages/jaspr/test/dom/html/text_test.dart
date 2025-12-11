@@ -10,7 +10,7 @@ void main() {
     testComponents('renders text elements', (tester) async {
       tester.pumpComponent(
         div([
-          a(download: "", href: "a", target: Target.blank, type: "", referrerPolicy: ReferrerPolicy.noReferrer, []),
+          a(download: '', href: 'a', target: Target.blank, type: '', referrerPolicy: ReferrerPolicy.noReferrer, []),
           b([]),
           br(),
           code([]),

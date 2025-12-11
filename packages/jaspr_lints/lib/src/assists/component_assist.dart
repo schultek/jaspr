@@ -13,10 +13,10 @@ abstract class CreateComponentAssist extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    if (node case CompilationUnit node) {
+    if (node case final CompilationUnit node) {
       var hasJasprImport = false;
 
-      for (var dir in node.directives) {
+      for (final dir in node.directives) {
         if (dir.end > selectionOffset) {
           return;
         }
@@ -25,7 +25,7 @@ abstract class CreateComponentAssist extends ResolvedCorrectionProducer {
         }
       }
 
-      for (var dec in node.declarations) {
+      for (final dec in node.declarations) {
         if (selectionOffset >= dec.offset && selectionEnd <= dec.end) {
           return;
         }
@@ -65,7 +65,7 @@ class CreateStatelessComponent extends CreateComponentAssist {
           '({super.key});\n\n  @override\n  Component build(BuildContext context) {\n'
           '    return ',
         );
-        edit.addSimpleLinkedEdit('child', "div([])");
+        edit.addSimpleLinkedEdit('child', 'div([])');
         edit.write(';\n  }\n}\n');
       });
       if (!hasJasprImport) {
@@ -103,7 +103,7 @@ class CreateStatefulComponent extends CreateComponentAssist {
           '> {\n\n  @override\n  Component build(BuildContext context) {\n'
           '    return ',
         );
-        edit.addSimpleLinkedEdit('child', "div([])");
+        edit.addSimpleLinkedEdit('child', 'div([])');
         edit.write(';\n  }\n}\n');
       });
       if (!hasJasprImport) {
@@ -170,9 +170,9 @@ abstract class ConvertComponentAssist extends ResolvedCorrectionProducer {
       }
 
       MethodDeclaration? buildMethod;
-      List<String> members = [];
-      for (var m in node.members) {
-        if (m is MethodDeclaration && m.name.lexeme == "build") {
+      final List<String> members = [];
+      for (final m in node.members) {
+        if (m is MethodDeclaration && m.name.lexeme == 'build') {
           buildMethod = m;
         } else if (m is FieldDeclaration) {
           members.addAll(m.fields.variables.map((v) => v.name.lexeme));
@@ -199,15 +199,15 @@ class ConvertToStatefulComponent extends ConvertComponentAssist {
         edit.write('StatefulComponent');
       });
 
-      var splitToken = buildMethod?.beginToken ?? node.rightBracket;
-      var indent = buildMethod != null ? '' : '  ';
-      var endIndent = buildMethod != null ? '  ' : '';
-      var name = node.name.lexeme;
+      final splitToken = buildMethod?.beginToken ?? node.rightBracket;
+      final indent = buildMethod != null ? '' : '  ';
+      final endIndent = buildMethod != null ? '  ' : '';
+      final name = node.name.lexeme;
 
       builder.addInsertion(splitToken.offset, (edit) {
         edit.write(
-          "$indent@override\n  State createState() => ${name}State();\n"
-          "}\n\nclass ${name}State extends State<$name> {\n$endIndent",
+          '$indent@override\n  State createState() => ${name}State();\n'
+          '}\n\nclass ${name}State extends State<$name> {\n$endIndent',
         );
       });
 
@@ -227,8 +227,8 @@ class ConvertToAsyncStatelessComponent extends ConvertComponentAssist {
   @override
   Future<void> convertComponent(ChangeBuilder builder, ClassDeclaration node, MethodDeclaration? buildMethod) async {
     await builder.addDartFileEdit(file, (builder) {
-      if (node.parent case CompilationUnit unit) {
-        for (var dir in unit.directives) {
+      if (node.parent case final CompilationUnit unit) {
+        for (final dir in unit.directives) {
           if (dir is ImportDirective && dir.uri.stringValue == 'package:jaspr/jaspr.dart') {
             builder.addDeletion(dir.sourceRange);
           }
@@ -263,7 +263,7 @@ class StateBuildVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    var elem = node.element;
+    final elem = node.element;
     if (elem == null) return;
 
     if (elem.enclosingElement == clazz.declaredFragment?.element) {

@@ -12,10 +12,10 @@ void main() {
           details(open: false, []),
           dialog(open: false, []),
           summary([]),
-          meta(httpEquiv: "x-ua-compatible", content: "ie=edge"),
-          meta(name: "description", content: "Hello world"),
-          link(href: "a", rel: "", type: "", as: ""),
-          script(async: false, defer: false, src: "a.js"),
+          meta(httpEquiv: 'x-ua-compatible', content: 'ie=edge'),
+          meta(name: 'description', content: 'Hello world'),
+          link(href: 'a', rel: '', type: '', as: ''),
+          script(async: false, defer: false, src: 'a.js'),
         ]),
       );
 

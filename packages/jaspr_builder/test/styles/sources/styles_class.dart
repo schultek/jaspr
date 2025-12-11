@@ -22,7 +22,7 @@ const stylesClassSources = {
 
 final stylesClassOutputs = {
   'site|lib/styles_class.styles.json': jsonEncode({
-    "elements": ["Component.styles", "Component.styles2"],
-    "id": ["site", "lib/styles_class.dart"],
+    'elements': ['Component.styles', 'Component.styles2'],
+    'id': ['site', 'lib/styles_class.dart'],
   }),
 };

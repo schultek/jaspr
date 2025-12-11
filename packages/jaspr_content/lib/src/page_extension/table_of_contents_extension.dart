@@ -86,7 +86,7 @@ class TableOfContents {
       yield li(styles: Styles(padding: Padding.only(left: (0.75 * indent).em)), [
         Builder(
           builder: (context) {
-            var route = RouteState.of(context);
+            final route = RouteState.of(context);
             return a(href: '${route.path}#${entry.id}', [Component.text(entry.text)]);
           },
         ),

@@ -34,6 +34,12 @@ The [flutter docs](https://docs.flutter.dev/platform-integration/web) write in t
 > static content such as blog articles benefit from the document-centric model that the web is built around, 
 > rather than the app-centric services that a UI framework like Flutter can deliver.
 
+<Info>
+Did you know `dart.dev` and `docs.flutter.dev` are both built with Jaspr? 
+
+They are a great example of how Jaspr can be used to build text-rich, static content websites with Dart.
+</Info>
+
 ---
 
 ## Conceptual Differences
@@ -64,11 +70,31 @@ Rather it **embraces these differences** to give the best of both worlds.
    a good practice.
    </Info>
 
+3. Jaspr does not have the same layout primitives like Flutter, such as `Column`, `Row`, or `Stack`. Instead, you use 
+   standard HTML elements like `div`, `p` and `span` in combination with CSS for layouting.
+
+   <Info>
+   Trade-Off: Implementing the same layout primitives as Flutter would hide the underlying web platform
+   and make it harder to learn and use web-native technologies like CSS for layouting.
+   </Info>
+
 ---
 
 ## Flutter Web Embedding
 
-A Flutter web app can be embedded in a normal website using Flutter's **element embedding** feature. Jaspr has first-class
-support for this feature and allows the embedding of a flutter web app as part of a jaspr website.
+A Flutter web app can be embedded in a normal website using Flutter's **element embedding** feature. Jaspr has first-class support for this feature and allows the embedding of a flutter web app as part of a jaspr website.
 
 For more details on this feature refer to the [Flutter Embedding](/going_further/flutter_embedding) page.
+
+## Using Flutter Plugins
+
+Jaspr has the ability to use Flutter web plugins inside your website code. "Flutter web plugins" means Flutter plugins that have web support and are purely service based (i.e. do not render and Flutter widgets). Examples of these plugins are `shared_preferences` or `firebase`.
+
+To enable Flutter plugin support, add the following to your `pubspec.yaml`:
+
+```yaml
+jaspr:
+  flutter: plugins
+```
+
+Read more about this in the [Configuration](/get_started/configuration) page.

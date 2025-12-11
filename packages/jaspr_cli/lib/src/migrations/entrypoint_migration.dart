@@ -2,7 +2,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:io/ansi.dart';
 
-import '../config.dart';
+import '../project.dart';
 import 'migration_models.dart';
 
 class EntrypointMigration implements Migration {
@@ -60,8 +60,8 @@ class EntrypointMigration implements Migration {
     final results = <MigrationResult>[];
 
     if (context.project.modeOrNull?.isServerOrStatic ?? false) {
-      var mainFile = context.dir.childFile('main.dart');
-      var mainServerFile = context.dir.childFile('main.server.dart');
+      final mainFile = context.dir.childFile('main.dart');
+      final mainServerFile = context.dir.childFile('main.server.dart');
       if (mainFile.existsSync() && !mainServerFile.existsSync()) {
         if (context.apply) {
           mainFile.renameSync(mainServerFile.path);
@@ -73,7 +73,7 @@ class EntrypointMigration implements Migration {
         );
       }
 
-      var jasprOptionsFile = context.dir.childFile('jaspr_options.dart');
+      final jasprOptionsFile = context.dir.childFile('jaspr_options.dart');
       if (jasprOptionsFile.existsSync()) {
         if (context.apply) {
           jasprOptionsFile.deleteSync();
@@ -85,7 +85,7 @@ class EntrypointMigration implements Migration {
         );
       }
 
-      var mainClientFile = context.dir.childFile('main.client.dart');
+      final mainClientFile = context.dir.childFile('main.client.dart');
       if (!mainClientFile.existsSync()) {
         if (context.apply) {
           mainClientFile

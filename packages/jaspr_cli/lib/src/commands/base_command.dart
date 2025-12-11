@@ -6,9 +6,9 @@ import 'package:args/command_runner.dart';
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 
-import '../config.dart';
 import '../helpers/analytics.dart';
 import '../logging.dart';
+import '../project.dart';
 
 abstract class BaseCommand extends Command<int> {
   Set<FutureOr<void> Function()> guards = {};
@@ -58,9 +58,9 @@ abstract class BaseCommand extends Command<int> {
   Future<int> runCommand();
 
   Future<void> stop() async {
-    var gs = [...guards];
+    final gs = [...guards];
     guards.clear();
-    for (var g in gs) {
+    for (final g in gs) {
       await g();
     }
   }
@@ -83,6 +83,7 @@ abstract class BaseCommand extends Command<int> {
     bool requireJasprDependency = true,
     bool requireJasprMode = true,
     bool preferBuilderDependency = true,
+    bool checkJasprDependencyVersion = true,
   }) {
     if (requirePubspecYaml) {
       project.requirePubspecYaml;
@@ -95,6 +96,9 @@ abstract class BaseCommand extends Command<int> {
     }
     if (preferBuilderDependency) {
       project.preferJasprBuilderDependency;
+    }
+    if (checkJasprDependencyVersion) {
+      project.checkJasprDependencyVersion();
     }
   }
 
@@ -119,27 +123,27 @@ abstract class BaseCommand extends Command<int> {
         await shutdown();
         exit(1);
       }
-      logger.write("Using server entry point: $target", level: Level.verbose);
+      logger.write('Using server entry point: $target', level: Level.verbose);
       return target;
     }
 
     final entryPoint = await _findServerEntrypoint();
-    logger.write("Using server entry point: $entryPoint", level: Level.verbose);
+    logger.write('Using server entry point: $entryPoint', level: Level.verbose);
 
     return entryPoint;
   }
 
   Future<String> _findServerEntrypoint() async {
-    var mainFile = File('lib/main.server.dart');
+    final mainFile = File('lib/main.server.dart');
     if (await mainFile.absolute.exists()) {
       return mainFile.path;
     }
 
-    var binDir = Directory('bin/').absolute;
-    var libDir = Directory('lib/').absolute;
+    final binDir = Directory('bin/').absolute;
+    final libDir = Directory('lib/').absolute;
 
     if (binDir.existsSync()) {
-      await for (var entity in binDir.list(recursive: true)) {
+      await for (final entity in binDir.list(recursive: true)) {
         if (entity is File && entity.path.endsWith('.server.dart')) {
           return entity.path;
         }
@@ -147,7 +151,7 @@ abstract class BaseCommand extends Command<int> {
     }
 
     if (libDir.existsSync()) {
-      await for (var entity in libDir.list(recursive: true)) {
+      await for (final entity in libDir.list(recursive: true)) {
         if (entity is File && entity.path.endsWith('.server.dart')) {
           return entity.path;
         }
@@ -178,11 +182,11 @@ abstract class BaseCommand extends Command<int> {
       logger.write(progress, tag: tag, progress: ProgressState.running);
     }
 
-    var errSub = process.stderr.listen((event) {
+    final errSub = process.stderr.listen((event) {
       logger.write(utf8.decode(event), tag: tag, level: Level.error, progress: ProgressState.completed);
     });
 
-    var outSub = process.stdout.map(utf8.decode).splitLines().listen((log) {
+    final outSub = process.stdout.map(utf8.decode).splitLines().listen((log) {
       if (hide != null && hide.call(log)) return;
 
       if (progress != null) {
@@ -196,7 +200,7 @@ abstract class BaseCommand extends Command<int> {
     bool wasKilled = false;
     guardResource(() async {
       if (exitCode == null) {
-        logger.write("Terminating $name...");
+        logger.write('Terminating $name...');
         process.kill();
         wasKilled = true;
         await errSub.cancel();

@@ -104,8 +104,8 @@ Finally, make sure all links and asset paths are **relative urls** (they don't s
 
 #### Flutter support
 
-If your project is depending on either `flutter` for element embedding or `jaspr_web_compilers` you need to modify the
-created workflow file to also pull in flutter, otherwise the build will result in an error.
+If your project is using Flutter embedding or Flutter plugins, you need to modify the created workflow file to also 
+pull in flutter, otherwise the build will result in an error.
 
 - After the "Setup Dart" step add the following step:
   ```yaml
@@ -173,8 +173,8 @@ Running `docker build` from your project directory will then build a container i
 
 #### Flutter support
 
-If your project is depending on either `flutter` for element embedding or `jaspr_web_compilers` you need to modify the
-`Dockerfile` to also have flutter installed in the build image, otherwise the build will result in an error.
+If your project is using Flutter embedding or Flutter plugins you need to modify the `Dockerfile` to also have 
+Flutter installed in the build image, otherwise the build will result in an error.
 
 First change the first lines to the following:
 
@@ -228,4 +228,5 @@ Globe will then build and deploy your application, providing you with a unique U
 
 ### Flutter Support
 
-No additional configuration is needed. Globe's build pipeline automatically detects and sets up projects that use Flutter for element embedding or `jaspr_web_compilers`.
+No additional configuration is needed. Globe's build pipeline automatically detects and sets up projects that use 
+Flutter for element embedding or plugins.

@@ -30,14 +30,16 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   @override
   String get currentUrl => request.url;
 
+  /// Unmodifiable view of the cookies sent with the [request].
   late final Map<String, String> cookies = () {
-    final Map<String, String> map = {};
-    final cookies = request.headers[HttpHeaders.cookieHeader]?.expand((h) => h.split(';')) ?? [];
-    for (final cookie in cookies) {
-      final c = Cookie.fromSetCookieValue(cookie.trim());
-      map[c.name] = c.value;
+    if (request.headers[HttpHeaders.cookieHeader]?.expand((h) => h.split(';')) case final cookies?) {
+      return UnmodifiableMapView({
+        for (final cookie in cookies.map((cookie) => Cookie.fromSetCookieValue(cookie.trim())))
+          cookie.name: cookie.value,
+      });
+    } else {
+      return const <String, String>{};
     }
-    return UnmodifiableMapView(map);
   }();
 
   final Map<String, List<String>> responseHeaders = {
@@ -54,32 +56,31 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   }
 
   Future<Uint8List> render({bool standalone = false}) async {
+    final rootElement = this.rootElement;
     if (rootElement == null) return _emptyResponse;
 
-    if (rootElement!.owner.isFirstBuild) {
+    if (rootElement.owner.isFirstBuild) {
       final completer = Completer<void>.sync();
-      rootElement!.binding.addPostFrameCallback(completer.complete);
+      rootElement.binding.addPostFrameCallback(completer.complete);
       await completer.future;
     }
 
-    var root = rootElement!.renderObject as MarkupRenderObject;
+    final root = rootElement.renderObject as MarkupRenderObject;
+    final adapters = [
+      ..._adapters.reversed,
+      GlobalStylesAdapter()..binding = this,
+      if (!standalone) DocumentAdapter()..binding = this,
+    ];
 
-    _adapters.insert(0, GlobalStylesAdapter()..binding = this);
-    if (!standalone) {
-      _adapters.insert(0, DocumentAdapter()..binding = this);
-    }
-
-    // Prepare from outer to inner.
-    for (var i = 0; i < _adapters.length; i++) {
-      var r = _adapters[i].prepare();
+    for (final adapter in adapters.reversed) {
+      final r = adapter.prepare();
       if (r is Future) {
         await r;
       }
     }
 
-    // Apply from inner to outer;
-    for (var i = _adapters.length - 1; i >= 0; i--) {
-      _adapters[i].apply(root);
+    for (final adapter in adapters) {
+      adapter.apply(root);
     }
 
     if (_responseBodyOverride case final override?) {
@@ -127,7 +128,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   Future<String?> loadFile(String name) => _fileLoader(name);
 
-  late final List<RenderAdapter> _adapters = [];
+  final List<RenderAdapter> _adapters = [];
 
   void addRenderAdapter(RenderAdapter adapter) {
     if (_adapters.contains(adapter)) return;
@@ -147,7 +148,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     stderr.writeln('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace');
   }
 
-  static final _emptyResponse = Uint8List(0);
+  static final Uint8List _emptyResponse = Uint8List(0);
 }
 
 abstract class RenderAdapter {

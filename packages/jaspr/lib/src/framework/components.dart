@@ -86,7 +86,7 @@ class DomElement extends MultiChildRenderObjectElement {
   @override
   void updateRenderObject(RenderElement renderObject) {
     if (_wrappingElement != null) {
-      var wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
+      final wrappingComponent = dependOnInheritedElement(_wrappingElement!) as _WrappingDomComponent;
       renderObject.update(
         component.id ?? wrappingComponent.id,
         _joinString(wrappingComponent.classes, component.classes),

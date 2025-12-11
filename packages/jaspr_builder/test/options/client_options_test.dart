@@ -7,7 +7,7 @@ import 'sources/client_options.dart';
 import 'sources/client_options_other.dart';
 
 void main() {
-  group('jaspr options builder', () {
+  group('client options builder', () {
     late TestReaderWriter reader;
 
     setUp(() async {

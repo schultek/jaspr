@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
@@ -16,7 +17,7 @@ class TutorialPanel extends StatelessComponent {
     var tutorial = context.watch(editProjectProvider);
 
     if (tutorial is! TutorialData) {
-      return text('');
+      return .text('');
     }
 
     return div(id: 'steps-panel', [
@@ -31,7 +32,7 @@ class TutorialPanel extends StatelessComponent {
             },
           ),
           div(id: 'steps-container', [
-            div(id: 'steps-label', [text(tutorial.configs[tutorial.currentStep].name)]),
+            div(id: 'steps-label', [.text(tutorial.configs[tutorial.currentStep].name)]),
             div(id: 'steps-menu-items', [
               for (var step in tutorial.configs.reversed)
                 a(
@@ -42,7 +43,7 @@ class TutorialPanel extends StatelessComponent {
                       context.read(logicProvider).selectTutorialStep(step.id);
                     },
                   ),
-                  [text(step.name)],
+                  [.text(step.name)],
                 ),
             ]),
           ]),

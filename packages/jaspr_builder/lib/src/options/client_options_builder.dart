@@ -36,7 +36,7 @@ class ClientOptionsBuilder implements Builder {
   };
 
   Future<void> generateClientOptions(BuildStep buildStep) async {
-    final mode = await buildStep.loadProjectMode(options, buildStep);
+    final (mode, flutter) = await buildStep.loadProjectMode(options, buildStep);
     if (mode != 'static' && mode != 'server') {
       return;
     }
@@ -46,10 +46,12 @@ class ClientOptionsBuilder implements Builder {
       buildStep.inputId.path.replaceFirst('.client.dart', '.server.dart'),
     );
 
+    final shouldInitializePlugins = flutter == 'embedded' || flutter == 'plugins';
+
     var (clients, sources, plugins) = await (
       buildStep.loadClients(),
       buildStep.loadTransitiveSourcesFor(serverId),
-      loadWebPlugins(buildStep),
+      shouldInitializePlugins ? loadWebPlugins(buildStep) : Future.value(<Plugin>[]),
     ).wait;
 
     if (sources.isNotEmpty) {
@@ -120,7 +122,7 @@ class ClientOptionsBuilder implements Builder {
 }
 
 Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
-  var pubspecId = AssetId(buildStep.inputId.package, 'pubspec.yaml');
+  final pubspecId = AssetId(buildStep.inputId.package, 'pubspec.yaml');
   if (!await buildStep.canRead(pubspecId)) {
     return [];
   }
@@ -132,13 +134,13 @@ Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
     _ => false,
   };
   final dependencies = switch (pubspecYaml) {
-    {'dependencies': Map<Object?, Object?> deps} => deps.keys.cast<String>().toSet(),
+    {'dependencies': final Map<Object?, Object?> deps} => deps.keys.cast<String>().toSet(),
     _ => <String>{},
   };
 
-  var packageConfig = await buildStep.packageConfig;
+  final packageConfig = await buildStep.packageConfig;
 
-  final packages = {for (var p in packageConfig.packages) p.name: p};
+  final packages = {for (final p in packageConfig.packages) p.name: p};
 
   final plugins = <String, Plugin>{};
   // If we're in a workspace, only consider packages that are direct dependencies.
@@ -164,7 +166,7 @@ Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
 }
 
 Future<Plugin?> _loadPluginForPackage(String pluginName, Uri root, BuildStep buildStep, List<String> toVisit) async {
-  var pubspecId = AssetId.resolve(root.resolve('pubspec.yaml'));
+  final pubspecId = AssetId.resolve(root.resolve('pubspec.yaml'));
   Object? pubspec;
   try {
     pubspec = loadYaml(await buildStep.readAsString(pubspecId));
@@ -175,16 +177,16 @@ Future<Plugin?> _loadPluginForPackage(String pluginName, Uri root, BuildStep bui
   }
 
   if (pubspec case {
-    'flutter': {'plugin': {'platforms': {'web': YamlMap webPlatformYaml}}},
+    'flutter': {'plugin': {'platforms': {'web': final YamlMap webPlatformYaml}}},
   }) {
-    if (webPlatformYaml case {'default_package': String defaultPackageName}) {
+    if (webPlatformYaml case {'default_package': final String defaultPackageName}) {
       toVisit.add(defaultPackageName);
       return null;
     }
 
     if (webPlatformYaml case {
-      'pluginClass': String pluginClass,
-      'fileName': String fileName,
+      'pluginClass': final String pluginClass,
+      'fileName': final String fileName,
     }) {
       return Plugin(
         name: pluginName,

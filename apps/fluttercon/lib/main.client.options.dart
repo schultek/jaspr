@@ -38,7 +38,7 @@ ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
     'like_button': ClientLoader(
       (p) => _like_button.LikeButton(
-        session: _session.SessionCodex.decode(p['session']),
+        session: _session.SessionCodex.decode(p.get<String>('session')),
       ),
       loader: _like_button.loadLibrary,
     ),

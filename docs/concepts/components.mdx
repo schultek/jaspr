@@ -11,7 +11,7 @@ description: An overview of Jasprs component system.
 The following page and other documentation assumes, that you have already a basic understanding of Flutters widget system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
 </Warning>
 
-When building an app or website with **jaspr** you will mostly use these **three** basic components:
+When building an app or website with **Jaspr** you will mostly use these **three** basic components:
 
 ## StatelessComponent
 
@@ -23,7 +23,7 @@ class MyComponent extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return p([text('Hello World')]);
+    return p([ .text('Hello World') ]);
   }
 }
 ```
@@ -50,7 +50,7 @@ class MyComponentState extends State<MyComponent> {
 
   @override
   Component build(BuildContext context) {
-    return p([text('Hello World')]);
+    return p([ .text('Hello World') ]);
   }
 }
 ```
@@ -106,11 +106,11 @@ The foundational component that renders a single html element with a tag, attrib
 The `Component.element()` factory constructor always creates a component of type `DomComponent`.
 
 <Info>
-In general, it is recommended to use the [html utility methods](/concepts/html) like `div()`, `button()`. You can use `Component.element()` directly for lower-level control (mainly specifying the tag as a `String`), but is more verbose. 
+In general, it is recommended to use [HTML components](/concepts/html) like `div()`, `button()`. You can use `Component.element()` directly for lower-level control (mainly by specifying the tag as a `String`), but is more verbose. 
 </Info>
 
 ```dart
-var component = Component.element(
+final component = Component.element(
   tag: 'div',
   id: 'my-id',
   classes: 'class-a class-b',
@@ -122,8 +122,8 @@ var component = Component.element(
   ],
 );
 
-// The same component, but using the html utility method instead.
-var component2 = div(
+// The same component, but using HTML components instead.
+final component2 = div(
   id: 'my-id', 
   classes: 'class-a class-b',
   styles: Styles(color: Colors.black),
@@ -152,14 +152,15 @@ A simple component that renders a text node. A text node in html is just some st
 The `Component.text()` factory constructor always creates a component of type `Text`.
 
 <Info>
-As it is recommended to use `div()` and other html methods over `Component.element()`, the `text()` utility method may also be used over the `Component.text()` constructor for consistency. 
+
+Since Dart 3.10 you can use [dot-shorthands](http://dart.dev/to/dot-shorthands) to shorten the syntax of text components: `.text('Hello World')` instead of `Component.text('Hello World')`.
 </Info>
 
 ```dart
-var component = Component.text('Hello World!');
+final component = Component.text('Hello World!');
 
-// The same component, but using the utility method instead.
-var component2 = text('Hello World!');
+// The same component, but using dot-shorthands instead.
+final Component component2 = .text('Hello World!');
 ```
 
 <Info>
@@ -174,20 +175,21 @@ This is meant to be used in places where you want to render multiple components 
 
 The `Component.fragment()` factory constructor always creates a component of type `Fragment`.
 
+
 <Info>
-As it is recommended to use `div()` and other html methods over `Component.element()`, the `fragment()` utility method may also be used over the `Component.fragment()` constructor for consistency. 
+Since Dart 3.10 you can use [dot-shorthands](http://dart.dev/to/dot-shorthands) to shorten the syntax of fragment components: `.fragment([ ... ])` instead of `Component.fragment([ ... ])`.
 </Info>
 
 ```dart
-var component = Component.fragment([
+final component = Component.fragment([
   Component.element(tag: 'h1', children: [Component.text('Welcome')]),
   Component.element(tag: 'p', children: [Component.text('Hello World')]),
 ]);
 
-// The same component, but using the utility methods instead.
-var component2 = fragment([
-  h1([text('Welcome')]),
-  p([text('Hello World')]),
+// The same component, but using dot-shorthands and HTML components instead.
+final Component component2 = .fragment([
+  h1([ .text('Welcome')]),
+  p([ .text('Hello World')]),
 ]);
 ```
 
@@ -205,10 +207,7 @@ A helper constructor that creates an empty fragment, thus rendering nothing.
 This is useful when you want to return "nothing" from a build method.
 
 ```dart
-var component = Component.empty();
-
-// The same component, but using the utility method
-var component2 = fragment([]);
+final component = Component.empty();
 ```
 
 ### Component.wrapElement()
@@ -218,14 +217,14 @@ A component which applies its attributes and parameters (like `classes`, `styles
 This does not create a HTML element itself. All properties are merged with the respective child element's properties, with the child's properties taking precedence where there are conflicts.
 
 ```dart
-var component = Component.wrapElement(
+final component = Component.wrapElement(
   classes: 'wrapping-class',
   styles: Styles(backgroundColor: Colors.blue, padding: Padding.all(8.px)),
   child: div(
     classes: 'some-class',
     styles: Styles(backgroundColor: Colors.red),
     [
-      text('Hello World'),
+      .text('Hello World'),
     ],
   ),
 );
@@ -247,9 +246,9 @@ For example lets look at this simple Jaspr code:
 
 ```dart
 div([
-  b([text('A')]),
-  em([text('B')]),
-  span([text('C')]),
+  b([ .text('A') ]),
+  em([ .text('B') ]),
+  span([ .text('C') ]),
 ])
 ```
 
@@ -271,9 +270,9 @@ So for example this code:
 
 ```dart
 span([
-  b([text('A')]),
-  em([text('B')]),
-  span([text('C')]),
+  b([ .text('A') ]),
+  em([ .text('B') ]),
+  span([ .text('C') ]),
 ]),
 ```
 

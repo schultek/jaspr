@@ -114,7 +114,7 @@ ContentApp.custom(
         path: 'dynamic-page.html',
         builder: (page) {
           return p([
-            text('Dynamic Page: ${page.data['title']}'),
+            .text('Dynamic Page: ${page.data['title']}'),
           ]);
         ),
         applyLayout: true
@@ -247,7 +247,7 @@ import 'package:jaspr_router/jaspr_router.dart';
 class HomePage extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return h1([text('Welcome to My Custom Site!')]);
+    return h1([.text('Welcome to My Custom Site!')]);
   }
 }
 

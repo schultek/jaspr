@@ -8,8 +8,8 @@ import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'utils.dart';
 
-const htmlns = 'http://www.w3.org/1999/xhtml';
-const xmlns = {'svg': 'http://www.w3.org/2000/svg', 'math': 'http://www.w3.org/1998/Math/MathML'};
+const _htmlns = 'http://www.w3.org/1999/xhtml';
+const _xmlns = {'svg': 'http://www.w3.org/2000/svg', 'math': 'http://www.w3.org/1998/Math/MathML'};
 
 abstract class DomRenderObject implements RenderObject {
   @override
@@ -55,7 +55,7 @@ class DomRenderElement extends DomRenderObject
   Map<String, EventBinding>? events;
 
   void _createNode(String tag) {
-    var namespace = xmlns[tag];
+    var namespace = _xmlns[tag];
     if (namespace == null && (parent?.node.isElement ?? false)) {
       namespace = (parent?.node as web.Element).namespaceURI;
     }
@@ -65,7 +65,7 @@ class DomRenderElement extends DomRenderObject
     });
     if (retakeNode != null) {
       if (kVerboseMode) {
-        print("Hydrate html node: $retakeNode");
+        print('Hydrate html node: $retakeNode');
       }
       node = retakeNode as web.Element;
 
@@ -75,12 +75,12 @@ class DomRenderElement extends DomRenderObject
 
     node = _createElement(tag, namespace);
     if (kVerboseMode) {
-      web.console.log("Create html node: $node".toJS);
+      web.console.log('Create html node: $node'.toJS);
     }
   }
 
   web.Element _createElement(String tag, String? namespace) {
-    if (namespace != null && namespace != htmlns) {
+    if (namespace != null && namespace != _htmlns) {
       return web.document.createElementNS(namespace, tag);
     }
     return web.document.createElement(tag);
@@ -231,13 +231,13 @@ class DomRenderText extends DomRenderObject implements RenderText {
 
     if (retakeNode != null) {
       if (kVerboseMode) {
-        print("Hydrate text node: $retakeNode");
+        print('Hydrate text node: $retakeNode');
       }
       node = retakeNode as web.Text;
       if (node.textContent != text) {
         node.textContent = text;
         if (kVerboseMode) {
-          print("Update text node: $text");
+          print('Update text node: $text');
         }
       }
       return;
@@ -245,7 +245,7 @@ class DomRenderText extends DomRenderObject implements RenderText {
 
     node = web.Text(text);
     if (kVerboseMode) {
-      print("Create text node: $text");
+      print('Create text node: $text');
     }
   }
 
@@ -254,7 +254,7 @@ class DomRenderText extends DomRenderObject implements RenderText {
     if (node.textContent != text) {
       node.textContent = text;
       if (kVerboseMode) {
-        print("Update text node: $text");
+        print('Update text node: $text');
       }
     }
   }
@@ -302,17 +302,27 @@ class DomRenderFragment extends DomRenderObject
   DomRenderObject? _lastChild;
 
   web.Node? get firstChildNode {
-    if (_firstChild case DomRenderFragment c) {
-      return c.firstChildNode;
+    if (_firstChild case final firstChild?) {
+      if (firstChild is DomRenderFragment) {
+        return firstChild.lastChildNode;
+      }
+
+      return firstChild.node;
     }
-    return _firstChild?.node;
+
+    return null;
   }
 
   web.Node? get lastChildNode {
-    if (_lastChild case DomRenderFragment c) {
-      return c.lastChildNode;
+    if (_lastChild case final lastChild?) {
+      if (lastChild is DomRenderFragment) {
+        return lastChild.lastChildNode;
+      }
+
+      return lastChild.node;
     }
-    return _lastChild?.node;
+
+    return null;
   }
 
   @override
@@ -332,17 +342,18 @@ class DomRenderFragment extends DomRenderObject
     assert(isAttached, 'Cannot move fragment that is not attached to a parent.');
 
     if (kVerboseMode) {
-      print("Move fragment to $targetNode after $afterNode");
+      print('Move fragment to $targetNode after $afterNode');
     }
 
-    if (firstChildNode == null) {
+    final originalFirstChildNode = firstChildNode;
+    if (originalFirstChildNode == null) {
       // If fragment is empty, nothing to move.
       return;
     }
 
     assert(lastChildNode != null, 'Non-empty attached fragments must have a valid last child reference.');
 
-    if (firstChildNode!.previousSibling == afterNode && firstChildNode!.parentNode == targetNode) {
+    if (originalFirstChildNode.previousSibling == afterNode && originalFirstChildNode.parentNode == targetNode) {
       return;
     }
 
@@ -353,7 +364,7 @@ class DomRenderFragment extends DomRenderObject
     while (currentNode != null) {
       final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
 
-      // Attach to new parent
+      // Attach to new parent.
       targetNode.insertBefore(currentNode, beforeNode);
 
       beforeNode = currentNode;
@@ -371,7 +382,7 @@ class DomRenderFragment extends DomRenderObject
     assert(isAttached, 'Cannot remove fragment that is not attached to a parent.');
 
     if (kVerboseMode) {
-      print("Remove fragment $node from ${parent.node}");
+      print('Remove fragment $node from ${parent.node}');
     }
 
     if (firstChildNode == null) {
@@ -396,7 +407,10 @@ class DomRenderFragment extends DomRenderObject
       currentNode = prevNode;
     }
 
-    assert(firstChildNode == node.childNodes.item(0), 'First child node should be the first child of the fragment.');
+    assert(
+      firstChildNode == node.childNodes.item(0),
+      'First child node should be the first child of the fragment.',
+    );
     assert(
       lastChildNode == node.childNodes.item(node.childNodes.length - 1),
       'Last child node should be the last child of the fragment.',
@@ -495,7 +509,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       }
 
       if (kVerboseMode) {
-        print("Attach node $childNode to $targetNode after $afterNode ($after)");
+        print('Attach node $childNode to $targetNode after $afterNode ($after)');
       }
 
       if (afterNode == null) {
@@ -505,7 +519,10 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       }
 
       if (child is! DomRenderFragment) {
-        assert(childNode.previousSibling == afterNode, 'Child node should have been placed after the specified node.');
+        assert(
+          childNode.previousSibling == afterNode,
+          'Child node should have been placed after the specified node.',
+        );
       } else if (child.firstChildNode != null) {
         assert(
           child.firstChildNode?.previousSibling == afterNode,
@@ -531,7 +548,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     }
 
     if (kVerboseMode) {
-      print("Remove child ${child.node} of $node");
+      print('Remove child ${child.node} of $node');
     }
 
     assert(node == child.node.parentNode, 'Child node must be a child of this element.');
@@ -562,7 +579,7 @@ mixin HydratableDomRenderObject on DomRenderObject {
   @override
   void finalize() {
     if (kVerboseMode && toHydrate.isNotEmpty) {
-      print("Clear ${toHydrate.length} nodes not hydrated ($toHydrate)");
+      print('Clear ${toHydrate.length} nodes not hydrated ($toHydrate)');
     }
     for (final node in toHydrate) {
       node.parentNode!.removeChild(node);
@@ -594,13 +611,13 @@ extension AttributeOperation on web.Element {
     if (value == null) {
       if (!hasAttribute(name)) return;
       if (kVerboseMode) {
-        print("Remove attribute: $name");
+        print('Remove attribute: $name');
       }
       removeAttribute(name);
     } else {
       if (getAttribute(name) == value) return;
       if (kVerboseMode) {
-        print("Update attribute: $name - $value");
+        print('Update attribute: $name - $value');
       }
       setAttribute(name, value);
     }

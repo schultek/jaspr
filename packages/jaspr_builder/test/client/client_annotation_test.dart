@@ -108,16 +108,7 @@ void main() {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientWithServerComponentsSources,
-          outputs: {...clientWithServerComponentsJsonOutputs, 'site|lib/client_with_sc.client.dart': isNotEmpty},
-          readerWriter: reader,
-        );
-      });
-
-      test('generates entrypoint', () async {
-        await testBuilder(
-          ClientModuleBuilder(BuilderOptions({})),
-          clientWithServerComponentsSources,
-          outputs: {'site|lib/client_with_sc.client.json': isNotEmpty, ...clientWithServerComponentsDartOutputs},
+          outputs: {...clientWithServerComponentsModuleOutputs},
           readerWriter: reader,
         );
       });
@@ -130,6 +121,7 @@ void main() {
           ...clientBasicModuleOutputs,
           ...clientModelClassModuleOutputs,
           ...clientModelExtensionModuleOutputs,
+          ...clientWithServerComponentsModuleOutputs,
         },
         outputs: clientBundleOutputs,
         readerWriter: reader,

@@ -13,13 +13,13 @@ import '../utils.dart';
 class StylesOrderingRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'styles_ordering',
-    "Styles are not ordered. Try sorting them.",
+    'Styles are not ordered. Try sorting them.',
   );
 
   StylesOrderingRule()
     : super(
         name: 'styles_ordering',
-        description: "Styles are not ordered. Try sorting them.",
+        description: 'Styles are not ordered. Try sorting them.',
       );
 
   @override
@@ -27,7 +27,7 @@ class StylesOrderingRule extends AnalysisRule {
 
   @override
   void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
-    var visitor = _StylesVisitor(this, context);
+    final visitor = _StylesVisitor(this, context);
     registry.addMethodInvocation(this, visitor);
     registry.addInstanceCreationExpression(this, visitor);
   }
@@ -41,15 +41,15 @@ class _StylesVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    var fn = node.function;
+    final fn = node.function;
     if (fn is! SimpleIdentifier || fn.name != 'styles') {
       return;
     }
-    var method = fn.element;
+    final method = fn.element;
     if (method is! MethodElement) {
       return;
     }
-    var mixin = method.enclosingElement;
+    final mixin = method.enclosingElement;
     if (mixin is! ClassElement || mixin.name != 'StylesMixin') {
       return;
     }
@@ -70,7 +70,7 @@ class _StylesVisitor extends SimpleAstVisitor<void> {
     if (!isStylesType(node.staticType)) {
       return;
     }
-    var constructor = node.constructorName.element;
+    final constructor = node.constructorName.element;
     if (constructor == null) {
       return;
     }
@@ -91,11 +91,11 @@ class _StylesVisitor extends SimpleAstVisitor<void> {
   static Expression? checkOrder(NodeList<Expression> args, List<String?> params) {
     int lastSeenParam = -1;
 
-    for (var argument in args) {
+    for (final argument in args) {
       if (argument is! NamedExpression) {
         continue;
       }
-      var paramIndex = params.indexOf(argument.name.label.name);
+      final paramIndex = params.indexOf(argument.name.label.name);
       if (paramIndex == -1) {
         continue;
       }
@@ -112,7 +112,7 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
   static const _sortStylesKind = FixKind(
     'jaspr.fix.sortStyles',
     DartFixKindPriority.standard,
-    "Sort styles",
+    'Sort styles',
   );
 
   OrderStylesFix({required super.context});
@@ -127,7 +127,7 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
   Future<void> compute(ChangeBuilder builder) async {
     if (node case NamedExpression(parent: final ArgumentList arguments)) {
       if (arguments.parent case final InstanceCreationExpression node) {
-        var constructor = node.constructorName.element;
+        final constructor = node.constructorName.element;
         if (constructor == null) {
           return;
         }
@@ -137,11 +137,11 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
 
         await _sortStyles(builder, arguments, params);
       } else if (arguments.parent case final MethodInvocation node) {
-        var fn = node.function;
+        final fn = node.function;
         if (fn is! SimpleIdentifier) {
           return;
         }
-        var method = fn.element;
+        final method = fn.element;
         if (method is! MethodElement) {
           return;
         }
@@ -156,16 +156,16 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
 
   Future<void> _sortStyles(ChangeBuilder builder, NodeList<Expression> arguments, List<String?> params) async {
     await builder.addDartFileEdit(file, (builder) {
-      var start = arguments.beginToken!.offset;
-      var end = arguments.endToken!.end;
+      final start = arguments.beginToken!.offset;
+      final end = arguments.endToken!.end;
 
-      var breaks = <String>[];
+      final breaks = <String>[];
 
       for (var i = 0; i < arguments.length - 1; i++) {
         breaks.add(getRangeText(SourceRange(arguments[i].end, arguments[i + 1].offset - arguments[i].end)));
       }
 
-      var args = [...arguments]
+      final args = [...arguments]
         ..sort((a, b) {
           if (a is NamedExpression && b is NamedExpression) {
             return params.indexOf(a.name.label.name).compareTo(params.indexOf(b.name.label.name));
@@ -173,7 +173,7 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
           return 0;
         });
 
-      var argSources = args.map((a) => getRangeText(SourceRange(a.offset, a.length))).toList();
+      final argSources = args.map((a) => getRangeText(SourceRange(a.offset, a.length))).toList();
 
       builder.addReplacement(SourceRange(start, end - start), (edit) {
         for (var i = 0; i < args.length; i++) {

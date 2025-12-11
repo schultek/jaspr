@@ -15,6 +15,9 @@ class App extends StatelessComponent {
   Component build(BuildContext context) {
     return ProviderScope(
       sync: [
+        // Syncs the initial count provider between server and client.
+        // This causes the initialCountProvider to be evaluated only on the server,
+        // and the value to be reused (overridden) on the client.
         initialCountProvider.syncWith('initial_count'),
       ],
       child: Counter(),

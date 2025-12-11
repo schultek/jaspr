@@ -29,8 +29,8 @@ ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
     'quote_like_button': ClientLoader(
       (p) => _quote_like_button.QuoteLikeButton(
-        id: p['id'],
-        initialCount: p['initialCount'],
+        id: p.get<int>('id'),
+        initialCount: p.get<int>('initialCount'),
       ),
       loader: _quote_like_button.loadLibrary,
     ),
