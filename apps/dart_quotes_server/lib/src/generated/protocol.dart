@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -38,16 +39,36 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'int?',
           columnDefault: 'nextval(\'quotes_id_seq\'::regclass)',
         ),
-        _i2.ColumnDefinition(name: 'quote', columnType: _i2.ColumnType.text, isNullable: false, dartType: 'String'),
-        _i2.ColumnDefinition(name: 'author', columnType: _i2.ColumnType.text, isNullable: false, dartType: 'String'),
-        _i2.ColumnDefinition(name: 'likes', columnType: _i2.ColumnType.json, isNullable: false, dartType: 'List<int>'),
+        _i2.ColumnDefinition(
+          name: 'quote',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'author',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'likes',
+          columnType: _i2.ColumnType.json,
+          isNullable: false,
+          dartType: 'List<String>',
+        ),
       ],
       foreignKeys: [],
       indexes: [
         _i2.IndexDefinition(
           indexName: 'quotes_pkey',
           tableSpace: null,
-          elements: [_i2.IndexElementDefinition(type: _i2.IndexElementDefinitionType.column, definition: 'id')],
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
           type: 'btree',
           isUnique: true,
           isPrimary: true,
@@ -59,9 +80,33 @@ class Protocol extends _i1.SerializationManagerServer {
     ..._i2.Protocol.targetTableDefinitions,
   ];
 
+  static String? getClassNameFromObjectJson(dynamic data) {
+    if (data is! Map) return null;
+    final className = data['__className__'] as String?;
+    return className;
+  }
+
   @override
-  T deserialize<T>(dynamic data, [Type? t]) {
+  T deserialize<T>(
+    dynamic data, [
+    Type? t,
+  ]) {
     t ??= T;
+
+    final dataClassName = getClassNameFromObjectJson(data);
+    if (dataClassName != null && dataClassName != getClassNameForType(t)) {
+      try {
+        return deserializeByClassName({
+          'className': dataClassName,
+          'data': data,
+        });
+      } on FormatException catch (_) {
+        // If the className is not recognized (e.g., older client receiving
+        // data with a new subtype), fall back to deserializing without the
+        // className, using the expected type T.
+      }
+    }
+
     if (t == _i4.Quote) {
       return _i4.Quote.fromJson(data) as T;
     }
@@ -74,8 +119,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i5.QuoteInit?>()) {
       return (data != null ? _i5.QuoteInit.fromJson(data) : null) as T;
     }
-    if (t == List<int>) {
-      return (data as List).map((e) => deserialize<int>(e)).toList() as dynamic;
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     try {
       return _i3.Protocol().deserialize<T>(data, t);
@@ -86,15 +131,28 @@ class Protocol extends _i1.SerializationManagerServer {
     return super.deserialize<T>(data, t);
   }
 
+  static String? getClassNameForType(Type type) {
+    return switch (type) {
+      _i4.Quote => 'Quote',
+      _i5.QuoteInit => 'QuoteInit',
+      _ => null,
+    };
+  }
+
   @override
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i4.Quote) {
-      return 'Quote';
+
+    if (data is Map<String, dynamic> && data['__className__'] is String) {
+      return (data['__className__'] as String).replaceFirst('dart_quotes.', '');
     }
-    if (data is _i5.QuoteInit) {
-      return 'QuoteInit';
+
+    switch (data) {
+      case _i4.Quote():
+        return 'Quote';
+      case _i5.QuoteInit():
+        return 'QuoteInit';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -152,7 +210,8 @@ class Protocol extends _i1.SerializationManagerServer {
   }
 
   @override
-  List<_i2.TableDefinition> getTargetTableDefinitions() => targetTableDefinitions;
+  List<_i2.TableDefinition> getTargetTableDefinitions() =>
+      targetTableDefinitions;
 
   @override
   String getModuleName() => 'dart_quotes';

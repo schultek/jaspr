@@ -21,7 +21,7 @@ void main(List<String> args) async {
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
 
   pod.webServer.addRoute(auth.RouteGoogleSignIn(), '/googlesignin');
-  pod.webServer.addRoute(RootRoute(), '/*');
+  pod.webServer.addRoute(RootRoute(), '/**');
 
   // Start the server.
   await pod.start();
