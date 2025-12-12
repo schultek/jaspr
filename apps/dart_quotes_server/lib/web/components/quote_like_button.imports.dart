@@ -15,8 +15,4 @@ export '../../generated/imports/_web.dart'
         ClientOrStubbed,
         QuoteInit,
         QuoteInitOrStubbed,
-        signInWithGoogle,
-        FlutterAuthenticationKeyManager,
-        FlutterAuthenticationKeyManagerOrStubbed,
-        SessionManager,
-        SessionManagerOrStubbed;
+        signInWithGoogle;

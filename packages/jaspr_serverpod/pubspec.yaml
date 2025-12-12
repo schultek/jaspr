@@ -21,6 +21,7 @@ resolution: workspace
 dependencies:
   jaspr: ^0.22.0
   serverpod: ^3.0.0
+  serverpod_auth_client: ^3.0.0
   serverpod_client: ^3.0.0
   shelf: ^1.4.0
   web: ^1.0.0

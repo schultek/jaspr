@@ -8,10 +8,6 @@ import 'package:jaspr_serverpod/jaspr_serverpod.dart';
   'package:dart_quotes_client/dart_quotes_client.dart',
   show: [#StreamingConnectionHandler, #Client, #QuoteInit],
 )
-@Import.onWeb(
-  'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart',
-  show: [#FlutterAuthenticationKeyManager, #SessionManager],
-)
 @Import.onWeb('../interop/confetti.dart', show: [#JSConfetti])
 @Import.onWeb('package:serverpod_auth_google_flutter/serverpod_auth_google_flutter.dart', show: [#signInWithGoogle])
 import 'quote_like_button.imports.dart';
@@ -30,9 +26,8 @@ class QuoteLikeButton extends StatefulComponent {
 class QuoteLikeButtonState extends State<QuoteLikeButton> {
   late final ClientOrStubbed client = Client(
     'http://localhost:8080/',
-    authenticationKeyManager: FlutterAuthenticationKeyManager(),
-  );
-  late SessionManagerOrStubbed sessionManager;
+  )..authKeyProvider = WebAuthKeyProvider();
+  late WebSessionManager sessionManager;
 
   StreamSubscription? subscription;
 
@@ -56,13 +51,13 @@ class QuoteLikeButtonState extends State<QuoteLikeButton> {
     // The session manager keeps track of the signed-in state of the user. You
     // can query it to see if the user is currently signed in and get information
     // about the user.
-    sessionManager = SessionManager(caller: client.modules.auth);
+    sessionManager = WebSessionManager(caller: client.modules.auth);
     await sessionManager.initialize();
 
     subscription = client.quotes.subscribeToQuote(component.id).listen((quote) {
       setState(() {
         count = quote.likes.length;
-        hasLiked = sessionManager.isSignedIn && quote.likes.contains(sessionManager.signedInUser?.id);
+        hasLiked = sessionManager.isSignedIn && quote.likes.contains(sessionManager.signedInUser?.userIdentifier);
       });
     });
   }

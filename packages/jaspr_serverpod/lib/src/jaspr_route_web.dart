@@ -1,3 +1,5 @@
 abstract class JasprRoute {
-  JasprRoute() : assert(false, 'JasprRoute is not available on the client.');
+  JasprRoute() {
+    throw UnsupportedError('JasprRoute is not available on the client.');
+  }
 }

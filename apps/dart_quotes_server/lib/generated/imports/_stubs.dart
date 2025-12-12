@@ -15,7 +15,3 @@ typedef ClientOrStubbed = dynamic;
 dynamic QuoteInit;
 typedef QuoteInitOrStubbed = dynamic;
 dynamic signInWithGoogle;
-dynamic FlutterAuthenticationKeyManager;
-typedef FlutterAuthenticationKeyManagerOrStubbed = dynamic;
-dynamic SessionManager;
-typedef SessionManagerOrStubbed = dynamic;

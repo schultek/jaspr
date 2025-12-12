@@ -14,7 +14,7 @@ import '../jaspr_serverpod.dart';
 ///
 /// {@category Setup}
 abstract class JasprRoute extends Route {
-  JasprRoute() {
+  JasprRoute() : super(methods: Method.values.toSet()) {
     handler = serveApp(_handleRenderCall);
   }
 
@@ -35,9 +35,9 @@ abstract class JasprRoute extends Route {
 
   @override
   FutureOr<Result> handleCall(Session session, Request request) async {
-    void Function(StreamChannel<List<int>>)? hijackCallback;
+    final hijackCompleter = Completer<void Function(StreamChannel<List<int>>)>.sync();
     final shelf.Request shelfRequest = shelf.Request(
-      request.method.name,
+      request.method.value,
       request.url,
       protocolVersion: request.protocolVersion,
       headers: request.headers,
@@ -45,15 +45,16 @@ abstract class JasprRoute extends Route {
       body: request.body.read(),
       encoding: request.encoding,
       context: {'session': session, 'request': request},
-      onHijack: (callback) => hijackCallback = callback,
+      onHijack: (callback) => hijackCompleter.complete(callback),
     );
     final shelf.Response shelfResponse;
     try {
       shelfResponse = await handler(shelfRequest);
     } on shelf.HijackException catch (error, stackTrace) {
       // A HijackException should bypass the response-writing logic entirely.
-      if (!shelfRequest.canHijack && hijackCallback != null) {
-        return Hijack(hijackCallback!);
+      if (!shelfRequest.canHijack) {
+        final callback = await hijackCompleter.future;
+        return Hijack(callback);
       }
 
       // If the request wasn't hijacked, we shouldn't be seeing this exception.
