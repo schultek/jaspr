@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
@@ -122,51 +124,64 @@ class ClientOptionsBuilder implements Builder {
 }
 
 Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
-  final pubspecId = AssetId(buildStep.inputId.package, 'pubspec.yaml');
-  if (!await buildStep.canRead(pubspecId)) {
+  final pluginsDependenciesId = AssetId(buildStep.inputId.package, '.flutter-plugins-dependencies');
+
+  Future<String?> readPluginsDependencies() async {
+    if (await buildStep.canRead(pluginsDependenciesId)) {
+      return buildStep.readAsString(pluginsDependenciesId);
+    }
+    final file = File('.flutter-plugins-dependencies');
+    if (await file.exists()) {
+      return file.readAsString();
+    }
+    return null;
+  }
+
+  var content = await readPluginsDependencies();
+
+  if (content == null) {
+    try {
+      final result = await Process.run('flutter', ['packages', 'get']);
+      if (result.exitCode != 0) {
+        log.warning('Failed to run `flutter packages get` in order to find Flutter web plugins.\n${result.stderr}');
+      }
+    } catch (_) {
+      return [];
+    }
+    content = await readPluginsDependencies();
+  }
+
+  if (content == null) {
     return [];
   }
 
-  final pubspecYaml = loadYaml(await buildStep.readAsString(pubspecId));
-
-  final isWorkspace = switch (pubspecYaml) {
-    {'resolution': 'workspace'} => true,
-    _ => false,
-  };
-  final dependencies = switch (pubspecYaml) {
-    {'dependencies': final Map<Object?, Object?> deps} => deps.keys.cast<String>().toSet(),
-    _ => <String>{},
-  };
-
-  final packageConfig = await buildStep.packageConfig;
-
-  final packages = {for (final p in packageConfig.packages) p.name: p};
-
-  final plugins = <String, Plugin>{};
-  // If we're in a workspace, only consider packages that are direct dependencies.
-  final toVisit = isWorkspace ? dependencies.toList() : packages.keys.toList();
-
-  while (toVisit.isNotEmpty) {
-    final packageName = toVisit.removeLast();
-    if (plugins.containsKey(packageName)) {
-      continue;
-    }
-    final package = packages[packageName];
-    if (package == null) {
-      continue;
-    }
-
-    final plugin = await _loadPluginForPackage(package.name, package.root, buildStep, toVisit);
-    if (plugin != null) {
-      plugins[packageName] = plugin;
-    }
-  }
-
-  return plugins.values.toList();
+  return _parseWebPlugins(content, buildStep);
 }
 
-Future<Plugin?> _loadPluginForPackage(String pluginName, Uri root, BuildStep buildStep, List<String> toVisit) async {
-  final pubspecId = AssetId.resolve(root.resolve('pubspec.yaml'));
+Future<List<Plugin>> _parseWebPlugins(String content, BuildStep buildStep) async {
+  final pluginsDependencies = jsonDecode(content);
+
+  if (pluginsDependencies case {'plugins': {'web': final List<Object?> webPluginsDependencies}}) {
+    final plugins = <Plugin>[];
+
+    for (final webPluginDependency in webPluginsDependencies) {
+      if (webPluginDependency case {'name': final String name, 'path': final String path, 'dev_dependency': false}) {
+        final plugin = await _loadPluginForPackage(name, Uri.parse(path), buildStep);
+        if (plugin != null) {
+          plugins.add(plugin);
+        }
+      }
+    }
+
+    return plugins;
+  } else {
+    log.warning('Failed to find Flutter web plugins in .flutter-plugins-dependencies file.');
+    return [];
+  }
+}
+
+Future<Plugin?> _loadPluginForPackage(String pluginName, Uri root, BuildStep buildStep) async {
+  final pubspecId = AssetId(pluginName, 'pubspec.yaml');
   Object? pubspec;
   try {
     pubspec = loadYaml(await buildStep.readAsString(pubspecId));
@@ -180,7 +195,9 @@ Future<Plugin?> _loadPluginForPackage(String pluginName, Uri root, BuildStep bui
     'flutter': {'plugin': {'platforms': {'web': final YamlMap webPlatformYaml}}},
   }) {
     if (webPlatformYaml case {'default_package': final String defaultPackageName}) {
-      toVisit.add(defaultPackageName);
+      log.warning(
+        'Failed to read Flutter web plugin for $pluginName. Default package $defaultPackageName not resolved.',
+      );
       return null;
     }
 

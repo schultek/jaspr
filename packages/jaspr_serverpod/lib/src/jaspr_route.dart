@@ -14,7 +14,7 @@ import '../jaspr_serverpod.dart';
 ///
 /// {@category Setup}
 abstract class JasprRoute extends Route {
-  JasprRoute() : super(methods: Method.values.toSet()) {
+  JasprRoute() : super(methods: {Method.get, Method.head, Method.post}) {
     handler = serveApp(_handleRenderCall);
   }
 
@@ -31,6 +31,13 @@ abstract class JasprRoute extends Route {
     final req = request.context['request'] as Request;
     final component = await build(session, req);
     return render(InheritedSession(session: session, child: component));
+  }
+
+  @override
+  void injectIn(RelicRouter router) {
+    final subRouter = Router<Handler>();
+    subRouter.anyOf(methods, '/**', asHandler);
+    router.attach('/', subRouter);
   }
 
   @override
@@ -58,8 +65,12 @@ abstract class JasprRoute extends Route {
       }
 
       // If the request wasn't hijacked, we shouldn't be seeing this exception.
-      return Response.internalServerError();
-    } catch (error, stackTrace) {
+      session.log(
+        '[jaspr_serverpod] Got a HijackException, but the request was not hijacked.',
+        level: LogLevel.error,
+        exception: error,
+        stackTrace: stackTrace,
+      );
       return Response.internalServerError();
     }
 

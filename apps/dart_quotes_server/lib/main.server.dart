@@ -12,8 +12,12 @@ import 'src/routes/root.dart';
 // configuring Relic (Serverpod's web-server), or need custom setup work.
 
 void main(List<String> args) async {
+  if (_runningPod case final pod?) {
+    await pod.shutdown(exitProcess: false);
+  }
+
   // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(args, Protocol(), Endpoints(), authenticationHandler: auth.authenticationHandler);
+  final pod = _runningPod = Serverpod(args, Protocol(), Endpoints(), authenticationHandler: auth.authenticationHandler);
 
   Jaspr.initializeApp(options: defaultServerOptions, useIsolates: false);
 
@@ -21,8 +25,10 @@ void main(List<String> args) async {
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
 
   pod.webServer.addRoute(auth.RouteGoogleSignIn(), '/googlesignin');
-  pod.webServer.addRoute(RootRoute(), '/**');
+  pod.webServer.addRoute(RootRoute());
 
   // Start the server.
   await pod.start();
 }
+
+Serverpod? _runningPod;

@@ -22,7 +22,7 @@ workspace:
   - apps/fluttercon
   - apps/website
   - examples/backend_dart_frog
-  #- examples/backend_serverpod/example_server
+  - examples/backend_serverpod/example_server
   - examples/backend_shelf
   - examples/flutter_embedding
   - examples/flutter_multi_view
