@@ -1,3 +1,5 @@
-class JasprConnectivityMonitor {
-  JasprConnectivityMonitor() : assert(false, 'JasprConnectivityMonitor is not available on the server.');
+abstract final class JasprConnectivityMonitor {
+  factory JasprConnectivityMonitor() {
+    throw UnsupportedError('JasprConnectivityMonitor is not available on the server.');
+  }
 }

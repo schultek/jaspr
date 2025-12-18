@@ -39,10 +39,10 @@ dependencies:
   # The following packages don't adhere to semantic versioning and might ship breaking changes in minor versions.
   # Therefore, we depend on fixed versions of these packages.
   build_daemon: 4.0.4
-  dwds: 24.3.5
-  webdev: 3.7.1
+  dwds: 24.3.11
+  webdev: 3.7.2
   browser_launcher: 1.1.3
-  vm_service: 14.3.1
+  vm_service: 15.0.0
   shelf: ^1.4.1
   shelf_proxy: ^1.0.4
   async: ^2.13.0
@@ -55,3 +55,7 @@ dependencies:
 
 dev_dependencies:
   test: ^1.22.0
+
+dependency_overrides:
+  # Remove when webdev supports this version
+  dds: ^5.0.0

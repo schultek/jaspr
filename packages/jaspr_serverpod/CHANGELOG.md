@@ -1,3 +1,26 @@
+## Unreleased breaking
+
+- Support Serverpod 3
+
+  To migrate, update your `JasprRoute`s build method to accept a request parameter of type `Request` from `package:serverpod/serverpod.dart`:
+  
+  ```diff
+  - import 'package:jaspr/server.dart';
+  + import 'package:jaspr/server.dart' hide Request;
+  
+  class RootRoute extends JasprRoute {
+    @override
+  -  Future<Component> build(Session session, HttpRequest request) async {
+  +  Future<Component> build(Session session, Request request) async {
+  ```
+
+  You also don't need to provide a path when calling `pod.webServer.addRoute()`, unless you want your app to be served at a different path than `/`.
+
+  ```diff
+  - pod.webServer.addRoute(RootRoute(), '/*');
+  + pod.webServer.addRoute(RootRoute());
+  ```
+
 ## 0.6.0
 
 - `jaspr` upgraded to `0.22.0`

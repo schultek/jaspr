@@ -9,14 +9,12 @@ export '../../generated/imports/_web.dart'
     show
         JSConfetti,
         JSConfettiOrStubbed,
-        StreamingConnectionHandler,
-        StreamingConnectionHandlerOrStubbed,
         Client,
         ClientOrStubbed,
         QuoteInit,
         QuoteInitOrStubbed,
-        signInWithGoogle,
         FlutterAuthenticationKeyManager,
         FlutterAuthenticationKeyManagerOrStubbed,
         SessionManager,
-        SessionManagerOrStubbed;
+        SessionManagerOrStubbed,
+        signInWithGoogle;

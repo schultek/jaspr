@@ -21,4 +21,4 @@ table: quotes
 fields:
   quote: String
   author: String
-  likes: List<int>
+  likes: List<String>
