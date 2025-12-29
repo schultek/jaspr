@@ -595,10 +595,13 @@ class EventBinding {
   DomEventCallback fn;
   StreamSubscription<web.Event>? _subscription;
 
-  EventBinding(web.Element element, this.type, this.fn)
-    : _subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
+  EventBinding(web.Element element, this.type, this.fn) {
+    _subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
+        // Do not move to a field initializer: we need fn here to refer to the
+        // field and not the constructor parameter.
         fn(event);
       });
+  }
 
   void clear() {
     _subscription?.cancel();
