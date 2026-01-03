@@ -1,4 +1,5 @@
 import '../../dom/validator.dart';
+import '../../foundation/constants.dart';
 import '../../framework/framework.dart';
 import '../markup_render_object.dart';
 import '../options.dart';
@@ -35,7 +36,7 @@ class ClientComponentRegistry extends ObserverComponent {
 class ClientComponentRegistryElement extends ObserverElement {
   ClientComponentRegistryElement(super.component);
 
-  bool _didAddClientScript = false;
+  bool _didHandleClientScript = false;
   final List<Element> _clientElements = [];
   final List<ClientTarget> _clientTargets = [];
 
@@ -46,9 +47,13 @@ class ClientComponentRegistryElement extends ObserverElement {
   void didRebuildElement(Element element) {
     final binding = this.binding as ServerAppBinding;
 
-    if (!_didAddClientScript && binding.options.clientId != null) {
-      (binding).addRenderAdapter(ClientScriptAdapter(binding.options.clientId!));
-      _didAddClientScript = true;
+    if (!_didHandleClientScript) {
+      if (binding.options.clientId != null) {
+        (binding).addRenderAdapter(ClientScriptAdapter(binding.options.clientId!));
+      } else if (kDebugMode) {
+        (binding).addRenderAdapter(NoClientScriptAdapter());
+      }
+      _didHandleClientScript = true;
     }
 
     final entry = binding.options.clients?[element.component.runtimeType];
