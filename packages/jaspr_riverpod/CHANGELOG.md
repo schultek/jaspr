@@ -1,4 +1,4 @@
-## unreleased patch
+## Unreleased patch
 
 - Fix compilation errors with `riverpod` versions `^3.1.0`
 
