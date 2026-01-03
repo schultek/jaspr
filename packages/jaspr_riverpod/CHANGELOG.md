@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fix compilation errors with `riverpod` versions `^3.1.0`
+
 ## 0.4.2
 
 - `jaspr` upgraded to `0.22.0`
