@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed bug preventing event handlers from being updated in rebuilds.
+
 ## 0.22.0
 
 - **Breaking** Changed project entrypoint conventions:
