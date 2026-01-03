@@ -38,11 +38,8 @@ class ClientOptionsBuilder implements Builder {
   };
 
   Future<void> generateClientOptions(BuildStep buildStep) async {
-    final (mode, flutter) = await buildStep.loadProjectMode(options, buildStep);
-    if (mode != 'static' && mode != 'server') {
-      return;
-    }
-
+    final (_, flutter) = await buildStep.loadProjectMode(options, buildStep);
+    
     final serverId = AssetId(
       buildStep.inputId.package,
       buildStep.inputId.path.replaceFirst('.client.dart', '.server.dart'),

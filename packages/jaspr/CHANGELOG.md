@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.
+- Fixed generation of `*.client.options.dart` file in client mode.
 - Improved detection of Flutter plugins by reading the generated `.flutter-plugins-dependencies` file.
 
 ## 0.22.0
