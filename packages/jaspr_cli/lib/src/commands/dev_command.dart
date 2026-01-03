@@ -295,7 +295,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     final ddcDefines = {
-      'jaspr.flags.verbose':debug,
+      'jaspr.flags.verbose': debug,
       ...dartDefines,
     };
 
