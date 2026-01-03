@@ -1,3 +1,8 @@
+## Unreleased patch
+
+- Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.
+- Improved detection of Flutter plugins by reading the generated `.flutter-plugins-dependencies` file.
+
 ## 0.22.0
 
 - **Breaking** Changed project entrypoint conventions:
