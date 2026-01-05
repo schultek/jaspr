@@ -436,9 +436,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--define=build_web_compilers:ddc_modules=use-ui-libraries=true',
         '--define=build_web_compilers:dart2js_modules=use-ui-libraries=true',
         '--define=build_web_compilers:dart2wasm_modules=use-ui-libraries=true',
-        '--define=build_web_compilers:entrypoint=libraries-path="$librariesPath"',
+        '--define=build_web_compilers:entrypoint=libraries-path=${jsonEncode(librariesPath)}',
         '--define=build_web_compilers:entrypoint=unsafe-allow-unsupported-modules=true',
-        '--define=build_web_compilers:sdk_js=use-prebuilt-sdk-from-path="$sdkJsPath"',
+        '--define=build_web_compilers:sdk_js=use-prebuilt-sdk-from-path=${jsonEncode(sdkJsPath)}',
       ];
     }
 
@@ -448,7 +448,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '--delete-conflicting-outputs',
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
-        '--define=build_web_compilers:entrypoint=${compiler}_args=[${args.map((a) => '"$a"').join(',')}]',
+        '--define=build_web_compilers:entrypoint=${compiler}_args=${jsonEncode(args)}',
         if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
         if (includeSourceMaps) ...[
           '--define=build_web_compilers:dart2js_archive_extractor=filter_outputs=false',

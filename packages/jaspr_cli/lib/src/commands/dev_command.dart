@@ -1,6 +1,7 @@
 // ignore_for_file: implementation_imports
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
@@ -293,18 +294,18 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       project.checkFlutterBuildSupport();
     }
 
-    final ddcDefines = [
-      '"jaspr.flags.verbose":$debug',
-      for (final e in dartDefines.entries) '"${e.key}":"${e.value}"',
-    ].join(',');
+    final ddcDefines = {
+      'jaspr.flags.verbose': debug,
+      ...dartDefines,
+    };
 
     final dart2jsDefines = [
-      '"-Djaspr.flags.release=$release"',
-      if (!release) '"--enable-asserts"',
+      '-Djaspr.flags.release=$release',
+      if (!release) '--enable-asserts',
       if (useWasm && project.flutterMode != FlutterMode.none)
-        '"--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}"',
-      for (final e in dartDefines.entries) '"-D${e.key}=${e.value}"',
-    ].join(',');
+        '--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
+      for (final e in dartDefines.entries) '-D${e.key}=${e.value}',
+    ];
 
     List<String> additionalFlutterBuildArgs() {
       final sdkKernelPath = p.url.join(
@@ -324,13 +325,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--define=build_web_compilers:ddc_modules=use-ui-libraries=true',
         '--define=build_web_compilers:dart2js_modules=use-ui-libraries=true',
         '--define=build_web_compilers:dart2wasm_modules=use-ui-libraries=true',
-        '--define=build_web_compilers:entrypoint=libraries-path="$librariesPath"',
+        '--define=build_web_compilers:entrypoint=libraries-path=${jsonEncode(librariesPath)}',
         '--define=build_web_compilers:entrypoint=unsafe-allow-unsupported-modules=true',
-        '--define=build_web_compilers:sdk_js=use-prebuilt-sdk-from-path="$sdkJsPath"',
+        '--define=build_web_compilers:sdk_js=use-prebuilt-sdk-from-path=${jsonEncode(sdkJsPath)}',
         if (compiler == 'dartdevc') ...[
-          '--define=build_web_compilers:ddc=ddc-kernel-path="$sdkKernelPath"',
-          '--define=build_web_compilers:ddc=libraries-path="$librariesPath"',
-          '--define=build_web_compilers:ddc=platform-sdk="$webSdkDir"',
+          '--define=build_web_compilers:ddc=ddc-kernel-path=${jsonEncode(sdkKernelPath)}',
+          '--define=build_web_compilers:ddc=libraries-path=${jsonEncode(librariesPath)}',
+          '--define=build_web_compilers:ddc=platform-sdk=${jsonEncode(webSdkDir)}',
         ],
       ];
     }
@@ -342,8 +343,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--define=build_web_compilers:ddc=generate-full-dill=true',
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
         switch (compiler) {
-          'dartdevc' => '--define=build_web_compilers:ddc=environment={$ddcDefines}',
-          _ => '--define=build_web_compilers:entrypoint=${compiler}_args=[$dart2jsDefines]',
+          'dartdevc' => '--define=build_web_compilers:ddc=environment=${jsonEncode(ddcDefines)}',
+          _ => '--define=build_web_compilers:entrypoint=${compiler}_args=${jsonEncode(dart2jsDefines)}',
         },
         if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
       ],

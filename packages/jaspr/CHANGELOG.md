@@ -1,3 +1,10 @@
+## 0.22.1
+
+- Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.
+- Fixed generation of `*.client.options.dart` file in client mode.
+- Improved detection of Flutter plugins by reading the generated `.flutter-plugins-dependencies` file.
+- Fixed bug preventing event handlers from being updated in rebuilds.
+
 ## 0.22.0
 
 - **Breaking** Changed project entrypoint conventions:
