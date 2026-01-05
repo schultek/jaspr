@@ -14,7 +14,7 @@ topics:
   - cli
 
 environment:
-  sdk: '>=3.8.0 <4.0.0'
+  sdk: ">=3.8.0 <4.0.0"
 
 resolution: workspace
 
@@ -22,7 +22,7 @@ executables:
   jaspr:
 
 dependencies:
-  analyzer: '>=8.1.0 <10.0.0'
+  analyzer: ">=8.1.0 <10.0.0"
   ansi_styles: ^0.3.2
   args: ^2.3.0
   cli_completion: ^0.5.0
@@ -39,6 +39,7 @@ dependencies:
   # The following packages don't adhere to semantic versioning and might ship breaking changes in minor versions.
   # Therefore, we depend on fixed versions of these packages.
   build_daemon: 4.0.4
+  dds: 4.2.7
   dwds: 24.3.5
   webdev: 3.7.1
   browser_launcher: 1.1.3

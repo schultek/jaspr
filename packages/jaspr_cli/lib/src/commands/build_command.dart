@@ -9,8 +9,8 @@ import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http show Client, Response;
 import 'package:path/path.dart' as p;
-import 'package:webdev/src/daemon_client.dart' as d;
 
+import '../dev/util.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
@@ -188,7 +188,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       await startProxy(
         '5567',
-        webPort: '0',
         serverPort: serverPort,
         onMessage: (message) {
           if (message case {'route': final String route}) {
@@ -442,7 +441,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       ];
     }
 
-    final client = await d.connectClient(Directory.current.path, [
+    final client = await connectClient(Directory.current.path, [
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',

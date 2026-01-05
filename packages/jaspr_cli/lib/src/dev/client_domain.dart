@@ -15,17 +15,17 @@ import 'package:vm_service/vm_service_io.dart';
 import 'package:webdev/src/daemon/daemon.dart';
 import 'package:webdev/src/daemon/domain.dart';
 import 'package:webdev/src/daemon/utilites.dart';
-import 'package:webdev/src/serve/server_manager.dart';
-import 'package:webdev/src/serve/webdev_server.dart';
+
+import 'dev_proxy.dart';
 
 /// A collection of method and events relevant to the running application.
 class ClientDomain extends Domain {
-  ClientDomain(Daemon daemon, ServerManager serverManager) : super(daemon, 'client') {
+  ClientDomain(Daemon daemon, DevProxy devProxy) : super(daemon, 'client') {
     registerHandler('restart', _restart);
     registerHandler('callServiceExtension', _callServiceExtension);
     registerHandler('stop', _stop);
 
-    _initialize(serverManager);
+    _handleAppConnections(devProxy);
   }
 
   bool _isShutdown = false;
@@ -49,12 +49,8 @@ class ClientDomain extends Domain {
     }
   }
 
-  void _initialize(ServerManager serverManager) {
-    serverManager.servers.forEach(_handleAppConnections);
-  }
-
-  Future<void> _handleAppConnections(WebDevServer server) async {
-    final dwds = server.dwds!;
+  Future<void> _handleAppConnections(DevProxy devProxy) async {
+    final dwds = devProxy.dwds!;
 
     // The connection is established right before `main()` is called.
     await for (final appConnection in dwds.connectedApps) {
@@ -65,7 +61,7 @@ class ClientDomain extends Domain {
         continue;
       }
 
-      _clientStates[appId] = _ClientState(appConnection, dwds, this)..start(server);
+      _clientStates[appId] = _ClientState(appConnection, dwds, this)..start(devProxy);
     }
 
     // Shutdown could have been triggered while awaiting above.
@@ -164,7 +160,7 @@ class _ClientState {
 
   VmService? get vmService => _debugConnection?.vmService;
 
-  void start(WebDevServer server) async {
+  void start(DevProxy devProxy) async {
     final appId = _appConnection.request.appId;
     try {
       final debugConnection = _debugConnection = await dwds.debugConnection(_appConnection);
@@ -216,7 +212,7 @@ class _ClientState {
       // noop
     }
 
-    _resultSub = server.buildResults.listen((r) {
+    _resultSub = devProxy.buildResults.listen((r) {
       domain._handleBuildResult(r, appId);
     });
 

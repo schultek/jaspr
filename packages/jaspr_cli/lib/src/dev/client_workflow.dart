@@ -12,11 +12,10 @@ import 'package:build_daemon/client.dart';
 import 'package:build_daemon/data/build_target.dart';
 
 import 'package:webdev/src/command/configuration.dart';
-import 'package:webdev/src/daemon_client.dart';
-import 'package:webdev/src/serve/server_manager.dart';
-import 'package:webdev/src/serve/webdev_server.dart';
 
 import '../logging.dart';
+import 'dev_proxy.dart';
+import 'util.dart';
 
 export 'package:webdev/src/command/configuration.dart';
 
@@ -50,14 +49,22 @@ class ClientWorkflow {
         logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
         client.startBuild();
 
-        final serverManager = await _startServerManager(configuration, targetPorts, workingDirectory, client, logger);
+        final assetPort = daemonPort(workingDirectory);
+        final devProxy = await DevProxy.start(
+          assetPort,
+          client.buildResults,
+          autoRun: configuration.autoRun,
+          enableDebugging: configuration.debug,
+          reload: configuration.reload,
+        );
+
         if (cancelled) {
           await client.close();
-          await serverManager.stop();
+          await devProxy.stop();
           return null;
         }
 
-        return ClientWorkflow._(client, serverManager, logger);
+        return ClientWorkflow._(client, devProxy, logger);
       }),
     );
 
@@ -69,7 +76,7 @@ class ClientWorkflow {
     return op.valueOrCancellation(null);
   }
 
-  ClientWorkflow._(this.client, this.serverManager, this.logger) {
+  ClientWorkflow._(this.client, this.devProxy, this.logger) {
     client.shutdownNotifications.listen((data) {
       logger.write(data.message, tag: Tag.builder, level: Level.warning);
       if (data.failureType == 75) {
@@ -83,13 +90,13 @@ class ClientWorkflow {
   final BuildDaemonClient client;
   final Logger logger;
 
-  final ServerManager serverManager;
+  final DevProxy devProxy;
 
   Future<void> get done => _doneCompleter.future;
 
   Future<void> shutDown() async {
     await client.close();
-    await serverManager.stop();
+    await devProxy.stop();
     if (!_doneCompleter.isCompleted) _doneCompleter.complete();
   }
 }
@@ -109,23 +116,6 @@ Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<Strin
     );
     return null;
   }
-}
-
-Future<ServerManager> _startServerManager(
-  Configuration configuration,
-  Map<String, int> targetPorts,
-  String workingDirectory,
-  BuildDaemonClient client,
-  Logger logger,
-) async {
-  final assetPort = daemonPort(workingDirectory);
-  final serverOptions = <ServerOptions>{};
-  for (final target in targetPorts.keys) {
-    serverOptions.add(ServerOptions(configuration, targetPorts[target]!, target, assetPort));
-  }
-
-  final serverManager = await ServerManager.start(serverOptions, client.buildResults);
-  return serverManager;
 }
 
 void _registerBuildTargets(BuildDaemonClient client, Configuration configuration, Map<String, int> targetPorts) {

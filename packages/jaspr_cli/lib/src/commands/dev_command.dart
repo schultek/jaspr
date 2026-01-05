@@ -111,9 +111,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.flutterMode == FlutterMode.embedded) {
       final flutterProcess = await serveFlutter(flutterPort, useWasm);
 
-      workflow.serverManager.servers.first.buildResults.where((event) => event.status == BuildStatus.succeeded).listen((
-        event,
-      ) {
+      workflow.devProxy.buildResults.where((event) => event.status == BuildStatus.succeeded).listen((event) {
         // trigger reload
         flutterProcess.stdin.writeln('r');
       });
@@ -121,7 +119,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     await startProxy(
       proxyPort,
-      webPort: webPort,
+      devProxy: workflow.devProxy,
       serverPort: port,
       flutterPort: project.flutterMode == FlutterMode.embedded ? flutterPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
@@ -372,7 +370,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     });
 
-    workflow.serverManager.servers.first.buildResults.listen((event) {
+    workflow.devProxy.buildResults.listen((event) {
       if (event.status == BuildStatus.succeeded) {
         if (!buildCompleter.isCompleted) {
           buildCompleter.complete();
