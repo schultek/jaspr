@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,6 +9,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
+import 'package:sse/server/sse_handler.dart';
 
 import '../foundation/constants.dart';
 import 'options.dart';
@@ -67,6 +69,16 @@ Handler createHandler(
   final staticHandler = fileHandler ?? staticFileHandler(client);
 
   var cascade = Cascade();
+
+  if (kDebugMode) {
+    final sseHandler = SseHandler(Uri(path: r'/$jasprEventsHandler'));
+    sseHandler.connections.rest.listen(
+      (connection) => ClientConnection._initialize(connection),
+      onDone: () {},
+    );
+
+    cascade = cascade.add(sseHandler.handler);
+  }
 
   if (jasprProxyPort != null) {
     cascade = cascade.add(_sseProxyHandler(client, jasprProxyPort!));
@@ -185,3 +197,34 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
 }
 
 // coverage:ignore-end
+
+class ClientConnection {
+  ClientConnection._(this._connection) {
+    _connection.stream.listen(
+      (event) {
+        final message = jsonDecode(event);
+        if (message case ['RouteInfo', final String route]) {
+          currentRoute = route;
+        }
+      },
+      onDone: () {
+        _connections.remove(this);
+      },
+    );
+  }
+
+  final SseConnection _connection;
+  String? currentRoute;
+
+  static void _initialize(SseConnection connection) {
+    final client = ClientConnection._(connection);
+    _connections.add(client);
+  }
+
+  static List<ClientConnection> get connections => UnmodifiableListView(_connections);
+  static final List<ClientConnection> _connections = [];
+
+  void reload() {
+    _connection.sink.add(jsonEncode(['ReloadRequest']));
+  }
+}

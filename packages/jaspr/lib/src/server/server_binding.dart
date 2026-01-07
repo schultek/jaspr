@@ -7,7 +7,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../jaspr.dart';
-import 'adapters/document_adapter.dart';
+import 'adapters/document_structure_helper.dart';
 import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
 import 'components/client_component_registry.dart';
@@ -19,7 +19,9 @@ typedef FileLoader = Future<String?> Function(String);
 
 /// Global component binding for the server.
 class ServerAppBinding extends AppBinding with ComponentsBinding {
-  ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile;
+  ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile {
+    addRenderAdapter(GlobalStylesAdapter());
+  }
 
   final RequestLike request;
   final FileLoader _fileLoader;
@@ -66,21 +68,20 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     }
 
     final root = rootElement.renderObject as MarkupRenderObject;
-    final adapters = [
-      ..._adapters.reversed,
-      GlobalStylesAdapter()..binding = this,
-      if (!standalone) DocumentAdapter()..binding = this,
-    ];
 
-    for (final adapter in adapters.reversed) {
-      final r = adapter.prepare();
+    for (var i = 0; i < _adapters.length; i++) {
+      final r = _adapters[i].prepare();
       if (r is Future) {
         await r;
       }
     }
 
-    for (final adapter in adapters) {
+    for (final adapter in _adapters.reversed) {
       adapter.apply(root);
+    }
+
+    if (!standalone) {
+      createDocumentStructure(root, true);
     }
 
     if (_responseBodyOverride case final override?) {

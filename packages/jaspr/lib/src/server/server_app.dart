@@ -49,6 +49,7 @@ final class ServerApp {
     _client = client;
 
     _reassembleController.add(Object());
+    reloadClients();
 
     if (isFirstStartup) {
       print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
@@ -92,5 +93,13 @@ final class ServerApp {
   static Future<void> _sendDebugMessage(Object message) async {
     final postWithClient = _client?.post ?? http.post;
     await postWithClient(Uri.http('localhost:$jasprProxyPort', r'$jasprMessageHandler'), body: jsonEncode(message));
+  }
+
+  static void reloadClients([String? route]) {
+    for (final connection in ClientConnection.connections) {
+      if (route == null || route == connection.currentRoute) {
+        connection.reload();
+      }
+    }
   }
 }

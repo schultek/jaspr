@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 
+import '../../server/adapters/document_structure_helper.dart';
 import '/dom.dart';
 import '/server.dart';
-import '/src/server/adapters/document_adapter.dart';
 
 abstract class Document implements Component {
   /// Sets up a basic document structure at the root of your app and renders the main `<html>`, `<head>` and `<body>` tags.
@@ -307,7 +307,7 @@ class AttachDocument extends StatelessComponent implements Document {
 
 final Expando<AttachAdapter> _attach = Expando();
 
-class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
+class AttachAdapter extends RenderAdapter {
   static void register(BuildContext context, AttachDocument item) {
     if (context.binding is! ServerAppBinding) {
       // Return early in component tests.

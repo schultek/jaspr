@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../../jaspr.dart';
@@ -299,42 +300,62 @@ void updateChildren(web.Element currentNode, web.Element newNode) {
   var currentChildIndex = 0;
   var newChildIndex = 0;
 
+  var peekNewChildIndex = 0;
+
   while (currentChildIndex < currentChildren.length && newChildIndex < newChildren.length) {
     final currentChild = currentChildren.item(currentChildIndex)!;
-    final newChild = newChildren.item(newChildIndex)!;
 
-    if (currentChild.clientAnchor case final anchor?) {
-      // This is a client component anchor, skip it.
-      currentChildIndex++;
-      while (currentChildIndex < currentChildren.length) {
-        if (currentChildren.item(currentChildIndex) == anchor.endNode) {
-          currentChildIndex++;
-          break;
-        }
+    if (peekNewChildIndex >= newChildren.length) {
+      currentNode.removeChild(currentChild);
+      peekNewChildIndex = newChildIndex;
+      continue;
+    }
+
+    final newChild = newChildren.item(peekNewChildIndex)!;
+
+    // if (currentChild.clientAnchor case final anchor?) {
+    //   // This is a client component anchor, skip it.
+    //   currentChildIndex++;
+    //   while (currentChildIndex < currentChildren.length) {
+    //     if (currentChildren.item(currentChildIndex) == anchor.endNode) {
+    //       currentChildIndex++;
+    //       break;
+    //     }
+    //     currentChildIndex++;
+    //   }
+
+    //   if (newChild.clientAnchor case final newAnchor? when newAnchor.name == anchor.name) {
+    //     // Skip the new client component as well.
+    //     peekNewChildIndex++;
+    //     while (peekNewChildIndex < newChildren.length) {
+    //       final child = newChildren.item(peekNewChildIndex)!;
+    //       if (child == newAnchor.endNode) {
+    //         peekNewChildIndex++;
+    //         break;
+    //       }
+    //       peekNewChildIndex++;
+    //     }
+
+    //     anchor.rebuild(newAnchor.data, newAnchor.serverAnchors);
+    //   }
+    //   continue;
+    // }
+
+    if (currentChild.nodeType != newChild.nodeType ||
+        (newChild.isElement && (newChild as web.Element).tagName != (currentChild as web.Element).tagName)) {
+      peekNewChildIndex++;
+      continue;
+    }
+
+    if (newChildIndex < peekNewChildIndex) {
+      while (newChildIndex < peekNewChildIndex) {
+        currentNode.insertBefore(newChildren.item(newChildIndex)!, currentChild);
+        peekNewChildIndex--;
         currentChildIndex++;
       }
-
-      if (newChild.clientAnchor case final newAnchor? when newAnchor.name == anchor.name) {
-        // Skip the new client component as well.
-        newChildIndex++;
-        while (newChildIndex < newChildren.length) {
-          final child = newChildren.item(newChildIndex)!;
-          if (child == newAnchor.endNode) {
-            newChildIndex++;
-            break;
-          }
-          newChildIndex++;
-        }
-
-        anchor.rebuild(newAnchor.data, newAnchor.serverAnchors);
-      }
-      continue;
     }
 
-    if (currentChild.nodeType != newChild.nodeType) {
-      currentNode.insertBefore(newChild, currentChild);
-      continue;
-    }
+    assert(newChildIndex == peekNewChildIndex);
 
     if (currentChild.isText) {
       if (currentChild.textContent != newChild.textContent) {
@@ -342,12 +363,14 @@ void updateChildren(web.Element currentNode, web.Element newNode) {
       }
       currentChildIndex++;
       newChildIndex++;
+      peekNewChildIndex++;
       continue;
     }
     if (currentChild.isElement) {
       updateElement(currentChild as web.Element, newChild as web.Element);
       currentChildIndex++;
       newChildIndex++;
+      peekNewChildIndex++;
       continue;
     }
 

@@ -7,28 +7,27 @@ import 'element_boundary_adapter.dart';
 import 'server_component_adapter.dart';
 
 class ClientComponentAdapter extends ElementBoundaryAdapter {
-  ClientComponentAdapter(this.registry, this.target, super.element);
+  ClientComponentAdapter(this.registry, this.target, super.element) : super(priority: 1000);
 
   final ClientComponentRegistryElement registry;
   final ClientTarget target;
 
+  bool _isClientBoundary = true;
   late String? data;
-  bool isClientBoundary = true;
 
   @override
   void prepareBoundary(ChildListRange range) {
-    isClientBoundary = true;
     element.visitAncestorElements((e) {
       if (registry.serverElements.containsValue(e)) {
         return false;
-      } else if (registry.clientElements.contains(e)) {
-        isClientBoundary = false;
+      } else if (registry.clientElements.containsKey(e)) {
+        _isClientBoundary = false;
         return false;
       }
       return true;
     });
 
-    if (!isClientBoundary) {
+    if (!_isClientBoundary) {
       return;
     }
 
@@ -37,7 +36,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   @override
   void applyBoundary(ChildListRange range) {
-    if (!isClientBoundary) {
+    if (!_isClientBoundary) {
       return;
     }
 

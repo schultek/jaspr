@@ -31,10 +31,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'mode',
       abbr: 'm',
       help: 'Sets the reload/refresh mode.',
-      allowed: ['reload', 'refresh'],
+      allowed: ['reload', 'refresh', 'none'],
       allowedHelp: {
         'reload': 'Reloads js modules without server reload (loses current state)',
         'refresh': 'Performs a full page refresh and server reload',
+        'none': 'Does not perform any reloads',
       },
       defaultsTo: 'refresh',
     );
@@ -272,7 +273,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
 
     final configuration = Configuration(
-      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+      reload: switch (mode) {
+        'reload' => ReloadConfiguration.hotRestart,
+        'refresh' => ReloadConfiguration.liveReload,
+        _ => ReloadConfiguration.none,
+      },
       debug: launchInChrome,
       debugExtension: launchInChrome,
       launchInChrome: launchInChrome,

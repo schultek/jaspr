@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:sse/client/sse_client.dart';
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
@@ -12,6 +14,10 @@ import 'dom_render_object.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
+  ClientAppBinding() {
+    initializeEvents();
+  }
+
   @override
   bool get isClient => true;
 
@@ -70,7 +76,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   /// Reloads the current page.
-  void reload() async {
+  static void reload() async {
     final response = await http.get(
       Uri.parse(web.window.location.href),
       headers: {'X-Jaspr-Reload': 'true'},
@@ -90,5 +96,26 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     updatePage(body);
     sw.stop();
     print('Page reloaded in ${sw.elapsedMilliseconds}ms');
+  }
+
+  static SseClient? _eventsClient;
+
+  static void initializeEvents() {
+    if (_eventsClient != null) return;
+
+    _eventsClient = SseClient(r'/$jasprEventsHandler');
+    _eventsClient!.stream.listen(
+      (event) {
+        final data = jsonDecode(event);
+        if (data case ['ReloadRequest']) {
+          reload();
+        }
+      },
+      onDone: () {
+        _eventsClient!.close();
+        _eventsClient = null;
+      },
+    );
+    _eventsClient!.sink.add(jsonEncode(['RouteInfo', web.window.location.pathname]));
   }
 }
