@@ -1,3 +1,9 @@
+## Unreleased breaking
+
+- Added **Server Components** to allow for more fine-grained control over the server-side rendered component trees.
+- **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
+- Added stateful server-side reload feature.
+
 ## 0.22.1
 
 - Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.

@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../../jaspr.dart';
-import '../dom/type_checks.dart';
 import '../dom/validator.dart';
 import 'options.dart';
 import 'slotted_child_view.dart';
@@ -75,6 +73,7 @@ class ClientComponentAnchor extends ComponentAnchor {
 
   ChildSlot createSlot() {
     return _AnchorChildSlot(
+      key: UniqueKey(),
       start: startNode,
       end: endNode,
       child: build(),
@@ -83,7 +82,7 @@ class ClientComponentAnchor extends ComponentAnchor {
 }
 
 class _AnchorChildSlot extends ChildSlot {
-  _AnchorChildSlot({required this.start, required this.end, required this.child});
+  _AnchorChildSlot({required this.start, required this.end, required this.child, super.key});
 
   final web.Node start;
   final web.Node end;
@@ -254,137 +253,4 @@ List<ClientComponentAnchor> extractAnchors({
   }
 
   return clientAnchors;
-}
-
-void updatePage(web.Element newBody) {
-  final currentBody = web.document.body!;
-  extractAnchors(nodes: [newBody]);
-
-  updateChildren(currentBody, newBody);
-}
-
-void updateElement(web.Element currentNode, web.Element newNode) {
-  // Update attributes.
-
-  final currentAttributes = currentNode.attributes;
-  final newAttributes = newNode.attributes;
-
-  final attributesToRemove = <String>{};
-
-  for (var i = 0; i < currentAttributes.length; i++) {
-    final attr = currentAttributes.item(i)!;
-    attributesToRemove.add(attr.name);
-  }
-
-  for (var i = 0; i < newAttributes.length; i++) {
-    final attr = newAttributes.item(i)!;
-    attributesToRemove.remove(attr.name);
-
-    if (currentAttributes.getNamedItem(attr.name)?.name != attr.value) {
-      currentNode.setAttribute(attr.name, attr.value);
-    }
-  }
-
-  for (final attrName in attributesToRemove) {
-    currentNode.removeAttribute(attrName);
-  }
-
-  // Recursively update child nodes.
-  updateChildren(currentNode, newNode);
-}
-
-void updateChildren(web.Element currentNode, web.Element newNode) {
-  final currentChildren = currentNode.childNodes;
-  final newChildren = newNode.childNodes;
-
-  var currentChildIndex = 0;
-  var newChildIndex = 0;
-
-  var peekNewChildIndex = 0;
-
-  while (currentChildIndex < currentChildren.length && newChildIndex < newChildren.length) {
-    final currentChild = currentChildren.item(currentChildIndex)!;
-
-    if (peekNewChildIndex >= newChildren.length) {
-      currentNode.removeChild(currentChild);
-      peekNewChildIndex = newChildIndex;
-      continue;
-    }
-
-    final newChild = newChildren.item(peekNewChildIndex)!;
-
-    // if (currentChild.clientAnchor case final anchor?) {
-    //   // This is a client component anchor, skip it.
-    //   currentChildIndex++;
-    //   while (currentChildIndex < currentChildren.length) {
-    //     if (currentChildren.item(currentChildIndex) == anchor.endNode) {
-    //       currentChildIndex++;
-    //       break;
-    //     }
-    //     currentChildIndex++;
-    //   }
-
-    //   if (newChild.clientAnchor case final newAnchor? when newAnchor.name == anchor.name) {
-    //     // Skip the new client component as well.
-    //     peekNewChildIndex++;
-    //     while (peekNewChildIndex < newChildren.length) {
-    //       final child = newChildren.item(peekNewChildIndex)!;
-    //       if (child == newAnchor.endNode) {
-    //         peekNewChildIndex++;
-    //         break;
-    //       }
-    //       peekNewChildIndex++;
-    //     }
-
-    //     anchor.rebuild(newAnchor.data, newAnchor.serverAnchors);
-    //   }
-    //   continue;
-    // }
-
-    if (currentChild.nodeType != newChild.nodeType ||
-        (newChild.isElement && (newChild as web.Element).tagName != (currentChild as web.Element).tagName)) {
-      peekNewChildIndex++;
-      continue;
-    }
-
-    if (newChildIndex < peekNewChildIndex) {
-      while (newChildIndex < peekNewChildIndex) {
-        currentNode.insertBefore(newChildren.item(newChildIndex)!, currentChild);
-        peekNewChildIndex--;
-        currentChildIndex++;
-      }
-    }
-
-    assert(newChildIndex == peekNewChildIndex);
-
-    if (currentChild.isText) {
-      if (currentChild.textContent != newChild.textContent) {
-        currentChild.textContent = newChild.textContent;
-      }
-      currentChildIndex++;
-      newChildIndex++;
-      peekNewChildIndex++;
-      continue;
-    }
-    if (currentChild.isElement) {
-      updateElement(currentChild as web.Element, newChild as web.Element);
-      currentChildIndex++;
-      newChildIndex++;
-      peekNewChildIndex++;
-      continue;
-    }
-
-    currentNode.replaceChild(newChild, currentChild);
-    currentChildIndex++;
-  }
-
-  while (currentChildIndex < currentChildren.length) {
-    final currentChild = currentChildren.item(currentChildIndex)!;
-    currentNode.removeChild(currentChild);
-  }
-
-  while (newChildIndex < newChildren.length) {
-    final newChild = newChildren.item(newChildIndex)!;
-    currentNode.appendChild(newChild);
-  }
 }

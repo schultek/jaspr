@@ -9,8 +9,8 @@ import 'package:universal_web/web.dart' as web;
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../framework/framework.dart';
-import 'component_anchors.dart';
 import 'dom_render_object.dart';
+import 'utils.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
@@ -39,22 +39,16 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   late String _attachTarget;
-  (web.Node, web.Node)? _attachBetween;
 
   @override
-  void attachRootComponent(Component app, {String attachTo = 'body', (web.Node, web.Node)? attachBetween}) {
+  void attachRootComponent(Component app, {String attachTo = 'body'}) {
     _attachTarget = attachTo;
-    _attachBetween = attachBetween;
     super.attachRootComponent(app);
   }
 
   @override
   RenderObject createRootRenderObject() {
-    if (_attachBetween case (final start, final end)) {
-      return RootDomRenderObject.between(start, end);
-    } else {
-      return RootDomRenderObject(web.document.querySelector(_attachTarget)!);
-    }
+    return RootDomRenderObject(web.document.querySelector(_attachTarget)!);
   }
 
   @override
@@ -76,9 +70,9 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   /// Reloads the current page.
-  static void reload() async {
+  void reload([String? path]) async {
     final response = await http.get(
-      Uri.parse(web.window.location.href),
+      Uri.parse(web.window.location.href).replace(path: path),
       headers: {'X-Jaspr-Reload': 'true'},
     );
     if (response.statusCode != 200) {
@@ -91,16 +85,28 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     if (body == null) {
       throw Exception('Failed to reload page: No body found');
     }
+    if (_attachTarget != 'body') {
+      throw Exception('Can only reload page when attached to body');
+    }
 
     final sw = Stopwatch()..start();
-    updatePage(body);
+
+    final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;
+    final rootNode = rootRenderObject.node;
+
+    rootRenderObject.node = body;
+    rootRenderObject.toHydrate = [...body.childNodes.toIterable()];
+    rootElement!.owner.performReload(rootElement!);
+
+    rootNode.replaceWith(body);
+
     sw.stop();
     print('Page reloaded in ${sw.elapsedMilliseconds}ms');
   }
 
-  static SseClient? _eventsClient;
+  SseClient? _eventsClient;
 
-  static void initializeEvents() {
+  void initializeEvents() {
     if (_eventsClient != null) return;
 
     _eventsClient = SseClient(r'/$jasprEventsHandler');

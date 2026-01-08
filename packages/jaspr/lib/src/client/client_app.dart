@@ -30,27 +30,36 @@ final class ClientApp extends Component {
 class _ClientAppElement extends BuildableElement {
   _ClientAppElement(ClientApp super.component);
 
-  final List<ClientComponentAnchor> anchors = [];
   final List<ChildSlot> slots = [];
 
   bool mounted = true;
 
   @override
   void didMount() {
+    loadSlots();
+    super.didMount();
+  }
+
+  @override
+  void onReload() {
+    slots.clear();
+    loadSlots();
+    super.onReload();
+  }
+
+  void loadSlots() {
     final parent = parentRenderObjectElement!.renderObject;
     final nodes = parent is HydratableDomRenderObject ? parent.toHydrate : <web.Node>[];
     final anchors = extractAnchors(nodes: nodes);
 
     for (final anchor in anchors) {
       if (anchor.builder is ClientBuilder) {
-        this.anchors.add(anchor);
         slots.add(anchor.createSlot());
       } else {
         anchor
             .resolve()
             .then((b) {
               if (mounted) {
-                this.anchors.add(anchor);
                 slots.add(anchor.createSlot());
                 markNeedsBuild();
               }
@@ -60,7 +69,6 @@ class _ClientAppElement extends BuildableElement {
             });
       }
     }
-    super.didMount();
   }
 
   @override

@@ -50,14 +50,10 @@ class ZoomableImage extends StatefulComponent {
 }
 
 class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin {
-  static int _dialogCount = 0;
-
-  late final HTMLDialogElement dialog;
+  final GlobalNodeKey<HTMLDialogElement> dialogKey = GlobalNodeKey();
   final GlobalNodeKey<HTMLImageElement> imageKey = GlobalNodeKey();
 
-  StreamSubscription<Event>? _cancelSub;
   StreamSubscription<Event>? _resizeSub;
-  void Function(void Function())? dialogSetState;
 
   bool zoomed = false;
   bool isResize = false;
@@ -71,27 +67,7 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
 
     if (kIsWeb) {
       context.binding.addPostFrameCallback(() {
-        dialog = HTMLDialogElement()
-          ..id = 'dzm${_dialogCount++}'
-          ..className = 'zoom-modal';
-        window.document.body!.appendChild(dialog);
-
-        _cancelSub = EventStreamProviders.cancelEvent.forTarget(dialog).listen((e) {
-          e.preventDefault();
-          zoomOut();
-        });
-
         updateImageOffset(false);
-
-        (runApp as dynamic)(
-          StatefulBuilder(
-            builder: (context, setState) {
-              dialogSetState = setState;
-              return _buildDialog(context);
-            },
-          ),
-          attachTo: '#${dialog.id}',
-        );
       });
 
       _resizeSub = EventStreamProviders.resizeEvent.forTarget(window).listen((_) {
@@ -128,89 +104,91 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
       );
       this.isResize = isResize;
     });
-    dialogSetState?.call(() {});
   }
 
   void zoomIn() {
     updateImageOffset(false);
 
-    setState(() {
-      zoomed = true;
-    });
-    dialogSetState?.call(() {});
+    setState(() => zoomed = true);
     document.body!.style.overflow = 'hidden';
-    dialog.showModal();
+    dialogKey.currentNode?.showModal();
   }
 
   void zoomOut() async {
-    setState(() {
-      zoomed = false;
-    });
-    dialogSetState?.call(() {});
+    setState(() => zoomed = false);
     await Future<void>.delayed(const Duration(milliseconds: 300));
     if (zoomed) return;
-    dialog.close();
     document.body!.style.overflow = 'auto';
+    dialogKey.currentNode?.close();
   }
 
   @override
   void dispose() {
-    _cancelSub?.cancel();
     _resizeSub?.cancel();
-    dialog.remove();
     super.dispose();
   }
 
   @override
   Component build(BuildContext context) {
-    return figure(classes: 'image zoomable', [
-      img(
-        key: imageKey,
-        src: component.src,
-        alt: component.alt ?? component.caption,
-        styles: zoomed ? Styles(visibility: Visibility.hidden) : null,
-        events: events<void>(
-          onClick: () {
-            zoomIn();
-          },
+    return Component.fragment([
+      figure(classes: 'image zoomable', [
+        img(
+          key: imageKey,
+          src: component.src,
+          alt: component.alt ?? component.caption,
+          styles: zoomed ? Styles(visibility: Visibility.hidden) : null,
+          events: events<void>(
+            onClick: () {
+              zoomIn();
+            },
+          ),
         ),
-      ),
-      if (component.caption != null) figcaption([Component.text(component.caption!)]),
+        if (component.caption != null) figcaption([Component.text(component.caption!)]),
+      ]),
+      _buildDialog(context),
     ]);
   }
 
   Component _buildDialog(BuildContext context) {
-    return div(
-      classes: 'image-wrapper',
+    return Component.element(
+      key: dialogKey,
+      tag: 'dialog',
+      classes: 'zoom-modal not-content',
+      attributes: {
+        if (dialogKey.currentNode?.open ?? false) 'open': '',
+      },
       events: {
-        'click': (_) {
-          zoomOut();
-        },
-        'wheel': (_) {
+        'cancel': (e) {
+          e.preventDefault();
           zoomOut();
         },
       },
-      [
-        img(
-          src: component.src,
-          alt: component.alt ?? component.caption,
-          styles: Styles(
-            position: Position.absolute(top: sourceOffset.y.px, left: sourceOffset.x.px),
-            width: targetOffset.width.px,
-            height: targetOffset.height.px,
-            transform: Transform.combine(
-              zoomed
-                  ? [
-                      Transform.translate(
-                        x: (-sourceOffset.x + targetOffset.x).px,
-                        y: (-sourceOffset.y + targetOffset.y).px,
-                      ),
-                      Transform.scale(1),
-                    ]
-                  : [Transform.translate(x: 0.px, y: 0.px), Transform.scale(sourceOffset.scale)],
+      children: [
+        div(
+          classes: 'image-wrapper',
+          events: {
+            'click': (_) => zoomOut(),
+            'wheel': (_) => zoomOut(),
+          },
+          [
+            img(
+              src: component.src,
+              alt: component.alt ?? component.caption,
+              styles: Styles(
+                position: Position.absolute(top: sourceOffset.y.px, left: sourceOffset.x.px),
+                width: targetOffset.width.px,
+                height: targetOffset.height.px,
+                transform: Transform.combine([
+                  Transform.translate(
+                    x: zoomed ? (-sourceOffset.x + targetOffset.x).px : 0.px,
+                    y: zoomed ? (-sourceOffset.y + targetOffset.y).px : 0.px,
+                  ),
+                  Transform.scale(zoomed ? 1 : sourceOffset.scale),
+                ]),
+                raw: {if (isResize) 'transition': 'none'},
+              ),
             ),
-            raw: {if (isResize) 'transition': 'none'},
-          ),
+          ],
         ),
       ],
     );

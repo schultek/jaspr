@@ -412,6 +412,9 @@ abstract class Element implements BuildContext {
         if (child._parentChanged || child.slot != newSlot) {
           updateSlotForChild(child, newSlot);
         }
+        if (owner._isReload) {
+          child.onReload();
+        }
         newChild = child;
       } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
         if (child._parentChanged || child.slot != newSlot) {
@@ -420,6 +423,9 @@ abstract class Element implements BuildContext {
         final oldComponent = child.component;
         child.update(newComponent);
         assert(child.component == newComponent);
+        if (owner._isReload) {
+          child.onReload();
+        }
         child.didUpdate(oldComponent);
         newChild = child;
       } else {
@@ -1200,6 +1206,12 @@ abstract class Element implements BuildContext {
   RenderObjectElement? get parentRenderObjectElement => _parentRenderObjectElement;
 
   var _parentChanged = false;
+
+  @mustCallSuper
+  void onReload() {
+    _dirty = true;
+    rebuild();
+  }
 }
 
 class ElementSlot {

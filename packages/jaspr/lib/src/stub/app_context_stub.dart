@@ -10,7 +10,7 @@ extension AppContext on BuildContext {
   }
 
   /// Reloads the current page.
-  void reload() {
+  void reload([String? path]) {
     throw UnimplementedError('Should be overridden on client and server.');
   }
 }

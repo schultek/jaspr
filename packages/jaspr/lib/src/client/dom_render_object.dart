@@ -304,7 +304,7 @@ class DomRenderFragment extends DomRenderObject
   web.Node? get firstChildNode {
     if (_firstChild case final firstChild?) {
       if (firstChild is DomRenderFragment) {
-        return firstChild.lastChildNode;
+        return firstChild.firstChildNode;
       }
 
       return firstChild.node;
@@ -452,7 +452,7 @@ class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject
   }
 
   @override
-  final web.Element node;
+  web.Element node;
   late final web.Node? beforeStart;
 
   @override

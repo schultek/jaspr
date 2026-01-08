@@ -8,9 +8,9 @@ import 'utils.dart';
 /// A slot that attaches a child component to a specific DOM node within
 /// a [SlottedChildView].
 abstract class ChildSlot extends Component {
-  const ChildSlot();
+  const ChildSlot({super.key});
 
-  factory ChildSlot.fromQuery(String query, {required Component child}) = QueryChildSlot;
+  factory ChildSlot.fromQuery(String query, {required Component child, Key? key}) = QueryChildSlot;
 
   Component get child;
 
@@ -24,7 +24,7 @@ abstract class ChildSlot extends Component {
 /// A [ChildSlot] that attaches its child to the first DOM element matching
 /// the given CSS [query].
 class QueryChildSlot extends ChildSlot {
-  QueryChildSlot(this.query, {required this.child});
+  const QueryChildSlot(this.query, {required this.child, super.key});
 
   final String query;
   @override
@@ -168,14 +168,14 @@ class SlottedDomRenderObject extends DomRenderFragment {
     final lastNode = nodesToAdd.last;
     assert(firstNode.parentNode == lastNode.parentNode, 'All nodes must share the same parent.');
     final object = SlottedDomRenderObject._(parent, firstChildNode: firstNode, lastChildNode: lastNode);
-    if (parent != null && parent.node.contains(firstNode)) {
-      if (parent is HydratableDomRenderObject) {
-        final startIndex = parent.toHydrate.indexOf(firstNode);
-        final endIndex = parent.toHydrate.indexOf(lastNode);
-        if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
-          parent.toHydrate.removeRange(startIndex, endIndex + 1);
-        }
+    if (parent is HydratableDomRenderObject) {
+      final startIndex = parent.toHydrate.indexOf(firstNode);
+      final endIndex = parent.toHydrate.indexOf(lastNode);
+      if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
+        parent.toHydrate.removeRange(startIndex, endIndex + 1);
       }
+    }
+    if (_realNodeOf(parent!).contains(firstNode)) {
       object.isAttached = true;
     } else {
       for (final node in nodesToAdd) {
@@ -195,7 +195,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
   void attach(covariant RenderObject child, {covariant RenderObject? after}) {
     if (child is ChildSlotRenderObject) {
       assert(
-        isAttached ? parent!.node.contains(child.node) : node.contains(child.node),
+        isAttached ? _realNodeOf(parent!).contains(child.node) : node.contains(child.node),
         'Cannot attach a child that is not already part of the component fragment.',
       );
       child.parent = this;
@@ -207,7 +207,18 @@ class SlottedDomRenderObject extends DomRenderFragment {
 
   @override
   void remove(covariant RenderObject child) {
+    if (child is ChildSlotRenderObject) {
+      child.parent = null;
+      return;
+    }
     throw UnsupportedError('SlottedDomRenderObject cannot have children removed from them.');
+  }
+
+  static web.Node _realNodeOf(DomRenderObject object) {
+    if (object is DomRenderFragment) {
+      return _realNodeOf(object.parent!);
+    }
+    return object.node;
   }
 }
 
