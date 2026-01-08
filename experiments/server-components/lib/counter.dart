@@ -12,8 +12,19 @@ class Counter extends StatefulComponent {
   State<StatefulComponent> createState() => CounterState();
 }
 
-class CounterState extends State<Counter> {
+class CounterState extends State<Counter>
+    with SyncStateMixin<Counter, Map<String, dynamic>> {
   int count = 0;
+
+  @override
+  Map<String, dynamic> getState() {
+    return {'stepDouble': component.step * 2};
+  }
+
+  @override
+  void updateState(Map<String, dynamic> value) {
+    print("GOT SYNC: $value");
+  }
 
   @override
   Component build(BuildContext context) {
@@ -29,9 +40,12 @@ class CounterState extends State<Counter> {
         [.text("Increase by ${component.step}")],
       ),
       if (component.child != null) component.child!,
-      button(onClick: () {
-        context.reload();
-      }, [.text('Reload Page')]),
+      button(
+        onClick: () {
+          context.reload();
+        },
+        [.text('Reload Page')],
+      ),
     ]);
   }
 }

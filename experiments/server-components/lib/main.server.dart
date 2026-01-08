@@ -19,9 +19,7 @@ void main() {
             Counter(
               step: time.second,
               child: p(classes: 'server', [
-                .text(
-                  'This is a server component asdasdaasdasd, rendered at $time.',
-                ),
+                .text('This is a server component, rendered at $time.'),
                 MiniCounter(),
               ]),
             ),
