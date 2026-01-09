@@ -37,6 +37,7 @@ class DevProxy {
 
   static Future<DevProxy> start(
     int daemonPort,
+    int proxyPort,
     Stream<daemon.BuildResults> buildResults, {
     bool autoRun = true,
     bool enableDebugging = false,
@@ -78,7 +79,7 @@ class DevProxy {
       );
 
       final buildSettings = BuildSettings(
-        appEntrypoint: Uri.parse('org-dartlang-app:///$target/main.dart'),
+        //appEntrypoint: Uri.parse('org-dartlang-app:///$target/main.dart'),
         canaryFeatures: false,
         isFlutterApp: false,
         experiments: [],
@@ -95,7 +96,7 @@ class DevProxy {
       if (enableDebugging) {
         ddcService = ExpressionCompilerService(
           'localhost',
-          daemonPort, // TODO: does this work instead of 'options.port'?
+          proxyPort,
           verbose: false,
           sdkConfigurationProvider: const DefaultSdkConfigurationProvider(),
         );

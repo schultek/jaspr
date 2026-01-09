@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../project.dart';
 import 'base_command.dart';
 
 class CleanCommand extends BaseCommand {
@@ -45,8 +46,8 @@ class CleanCommand extends BaseCommand {
     // TODO support windows
     if (Platform.isMacOS || Platform.isLinux) {
       final pids = await findRunawayProcesses([
-        // server, vm, build_runner, flutter
-        '8080', '8181', '5467', '5678',
+        // server, vm, proxy, flutter
+        defaultServePort, '8181', serverProxyPort, flutterProxyPort,
       ]);
 
       if (pids.isNotEmpty) {

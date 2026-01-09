@@ -22,6 +22,7 @@ import 'util.dart';
 /// the DevTools.
 class ClientWorkflow {
   static Future<ClientWorkflow?> start(
+    String proxyPort,
     List<String> buildOptions,
     Logger logger,
     void Function(FutureOr<void> Function()) guard, {
@@ -47,9 +48,9 @@ class ClientWorkflow {
         logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
         client.startBuild();
 
-        final assetPort = daemonPort(workingDirectory);
         final devProxy = await DevProxy.start(
-          assetPort,
+          daemonPort(workingDirectory),
+          int.parse(proxyPort),
           client.buildResults,
           autoRun: autoRun,
           enableDebugging: enableDebugging,

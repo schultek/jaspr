@@ -173,7 +173,7 @@ abstract class BaseCommand extends Command<int> {
   Future<int> watchProcess(
     String name,
     Process process, {
-    required Tag tag,
+    Tag? tag,
     String? progress,
     bool Function(String)? hide,
     bool Function()? onFail,

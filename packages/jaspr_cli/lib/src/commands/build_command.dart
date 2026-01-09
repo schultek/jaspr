@@ -179,7 +179,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
       ], workingDirectory: Directory.current.path);
 
-      await watchProcess('server build', process, tag: Tag.cli, progress: 'Building server app...');
+      await watchProcess('server build', process, progress: 'Compiling server executable.');
     } else if (project.requireMode == JasprMode.static) {
       logger.write('Preparing static rendering...');
 
@@ -187,10 +187,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       final List<String> queuedRoutes = [];
 
       final serverStartedCompleter = Completer<void>();
-      final serverPort = project.port ?? '8080';
+      final serverPort = project.port ?? defaultServePort;
 
       await startProxy(
-        '5567',
+        serverProxyPort,
         serverPort: serverPort,
         onMessage: (message) {
           if (message case {'route': final String route}) {
@@ -229,7 +229,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
           entryPoint!,
         ],
-        environment: {'PORT': serverPort, 'JASPR_PROXY_PORT': '5567'},
+        environment: {'PORT': serverPort, 'JASPR_PROXY_PORT': serverProxyPort},
         workingDirectory: Directory.current.path,
       );
 

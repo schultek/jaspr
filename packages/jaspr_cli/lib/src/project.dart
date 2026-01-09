@@ -293,6 +293,10 @@ class Project {
   }
 }
 
+const defaultServePort = '8080';
+const serverProxyPort = '5567';
+const flutterProxyPort = '5678';
+
 final dartExecutable = () {
   return Platform.isWindows
       // Use 'where.exe' to support powershell as well

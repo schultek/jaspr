@@ -41,7 +41,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'port',
       abbr: 'p',
-      help: 'Specify a port to run the dev server on. Defaults to {jaspr.port} from pubspec.yaml or "8080".',
+      help:
+          'Specify a port to run the dev server on. '
+          'Defaults to {jaspr.port} from pubspec.yaml or "$defaultServePort".',
     );
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
@@ -71,7 +73,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final debug = argResults!.flag('debug');
   late final release = argResults!.flag('release');
   late final mode = argResults!.option('mode')!;
-  late final port = argResults!.option('port') ?? project.port ?? '8080';
+  late final port = argResults!.option('port') ?? project.port ?? defaultServePort;
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
   late final skipServer = argResults!.flag('skip-server');
@@ -87,9 +89,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Running jaspr in ${project.requireMode.name} rendering mode.');
 
-    final proxyPort = project.requireMode == JasprMode.client ? port : '5567';
-    final flutterPort = '5678';
-
     final entryPoint = await getServerEntryPoint(input);
 
     if (entryPoint != null && !entryPoint.startsWith('lib/')) {
@@ -99,7 +98,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       );
     }
 
-    final workflow = await _runClient();
+    final proxyPort = project.requireMode == JasprMode.client ? port : serverProxyPort;
+
+    final workflow = await _runClient(proxyPort);
     if (workflow == null) {
       await stop();
       return 1;
@@ -108,7 +109,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     handleClientWorkflow(workflow);
 
     if (project.flutterMode == FlutterMode.embedded) {
-      final flutterProcess = await serveFlutter(flutterPort, useWasm);
+      final flutterProcess = await serveFlutter(useWasm);
 
       workflow.devProxy.buildResults.where((event) => event.status == BuildStatus.succeeded).listen((event) {
         // trigger reload
@@ -120,7 +121,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       proxyPort,
       devProxy: workflow.devProxy,
       serverPort: port,
-      flutterPort: project.flutterMode == FlutterMode.embedded ? flutterPort : null,
+      flutterPort: project.flutterMode == FlutterMode.embedded ? flutterProxyPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
     );
 
@@ -261,12 +262,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     });
   }
 
-  Future<ClientWorkflow?> _runClient() async {
+  Future<ClientWorkflow?> _runClient(String proxyPort) async {
     if (useWasm) {
       project.checkWasmSupport();
     }
 
-    logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
+    logger.write('Starting web compilers...', tag: Tag.cli, progress: ProgressState.running);
 
     final compiler = useWasm
         ? 'dart2wasm'
@@ -340,6 +341,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     ];
 
     final workflow = await ClientWorkflow.start(
+      proxyPort,
       buildArgs,
       logger,
       guardResource,
@@ -352,7 +354,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     guardResource(() async {
-      logger.write('Terminating web compiler...');
+      logger.write('Terminating web compilers...');
       await workflow.shutDown();
     });
 
@@ -389,6 +391,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         if (buildCompleter.isCompleted) {
           logger.write('Rebuilding web assets...', tag: Tag.cli, progress: ProgressState.running);
         } else {
+          logger.write('Web compilers started.', tag: Tag.cli, progress: ProgressState.completed);
           logger.write('Building web assets...', tag: Tag.cli, progress: ProgressState.running);
         }
       }
