@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+import 'dart:io';
 
 import 'package:file/file.dart';
 import 'package:file/local.dart';
@@ -309,3 +310,28 @@ final dartSdkVersion = () {
     return output.substring('Dart SDK version:'.length).trim();
   }
 }();
+
+final String dartExecutablePath = (() {
+  if (Platform.isWindows) {
+    // Use 'where.exe' to support powershell as well
+    return (Process.runSync('where.exe', ['dart.exe']).stdout as String).split(RegExp('(\r\n|\r|\n)')).first;
+  }
+  return Process.runSync('which', ['dart']).stdout as String;
+})();
+
+/// The path to the root directory of the SDK.
+final String? dartSdkDir = (() {
+  final maybeDartSdkDir = path.dirname(path.dirname(dartExecutable));
+  if (io.FileSystemEntity.isFileSync(path.join(maybeDartSdkDir, 'version'))) {
+    return maybeDartSdkDir;
+  }
+
+  final maybeFlutterDartSdkDir = path.join(path.dirname(dartExecutable), 'cache', 'dart-sdk');
+  if (io.FileSystemEntity.isFileSync(path.join(maybeFlutterDartSdkDir, 'version'))) {
+    return maybeFlutterDartSdkDir;
+  }
+
+  return null;
+})();
+
+final String? dartDevToolsPath = dartSdkDir != null ? path.join(dartSdkDir!, 'bin', 'resources', 'devtools') : null;

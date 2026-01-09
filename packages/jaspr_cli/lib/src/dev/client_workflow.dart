@@ -10,14 +10,11 @@ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:build_daemon/client.dart';
 import 'package:build_daemon/data/build_target.dart';
-
-import 'package:webdev/src/command/configuration.dart';
+import 'package:dwds/dwds.dart';
 
 import '../logging.dart';
 import 'dev_proxy.dart';
 import 'util.dart';
-
-export 'package:webdev/src/command/configuration.dart';
 
 /// Controls the web development workflow.
 ///
@@ -25,26 +22,27 @@ export 'package:webdev/src/command/configuration.dart';
 /// the DevTools.
 class ClientWorkflow {
   static Future<ClientWorkflow?> start(
-    Configuration configuration,
     List<String> buildOptions,
-    String targetPort,
     Logger logger,
-    void Function(FutureOr<void> Function()) guard,
-  ) async {
+    void Function(FutureOr<void> Function()) guard, {
+    bool autoRun = true,
+    bool enableDebugging = false,
+    ReloadConfiguration reload = ReloadConfiguration.none,
+  }) async {
     var cancelled = false;
 
     final op = CancelableOperation<ClientWorkflow?>.fromFuture(
       Future(() async {
         final workingDirectory = Directory.current.path;
-        final targetPorts = {'web': int.parse(targetPort)};
 
-        final client = await _startBuildDaemon(workingDirectory, buildOptions, logger);
+        final client = await startBuildDaemon(workingDirectory, buildOptions, logger);
         if (client == null) return null;
         if (cancelled) {
           client.close();
           return null;
         }
-        _registerBuildTargets(client, configuration, targetPorts);
+
+        client.registerBuildTarget(DefaultBuildTarget((b) => b..target = 'web'));
 
         logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
         client.startBuild();
@@ -53,9 +51,9 @@ class ClientWorkflow {
         final devProxy = await DevProxy.start(
           assetPort,
           client.buildResults,
-          autoRun: configuration.autoRun,
-          enableDebugging: configuration.debug,
-          reload: configuration.reload,
+          autoRun: autoRun,
+          enableDebugging: enableDebugging,
+          reload: reload,
         );
 
         if (cancelled) {
@@ -98,62 +96,5 @@ class ClientWorkflow {
     await client.close();
     await devProxy.stop();
     if (!_doneCompleter.isCompleted) _doneCompleter.complete();
-  }
-}
-
-Future<BuildDaemonClient?> _startBuildDaemon(String workingDirectory, List<String> buildOptions, Logger logger) async {
-  try {
-    logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
-    return await connectClient(workingDirectory, buildOptions, logger.writeServerLog);
-  } on OptionsSkew {
-    logger.write(
-      'Incompatible options with current running build daemon.\n\n'
-      'Please stop other Jaspr processes running in this directory '
-      'before starting a new process with these options.',
-      tag: Tag.cli,
-      level: Level.critical,
-      progress: ProgressState.completed,
-    );
-    return null;
-  }
-}
-
-void _registerBuildTargets(BuildDaemonClient client, Configuration configuration, Map<String, int> targetPorts) {
-  // Register a target for each serve target.
-  for (final target in targetPorts.keys) {
-    OutputLocation? outputLocation;
-    if (configuration.outputPath != null &&
-        (configuration.outputInput == null || target == configuration.outputInput)) {
-      outputLocation = OutputLocation(
-        (b) => b
-          ..output = configuration.outputPath
-          ..useSymlinks = true
-          ..hoist = true,
-      );
-    }
-    client.registerBuildTarget(
-      DefaultBuildTarget(
-        (b) => b
-          ..target = target
-          ..outputLocation = outputLocation?.toBuilder(),
-      ),
-    );
-  }
-  // Empty string indicates we should build everything, register a corresponding
-  // target.
-  if (configuration.outputInput == '' && configuration.outputPath != null) {
-    final outputLocation = OutputLocation(
-      (b) => b
-        ..output = configuration.outputPath
-        ..useSymlinks = true
-        ..hoist = false,
-    );
-    client.registerBuildTarget(
-      DefaultBuildTarget(
-        (b) => b
-          ..target = ''
-          ..outputLocation = outputLocation.toBuilder(),
-      ),
-    );
   }
 }

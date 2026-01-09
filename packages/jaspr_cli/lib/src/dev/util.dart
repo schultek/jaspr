@@ -2,33 +2,29 @@ import 'dart:io';
 
 import 'package:build_daemon/client.dart';
 import 'package:build_daemon/constants.dart';
-import 'package:build_daemon/data/server_log.dart';
 import 'package:path/path.dart' as p;
 
-/// The path to the root directory of the SDK.
-final String _sdkDir = (() {
-  // The Dart executable is in "/path/to/sdk/bin/dart", so two levels up is
-  // "/path/to/sdk".
-  final aboveExecutable = p.dirname(p.dirname(Platform.resolvedExecutable));
-  assert(FileSystemEntity.isFileSync(p.join(aboveExecutable, 'version')));
-  return aboveExecutable;
-})();
-
-final String dartPath = p.join(_sdkDir, 'bin', 'dart');
-final String devToolsPath = p.join(_sdkDir, 'bin', 'resources', 'devtools');
+import '../logging.dart';
+import '../project.dart';
 
 /// Connects to the `build_runner` daemon.
-Future<BuildDaemonClient> connectClient(
-  String workingDirectory,
-  List<String> options,
-  void Function(ServerLog) logHandler,
-) => BuildDaemonClient.connect(workingDirectory, [
-  dartPath,
-  'run',
-  'build_runner',
-  'daemon',
-  ...options,
-], logHandler: logHandler);
+Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String> buildOptions, Logger logger) async {
+  try {
+    logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
+    final args = [dartExecutable, 'run', 'build_runner', 'daemon', ...buildOptions];
+    return await BuildDaemonClient.connect(workingDirectory, args, logHandler: logger.writeServerLog);
+  } on OptionsSkew {
+    logger.write(
+      'Incompatible options with current running build daemon.\n\n'
+      'Please stop other Jaspr processes running in this directory '
+      'before starting a new process with these options.',
+      tag: Tag.cli,
+      level: Level.critical,
+      progress: ProgressState.completed,
+    );
+    return null;
+  }
+}
 
 /// Returns the port of the daemon asset server.
 int daemonPort(String workingDirectory) {
@@ -40,3 +36,54 @@ int daemonPort(String workingDirectory) {
 }
 
 String _assetServerPortFilePath(String workingDirectory) => '${daemonWorkspace(workingDirectory)}/.asset_server_port';
+
+/// Returns the absolute file path of the `package_config.json` file in the `.dart_tool`
+/// directory, searching recursively from the current directory hierarchy.
+String? findPackageConfigFilePath() {
+  var candidateDir = Directory(p.current).absolute;
+
+  while (true) {
+    final candidatePackageConfigFile = File(p.join(candidateDir.path, '.dart_tool', 'package_config.json'));
+
+    if (candidatePackageConfigFile.existsSync()) {
+      return candidatePackageConfigFile.path;
+    }
+
+    final parentDir = candidateDir.parent;
+    if (parentDir.path == candidateDir.path) {
+      // We've reached the root directory
+      return null;
+    }
+
+    candidateDir = parentDir;
+  }
+}
+
+String? getStringArg(Map<String, dynamic> args, String name, {bool required = false}) {
+  if (required && !args.containsKey(name)) {
+    throw ArgumentError('$name is required');
+  }
+  final val = args[name];
+  if (val != null && val is! String) {
+    throw ArgumentError('$name is not a String');
+  }
+  return val as String?;
+}
+
+bool? getBoolArg(Map<String, dynamic> args, String name, {bool required = false}) {
+  if (required && !args.containsKey(name)) {
+    throw ArgumentError('$name is required');
+  }
+  final val = args[name];
+  if (val != null && val is! bool) throw ArgumentError('$name is not a bool');
+  return val as bool?;
+}
+
+int? getIntArg(Map<String, dynamic> args, String name, {bool required = false}) {
+  if (required && !args.containsKey(name)) {
+    throw ArgumentError('$name is required');
+  }
+  final val = args[name];
+  if (val != null && val is! int) throw ArgumentError('$name is not an int');
+  return val as int?;
+}

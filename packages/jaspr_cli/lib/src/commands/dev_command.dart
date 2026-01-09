@@ -89,7 +89,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final proxyPort = project.requireMode == JasprMode.client ? port : '5567';
     final flutterPort = '5678';
-    final webPort = '5467';
 
     final entryPoint = await getServerEntryPoint(input);
 
@@ -100,7 +99,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       );
     }
 
-    final workflow = await _runClient(webPort);
+    final workflow = await _runClient();
     if (workflow == null) {
       await stop();
       return 1;
@@ -262,20 +261,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     });
   }
 
-  Future<ClientWorkflow?> _runClient(String webPort) async {
+  Future<ClientWorkflow?> _runClient() async {
     if (useWasm) {
       project.checkWasmSupport();
     }
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
-
-    final configuration = Configuration(
-      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
-      debug: launchInChrome,
-      debugExtension: launchInChrome,
-      launchInChrome: launchInChrome,
-      autoRun: autoRun,
-    );
 
     final compiler = useWasm
         ? 'dart2wasm'
@@ -348,7 +339,14 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       ],
     ];
 
-    final workflow = await ClientWorkflow.start(configuration, buildArgs, webPort, logger, guardResource);
+    final workflow = await ClientWorkflow.start(
+      buildArgs,
+      logger,
+      guardResource,
+      autoRun: autoRun,
+      enableDebugging: launchInChrome,
+      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+    );
     if (workflow == null) {
       return null;
     }

@@ -1,3 +1,4 @@
+import '../daemon/logger.dart';
 import '../dev/client_domain.dart';
 import '../dev/client_workflow.dart';
 import '../helpers/daemon_helper.dart';

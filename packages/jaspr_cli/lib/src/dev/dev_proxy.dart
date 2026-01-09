@@ -1,17 +1,14 @@
-import 'dart:io';
-
 import 'package:build_daemon/data/build_status.dart' as daemon;
 import 'package:dds/devtools_server.dart';
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/dwds.dart';
 import 'package:dwds/sdk_configuration.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
-// ignore: implementation_imports
-import 'package:webdev/src/serve/chrome.dart' as webdev;
 
+import '../project.dart';
+import 'chrome.dart';
 import 'util.dart';
 
 class DevProxy {
@@ -114,7 +111,7 @@ class DevProxy {
                 final server = await DevToolsServer().serveDevTools(
                   hostname: hostname,
                   enableStdinCommands: false,
-                  customDevToolsPath: devToolsPath,
+                  customDevToolsPath: dartDevToolsPath,
                 );
                 return DevTools(server!.address.host, server.port, server);
               }
@@ -134,7 +131,8 @@ class DevProxy {
         toolConfiguration: toolConfiguration,
         assetReader: assetReader,
         buildResults: filteredBuildResults,
-        chromeConnection: () async => (await webdev.Chrome.connectedInstance).chromeConnection,
+        chromeConnection: () async => (await Chrome.connectedInstance).chrome.chromeConnection,
+        injectDebuggingSupportCode: enableDebugging,
       );
       pipeline = pipeline.addMiddleware(dwds.middleware);
       cascade = cascade.add(dwds.handler);
@@ -157,27 +155,5 @@ class DevProxy {
     client.close();
     await dwds?.stop();
     await ddcService?.stop();
-  }
-}
-
-/// Returns the absolute file path of the `package_config.json` file in the `.dart_tool`
-/// directory, searching recursively from the current directory hierarchy.
-String? findPackageConfigFilePath() {
-  var candidateDir = Directory(p.current).absolute;
-
-  while (true) {
-    final candidatePackageConfigFile = File(p.join(candidateDir.path, '.dart_tool', 'package_config.json'));
-
-    if (candidatePackageConfigFile.existsSync()) {
-      return candidatePackageConfigFile.path;
-    }
-
-    final parentDir = candidateDir.parent;
-    if (parentDir.path == candidateDir.path) {
-      // We've reached the root directory
-      return null;
-    }
-
-    candidateDir = parentDir;
   }
 }

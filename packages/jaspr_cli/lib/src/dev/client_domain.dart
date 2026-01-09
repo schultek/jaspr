@@ -12,11 +12,11 @@ import 'package:dwds/data/build_result.dart';
 import 'package:dwds/dwds.dart';
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
-import 'package:webdev/src/daemon/daemon.dart';
-import 'package:webdev/src/daemon/domain.dart';
-import 'package:webdev/src/daemon/utilites.dart';
 
+import '../daemon/daemon.dart';
+import '../daemon/domain.dart';
 import 'dev_proxy.dart';
+import 'util.dart';
 
 /// A collection of method and events relevant to the running application.
 class ClientDomain extends Domain {

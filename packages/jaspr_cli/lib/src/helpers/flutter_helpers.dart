@@ -127,6 +127,7 @@ final flutterInfo = (() {
   }
   return output;
 })();
+
 final webSdkDir = (() {
   final webSdkPath = p.join(flutterInfo['flutterRoot'] as String, 'bin', 'cache', 'flutter_web_sdk');
   if (!Directory(webSdkPath).existsSync()) {
@@ -141,4 +142,5 @@ final webSdkDir = (() {
   }
   return webSdkPath;
 })();
+
 final flutterVersion = flutterInfo['flutterVersion'] as String;

@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:mason/mason.dart';
 
-import '../config.dart';
 import '../helpers/analytics.dart';
+import '../project.dart';
 import '../version.dart';
 import 'base_command.dart';
 
