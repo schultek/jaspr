@@ -1,4 +1,4 @@
-import '/server.dart';
+import '../../framework/framework.dart';
 
 /// Renders its [text] input as raw HTML.
 ///
@@ -25,10 +25,12 @@ class _RawTextElement extends LeafRenderObjectElement {
 
   @override
   RenderObject createRenderObject() {
-    final parent = parentRenderObjectElement!.renderObject as MarkupRenderObject;
+    final parent = parentRenderObjectElement!.renderObject;
     return parent.createChildRenderText((component as RawText).text, true);
   }
 
   @override
-  void updateRenderObject(covariant RenderObject renderObject) {}
+  void updateRenderObject(covariant RenderObject renderObject) {
+    (renderObject as RenderText).update((component as RawText).text, true);
+  }
 }
