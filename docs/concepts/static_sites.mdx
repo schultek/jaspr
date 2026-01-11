@@ -66,6 +66,17 @@ server code and not the client.
 
 The method should be called during the initial build of your app, so putting it into `initState()` of your root component is a good choice.
 
+## Content-Driven Sites
+
+If you are building a content-heavy site like a blog, documentation or marketing page, it is recommended to use the `jaspr_content` package.
+
+This package provides a set of tools to load, parse, and render content from markdown files, along with support for frontmatter, templating, and custom components.
+It works great with static-site generation and automatically generates routes for your content.
+
+<Info>
+  Check out the [jaspr_content](/content) documentation for more details.
+</Info>
+
 ## Generating a Sitemap
 
 Jaspr can automatically generate a sitemap for your static site. To enable this, pass the `--sitemap-domain` argument to the `jaspr build` command, e.g.
