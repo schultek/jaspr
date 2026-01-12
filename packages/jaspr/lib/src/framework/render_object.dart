@@ -5,7 +5,7 @@ abstract class RenderObject {
   web.Node? get node;
 
   RenderElement createChildRenderElement(String tag);
-  RenderText createChildRenderText(String text, [bool rawHtml = false]);
+  RenderText createChildRenderText(String text);
   RenderFragment createChildRenderFragment();
 
   void attach(covariant RenderObject child, {covariant RenderObject? after});
@@ -24,6 +24,16 @@ abstract class RenderElement implements RenderObject {
 }
 
 abstract class RenderText implements RenderObject {
+  void update(String text);
+}
+
+abstract class RawableRenderObject implements RenderObject {
+  @override
+  RenderText createChildRenderText(String text, [bool rawHtml = false]);
+}
+
+abstract class RawableRenderText implements RenderText {
+  @override
   void update(String text, [bool rawHtml = false]);
 }
 

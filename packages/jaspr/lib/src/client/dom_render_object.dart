@@ -27,7 +27,7 @@ abstract class DomRenderObject implements RenderObject {
   }
 
   @override
-  RenderText createChildRenderText(String text, [bool rawHtml = false]) {
+  RenderText createChildRenderText(String text) {
     return DomRenderText(text, this);
   }
 
@@ -250,7 +250,7 @@ class DomRenderText extends DomRenderObject implements RenderText {
   }
 
   @override
-  void update(String text, [bool rawHtml = false]) {
+  void update(String text) {
     if (node.textContent != text) {
       node.textContent = text;
       if (kVerboseMode) {

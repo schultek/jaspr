@@ -1,8 +1,9 @@
 ## Unreleased patch
 
 - Fixed `testComponents` failing with `RawText` components due to `MarkupRenderObject` cast error.
-  - Added optional `rawHtml` parameter to `RenderObject.createChildRenderText()` and `RenderText.update()` interfaces.
-  - Updated `TestRenderObject` and `TestRenderText` to support raw HTML text rendering in tests.
+  - Added `RawableRenderObject` and `RawableRenderText` interfaces for raw HTML text rendering support.
+  - `MarkupRenderObject` and `TestRenderObject` now implement `RawableRenderObject`.
+  - `MarkupRenderText` and `TestRenderText` now implement `RawableRenderText`.
 
 ## 0.22.1
 

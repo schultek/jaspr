@@ -139,7 +139,7 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   }
 }
 
-class TestRenderObject extends RenderObject {
+class TestRenderObject extends RenderObject implements RawableRenderObject {
   List<TestRenderObject> children = [];
 
   @override
@@ -209,7 +209,7 @@ class TestRenderElement extends TestRenderObject implements RenderElement {
   }
 }
 
-class TestRenderText extends TestRenderObject implements RenderText {
+class TestRenderText extends TestRenderObject implements RawableRenderText {
   TestRenderText(this.text, [this.rawHtml = false]);
 
   String text;
