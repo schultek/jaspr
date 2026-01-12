@@ -16,8 +16,25 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
   } on OptionsSkew {
     logger.write(
       'Incompatible options with current running build daemon.\n\n'
-      'Please stop other Jaspr processes running in this directory '
-      'before starting a new process with these options.',
+      'Please stop other Jaspr processes running in this directory and try again.',
+      tag: Tag.cli,
+      level: Level.critical,
+      progress: ProgressState.completed,
+    );
+    return null;
+  } on VersionSkew {
+    logger.write(
+      'Incompatible version with current running build daemon.\n\n'
+      'Please stop other Jaspr processes running in this directory and try again.',
+      tag: Tag.cli,
+      level: Level.critical,
+      progress: ProgressState.completed,
+    );
+    return null;
+  } catch (e) {
+    logger.write(e.toString(), tag: Tag.builder, level: Level.error, progress: ProgressState.completed);
+    logger.write(
+      'Failed to connect to the build daemon. See the error above for more details.',
       tag: Tag.cli,
       level: Level.critical,
       progress: ProgressState.completed,

@@ -313,15 +313,8 @@ final dartSdkVersion = () {
   if (output.startsWith('Dart SDK version:')) {
     return output.substring('Dart SDK version:'.length).trim();
   }
+  return 'unknown';
 }();
-
-final String dartExecutablePath = (() {
-  if (Platform.isWindows) {
-    // Use 'where.exe' to support powershell as well
-    return (Process.runSync('where.exe', ['dart.exe']).stdout as String).split(RegExp('(\r\n|\r|\n)')).first;
-  }
-  return Process.runSync('which', ['dart']).stdout as String;
-})();
 
 /// The path to the root directory of the SDK.
 final String? dartSdkDir = (() {
