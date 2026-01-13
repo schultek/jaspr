@@ -307,7 +307,7 @@ final dartExecutable = () {
   return (ProcessRunner.instance.runSync('which', ['dart'])).stdout.toString().trim();
 }();
 
-final dartSdkVersion = () async {
+final dartSdkVersion = () {
   final result = ProcessRunner.instance.runSync(dartExecutable, ['--version']);
   if (result.exitCode != 0) {
     return 'unknown';
