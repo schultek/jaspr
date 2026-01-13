@@ -8,6 +8,7 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
 import 'logging.dart';
+import 'process_runner.dart';
 import 'version.dart';
 
 enum JasprMode { static, server, client }
@@ -97,7 +98,7 @@ class Project {
       // ok
     } else {
       final log = logger.logger;
-      if (log == null) {
+      if (log == null || !stdout.hasTerminal) {
         logger.write(
           'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.',
           tag: Tag.cli,
@@ -109,7 +110,7 @@ class Project {
           defaultValue: true,
         );
         if (result) {
-          final result = io.Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
+          final result = ProcessRunner.instance.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
           if (result.exitCode != 0) {
             log.err(result.stderr as String?);
             logger.write(
@@ -298,14 +299,16 @@ const serverProxyPort = '5567';
 const flutterProxyPort = '5678';
 
 final dartExecutable = () {
-  return Platform.isWindows
-      // Use 'where.exe' to support powershell as well
-      ? (Process.runSync('where.exe', ['dart.exe']).stdout as String).split(RegExp('(\r\n|\r|\n)')).first.trim()
-      : Process.runSync('which', ['dart']).stdout.toString().trim();
+  if (Platform.isWindows) {
+    // Use 'where.exe' to support powershell as well
+    final result = (ProcessRunner.instance.runSync('where.exe', ['dart.exe'])).stdout.toString();
+    return result.split(RegExp('(\r\n|\r|\n)')).first.trim();
+  }
+  return (ProcessRunner.instance.runSync('which', ['dart'])).stdout.toString().trim();
 }();
 
-final dartSdkVersion = () {
-  final result = Process.runSync(dartExecutable, ['--version']);
+final dartSdkVersion = () async {
+  final result = ProcessRunner.instance.runSync(dartExecutable, ['--version']);
   if (result.exitCode != 0) {
     return 'unknown';
   }

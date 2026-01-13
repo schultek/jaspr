@@ -18,7 +18,6 @@ mixin DaemonHelper on BaseCommand {
     final resultFuture = callback(daemon);
 
     await daemon.onExit;
-    await stop();
 
     return await resultFuture;
   }

@@ -15,6 +15,7 @@ import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
+import '../process_runner.dart';
 import '../project.dart';
 import 'base_command.dart';
 
@@ -133,7 +134,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       dummyIndex = true;
       dummyTargetIndex = true;
       indexHtml
-        ..createSync()
+        ..createSync(recursive: true)
         ..writeAsStringSync(
           'This file (web/index.html) should not exist. If you see this message something went wrong during "jaspr build". Simply delete the file.',
         );
@@ -169,7 +170,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         _ => '',
       };
 
-      final process = await Process.start('dart', [
+      final process = await ProcessRunner.instance.start('dart', [
         'compile',
         compileTarget,
         entryPoint!,
@@ -216,7 +217,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
       serverPid.writeAsStringSync('');
 
-      final process = await Process.start(
+      final process = await ProcessRunner.instance.start(
         dartExecutable,
         [
           // Use direct `dart` entry point for now due to

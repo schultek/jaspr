@@ -5,54 +5,60 @@ import 'package:build_daemon/constants.dart';
 import 'package:path/path.dart' as p;
 
 import '../logging.dart';
+import '../process_runner.dart';
 import '../project.dart';
 
 /// Connects to the `build_runner` daemon.
 Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String> buildOptions, Logger logger) async {
-  try {
-    logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
-    final args = [dartExecutable, 'run', 'build_runner', 'daemon', ...buildOptions];
-    return await BuildDaemonClient.connect(workingDirectory, args, logHandler: logger.writeServerLog);
-  } on OptionsSkew {
-    logger.write(
-      'Incompatible options with current running build daemon.\n\n'
-      'Please stop other Jaspr processes running in this directory and try again.',
-      tag: Tag.cli,
-      level: Level.critical,
-      progress: ProgressState.completed,
-    );
-    return null;
-  } on VersionSkew {
-    logger.write(
-      'Incompatible version with current running build daemon.\n\n'
-      'Please stop other Jaspr processes running in this directory and try again.',
-      tag: Tag.cli,
-      level: Level.critical,
-      progress: ProgressState.completed,
-    );
-    return null;
-  } catch (e) {
-    logger.write(e.toString(), tag: Tag.builder, level: Level.error, progress: ProgressState.completed);
-    logger.write(
-      'Failed to connect to the build daemon. See the error above for more details.',
-      tag: Tag.cli,
-      level: Level.critical,
-      progress: ProgressState.completed,
-    );
-    return null;
+  logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
+  final args = [dartExecutable, 'run', 'build_runner', 'daemon', ...buildOptions];
+  if (ProcessRunner.isDefault) {
+    try {
+      return await BuildDaemonClient.connect(workingDirectory, args, logHandler: logger.writeServerLog);
+    } on OptionsSkew {
+      logger.write(
+        'Incompatible options with current running build daemon.\n\n'
+        'Please stop other Jaspr processes running in this directory and try again.',
+        tag: Tag.cli,
+        level: Level.critical,
+        progress: ProgressState.completed,
+      );
+      return null;
+    } on VersionSkew {
+      logger.write(
+        'Incompatible version with current running build daemon.\n\n'
+        'Please stop other Jaspr processes running in this directory and try again.',
+        tag: Tag.cli,
+        level: Level.critical,
+        progress: ProgressState.completed,
+      );
+      return null;
+    } catch (e) {
+      logger.write(e.toString(), tag: Tag.builder, level: Level.error, progress: ProgressState.completed);
+      logger.write(
+        'Failed to connect to the build daemon. See the error above for more details.',
+        tag: Tag.cli,
+        level: Level.critical,
+        progress: ProgressState.completed,
+      );
+      return null;
+    }
+  } else {
+    await ProcessRunner.instance.start(args.first, args.sublist(1), workingDirectory: workingDirectory);
+    return await BuildDaemonClient.connectUnchecked(workingDirectory, logHandler: logger.writeServerLog);
   }
 }
 
 /// Returns the port of the daemon asset server.
 int daemonPort(String workingDirectory) {
-  final portFile = File(_assetServerPortFilePath(workingDirectory));
+  final portFile = File(assetServerPortFilePath(workingDirectory));
   if (!portFile.existsSync()) {
     throw Exception('Unable to read daemon asset port file.');
   }
   return int.parse(portFile.readAsStringSync());
 }
 
-String _assetServerPortFilePath(String workingDirectory) => '${daemonWorkspace(workingDirectory)}/.asset_server_port';
+String assetServerPortFilePath(String workingDirectory) => '${daemonWorkspace(workingDirectory)}/.asset_server_port';
 
 /// Returns the absolute file path of the `package_config.json` file in the `.dart_tool`
 /// directory, searching recursively from the current directory hierarchy.

@@ -68,8 +68,10 @@ class ClientWorkflow {
     );
 
     guard(() {
-      op.cancel();
-      cancelled = true;
+      if (!op.isCompleted) {
+        op.cancel();
+        cancelled = true;
+      }
     });
 
     return op.valueOrCancellation(null);
@@ -81,21 +83,21 @@ class ClientWorkflow {
       if (data.failureType == 75) {
         logger.write('Please restart Jaspr.', tag: Tag.builder, level: Level.critical);
       }
-      shutDown();
+      shutDown(data.failureType);
     });
   }
 
-  final _doneCompleter = Completer<void>();
+  final _doneCompleter = Completer<int>();
   final BuildDaemonClient client;
   final Logger logger;
 
   final DevProxy devProxy;
 
-  Future<void> get done => _doneCompleter.future;
+  Future<int> get done => _doneCompleter.future;
 
-  Future<void> shutDown() async {
+  Future<void> shutDown([int code = 0]) async {
     await client.close();
     await devProxy.stop();
-    if (!_doneCompleter.isCompleted) _doneCompleter.complete();
+    if (!_doneCompleter.isCompleted) _doneCompleter.complete(code);
   }
 }

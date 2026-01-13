@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../process_runner.dart';
 import '../project.dart';
 import 'base_command.dart';
 
@@ -40,7 +41,7 @@ class CleanCommand extends BaseCommand {
       }
 
       logger.write("Running 'dart run build_runner clean'...");
-      await Process.run('dart', ['run', 'build_runner', 'clean']);
+      await ProcessRunner.instance.run('dart', ['run', 'build_runner', 'clean']);
     }
 
     // TODO support windows
@@ -77,7 +78,7 @@ Future<List<int>> findRunawayProcesses(List<String> ports) async {
   final pids = <int>[];
 
   for (final port in ports) {
-    final proc = await Process.run('lsof', ['-i', ':$port']);
+    final proc = await ProcessRunner.instance.run('lsof', ['-i', ':$port']);
 
     if (proc.exitCode == 0) {
       pids.addAll(

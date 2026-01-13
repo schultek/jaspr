@@ -51,12 +51,7 @@ class ServeCommand extends DevCommand {
       daemon.shutdown();
     });
 
-    final resultFuture = super.runCommand();
-
-    await daemon.onExit;
-    await stop();
-
-    return await resultFuture;
+    return super.runCommand();
   }
 
   @override

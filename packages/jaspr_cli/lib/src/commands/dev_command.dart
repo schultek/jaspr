@@ -6,7 +6,6 @@ import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
 import '../dev/chrome.dart';
@@ -15,6 +14,7 @@ import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
+import '../process_runner.dart';
 import '../project.dart';
 import 'base_command.dart';
 
@@ -129,25 +129,23 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
 
       await _runChrome();
-
-      await workflow.done;
-      return 0;
-    }
-
-    if (skipServer) {
+    } else if (skipServer) {
       logger.write(
         'Skipping server as per --skip-server flag.\n'
         'Make sure to set the JASPR_PROXY_PORT=$proxyPort environment variable when starting the server manually.',
         tag: Tag.cli,
         level: Level.warning,
       );
-      await workflow.done;
-      return 0;
+    } else {
+      final started = await _startServer(entryPoint!, proxyPort, workflow);
+      if (started) {
+        await _runChrome();
+      }
     }
-    return await _runServer(entryPoint!, proxyPort, workflow);
+    return await workflow.done;
   }
 
-  Future<int> _runServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
+  Future<bool> _startServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
     logger.write('Starting server...', tag: Tag.cli, progress: ProgressState.running);
 
     final useHotReload = entryPoint.startsWith('lib/') && !release;
@@ -188,7 +186,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     args.addAll(argResults!.rest);
-    final process = await Process.start(
+    final process = await ProcessRunner.instance.start(
       dartExecutable,
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
@@ -213,34 +211,42 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     );
 
     var serverClosed = false;
-    serverFuture.whenComplete(() {
+    serverFuture.then((code) {
+      workflow.shutDown(code);
       serverClosed = true;
     });
 
     // Wait until server is reachable.
     var n = 0;
+    final sw = Stopwatch()..start();
+
     while (true) {
-      await Future<void>.delayed(Duration(seconds: 2));
+      await Future<void>.delayed(Duration(milliseconds: 1000 + (n * 100)));
       try {
-        await http.head(Uri.parse('http://localhost:$port'));
+        final socket = await Socket.connect('localhost', int.parse(port));
+        socket.close();
+        sw.stop();
         break;
       } on SocketException catch (_) {}
 
-      if (serverClosed) return serverFuture;
+      if (serverClosed) {
+        sw.stop();
+        return false;
+      }
 
       n++;
-      if (n > 10) {
+      if (n >= 10) {
+        sw.stop();
         logger.write(
-          'Server at http://localhost:$port not reachable after ${n * 2} seconds. Please check the server logs for errors.',
+          'Server at http://localhost:$port not reachable after ${sw.elapsed.inSeconds} seconds. Please check the server logs for errors.',
           tag: Tag.cli,
-          level: Level.error,
+          level: Level.warning,
         );
-        return 1;
+        return false;
       }
     }
 
-    await _runChrome();
-    return serverFuture;
+    return true;
   }
 
   Future<void> _runChrome() async {
