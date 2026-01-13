@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
-import '../helpers/daemon_helper.dart';
+import '../daemon/daemon.dart';
+import '../daemon/domain.dart';
 import '../html_spec.dart';
 import '../logging.dart';
 

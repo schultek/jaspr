@@ -1,12 +1,13 @@
-import 'dart:io' as io;
+import 'dart:io';
 
-import 'package:file/file.dart';
+import 'package:file/file.dart' hide FileSystemEntity;
 import 'package:file/local.dart';
 import 'package:path/path.dart' as path;
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
 import 'logging.dart';
+import 'process_runner.dart';
 import 'version.dart';
 
 enum JasprMode { static, server, client }
@@ -20,7 +21,7 @@ extension JasprModeExtension on JasprMode {
 class Project {
   Project(this.logger, {FileSystem? fs, Never Function(int)? exitFn})
     : _fs = fs ?? const LocalFileSystem(),
-      _exitFn = exitFn ?? io.exit;
+      _exitFn = exitFn ?? exit;
 
   final Logger logger;
   final FileSystem _fs;
@@ -96,7 +97,7 @@ class Project {
       // ok
     } else {
       final log = logger.logger;
-      if (log == null) {
+      if (log == null || !stdout.hasTerminal) {
         logger.write(
           'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.',
           tag: Tag.cli,
@@ -108,7 +109,7 @@ class Project {
           defaultValue: true,
         );
         if (result) {
-          final result = io.Process.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
+          final result = ProcessRunner.instance.runSync('dart', ['pub', 'add', '--dev', 'jaspr_builder']);
           if (result.exitCode != 0) {
             log.err(result.stderr as String?);
             logger.write(
@@ -291,3 +292,45 @@ class Project {
     }
   }
 }
+
+const defaultServePort = '8080';
+const serverProxyPort = '5567';
+const flutterProxyPort = '5678';
+
+final dartExecutable = () {
+  if (Platform.isWindows) {
+    // Use 'where.exe' to support powershell as well
+    final result = (ProcessRunner.instance.runSync('where.exe', ['dart.exe'])).stdout.toString();
+    return result.split(RegExp('(\r\n|\r|\n)')).first.trim();
+  }
+  return (ProcessRunner.instance.runSync('which', ['dart'])).stdout.toString().trim();
+}();
+
+final dartSdkVersion = () {
+  final result = ProcessRunner.instance.runSync(dartExecutable, ['--version']);
+  if (result.exitCode != 0) {
+    return 'unknown';
+  }
+  final output = result.stdout.toString().trim();
+  if (output.startsWith('Dart SDK version:')) {
+    return output.substring('Dart SDK version:'.length).trim();
+  }
+  return 'unknown';
+}();
+
+/// The path to the root directory of the SDK.
+final String? dartSdkDir = (() {
+  final maybeDartSdkDir = path.dirname(path.dirname(dartExecutable));
+  if (FileSystemEntity.isFileSync(path.join(maybeDartSdkDir, 'version'))) {
+    return maybeDartSdkDir;
+  }
+
+  final maybeFlutterDartSdkDir = path.join(path.dirname(dartExecutable), 'cache', 'dart-sdk');
+  if (FileSystemEntity.isFileSync(path.join(maybeFlutterDartSdkDir, 'version'))) {
+    return maybeFlutterDartSdkDir;
+  }
+
+  return null;
+})();
+
+final String? dartDevToolsPath = dartSdkDir != null ? path.join(dartSdkDir!, 'bin', 'resources', 'devtools') : null;

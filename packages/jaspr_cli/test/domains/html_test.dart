@@ -1,8 +1,8 @@
+import 'package:jaspr_cli/src/daemon/daemon.dart';
 import 'package:jaspr_cli/src/domains/html_domain.dart';
 import 'package:jaspr_cli/src/logging.dart';
 import 'package:test/fake.dart';
 import 'package:test/test.dart';
-import 'package:webdev/src/daemon/daemon.dart';
 
 class FakeDaemon extends Fake implements Daemon {
   FakeDaemon();

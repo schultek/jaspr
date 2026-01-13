@@ -9,8 +9,6 @@ import 'dart:io';
 
 import 'package:browser_launcher/browser_launcher.dart' as browser_launcher;
 import 'package:path/path.dart' as path;
-// ignore: implementation_imports
-import 'package:webdev/src/serve/chrome.dart' as webdev;
 import '../helpers/settings_helper.dart';
 import '../logging.dart';
 
@@ -56,16 +54,18 @@ final Directory? chromeUserDir = () {
   return chromeUserDir;
 }();
 
+var _currentCompleter = Completer<Chrome>();
+
 /// A class for managing an instance of Chrome.
 class Chrome {
-  final webdev.Chrome wChrome;
-  final browser_launcher.Chrome? bChrome;
+  final int debugPort;
+  final browser_launcher.Chrome chrome;
 
-  Chrome._(this.wChrome, this.bChrome);
+  Chrome._(this.debugPort, this.chrome);
 
   Future<void> close() async {
-    wChrome.close();
-    bChrome?.close();
+    if (_currentCompleter.isCompleted) _currentCompleter = Completer<Chrome>();
+    await chrome.close();
   }
 
   static Future<Chrome> start(List<String> urls, {required int port, required Directory? chromeUserDir}) async {
@@ -75,11 +75,39 @@ class Chrome {
       userDataDir: chromeUserDir?.path,
       signIn: true,
     );
-    return Chrome._(await webdev.Chrome.fromExisting(browser.debugPort), browser);
+    return _connect(Chrome._(port, browser));
   }
 
   static Future<Chrome> fromExisting(int port) async {
     final browser = await browser_launcher.Chrome.fromExisting(port);
-    return Chrome._(await webdev.Chrome.fromExisting(browser.debugPort), browser);
+    return _connect(Chrome._(port, browser));
+  }
+
+  static Future<Chrome> get connectedInstance => _currentCompleter.future;
+
+  static Future<Chrome> _connect(Chrome chrome) async {
+    if (_currentCompleter.isCompleted) {
+      throw ChromeError('Only one instance of chrome can be started.');
+    }
+    // The connection is lazy. Try a simple call to make sure the provided
+    // connection is valid.
+    try {
+      await chrome.chrome.chromeConnection.getTabs();
+    } catch (e) {
+      await chrome.close();
+      throw ChromeError('Unable to connect to Chrome debug port: ${chrome.debugPort}\n $e');
+    }
+    _currentCompleter.complete(chrome);
+    return chrome;
+  }
+}
+
+class ChromeError extends Error {
+  final String details;
+  ChromeError(this.details);
+
+  @override
+  String toString() {
+    return 'ChromeError: $details';
   }
 }

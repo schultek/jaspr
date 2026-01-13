@@ -1,9 +1,7 @@
 // ignore: implementation_imports
 import 'dart:async';
 
-// ignore: implementation_imports
-import 'package:webdev/src/daemon/daemon.dart';
-
+import '../daemon/daemon.dart';
 import '../dev/client_domain.dart';
 import '../dev/client_workflow.dart';
 import '../logging.dart';
@@ -36,7 +34,6 @@ class ServeCommand extends DevCommand {
   Future<int> runCommand() async {
     final fakeInput = StreamController<Map<String, Object?>>();
     daemon = Daemon(fakeInput.stream, (data) {
-      //print(data);
       if (data['event'] == 'client.debugPort') {
         final params = data['params'] as Map<String, Object?>;
         final wsUri = params['wsUri'] as String;
@@ -54,18 +51,13 @@ class ServeCommand extends DevCommand {
       daemon.shutdown();
     });
 
-    final resultFuture = super.runCommand();
-
-    await daemon.onExit;
-    await stop();
-
-    return await resultFuture;
+    return super.runCommand();
   }
 
   @override
   void handleClientWorkflow(ClientWorkflow workflow) {
     if (launchInChrome) {
-      daemon.registerDomain(ClientDomain(daemon, workflow.serverManager));
+      daemon.registerDomain(ClientDomain(daemon, workflow.devProxy));
     }
   }
 }

@@ -16,7 +16,8 @@ import 'package:path/path.dart' as path;
 import 'package:watcher/watcher.dart';
 import 'package:yaml/yaml.dart';
 
-import '../helpers/daemon_helper.dart';
+import '../daemon/daemon.dart';
+import '../daemon/domain.dart';
 import '../logging.dart';
 
 class ScopesDomain extends Domain {
