@@ -1,7 +1,6 @@
-import 'dart:io' as io;
 import 'dart:io';
 
-import 'package:file/file.dart';
+import 'package:file/file.dart' hide FileSystemEntity;
 import 'package:file/local.dart';
 import 'package:path/path.dart' as path;
 import 'package:pub_semver/pub_semver.dart';
@@ -22,7 +21,7 @@ extension JasprModeExtension on JasprMode {
 class Project {
   Project(this.logger, {FileSystem? fs, Never Function(int)? exitFn})
     : _fs = fs ?? const LocalFileSystem(),
-      _exitFn = exitFn ?? io.exit;
+      _exitFn = exitFn ?? exit;
 
   final Logger logger;
   final FileSystem _fs;
@@ -322,12 +321,12 @@ final dartSdkVersion = () {
 /// The path to the root directory of the SDK.
 final String? dartSdkDir = (() {
   final maybeDartSdkDir = path.dirname(path.dirname(dartExecutable));
-  if (io.FileSystemEntity.isFileSync(path.join(maybeDartSdkDir, 'version'))) {
+  if (FileSystemEntity.isFileSync(path.join(maybeDartSdkDir, 'version'))) {
     return maybeDartSdkDir;
   }
 
   final maybeFlutterDartSdkDir = path.join(path.dirname(dartExecutable), 'cache', 'dart-sdk');
-  if (io.FileSystemEntity.isFileSync(path.join(maybeFlutterDartSdkDir, 'version'))) {
+  if (FileSystemEntity.isFileSync(path.join(maybeFlutterDartSdkDir, 'version'))) {
     return maybeFlutterDartSdkDir;
   }
 
