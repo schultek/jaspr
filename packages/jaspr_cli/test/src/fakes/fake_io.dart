@@ -221,7 +221,7 @@ class FakeStdin extends Stream<List<int>> implements io.Stdin {
 
   void addLine(String line) {
     _lines.add(line);
-    _controller.add(utf8.encode(line));
+    _controller.add(utf8.encode('$line\n'));
   }
 
   @override

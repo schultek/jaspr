@@ -51,15 +51,6 @@ extension FakeBuildDaemonIO on FakeIO {
   }
 
   Future<void> runInitialBuild(FakeBuildDaemon buildDaemon) async {
-    expect(
-      this.stdout.queue,
-      emitsInOrder([
-        '[CLI] Starting web compilers...',
-        '[BUILDER] Connecting to the build daemon...',
-        '[BUILDER] Starting initial build...',
-      ]),
-    );
-
     await expectLater(
       buildDaemon.messages,
       emitsInOrder([
@@ -77,13 +68,6 @@ extension FakeBuildDaemonIO on FakeIO {
           }),
         );
       }),
-    );
-
-    await expectLater(
-      this.stdout.queue,
-      emitsInOrder([
-        '[CLI] Done building web assets.',
-      ]),
     );
   }
 

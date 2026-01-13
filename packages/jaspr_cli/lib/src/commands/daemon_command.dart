@@ -5,7 +5,14 @@ import '../helpers/daemon_helper.dart';
 import 'dev_command.dart';
 
 class DaemonCommand extends DevCommand with DaemonHelper {
-  DaemonCommand() : super(logger: DaemonLogger());
+  DaemonCommand() : super(logger: DaemonLogger()) {
+    argParser.addFlag(
+      'launch-in-chrome',
+      help: 'Automatically launches your application in Chrome with the debug port open.',
+      defaultsTo: true,
+      negatable: true,
+    );
+  }
 
   @override
   String get description => 'Runs a daemon server.';
@@ -21,7 +28,8 @@ class DaemonCommand extends DevCommand with DaemonHelper {
   final bool verbose = true;
 
   @override
-  final bool launchInChrome = true;
+  late final bool launchInChrome = argResults?.flag('launch-in-chrome') ?? true;
+
   @override
   final bool autoRun = false;
 

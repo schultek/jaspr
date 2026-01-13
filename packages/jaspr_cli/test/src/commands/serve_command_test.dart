@@ -34,7 +34,15 @@ void main() {
 
         final serveResult = runner.run(['serve', '--verbose']);
 
-        await expectLater(io.stdout.queue, emits('Running jaspr in client rendering mode.'));
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrder([
+            'Running jaspr in client rendering mode.',
+            '[CLI] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
 
         await io.runInitialBuild(buildDaemon);
 
@@ -43,7 +51,13 @@ void main() {
           completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
         );
 
-        await expectLater(io.stdout.queue, emits('[CLI] Serving at http://localhost:8080'));
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrder([
+            '[CLI] Done building web assets.',
+            '[CLI] Serving at http://localhost:8080',
+          ]),
+        );
 
         await io.shutdownBuildDaemon(buildDaemon);
 
@@ -68,10 +82,15 @@ void main() {
           emitsInOrder([
             'Running jaspr in server rendering mode.',
             'Using server entry point: lib/main.server.dart',
+            '[CLI] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
           ]),
         );
 
         await io.runInitialBuild(buildDaemon);
+
+        expect(io.stdout.queue, emits('[CLI] Done building web assets.'));
 
         await expectLater(
           io.serverSockets.next,
@@ -120,14 +139,19 @@ void main() {
           emitsInOrder([
             'Running jaspr in server rendering mode.',
             'Using server entry point: lib/main.server.dart',
+            '[CLI] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
           ]),
         );
 
         await io.runInitialBuild(buildDaemon);
 
-        expect(flutterProcess, isNotNull);
+        expect(io.stdout.queue, emits('[CLI] Done building web assets.'));
 
         await io.connectToProxy();
+
+        expect(flutterProcess, isNotNull);
 
         await io.expectServerStarted(server);
 
