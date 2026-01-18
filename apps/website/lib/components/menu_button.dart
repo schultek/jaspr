@@ -2,7 +2,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../constants/theme.dart';
-import '../layout/header.dart';
+import 'layout/header.dart';
 import 'icon.dart';
 
 class MenuButton extends StatelessComponent {
