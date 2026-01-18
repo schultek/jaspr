@@ -36,18 +36,23 @@
   "tabs": [
     {
       "id": "root",
-      "title": "Guides",
+      "title": "Docs",
       "href": "/"
     },
     {
-      "id": "api",
-      "title": "API",
-      "href": "/api"
+      "id": "guides",
+      "title": "Guides",
+      "href": "/guides"
     },
     {
       "id": "content",
       "title": "Content",
       "href": "/content"
+    },
+    {
+      "id": "api",
+      "title": "Reference",
+      "href": "/api"
     },
     {
       "id": "releases",
@@ -82,20 +87,12 @@
           "href": "/get_started/modes"
         },
         {
-          "title": "\uD83C\uDD9A Server vs Client",
-          "href": "/get_started/server_client"
-        },
-        {
           "title": "\uD83D\uDD79 Jaspr CLI",
           "href": "/get_started/cli"
         },
         {
           "title": "\uD83D\uDCE6 Configuration",
           "href": "/get_started/configuration"
-        },
-        {
-          "title": "\uD83E\uDDF9 Linting",
-          "href": "/get_started/linting"
         }
       ]
     },
@@ -110,6 +107,10 @@
         {
           "title": "\uD83D\uDD8D Writing HTML",
           "href": "/concepts/html"
+        },
+        {
+          "title": "\uD83C\uDD9A Server vs Client",
+          "href": "/concepts/server_client"
         },
         {
           "title": "\uD83C\uDFA8 Styling",
@@ -187,6 +188,10 @@
         {
           "title": "Overview",
           "href": "/api"
+        },
+        {
+          "title": "\uD83E\uDDF9 Linting",
+          "href": "/api/linting"
         }
       ]
     },
@@ -450,6 +455,15 @@
         {
           "title": "PostBreak",
           "href": "/content/components/post_break"
+        }
+      ]
+    },
+    {
+      "tab": "guides",
+      "pages": [
+        {
+          "title": "Overview",
+          "href": "/guides"
         }
       ]
     },
