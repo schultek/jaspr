@@ -161,24 +161,20 @@
         {
           "title": "\uD83C\uDF1F Contributing",
           "href": "/going_further/contributing"
-        }
-      ]
-    },
-    {
-      "tab": "root",
-      "group": "Ecosystem",
-      "pages": [
-        {
-          "title": "\uD83C\uDF0A Riverpod",
-          "href": "/eco/riverpod"
         },
         {
-          "title": "\uD83C\uDF2C️ Tailwind",
-          "href": "/eco/tailwind"
-        },
-        {
-          "title": "\uD83D\uDCDA Third-Party Packages",
-          "href": "/eco/packages"
+          "group": "📦 Packages",
+          "href": "/going_further/packages",
+          "pages": [
+            {
+              "title": "jaspr_riverpod",
+              "href": "https://pub.dev/packages/jaspr_riverpod"
+            },
+            {
+              "title": "jaspr_tailwind (3rd party)",
+              "href": "https://pub.dev/packages/jaspr_tailwind"
+            }
+          ]
         }
       ]
     },
