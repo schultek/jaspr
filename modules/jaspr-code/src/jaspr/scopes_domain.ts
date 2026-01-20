@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import { JasprToolingDaemon } from "./tooling_daemon";
 import { findJasprProjectFolders } from "../helpers/project_helper";
-import { join } from "path";
 
 export type ScopeResults = Record<string, ScopeLibraryResult>;
 

@@ -7,10 +7,8 @@ import {
 
 import { createJasprProject, handleNewProjects } from "./create";
 import { jasprClean, jasprDoctor, jasprServe } from "./commands";
-import { JasprServeDaemon } from "./jaspr/serve_daemon";
 import {
   findJasprProjectFolders,
-  getFolderToRunCommandIn,
 } from "./helpers/project_helper";
 import { JasprToolingDaemon } from "./jaspr/tooling_daemon";
 import { ScopesDomain } from "./jaspr/scopes_domain";

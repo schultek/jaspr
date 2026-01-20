@@ -1,6 +1,6 @@
 import { ExtensionContext } from "vscode";
 import { checkJasprInstalled } from "./helpers/install_helper";
-import { runJaspr, runJasprInFolder } from "./helpers/process_helper";
+import { runJasprCommand, runJasprCommandInFolder } from "./helpers/process_helper";
 import { getFolderToRunCommandIn } from "./helpers/project_helper";
 import { JasprServeDaemon } from "./jaspr/serve_daemon";
 
@@ -51,17 +51,17 @@ export async function jasprCreate(
 
   args.push(".");
 
-  const exitCode = await runJasprInFolder(projectPath, args, undefined);
+  const exitCode = await runJasprCommandInFolder(projectPath, args, undefined);
 
   return exitCode === 0;
 }
 
 export async function jasprClean(): Promise<number | undefined> {
-  return runJaspr(["clean"]);
+  return runJasprCommand(["clean"]);
 }
 
 export function jasprDoctor(): Promise<number | undefined> {
-  return runJaspr(["doctor"], true);
+  return runJasprCommand(["doctor"], true);
 }
 
 export function jasprServe(context: ExtensionContext) {
