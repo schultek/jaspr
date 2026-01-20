@@ -3,6 +3,7 @@ import * as vs from "vscode";
 import { checkJasprInstalled } from "./install_helper";
 import { getFolderToRunCommandIn } from "./project_helper";
 import path from "path";
+import { isWin } from "../constants";
 
 export type SpawnedProcess = child_process.ChildProcessWithoutNullStreams;
 
@@ -35,7 +36,7 @@ export async function runJasprCommandInFolder(
 }
 
 export function startJaspr(args: string[], cwd: string): SpawnedProcess {
-  return child_process.spawn('jaspr', args, { cwd });
+  return child_process.spawn('jaspr', args, { cwd, shell: isWin });
 }
 
 export function runJaspr(args: string[], cwd: string): Thenable<string> {
@@ -108,16 +109,16 @@ export async function runJasprToOutput(folder: string, args: string[], alwaysSho
 const channels: Record<string, vs.OutputChannel> = {};
 
 export function getOutputChannel(name: string, insertDivider = false): vs.OutputChannel {
-	if (!channels[name]) {
-		channels[name] = vs.window.createOutputChannel(name);
-	} else if (insertDivider) {
-		const ch = channels[name];
-		ch.appendLine("");
-		ch.appendLine("--");
-		ch.appendLine("");
-	}
+  if (!channels[name]) {
+    channels[name] = vs.window.createOutputChannel(name);
+  } else if (insertDivider) {
+    const ch = channels[name];
+    ch.appendLine("");
+    ch.appendLine("--");
+    ch.appendLine("");
+  }
 
-	return channels[name];
+  return channels[name];
 }
 function runProcessInOutputChannel(process: SpawnedProcess, channel: vs.OutputChannel) {
   process.stdout.on("data", (data: Buffer | string) => channel.append(data.toString()));

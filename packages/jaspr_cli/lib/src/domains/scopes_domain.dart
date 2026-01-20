@@ -19,6 +19,7 @@ import 'package:yaml/yaml.dart';
 import '../daemon/daemon.dart';
 import '../daemon/domain.dart';
 import '../logging.dart';
+import '../project.dart';
 
 class ScopesDomain extends Domain {
   ScopesDomain(Daemon daemon, this.logger) : super(daemon, 'scopes') {
@@ -86,6 +87,7 @@ class ScopesDomain extends Domain {
     _collection = AnalysisContextCollection(
       includedPaths: entryPaths,
       resourceProvider: resourceProvider ?? PhysicalResourceProvider.INSTANCE,
+      sdkPath: dartSdkDir,
     );
 
     if (resourceProvider == null) {

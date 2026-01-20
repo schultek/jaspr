@@ -300,8 +300,8 @@ const flutterProxyPort = '5678';
 final dartExecutable = () {
   if (Platform.isWindows) {
     // Use 'where.exe' to support powershell as well
-    final result = (ProcessRunner.instance.runSync('where.exe', ['dart.exe'])).stdout.toString();
-    return result.split(RegExp('(\r\n|\r|\n)')).first.trim();
+    final result = (ProcessRunner.instance.runSync('where.exe', ['dart.bat', 'dart.exe'])).stdout.toString();
+    return result.split(RegExp('(\r\n|\r|\n)')).where((s) => !s.contains('Could not find')).firstOrNull?.trim() ?? '';
   }
   return (ProcessRunner.instance.runSync('which', ['dart'])).stdout.toString().trim();
 }();
