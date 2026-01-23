@@ -170,7 +170,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         _ => '',
       };
 
-      final process = await ProcessRunner.instance.start('dart', [
+      final process = await ProcessRunner.instance.start(dartExecutable, [
         'compile',
         compileTarget,
         entryPoint!,

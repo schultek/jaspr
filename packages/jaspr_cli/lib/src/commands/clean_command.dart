@@ -41,7 +41,7 @@ class CleanCommand extends BaseCommand {
       }
 
       logger.write("Running 'dart run build_runner clean'...");
-      await ProcessRunner.instance.run('dart', ['run', 'build_runner', 'clean']);
+      await ProcessRunner.instance.run(dartExecutable, ['run', 'build_runner', 'clean']);
     }
 
     // TODO support windows

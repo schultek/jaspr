@@ -27,8 +27,10 @@ extension FakeProject on FakeIO {
   void stubDartSDK() {
     when(() => process.runSync('which', ['dart'])).thenAnswer((_) => ProcessResult(0, 0, '/fake/bin/dart', null));
     when(
-      () => process.runSync('where', ['dart.exe']),
+      () => process.runSync('where', ['dart.bat', 'dart.exe']),
     ).thenAnswer((_) => ProcessResult(0, 0, '/fake/bin/dart', null));
+
+    fs.file('/fake/version').createSync(recursive: true);
   }
 
   void stubFlutterSDK() {

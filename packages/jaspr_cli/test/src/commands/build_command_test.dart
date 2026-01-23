@@ -53,7 +53,7 @@ void main() {
         final serverProcess = FakeProcess();
         when(
           () => io.process.start(
-            'dart',
+            '/fake/bin/dart',
             any(that: containsAllInOrder(['compile', 'exe'])),
             workingDirectory: '/root/myapp',
           ),

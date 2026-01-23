@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../fakes/fake_io.dart';
+import '../fakes/fake_project.dart';
 
 void main() {
   group('create command', () {
@@ -16,8 +17,9 @@ void main() {
 
     test('creates project with client mode', () async {
       await io.runZoned(() async {
+        io.stubDartSDK();
         when(
-          () => io.process.start('dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
+          () => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
         ).thenAnswer((_) async => FakeProcess.sync());
 
         final result = await runner.run(['create', 'myapp', '--mode=client']);
@@ -34,7 +36,7 @@ void main() {
         // Files that should not exist.
         expect(io.fs.file('myapp/lib/main.server.dart').existsSync(), isFalse);
 
-        verify(() => io.process.start('dart', ['pub', 'get'], workingDirectory: '/root/myapp')).called(1);
+        verify(() => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp')).called(1);
 
         final pubspec = io.fs.file('myapp/pubspec.yaml').readAsStringSync();
         expect(pubspec, contains('name: myapp'));
@@ -44,8 +46,9 @@ void main() {
 
     test('creates project with server mode', () async {
       await io.runZoned(() async {
+        io.stubDartSDK();
         when(
-          () => io.process.start('dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
+          () => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
         ).thenAnswer((_) async => FakeProcess.sync());
 
         final result = await runner.run(['create', 'myapp', '--mode=server']);
@@ -62,7 +65,7 @@ void main() {
         // Files that should not exist.
         expect(io.fs.file('myapp/web/index.html').existsSync(), isFalse);
 
-        verify(() => io.process.start('dart', ['pub', 'get'], workingDirectory: '/root/myapp')).called(1);
+        verify(() => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp')).called(1);
 
         final pubspec = io.fs.file('myapp/pubspec.yaml').readAsStringSync();
         expect(pubspec, contains('name: myapp'));
@@ -72,8 +75,9 @@ void main() {
 
     test('creates project with static mode', () async {
       await io.runZoned(() async {
+        io.stubDartSDK();
         when(
-          () => io.process.start('dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
+          () => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
         ).thenAnswer((_) async => FakeProcess.sync());
 
         final result = await runner.run(['create', 'myapp', '--mode=static']);
@@ -90,7 +94,7 @@ void main() {
         // Files that should not exist.
         expect(io.fs.file('myapp/web/index.html').existsSync(), isFalse);
 
-        verify(() => io.process.start('dart', ['pub', 'get'], workingDirectory: '/root/myapp')).called(1);
+        verify(() => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp')).called(1);
 
         final pubspec = io.fs.file('myapp/pubspec.yaml').readAsStringSync();
         expect(pubspec, contains('name: myapp'));
@@ -100,8 +104,9 @@ void main() {
 
     test('creates project from docs template', () async {
       await io.runZoned(() async {
+        io.stubDartSDK();
         when(
-          () => io.process.start('dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
+          () => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
         ).thenAnswer((_) async => FakeProcess.sync());
 
         final result = await runner.run(['create', 'myapp', '--template=docs']);
@@ -119,7 +124,7 @@ void main() {
         expect(io.fs.file('myapp/lib/app.dart').existsSync(), isFalse);
         expect(io.fs.file('myapp/web/index.html').existsSync(), isFalse);
 
-        verify(() => io.process.start('dart', ['pub', 'get'], workingDirectory: '/root/myapp')).called(1);
+        verify(() => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp')).called(1);
 
         final pubspec = io.fs.file('myapp/pubspec.yaml').readAsStringSync();
         expect(pubspec, contains('name: myapp'));

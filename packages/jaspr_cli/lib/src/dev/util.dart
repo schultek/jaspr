@@ -33,6 +33,15 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
         progress: ProgressState.completed,
       );
       return null;
+    } on MissingPortFile {
+      logger.write(
+        'Failed to start build daemon, port file is missing.\n\n'
+        'Please use the latest version of build_runner and try again.',
+        tag: Tag.cli,
+        level: Level.critical,
+        progress: ProgressState.completed,
+      );
+      return null;
     } catch (e) {
       logger.write(e.toString(), tag: Tag.builder, level: Level.error, progress: ProgressState.completed);
       logger.write(

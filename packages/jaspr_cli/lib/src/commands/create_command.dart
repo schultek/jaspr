@@ -161,7 +161,10 @@ class CreateCommand extends BaseCommand {
     progress.complete('Generated ${files.length} file(s)');
 
     if (runPubGet) {
-      final process = await ProcessRunner.instance.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+      final process = await ProcessRunner.instance.start(dartExecutable, [
+        'pub',
+        'get',
+      ], workingDirectory: dir.absolute.path);
 
       await watchProcess(
         'pub',
@@ -228,7 +231,10 @@ class CreateCommand extends BaseCommand {
     progress.complete('Generated ${files.length} file(s)');
 
     if (runPubGet) {
-      final process = await ProcessRunner.instance.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+      final process = await ProcessRunner.instance.start(dartExecutable, [
+        'pub',
+        'get',
+      ], workingDirectory: dir.absolute.path);
 
       await watchProcess(
         'pub',
