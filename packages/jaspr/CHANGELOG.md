@@ -5,6 +5,8 @@
   - `MarkupRenderObject` and `TestRenderObject` now implement `RawableRenderObject`.
   - `MarkupRenderText` and `TestRenderText` now implement `RawableRenderText`.
 
+- Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
+
 ## 0.22.1
 
 - Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.
