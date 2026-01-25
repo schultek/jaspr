@@ -109,7 +109,7 @@ mixin SyncScopeMixin on State<ProviderScope>
       final encodedValue = value[s.id];
       final Object? decodedValue;
       if (s.codec case final codec? when encodedValue != null) {
-        decodedValue = codec.encode(encodedValue);
+        decodedValue = codec.decode(encodedValue);
       } else {
         decodedValue = encodedValue;
       }

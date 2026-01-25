@@ -10,6 +10,8 @@ import 'package:jaspr_riverpod/legacy.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:web/web.dart';
 
+import '../utils.dart';
+
 void main() {
   group('sync', () {
     testClient('overrides sync provider with value', (tester) {
@@ -45,6 +47,38 @@ void main() {
       );
 
       expect(find.text('One: value, Two: 42'), findsOneComponent);
+    });
+
+    testClient('uses codec when decoding sync provider value', (tester) {
+      document.body!.innerHTML =
+          '<div>\n'
+                  '  <!--\${"some_number":42}-->\n'
+                  '  <p>Hello World</p>\n'
+                  '</div>\n'
+              .toJS;
+
+      final p1 = StateProvider((_) => 0);
+
+      tester.pumpComponent(
+        div([
+          ProviderScope(
+            sync: [
+              p1.syncWith('some_number', codec: DoublingCodec()),
+            ],
+            child: p([
+              Builder(
+                builder: (context) {
+                  final v1 = context.read(p1);
+
+                  return Component.text('One: $v1');
+                },
+              ),
+            ]),
+          ),
+        ]),
+      );
+
+      expect(find.text('One: 21'), findsOneComponent);
     });
   });
 }
