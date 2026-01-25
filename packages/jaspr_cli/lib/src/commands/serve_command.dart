@@ -25,9 +25,6 @@ class ServeCommand extends DevCommand {
   @override
   late final bool launchInChrome = argResults?.flag('launch-in-chrome') ?? false;
 
-  @override
-  final bool autoRun = true;
-
   late Daemon daemon;
 
   @override

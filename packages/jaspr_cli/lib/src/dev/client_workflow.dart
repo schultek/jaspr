@@ -26,7 +26,6 @@ class ClientWorkflow {
     List<String> buildOptions,
     Logger logger,
     void Function(FutureOr<void> Function()) guard, {
-    bool autoRun = true,
     bool enableDebugging = false,
     ReloadConfiguration reload = ReloadConfiguration.none,
   }) async {
@@ -52,7 +51,6 @@ class ClientWorkflow {
           daemonPort(workingDirectory),
           int.parse(proxyPort),
           client.buildResults,
-          autoRun: autoRun,
           enableDebugging: enableDebugging,
           reload: reload,
         );

@@ -31,9 +31,6 @@ class DaemonCommand extends DevCommand with DaemonHelper {
   late final bool launchInChrome = argResults?.flag('launch-in-chrome') ?? true;
 
   @override
-  final bool autoRun = false;
-
-  @override
   Future<int> runCommand() async {
     return runWithDaemon((_) async {
       return super.runCommand();

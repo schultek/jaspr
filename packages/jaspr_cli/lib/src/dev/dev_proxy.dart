@@ -1,5 +1,4 @@
 import 'package:build_daemon/data/build_status.dart' as daemon;
-import 'package:dds/devtools_server.dart';
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/dwds.dart';
 import 'package:dwds/sdk_configuration.dart';
@@ -7,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 
-import '../project.dart';
 import 'chrome.dart';
 import 'util.dart';
 
@@ -39,7 +37,6 @@ class DevProxy {
     int daemonPort,
     int proxyPort,
     Stream<daemon.BuildResults> buildResults, {
-    bool autoRun = true,
     bool enableDebugging = false,
     bool enableInjectedClient = true,
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
@@ -47,18 +44,16 @@ class DevProxy {
     const target = 'web';
     var pipeline = const Pipeline();
 
-    //pipeline = pipeline.addMiddleware(interceptFavicon);
-
     // Only provide relevant build results
     final filteredBuildResults = buildResults.asyncMap<BuildResult>((results) {
       final result = results.results.firstWhere((result) => result.target == target);
       switch (result.status) {
         case daemon.BuildStatus.started:
-          return BuildResult((b) => b.status = BuildStatus.started);
+          return BuildResult(status: BuildStatus.started);
         case daemon.BuildStatus.failed:
-          return BuildResult((b) => b.status = BuildStatus.failed);
+          return BuildResult(status: BuildStatus.failed);
         case daemon.BuildStatus.succeeded:
-          return BuildResult((b) => b.status = BuildStatus.succeeded);
+          return BuildResult(status: BuildStatus.succeeded);
         default:
           break;
       }
@@ -105,18 +100,11 @@ class DevProxy {
       final debugSettings = DebugSettings(
         enableDebugExtension: enableDebugging,
         enableDebugging: enableDebugging,
-        spawnDds: true,
+        ddsConfiguration: DartDevelopmentServiceConfiguration(
+          enable: true,
+          serveDevTools: true,
+        ),
         expressionCompiler: ddcService,
-        devToolsLauncher: enableDebugging
-            ? (String hostname) async {
-                final server = await DevToolsServer().serveDevTools(
-                  hostname: hostname,
-                  enableStdinCommands: false,
-                  customDevToolsPath: dartDevToolsPath,
-                );
-                return DevTools(server!.address.host, server.port, server);
-              }
-            : null,
       );
 
       final appMetadata = AppMetadata(
@@ -133,7 +121,6 @@ class DevProxy {
         assetReader: assetReader,
         buildResults: filteredBuildResults,
         chromeConnection: () async => (await Chrome.connectedInstance).chrome.chromeConnection,
-        injectDebuggingSupportCode: enableDebugging,
       );
       pipeline = pipeline.addMiddleware(dwds.middleware);
       cascade = cascade.add(dwds.handler);
@@ -146,7 +133,7 @@ class DevProxy {
       client,
       pipeline.addHandler(cascade.handler),
       filteredBuildResults,
-      autoRun,
+      !enableDebugging,
       dwds: dwds,
       ddcService: ddcService,
     );

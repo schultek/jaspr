@@ -79,7 +79,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final skipServer = argResults!.flag('skip-server');
 
   bool get launchInChrome;
-  bool get autoRun;
 
   void handleClientWorkflow(ClientWorkflow workflow) {}
 
@@ -351,7 +350,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       buildArgs,
       logger,
       guardResource,
-      autoRun: autoRun,
       enableDebugging: launchInChrome,
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
     );
