@@ -7,199 +7,193 @@ description: Get started with Jaspr and build your first website in Dart.
 
 Welcome to the Jaspr Getting Started guide. In it, you'll install Jaspr, setup a new project and learn the basics of Jaspr.
 
-
-<Steps>
+## 1. Install Jaspr
   
-  <Step title="Install Jaspr">
+You can install Jaspr either through our **VSCode Extension** or by installing the **Jaspr CLI** in the terminal. The CLI lets you manage the project from the command line, while the extension provides a more integrated experience within your IDE.
 
-    You can install Jaspr either through our **VSCode Extension** or by installing the **Jaspr CLI** in the terminal. The CLI lets you manage the project from the command line, while the extension provides a more integrated experience within your IDE.
+- <Icon name="cubes" /> Use the Jaspr VSCode Extension to setup and serve your website with full debugging support from inside VSCode.
+- <Icon name="terminal" /> Use the Jaspr CLI to setup and serve your website from the command line.
 
-    - <Icon name="cubes" /> Use the Jaspr VSCode Extension to setup and serve your website with full debugging support from inside VSCode.
-    - <Icon name="terminal" /> Use the Jaspr CLI to setup and serve your website from the command line.
+<Tabs groupId="tooling">
+  <TabItem label="VSCode Extension" value="extension">
+    Install the Jaspr VSCode extension by searching for `Jaspr` in the extensions menu.
 
-    <Tabs groupId="tooling">
-      <TabItem label="VSCode Extension" value="extension">
-        Install the Jaspr VSCode extension by searching for `Jaspr` in the extensions menu.
+    After installing and activating the extension, you will get a prompt to install the Jaspr CLI. Accept it to continue.
+  </TabItem>
+  <TabItem label="Jaspr CLI" value="cli">
+    Install the Jaspr CLI via:
 
-        After installing and activating the extension, you will get a prompt to install the Jaspr CLI. Accept it to continue.
-      </TabItem>
-      <TabItem label="Jaspr CLI" value="cli">
-        Install the Jaspr CLI via:
+    ```js
+    dart pub global activate jaspr_cli
+    ```
 
-        ```js
-        dart pub global activate jaspr_cli
-        ```
+    The `jaspr` command will be available in your terminal.
+  </TabItem>
+</Tabs>
+    
+## 2. Choose a Rendering Mode
 
-        The `jaspr` command will be available in your terminal.
-      </TabItem>
-    </Tabs>
-  </Step>
+The first thing to do when starting a new project with Jaspr is to decide on a **Rendering Mode** to use. 
+The rendering mode defines how your website is executed and built and each one has it's own advantages and disadvantages based on what you want to build.
 
-  <Step title="Choose a Rendering Mode">
+Jaspr supports these three rendering modes:
 
-    The first thing to do when starting a new project with Jaspr is to decide on a **Rendering Mode** to use. 
-    The rendering mode defines how your website is executed and built and each one has it's own advantages and disadvantages based on what you want to build.
+<Card title="Static" icon="1">
 
-    Jaspr supports these three rendering modes:
+  In static mode Jaspr performs **static rendering** (also known as Static Site Generation) at build time, generating a fully static site that you can deploy anywhere.
 
-    <Card title="Static" icon="1">
+  You can write server-side code to render components and pages, use local or remote data sources, while outputting clean HTML and CSS at build time to deploy anywhere.
 
-      In static mode Jaspr performs **static rendering** (also known as Static Site Generation) at build time, generating a fully static site that you can deploy anywhere.
+  Your client-side code is compiled to JavaScript or Wasm and included in the HTML at build time.
 
-      You can write server-side code to render components and pages, use local or remote data sources, while outputting clean HTML and CSS at build time to deploy anywhere.
+</Card>
+<Card title="Server" icon="2">
 
-      Your client-side code is compiled to JavaScript or Wasm and included in the HTML at build time.
+  In server mode Jaspr runs and builds a **server application** that pre-renders your components for each incoming request (also known as Server Side Rendering).
 
-    </Card>
-    <Card title="Server" icon="2">
+  You can use either Jaspr's inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
 
-      In server mode Jaspr runs and builds a **server application** that pre-renders your components for each incoming request (also known as Server Side Rendering).
+  Additionally, you can set up hydration on the client in order to make your site interactive.
+</Card>
+<Card title="Client" icon="3">
+  If you want, you can skip the server and pre-rendering part of Jaspr completely and use it as a client-side only framework.
 
-      You can use either Jaspr's inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
+  Similar to static mode, you can deploy your built site to any hosting service without needing an extra server.
+</Card>
 
-      Additionally, you can set up hydration on the client in order to make your site interactive.
-    </Card>
-    <Card title="Client" icon="3">
-      If you want, you can skip the server and pre-rendering part of Jaspr completely and use it as a client-side only framework.
+The following table gives a quick comparison of the different modes:
 
-      Similar to static mode, you can deploy your built site to any hosting service without needing an extra server.
-    </Card>
+|                               | **static**         | **server**           | **client** |
+| :---------------------------- | ------------------ | -------------------- | ---------- |
+| **Client-Side Interactivity** | ✅                 | ✅                   | ✅         |
+| **Pre-Rendering**             | ✅ (at build time) | ✅ (at request time) | ❌         |
+| **Pure Dart**                 | ✅                 | ✅                   | ❌         |
+| **Static Deployment**         | ✅                 | ❌                   | ✅         |
+| **Backend Integration**       | ❌                 | ✅                   | ❌         |
 
-    The following table gives a quick comparison of the different modes:
+## 3. Create your Project
 
-    |                               | **static**         | **server**           | **client** |
-    | :---------------------------- | ------------------ | -------------------- | ---------- |
-    | **Client-Side Interactivity** | ✅                 | ✅                   | ✅         |
-    | **Pre-Rendering**             | ✅ (at build time) | ✅ (at request time) | ❌         |
-    | **Pure Dart**                 | ✅                 | ✅                   | ❌         |
-    | **Static Deployment**         | ✅                 | ❌                   | ✅         |
-    | **Backend Integration**       | ❌                 | ✅                   | ❌         |
+<Tabs groupId="tooling">
+  <TabItem label="VSCode Extension" value="extension">
+    To create a new Jaspr project, open the command palette (`Ctrl+Shift+P`) and select **Jaspr: New Project**. You are ask to choose from several templates and set a project folder.
 
-  </Step>
+    ![New Project](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/new_project.png?raw=true)
 
-  <Step title="Create your Project">
+    The first three templates are the default choices for each rendering mode: static, server and client. The fourth option includes an embedded Flutter web app and the fifth comes with a custom backend setup using `shelf`.
 
-    <Tabs groupId="tooling">
-      <TabItem label="VSCode Extension" value="extension">
-        To create a new Jaspr project, open the command palette (`Ctrl+Shift+P`) and select **Jaspr: New Project**. You are ask to choose from several templates and set a project folder.
+    <Info>
+      Choosing a template will not lock you into a specific configuration. Starting from one template you can easily modify your code to behave as any other template along the way.
+    </Info>
+  </TabItem>
+  <TabItem label="Jaspr CLI" value="cli">
+    To create a new project run:
 
-        ![New Project](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/new_project.png?raw=true)
+    ```
+    jaspr create my_website
+    ```
 
-        The first three templates are the default choices for each rendering mode: static, server and client. The fourth option includes an embedded Flutter web app and the fifth comes with a custom backend setup using `shelf`.
+    This will walk you through the setup wizard and create a new Jaspr project inside the `my_website` folder.
 
-        <Info>
-          Choosing a template will not lock you into a specific configuration. Starting from one template you can easily modify your code to behave as any other template along the way.
-        </Info>
-      </TabItem>
-      <TabItem label="Jaspr CLI" value="cli">
-        To create a new project run:
+    The cli will prompt you with a set of options to configure your project. You can read about what each option does below or just start with the recommended ones (simply press **Enter** each time).
 
-        ```
-        jaspr create my_website
-        ```
+    <Accordion title="Click me to see all options">
+      You can configure the following options:
 
-        This will walk you through the setup wizard and create a new Jaspr project inside the `my_website` folder.
+      <Property name="Rendering Mode">
+        Select one of the three rendering modes Jaspr supports.
+      </Property>
 
-        The cli will prompt you with a set of options to configure your project. You can read about what each option does below or just start with the recommended ones (simply press **Enter** each time).
+      ---
 
-        <Accordion title="Click me to see all options">
-          You can configure the following options:
+      <Property name="Routing">
+        Whether to set up routing. Selecting **Yes** will setup a basic `Routing` with two routes ('/home' and '/about'). This gives you a convenient starting point when you plan to develop a website with multiple pages.
+      </Property>
 
-          <Property name="Rendering Mode">
-            Select one of the three rendering modes Jaspr supports.
-          </Property>
+      ---
 
-          ---
-
-          <Property name="Routing">
-            Whether to set up routing. Selecting **Yes** will setup a basic `Routing` with two routes ('/home' and '/about'). This gives you a convenient starting point when you plan to develop a website with multiple pages.
-          </Property>
-
-          ---
-
-          <Property name="Multi-Page Routing" type="conditional">
-            Whether to set up multi-page or single-page routing, also called server-side or client-side routing respectively. This defined how navigating
-            between routes will behave. Either a "real" page load is performed when navigating to a new route (aka. the browser requests the new page using its url from the server).
-            Or the routing happens purely on the client without any request to the server.
-
-            <Info>
-                There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
-            </Info>
-
-            Read more about routing [here](/concepts/routing).
-          </Property>
-
-          ---
-
-          <Property name="Flutter Embedding">
-            Whether to setup an embedded Flutter application with your site. This will use Jaspr's first-party integration for [Flutter element embedding](https://docs.flutter.dev/deployment/web#embedding-a-flutter-app-into-an-html-page) and create a simple Flutter counter app that synchronizes its state with your Jaspr site.
-          </Property>
-
-          ---
-
-          <Property name="Plugin Support">
-            Whether to enable support for Flutter web plugins. This will switch to Jaspr's custom compiler pipeline (replacing `build_web_compilers`) which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.
-            *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
-          </Property>
-
-          ---
-
-          <Property name="Custom Backend" type="conditional">
-            Whether to use a custom backend package or framework for the server part of your project. You can choose between:
-            - **None**: No backend setup. This is the default option and is recommended if you are just starting out.
-            - **Shelf**: A simple and lightweight web server for Dart. This is a good choice if you want to build a custom backend for your project.
-            - *More options coming soon*
-
-            Read more about backends [here](/going_further/backend).
-          </Property>
-        </Accordion>
-
-        Alternatively, you can select a pre-made template using the `--template` option.
+      <Property name="Multi-Page Routing" type="conditional">
+        Whether to set up multi-page or single-page routing, also called server-side or client-side routing respectively. This defined how navigating
+        between routes will behave. Either a "real" page load is performed when navigating to a new route (aka. the browser requests the new page using its url from the server).
+        Or the routing happens purely on the client without any request to the server.
 
         <Info>
-            Choosing a set of options do not lock you into a specific configuration. Starting from one setup you can easily modify your code to behave as any other setup along the way.
+            There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
         </Info>
-      </TabItem>
-    </Tabs>
-  </Step>
 
-  <Step title="Run your Project">
-    <Tabs groupId="tooling">
-      <TabItem label="VSCode Extension" value="extension">
-        To run and debug a Jaspr applications, launch it using F5 or the Debug menu. The extension will start the debug process and attach the Dart debugger to it. 
+        Read more about routing [here](/concepts/routing).
+      </Property>
 
-        ---
+      ---
 
-        When developing a Jaspr project in `static` or `server` mode, this will open **two** separate debugging sessions, one for the server and one for the client. Switch between the two using the debugging sidebar or process dropdown.
+      <Property name="Flutter Embedding">
+        Whether to setup an embedded Flutter application with your site. This will use Jaspr's first-party integration for [Flutter element embedding](https://docs.flutter.dev/deployment/web#embedding-a-flutter-app-into-an-html-page) and create a simple Flutter counter app that synchronizes its state with your Jaspr site.
+      </Property>
 
-        | Sidebar | Dropdown. |
-        |---|---|
-        | ![Sidebar](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/sidebar.png?raw=true) | ![Dropdown](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/dropdown.png?raw=true)
+      ---
 
-        Both processes will be managed by the main Jaspr terminal.
+      <Property name="Plugin Support">
+        Whether to enable support for Flutter web plugins. This will switch to Jaspr's custom compiler pipeline (replacing `build_web_compilers`) which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.
+        *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
+      </Property>
 
-        ![Terminal](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/terminal.png?raw=true)
+      ---
 
-        To stop the server, click "Stop Jaspr" in the status bar, or focus the terminal and press `Ctrl+C`. This will stop both debugging sessions and the main process.
-        You can also detach the debugging sessions individually using the detach button in the debug bar, but this will keep the app running.
-      </TabItem>
-      <TabItem label="Jaspr CLI" value="cli">
-        Start the development server via:
+      <Property name="Custom Backend" type="conditional">
+        Whether to use a custom backend package or framework for the server part of your project. You can choose between:
+        - **None**: No backend setup. This is the default option and is recommended if you are just starting out.
+        - **Shelf**: A simple and lightweight web server for Dart. This is a good choice if you want to build a custom backend for your project.
+        - *More options coming soon*
 
-        ```shell
-        cd my_website
-        jaspr serve
-        ```
+        Read more about backends [here](/going_further/backend).
+      </Property>
+    </Accordion>
 
-        This will spin up a development server at `localhost:8080`.
-      </TabItem>
-    </Tabs>
-  </Step>
-  <Step title="Next Steps">
-    You can now start developing your website. 🎉
+    Alternatively, you can select a pre-made template using the `--template` option.
 
-    <Success>
-      Observe that the browser automatically refreshes the page when you change something in your code, like the `Welcome` text.
-    </Success>
-  </Step>
-</Steps>
+    <Info>
+        Choosing a set of options do not lock you into a specific configuration. Starting from one setup you can easily modify your code to behave as any other setup along the way.
+    </Info>
+  </TabItem>
+</Tabs>
+
+## 4. Run your Project
+    
+<Tabs groupId="tooling">
+  <TabItem label="VSCode Extension" value="extension">
+    To run and debug a Jaspr applications, launch it using F5 or the Debug menu. The extension will start the debug process and attach the Dart debugger to it. 
+
+    ---
+
+    When developing a Jaspr project in `static` or `server` mode, this will open **two** separate debugging sessions, one for the server and one for the client. Switch between the two using the debugging sidebar or process dropdown.
+
+    | Sidebar | Dropdown. |
+    |---|---|
+    | ![Sidebar](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/sidebar.png?raw=true) | ![Dropdown](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/dropdown.png?raw=true)
+
+    Both processes will be managed by the main Jaspr terminal.
+
+    ![Terminal](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/terminal.png?raw=true)
+
+    To stop the server, click "Stop Jaspr" in the status bar, or focus the terminal and press `Ctrl+C`. This will stop both debugging sessions and the main process.
+    You can also detach the debugging sessions individually using the detach button in the debug bar, but this will keep the app running.
+  </TabItem>
+  <TabItem label="Jaspr CLI" value="cli">
+    Start the development server via:
+
+    ```shell
+    cd my_website
+    jaspr serve
+    ```
+
+    This will spin up a development server at `localhost:8080`.
+  </TabItem>
+</Tabs>
+
+## 5. Next Steps
+
+You can now start developing your website. 🎉
+
+<Success>
+  Observe that the browser automatically refreshes the page when you change something in your code, like the `Welcome` text.
+</Success>
+  
