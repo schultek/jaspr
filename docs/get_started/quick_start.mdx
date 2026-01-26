@@ -38,27 +38,14 @@ The rendering mode defines how your website is executed and built and each one h
 
 Jaspr supports these three rendering modes:
 
-<Card title="Static" icon="1">
-
+<Card title="Static Mode" icon="1">
   In static mode Jaspr performs **static rendering** (also known as Static Site Generation) at build time, generating a fully static site that you can deploy anywhere.
-
-  You can write server-side code to render components and pages, use local or remote data sources, while outputting clean HTML and CSS at build time to deploy anywhere.
-
-  Your client-side code is compiled to JavaScript or Wasm and included in the HTML at build time.
-
 </Card>
-<Card title="Server" icon="2">
-
-  In server mode Jaspr runs and builds a **server application** that pre-renders your components for each incoming request (also known as Server Side Rendering).
-
-  You can use either Jaspr's inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
-
-  Additionally, you can set up hydration on the client in order to make your site interactive.
+<Card title="Server Mode" icon="2">
+  In server mode Jaspr builds a **server application** that pre-renders your components for each incoming request (also known as Server Side Rendering).
 </Card>
-<Card title="Client" icon="3">
+<Card title="Client Mode" icon="3">
   If you want, you can skip the server and pre-rendering part of Jaspr completely and use it as a client-side only framework.
-
-  Similar to static mode, you can deploy your built site to any hosting service without needing an extra server.
 </Card>
 
 The following table gives a quick comparison of the different modes:
@@ -70,6 +57,8 @@ The following table gives a quick comparison of the different modes:
 | **Pure Dart**                 | ✅                 | ✅                   | ❌         |
 | **Static Deployment**         | ✅                 | ❌                   | ✅         |
 | **Backend Integration**       | ❌                 | ✅                   | ❌         |
+
+Read more about rendering modes [here](concepts/modes).
 
 ## 3. Create your Project
 
@@ -132,7 +121,7 @@ The following table gives a quick comparison of the different modes:
       ---
 
       <Property name="Plugin Support">
-        Whether to enable support for Flutter web plugins. This will switch to Jaspr's custom compiler pipeline (replacing `build_web_compilers`) which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.
+        Whether to enable support for Flutter web plugins. This will enable Jaspr's compiler customizations which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.  
         *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
       </Property>
 
@@ -142,7 +131,7 @@ The following table gives a quick comparison of the different modes:
         Whether to use a custom backend package or framework for the server part of your project. You can choose between:
         - **None**: No backend setup. This is the default option and is recommended if you are just starting out.
         - **Shelf**: A simple and lightweight web server for Dart. This is a good choice if you want to build a custom backend for your project.
-        - *More options coming soon*
+        - *Want your favorite Dart backend here? Let us know.*
 
         Read more about backends [here](/going_further/backend).
       </Property>

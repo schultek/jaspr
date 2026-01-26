@@ -6,24 +6,29 @@ description: Jaspr comes with three different rendering modes - static, server a
 ---
 
 **Jaspr** is a full-stack web framework, meaning it can run both on the server and the client. Depending on what you
-want to build, you can choose how your app should be built and executed using Jaspr.
+want to build, you can choose how your website should be built and executed using Jaspr.
 
-Therefore, Jaspr supports the following three rendering modes:
+Jaspr supports the following three rendering modes:
 
-- **static** (also known as static-site-generation)
-- **server** (also known as server-side-rendering)
-- **client**
+<Card title="Static Mode" icon="1">
+  In static mode Jaspr performs **static rendering** (also known as Static Site Generation) at build time, generating a fully static site that you can deploy anywhere.
+</Card>
+<Card title="Server Mode" icon="2">
+  In server mode Jaspr builds a **server application** that pre-renders your components for each incoming request (also known as Server Side Rendering).
+</Card>
+<Card title="Client Mode" icon="3">
+  If you want, you can skip the server and pre-rendering part of Jaspr completely and use it as a client-side only framework.
+</Card>
 
-Each mode is explained in detail below. The following table gives a quick overview:
+Each mode is explained in more detail below. The following table gives a quick comparison:
 
 |                               | **static**         | **server**           | **client** |
 | :---------------------------- | ------------------ | -------------------- | ---------- |
-| **No HTML/CSS**               | ✅                 | ✅                   | ❌         |
-| **Pre-Rendering**             | ✅ (at build time) | ✅ (at request time) | ❌         |
 | **Client-Side Interactivity** | ✅                 | ✅                   | ✅         |
-| **Needs Server**              | ❌                 | ✅                   | ❌         |
+| **Pre-Rendering**             | ✅ (at build time) | ✅ (at request time) | ❌         |
+| **Pure Dart**                 | ✅                 | ✅                   | ❌         |
 | **Static Deployment**         | ✅                 | ❌                   | ✅         |
-| **Custom Backend**            | ❌                 | ✅                   | ❌         |
+| **Backend Integration**       | ❌                 | ✅                   | ❌         |
 
 ---
 

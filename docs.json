@@ -83,16 +83,16 @@
           "href": "/get_started/quick_start"
         },
         {
-          "title": "\uD83D\uDCDF Rendering Modes",
-          "href": "/get_started/modes"
-        },
-        {
-          "title": "\uD83D\uDD79 Jaspr CLI",
-          "href": "/get_started/cli"
+          "title": "🐾 First Steps",
+          "href": "/get_started/first_steps"
         },
         {
           "title": "\uD83D\uDCE6 Configuration",
           "href": "/get_started/configuration"
+        },
+        {
+          "title": "\uD83D\uDD79 Jaspr CLI",
+          "href": "/get_started/cli"
         }
       ]
     },
@@ -100,6 +100,10 @@
       "tab": "root",
       "group": "Key Concepts",
       "pages": [
+        {
+          "title": "\uD83D\uDCDF Rendering Modes",
+          "href": "/concepts/modes"
+        },
         {
           "title": "\uD83E\uDDF1 Component System",
           "href": "/concepts/components"
