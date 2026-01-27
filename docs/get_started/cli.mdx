@@ -70,12 +70,12 @@ The architecture can be:
 - `riscv64`: 64-bit RISC-V processor
 - `x64`: x86-64 processor
 
-The following command demonstrates how to cross-compile your server app from Linux/Windows/MacOS (X86-64 or ARM64) to Linux x86-64.
+The following command demonstrates how to cross-compile your server app from Linux/Windows/MacOS (x86-64 or arm64) to Linux x86-64.
 
-```dart
+```shell
 jaspr build --target exe \
-  --target-os linux \
-  --target-arch x64
+  --target-os=linux \
+  --target-arch=x64
 ```
 Read more about dart's cross-compilation in the [dart documentation](https://dart.dev/tools/dart-compile#cross-compilation-exe).
 
