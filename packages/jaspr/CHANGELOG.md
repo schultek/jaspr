@@ -7,6 +7,8 @@
 
 - Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
 
+- Added `--target-os` and `--target-arch` options to the build command to cross-compile server binaries.
+
 ## 0.22.1
 
 - Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.

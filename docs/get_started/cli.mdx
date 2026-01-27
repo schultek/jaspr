@@ -56,6 +56,29 @@ Your server app will be compiled to `build/jaspr/app<.exe/.aot/.dill>`.
 Your static files and assets will be built to the `build/jaspr/web` directory, which must be kept alongside the server
 executable during deployment.
 
+#### Cross-compilation
+
+To use cross-compilation, include the following flags:
+
+`--target-os=linux`: Target OS for the compiled executable (Only the Linux operating system is supported at this time.)
+
+`--target-arch=x64`: Target architecture for the compiled executable. 
+
+The architecture can be:
+- `arm`: 32-bit ARM processor
+- `arm64`: 64-bit ARM processor
+- `riscv64`: 64-bit RISC-V processor
+- `x64`: x86-64 processor
+
+The following command demonstrates how to cross-compile your server app from Linux/Windows/MacOS (X86-64 or ARM64) to Linux x86-64.
+
+```dart
+jaspr build --target exe \
+  --target-os linux \
+  --target-arch x64
+```
+Read more about dart's cross-compilation in the [dart documentation](https://dart.dev/tools/dart-compile#cross-compilation-exe).
+
 ### Client Mode
 
 All files are built to the `build/jaspr/` directory, which you can deploy to any static hosting provider.

@@ -46,7 +46,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'target-arch',
       help: 'Compile to a specific target architecture (only in server mode)',
-      allowed: ['arm', 'arm64', 'ia32', 'riscv32', 'riscv64', 'x64'],
+      allowed: ['arm', 'arm64', 'riscv64', 'x64'],
     );
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
     argParser.addMultiOption(
