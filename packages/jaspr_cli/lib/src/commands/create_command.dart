@@ -34,7 +34,10 @@ class CreateCommand extends BaseCommand {
       abbr: 't',
       help: 'The template to use for the project.',
       allowed: ['docs'],
-      allowedHelp: {'docs': 'A template for creating a documentation site with jaspr_content.'},
+      allowedHelp: {
+        'docs':
+            'A template for creating a documentation site with jaspr_content.',
+      },
     );
     argParser.addFlag(
       'pub-get',
@@ -48,12 +51,17 @@ class CreateCommand extends BaseCommand {
       abbr: 'm',
       help: 'Choose a rendering mode for the project.',
       allowed: [
-        for (final m in RenderingMode.values) ...[m.name, if (m.useServer) '${m.name}:auto'],
+        for (final m in RenderingMode.values) ...[
+          m.name,
+          if (m.useServer) '${m.name}:auto',
+        ],
       ],
       allowedHelp: {
         for (final v in RenderingMode.values) ...{
           v.name: '${v.help}.',
-          if (v.useServer) '${v.name}:auto': '(Deprecated) ${v.help} with automatic client-side hydration.',
+          if (v.useServer)
+            '${v.name}:auto':
+                '(Deprecated) ${v.help} with automatic client-side hydration.',
         },
       },
     );
@@ -82,9 +90,13 @@ class CreateCommand extends BaseCommand {
     argParser.addOption(
       'backend',
       abbr: 'b',
-      help: 'Choose the backend setup for the project (only valid in "server" mode).',
+      help:
+          'Choose the backend setup for the project (only valid in "server" mode).',
       allowed: ['none', 'shelf'],
-      allowedHelp: {'none': 'No custom backend setup.', 'shelf': 'Sets up a custom backend using the shelf package.'},
+      allowedHelp: {
+        'none': 'No custom backend setup.',
+        'shelf': 'Sets up a custom backend using the shelf package.',
+      },
     );
   }
 
@@ -126,9 +138,14 @@ class CreateCommand extends BaseCommand {
       if (useMode.useServer) useBackend ?? 'base',
     };
 
-    final updater = PubUpdater(null, getPubDevUrl());
+    final updater = PubUpdater(null, getPubDevBaseUrl());
 
-    final [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
+    final [
+      jasprFlutterEmbedVersion,
+      jasprRouterVersion,
+      jasprLintsVersion,
+      webCompilersVersion,
+    ] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_lints'),
@@ -161,7 +178,10 @@ class CreateCommand extends BaseCommand {
     progress.complete('Generated ${files.length} file(s)');
 
     if (runPubGet) {
-      final process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+      final process = await Process.start('dart', [
+        'pub',
+        'get',
+      ], workingDirectory: dir.absolute.path);
 
       await watchProcess(
         'pub',
@@ -177,7 +197,10 @@ class CreateCommand extends BaseCommand {
       'Created project $name! In order to get started, run the following commands:\n\n',
     );
 
-    final relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
+    final relativePath = p.relative(
+      dir.path,
+      from: Directory.current.absolute.path,
+    );
     if (relativePath != '.') {
       logger.write('  cd $relativePath\n');
     }
@@ -186,13 +209,17 @@ class CreateCommand extends BaseCommand {
     return 0;
   }
 
-  Future<int> createFromTemplate(String template, Directory dir, String name) async {
+  Future<int> createFromTemplate(
+    String template,
+    Directory dir,
+    String name,
+  ) async {
     final bundle = templates[template];
     if (bundle == null) {
       usageException('Template "$template" not found.');
     }
 
-    final updater = PubUpdater(null, getPubDevUrl());
+    final updater = PubUpdater(null, getPubDevBaseUrl());
 
     final [
       jasprFlutterEmbedVersion,
@@ -208,7 +235,9 @@ class CreateCommand extends BaseCommand {
       updater.getLatestVersion('build_web_compilers'),
     ]);
 
-    final progress = logger.logger!.progress('Generating project from template "$template"...');
+    final progress = logger.logger!.progress(
+      'Generating project from template "$template"...',
+    );
     final generator = await MasonGenerator.fromBundle(bundle);
     final files = await generator.generate(
       DirectoryGeneratorTarget(dir),
@@ -228,7 +257,10 @@ class CreateCommand extends BaseCommand {
     progress.complete('Generated ${files.length} file(s)');
 
     if (runPubGet) {
-      final process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+      final process = await Process.start('dart', [
+        'pub',
+        'get',
+      ], workingDirectory: dir.absolute.path);
 
       await watchProcess(
         'pub',
@@ -244,7 +276,10 @@ class CreateCommand extends BaseCommand {
       'Created project $name! In order to get started, run the following commands:\n\n',
     );
 
-    final relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
+    final relativePath = p.relative(
+      dir.path,
+      from: Directory.current.absolute.path,
+    );
     if (relativePath != '.') {
       logger.write('  cd $relativePath\n');
     }
@@ -254,7 +289,9 @@ class CreateCommand extends BaseCommand {
   }
 
   (Directory, String) getTargetDirectory() {
-    final targetPath = argResults!.rest.firstOrNull ?? logger.logger!.prompt('Specify a target directory:');
+    final targetPath =
+        argResults!.rest.firstOrNull ??
+        logger.logger!.prompt('Specify a target directory:');
 
     final directory = Directory(targetPath).absolute;
     final dir = p.basenameWithoutExtension(p.normalize(directory.path));
@@ -307,9 +344,15 @@ class CreateCommand extends BaseCommand {
     return switch (opt) {
       'none' => (false, false),
       'single-page' => (true, false),
-      'multi-page' => !useServer ? usageException('Cannot use multi-page routing in client mode.') : (true, true),
+      'multi-page' =>
+        !useServer
+            ? usageException('Cannot use multi-page routing in client mode.')
+            : (true, true),
       _ => () {
-        final routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
+        final routing = logger.logger!.confirm(
+          'Setup routing for different pages of your site?',
+          defaultValue: true,
+        );
         final multiPage = routing && useServer
             ? logger.logger!.confirm(
                 '(Recommended) Use multi-page (server-side) routing? '
@@ -330,7 +373,10 @@ class CreateCommand extends BaseCommand {
       'embedded' => FlutterMode.embedded,
       'plugins-only' => FlutterMode.plugins,
       _ => () {
-        final flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
+        final flutter = logger.logger!.confirm(
+          'Setup Flutter web embedding?',
+          defaultValue: false,
+        );
         if (flutter) {
           return FlutterMode.embedded;
         }
@@ -363,7 +409,10 @@ class CreateCommand extends BaseCommand {
             .chooseOne(
               'Select a backend framework:',
               choices: [
-                ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
+                (
+                  'shelf',
+                  'Shelf: An official and well-supported minimal server package by the Dart Team.',
+                ),
                 (
                   'dart_frog',
                   'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.',
@@ -406,6 +455,11 @@ class ScaffoldGeneratorTarget extends DirectoryGeneratorTarget {
       path = path.replaceFirst('$prefix#', '');
     }
 
-    return await super.createFile(path, contents, logger: logger, overwriteRule: overwriteRule);
+    return await super.createFile(
+      path,
+      contents,
+      logger: logger,
+      overwriteRule: overwriteRule,
+    );
   }
 }
