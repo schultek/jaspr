@@ -28,27 +28,10 @@ const executableName = 'jaspr';
 
 /// A [CommandRunner] for the Jaspr CLI.
 class JasprCommandRunner extends CompletionCommandRunner<int> {
-  JasprCommandRunner()
-    : super(
-        executableName,
-        'jaspr - A modern web framework for building websites in Dart.',
-      ) {
-    argParser.addFlag(
-      'version',
-      abbr: 'v',
-      negatable: false,
-      help: 'Print the current version info.',
-    );
-    argParser.addFlag(
-      'enable-analytics',
-      negatable: false,
-      help: 'Enable anonymous analytics.',
-    );
-    argParser.addFlag(
-      'disable-analytics',
-      negatable: false,
-      help: 'Disable anonymous analytics.',
-    );
+  JasprCommandRunner() : super(executableName, 'jaspr - A modern web framework for building websites in Dart.') {
+    argParser.addFlag('version', abbr: 'v', negatable: false, help: 'Print the current version info.');
+    argParser.addFlag('enable-analytics', negatable: false, help: 'Enable anonymous analytics.');
+    argParser.addFlag('disable-analytics', negatable: false, help: 'Disable anonymous analytics.');
     addCommand(CreateCommand());
     addCommand(ServeCommand());
     addCommand(BuildCommand());
@@ -139,9 +122,7 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
 
 String wrapBox(String message) {
   final lines = message.split('\n');
-  final lengths = lines
-      .map((l) => l.replaceAll(RegExp('\x1B\\[\\d+m'), '').length)
-      .toList();
+  final lengths = lines.map((l) => l.replaceAll(RegExp('\x1B\\[\\d+m'), '').length).toList();
   final maxLength = lengths.reduce(max);
   final buffer = StringBuffer();
   final hborder = ''.padLeft(maxLength + 8, '═');

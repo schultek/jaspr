@@ -20,36 +20,24 @@ import 'base_command.dart';
 
 class MigrateCommand extends BaseCommand {
   MigrateCommand({super.logger}) {
-    argParser.addFlag(
-      'dry-run',
-      help: 'Preview the proposed changes but make no changes.',
-      defaultsTo: false,
-    );
-    argParser.addFlag(
-      'apply',
-      help: 'Apply the proposed changes.',
-      defaultsTo: false,
-    );
+    argParser.addFlag('dry-run', help: 'Preview the proposed changes but make no changes.', defaultsTo: false);
+    argParser.addFlag('apply', help: 'Apply the proposed changes.', defaultsTo: false);
     argParser.addOption(
       'current-version',
-      help:
-          'Set the currently used Jaspr version. Defaults to the version used in your pubspec.lock file.',
+      help: 'Set the currently used Jaspr version. Defaults to the version used in your pubspec.lock file.',
     );
     argParser.addOption(
       'target-version',
-      help:
-          'Set the target Jaspr version for migration. Defaults to the latest version on pub.dev.',
+      help: 'Set the target Jaspr version for migration. Defaults to the latest version on pub.dev.',
     );
     argParser.addMultiOption(
       'include-dir',
-      help:
-          'Include the specified directory for migration (can be used multiple times).',
+      help: 'Include the specified directory for migration (can be used multiple times).',
       defaultsTo: ['lib', 'web', 'test'],
     );
     argParser.addMultiOption(
       'feature',
-      help:
-          'Specify which language features to use during migration (can be used multiple times).',
+      help: 'Specify which language features to use during migration (can be used multiple times).',
       allowed: ['dot-shorthands'],
       allowedHelp: {'dot-shorthands': 'Use dot shorthands where possible.'},
     );
@@ -110,10 +98,7 @@ class MigrateCommand extends BaseCommand {
     var targetJasprVersion = targetVersion;
     if (targetJasprVersion == null) {
       try {
-        targetJasprVersion = await PubUpdater(
-          null,
-          getPubDevBaseUrl(),
-        ).getLatestVersion(packageName);
+        targetJasprVersion = await PubUpdater(null, getPubDevBaseUrl()).getLatestVersion(packageName);
       } catch (error) {
         logger.write('$error', level: Level.error);
         logger.write(
@@ -124,10 +109,7 @@ class MigrateCommand extends BaseCommand {
       }
     }
 
-    logger.write(
-      'Checking for migrations from $currentJasprVersion to $targetJasprVersion...',
-      level: Level.info,
-    );
+    logger.write('Checking for migrations from $currentJasprVersion to $targetJasprVersion...', level: Level.info);
 
     final migrations = allMigrations.where((m) {
       return currentJasprVersion.compareTo(m.minimumJasprVersion) < 0 &&
@@ -159,43 +141,23 @@ class MigrateCommand extends BaseCommand {
       final pubspecMap = project.pubspecYaml;
 
       if (pubspecMap != null) {
-        logger.write(
-          'Updating Jaspr dependencies to $targetJasprVersion...',
-          level: Level.info,
-        );
+        logger.write('Updating Jaspr dependencies to $targetJasprVersion...', level: Level.info);
         try {
           final pubspecContent = project.pubspecFile.readAsStringSync();
           final builder = EditBuilder(LineInfo.fromContent(pubspecContent));
 
-          if (pubspecMap.nodes['dependencies']
-              case final YamlMap dependencies) {
-            if (dependencies.nodes['jaspr'] case final YamlScalar jasprNode
-                when jasprNode.value != null) {
-              builder.replace(
-                jasprNode.span.start.offset,
-                jasprNode.span.length,
-                '^$targetJasprVersion',
-              );
+          if (pubspecMap.nodes['dependencies'] case final YamlMap dependencies) {
+            if (dependencies.nodes['jaspr'] case final YamlScalar jasprNode when jasprNode.value != null) {
+              builder.replace(jasprNode.span.start.offset, jasprNode.span.length, '^$targetJasprVersion');
             }
           }
-          if (pubspecMap.nodes['dev_dependencies']
-              case final YamlMap devDependencies) {
-            if (devDependencies.nodes['jaspr_builder']
-                case final YamlScalar builderNode
+          if (pubspecMap.nodes['dev_dependencies'] case final YamlMap devDependencies) {
+            if (devDependencies.nodes['jaspr_builder'] case final YamlScalar builderNode
                 when builderNode.value != null) {
-              builder.replace(
-                builderNode.span.start.offset,
-                builderNode.span.length,
-                '^$targetJasprVersion',
-              );
+              builder.replace(builderNode.span.start.offset, builderNode.span.length, '^$targetJasprVersion');
             }
-            if (devDependencies.nodes['jaspr_test']
-                case final YamlScalar testNode when testNode.value != null) {
-              builder.replace(
-                testNode.span.start.offset,
-                testNode.span.length,
-                '^$targetJasprVersion',
-              );
+            if (devDependencies.nodes['jaspr_test'] case final YamlScalar testNode when testNode.value != null) {
+              builder.replace(testNode.span.start.offset, testNode.span.length, '^$targetJasprVersion');
             }
           }
 
@@ -210,19 +172,9 @@ class MigrateCommand extends BaseCommand {
       logger.write('Previewing migrations (dry run)...', level: Level.info);
     }
 
-    final results = migrations.computeResults(
-      includeDirs,
-      apply,
-      project,
-      LocalFileSystem(),
-      (file, e, st) {
-        logger.write(
-          'Error processing ${file.path}: $e\n$st',
-          level: Level.error,
-        );
-      },
-      features: features,
-    );
+    final results = migrations.computeResults(includeDirs, apply, project, LocalFileSystem(), (file, e, st) {
+      logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
+    }, features: features);
 
     final check = green.wrap(styleBold.wrap('✓'));
     final warn = yellow.wrap(styleBold.wrap('⚠'));
@@ -235,9 +187,7 @@ class MigrateCommand extends BaseCommand {
       output.write('${result.path}\n');
 
       for (final migration in result.migrations) {
-        output.write(
-          '  $check ${migration.migration.name} · ${migration.description}\n',
-        );
+        output.write('  $check ${migration.migration.name} · ${migration.description}\n');
       }
 
       stdout.write('$output\n');
@@ -251,23 +201,15 @@ class MigrateCommand extends BaseCommand {
       output.write('${result.path}\n');
 
       for (final warning in result.warnings) {
-        output.write(
-          '  $warn ${warning.migration.name} · ${warning.message}\n',
-        );
+        output.write('  $warn ${warning.migration.name} · ${warning.message}\n');
       }
 
       stdout.write('$output\n');
     }
 
-    final successCount = results.fold<int>(
-      0,
-      (sum, result) => sum + result.migrations.length,
-    );
+    final successCount = results.fold<int>(0, (sum, result) => sum + result.migrations.length);
 
-    final warningCount = results.fold<int>(
-      0,
-      (sum, result) => sum + result.warnings.length,
-    );
+    final warningCount = results.fold<int>(0, (sum, result) => sum + result.warnings.length);
 
     if (successCount == 0 && warningCount == 0) {
       logger.write('No migration changes found. All done.', level: Level.info);
@@ -275,9 +217,7 @@ class MigrateCommand extends BaseCommand {
     }
 
     logger.write(
-      styleBold.wrap(
-        'Applied $successCount changes and found $warningCount warnings across ${results.length} files.',
-      )!,
+      styleBold.wrap('Applied $successCount changes and found $warningCount warnings across ${results.length} files.')!,
       level: Level.info,
     );
 
