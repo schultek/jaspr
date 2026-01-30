@@ -7,6 +7,8 @@
 
 - Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
 
+- Respect `PUB_HOSTED_URL` environment variable for custom pub mirrors.
+
 ## 0.22.1
 
 - Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.
