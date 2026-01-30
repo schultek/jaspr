@@ -9,6 +9,7 @@ import '../bundles/bundles.dart';
 import '../bundles/scaffold/scaffold_bundle.dart';
 import '../logging.dart';
 import '../project.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -125,7 +126,7 @@ class CreateCommand extends BaseCommand {
       if (useMode.useServer) useBackend ?? 'base',
     };
 
-    final updater = PubUpdater();
+    final updater = PubUpdater(null, getPubDevUrl());
 
     final [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
@@ -191,7 +192,7 @@ class CreateCommand extends BaseCommand {
       usageException('Template "$template" not found.');
     }
 
-    final updater = PubUpdater();
+    final updater = PubUpdater(null, getPubDevUrl());
 
     final [
       jasprFlutterEmbedVersion,

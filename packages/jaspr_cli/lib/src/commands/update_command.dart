@@ -5,13 +5,13 @@ import 'package:pub_updater/pub_updater.dart';
 
 import '../command_runner.dart';
 import '../logging.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'base_command.dart';
 
 class UpdateCommand extends BaseCommand {
   UpdateCommand({super.logger});
-
-  final PubUpdater _updater = PubUpdater();
+  final _updater = PubUpdater(null, getPubDevUrl());
 
   @override
   final String description = 'Update the Jaspr cli.';
