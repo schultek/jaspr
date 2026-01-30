@@ -11,6 +11,7 @@ import 'base_command.dart';
 
 class UpdateCommand extends BaseCommand {
   UpdateCommand({super.logger});
+  
   final _updater = PubUpdater(null, getPubDevUrl());
 
   @override
