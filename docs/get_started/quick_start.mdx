@@ -83,59 +83,7 @@ Read more about rendering modes [here](concepts/modes).
 
     This will walk you through the setup wizard and create a new Jaspr project inside the `my_website` folder.
 
-    The cli will prompt you with a set of options to configure your project. You can read about what each option does below or just start with the recommended ones (simply press **Enter** each time).
-
-    <Accordion title="Click me to see all options">
-      You can configure the following options:
-
-      <Property name="Rendering Mode">
-        Select one of the three rendering modes Jaspr supports.
-      </Property>
-
-      ---
-
-      <Property name="Routing">
-        Whether to set up routing. Selecting **Yes** will setup a basic `Routing` with two routes ('/home' and '/about'). This gives you a convenient starting point when you plan to develop a website with multiple pages.
-      </Property>
-
-      ---
-
-      <Property name="Multi-Page Routing" type="conditional">
-        Whether to set up multi-page or single-page routing, also called server-side or client-side routing respectively. This defined how navigating
-        between routes will behave. Either a "real" page load is performed when navigating to a new route (aka. the browser requests the new page using its url from the server).
-        Or the routing happens purely on the client without any request to the server.
-
-        <Info>
-            There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
-        </Info>
-
-        Read more about routing [here](/concepts/routing).
-      </Property>
-
-      ---
-
-      <Property name="Flutter Embedding">
-        Whether to setup an embedded Flutter application with your site. This will use Jaspr's first-party integration for [Flutter element embedding](https://docs.flutter.dev/deployment/web#embedding-a-flutter-app-into-an-html-page) and create a simple Flutter counter app that synchronizes its state with your Jaspr site.
-      </Property>
-
-      ---
-
-      <Property name="Plugin Support">
-        Whether to enable support for Flutter web plugins. This will enable Jaspr's compiler customizations which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.  
-        *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
-      </Property>
-
-      ---
-
-      <Property name="Custom Backend" type="conditional">
-        Whether to use a custom backend package or framework for the server part of your project. You can choose between:
-        - **None**: No backend setup. This is the default option and is recommended if you are just starting out.
-        - **Shelf**: A simple and lightweight web server for Dart. This is a good choice if you want to build a custom backend for your project.
-        - *Want your favorite Dart backend here? Let us know.*
-
-        Read more about backends [here](/going_further/backend).
-      </Property>
-    </Accordion>
+    The cli will prompt you with a set of options to configure your project. You can read about what each option does [here](get_started/cli#creating-a-new-project) or just start with the recommended ones (simply press **Enter** each time).
 
     Alternatively, you can select a pre-made template using the `--template` option.
 
