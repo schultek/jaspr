@@ -133,7 +133,7 @@ class Meet extends StatelessComponent {
             LinkButton.filled(
               label: 'Explore Modes',
               icon: 'book-open',
-              to: 'https://docs.jaspr.site/get_started/modes',
+              to: 'https://docs.jaspr.site/concepts/modes',
             ),
             LinkButton.outlined(
               label: 'See what others have built',
