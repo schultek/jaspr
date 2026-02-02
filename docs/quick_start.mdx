@@ -40,25 +40,19 @@ Jaspr supports these three rendering modes:
 
 <Card title="Static Mode" icon="1">
   In static mode Jaspr performs **static rendering** (also known as Static Site Generation) at build time, generating a fully static site that you can deploy anywhere.
+
+  **Recommended for most websites, landing pages, portfolios, blogs, documentation sites, etc.**
 </Card>
 <Card title="Server Mode" icon="2">
   In server mode Jaspr builds a **server application** that pre-renders your components for each incoming request (also known as Server Side Rendering).
+
+  **Recommended for web applications that require backend integration, user authentication, or dynamic content that changes frequently.**
 </Card>
 <Card title="Client Mode" icon="3">
   If you want, you can skip the server and pre-rendering part of Jaspr completely and use it as a client-side only framework.
 </Card>
 
-The following table gives a quick comparison of the different modes:
-
-|                               | **static**         | **server**           | **client** |
-| :---------------------------- | ------------------ | -------------------- | ---------- |
-| **Client-Side Interactivity** | ✅                 | ✅                   | ✅         |
-| **Pre-Rendering**             | ✅ (at build time) | ✅ (at request time) | ❌         |
-| **Pure Dart**                 | ✅                 | ✅                   | ❌         |
-| **Static Deployment**         | ✅                 | ❌                   | ✅         |
-| **Backend Integration**       | ❌                 | ✅                   | ❌         |
-
-Read more about rendering modes [here](concepts/modes).
+All modes support client-side interactivity and can be used to build interactive web applications. The main difference is when and how the initial HTML is generated. Read more about rendering modes [here](concepts/modes).
 
 ## 3. Create your Project
 
@@ -133,4 +127,11 @@ You can now start developing your website. 🎉
 <Success>
   Observe that the browser automatically refreshes the page when you change something in your code, like the `Welcome` text.
 </Success>
+
+Check out the following resources to continue your journey with Jaspr:
+
+- []
+[Concepts](concepts/overview): Learn about the core concepts of Jaspr.
+- [Tutorials](tutorials/overview): Follow step-by-step tutorials to build more complex applications.
+- [API Reference](api/overview): Explore the API reference for Jaspr.
   
