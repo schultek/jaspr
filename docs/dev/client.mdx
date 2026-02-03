@@ -7,36 +7,57 @@ description: Learn about client-side rendering and hydration in Jaspr.
 
 ---
 
+The client environment is where all interactivity, event handling, and access to browser APIs happens. In client mode, your app is entirely executed on the client, while in server and static mode, the client-side rendering is started after the initial server-side rendering.
 
+*When using **static** or **server** mode, make sure to also read the [Server-Side Jaspr](/dev/server) page to understand the difference between server and client environments.*
 
+You can choose to compile the client-side part of your app to either JavaScript (default) or WebAssembly (by using the `--experimental-wasm` flag when running `jaspr serve` or `jaspr build`).
+
+## Client Entrypoint
+
+By default, your application's client entrypoint is `lib/main.client.dart`. This file is automatically used by the Jaspr when serving or building your application.
+
+In your entrypoint, you should call the `runApp()` method, which will start the [Hydration](#hydration) process described below.
+
+You can have multiple entrypoints, e.g. for different flavors, by following the `<filename>.client.dart` naming convention (doesn't have to be in root of `lib`). All files matching this pattern will be compiled to either JavaScript or WebAssembly (depending on the `--experimental-wasm` flag) and form a separate client bundle. You can then specify which bundle to use depending on the rendering mode:
+
+<Tabs groupId="mode_combined">
+  <TabItem value="static|server" label="Static & Server Mode">
+
+    If you have a peer `<filename>.server.dart` file next to your `<filename>.client.dart` entrypoint, the client bundle is **automatically included** during the server-side rendering.
+
+    For standalone client entrypoints, you need to manually include a script tag pointing to `<filename>.client.dart.js` in your page (usually in `Document(head: [...])`): 
+
+    ```dart
+    script(src: 'somefile.client.dart.js', defer: true),
+    ```
+    
+    The `src` path is defined relative to the `lib/` directory and may point to a file in a sub-directory.
+  </TabItem>
+  <TabItem value="client" label="Client Mode">
+
+    Your client bundle is included as a `<script>` element in your HTML file. You can change the `src` attribute of this element to any entrypoint file as `somefile.client.dart.js`.
+    
+    ```html
+    <script src="somefile.client.dart.js" defer></script>
+    ```
+
+    The `src` path is defined relative to the `lib/` directory and may point to a file in a sub-directory.
+  </TabItem>
+</Tabs>
 
 ## Adding Interactivity
 
 ## Hydration
 
-## Working with the DOM
 
-## Using js_interop
+While pre-rendering your components on the server (or at built time with 'static' mode) allows for a fast "first contentful paint" (when useful content is first displayed to the user), the site is **not interactive** (e.g. responding to button clicks) until the client-side rendering is started and event handlers have been attached.
 
+In static and server mode your apps lifecycle always **starts on the server**, which builds your components once and render them to html. Then when the browser has loaded your site along with additional files like `.js` or images, your app is executed **again on the client** to continue rendering on the client. This "picking up rendering on the client" is called **Hydration**.
 
+---
 
-While pre-rendering your components on the server (or at built time with 'static' mode) allows for a fast "first contentful paint"
-(when useful content is first displayed to the user), the site is **not interactive** (e.g. responding to button clicks) until the
-client-side rendering is started and event handlers have been attached.
-
-In static and server mode your apps lifecycle always **starts on the server**, which builds your components once and render
-them to html. Then when the browser has loaded your site along with additional files like `.js` or images, your app is executed
-**again on the client** to continue rendering on the client. This "picking up rendering on the client" is called **Hydration**.
-
-> The terms "Pre-Rendering" and "Server-Side-Rendering" can be use pretty much interchangeably. "Server" in this context just refers to whatever
-> computer performs the initial rendering away from the user's browser. This may be an actual webserver running in some datacenter, but
-> when using "static" mode this can also be just your computer or e.g. the machine running your ci pipeline.
-
-## Hydration Setup
-
-For hydration to happen seamlessly the initial client-side render has to match the previously pre-rendered html from the server exactly.
-This is achieved by re-executing the same components that have previously pre-rendered the html on the server also
-on the client as soon as the browser loads the page.
+For hydration to happen seamlessly the initial client-side render has to match the previously pre-rendered html from the server exactly. This is achieved by re-executing the same components that have previously pre-rendered the html on the server also on the client as soon as the browser loads the page.
 
 With Jaspr you can handle hydration in two ways:
 
@@ -123,6 +144,10 @@ This will attach the child components to the specified elements using css select
 The advantage of this approach is that you can leave other parts of your app, e.g. a static footer,
 out of the bundled javascript and thereby reducing loading and startup time.
 
-**Be aware** that on the server, you must still construct the complete app layout and and render the
-targeted components manually at the right location. Keeping your server and client component tree in sync like this is generally cumbersome and error-prone, therefore it is recommended to use `@client` components instead of manual hydration.
+**Be aware** that on the server, you must still construct the complete app layout and and render the targeted components manually at the right location. Keeping your server and client component tree in sync like this is generally cumbersome and error-prone, therefore it is recommended to use `@client` components instead of manual hydration.
+
+## Working with the DOM
+
+## Using js_interop
+
 

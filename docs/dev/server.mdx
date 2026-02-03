@@ -3,7 +3,7 @@ title: Server-Side Jaspr
 description: Understand server-side rendering and how it works with Jaspr.
 ---
 
-*This page is only relevant when using **static** or **server** mode.*
+*This page is relevant for both **static** and **server** mode.*
 
 ---
 
@@ -11,7 +11,7 @@ When using Jaspr in **static** or **server** mode, part of your code will be exe
 
 The term "server" in this context refers to **the environment in which the code is executed**, not the actual hardware running it. In our case, this means either the Dart VM during development, or a native binary when compiled for production. It **does not** refer to the device that is running the code, which may be your local machine (during development), a CI pipeline (during building in "static" mode) or an actual webserver (at runtime in "server" mode).
   
-The counterpart to this is the "client" environment, which is either the JavaScript or WASM runtime in the browser that is displaying your website. All interactivity, event handlers, and access to browser APIs needs to happen in the client environment.
+The counterpart to this is the "client" environment, which is either the JavaScript or WASM runtime in the browser that is displaying your website. All interactivity, event handling, and access to browser APIs needs to happen in the client environment.
 
 **Learning about and understanding the differences between these environments, and how components are rendered in either environment is crucial to building a successful app with Jaspr.**
 
@@ -157,9 +157,10 @@ Therefore, accessing a web-specific library like `dart:js_interop` in a server-r
 
 If you must access one of these libraries in a component that is rendered in both environments, you have several options:
 
-1. When using [`package:web`](https://pub.dev/packages/web) you should instead use [`package:universal_web`](https://pub.dev/packages/universal_web) which already works across web **and server** environments. No need to use conditional imports or the `@Import` annotation shown below.
-2. You can use the [`@Import`](/api/utils/at_import) annotation to import the correct library depending on the environment. This is a shorthand for using [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) and is the recommended way to do this in Jaspr.
-3. You can use Dart's [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) to import the correct library depending on the environment. This is a more verbose way of doing the same thing as the `@Import` annotation, but is still valid.
+1. Instead of using [`package:web`](https://pub.dev/packages/web) (or the legacy `dart:html` library) you should use [`package:universal_web`](https://pub.dev/packages/universal_web) which already works across **client and server** environments. No need to use conditional imports or the `@Import` annotation shown below.
+2. Instead of using `dart:js_interop` you should use `package:universal_web` and import `package:universal_web/js_interop.dart`. 
+3. For any other library (dart or package) you should use the [`@Import`](/api/utils/at_import) annotation to import a library in only one of the environments. This is more convenient then using [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) manually as all APIs are automatically stubbed for the other environment.
+4. Alternatively, you can use Dart's [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) to import different libraries depending on the environment. This requires more boilerplate and manual stubbing compared to using the `@Import` annotation, but is still a valid option.
 
 ## Next Steps
 
