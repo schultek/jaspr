@@ -1,15 +1,88 @@
 ---
-title: Server vs Client
-description: Understand the difference between server and client rendering.
+title: Server-Side Jaspr
+description: Understand server-side rendering and how it works with Jaspr.
 ---
 
-<Info>
-This page is only relevant when using **static** or **server** mode.
-</Info>
+*This page is only relevant when using **static** or **server** mode.*
 
 ---
 
-When using Jaspr in **static** or **server** mode, your app will be executed both on the server (as native code or running in the Dart VM) and on the client (compiled to either JS or WASM), with some parts being run in both environments and some in only one.
+When using Jaspr in **static** or **server** mode, part of your code will be executed on the server to generate the HTML and CSS for your site. This is what is commonly referred to as "server-side rendering".
+
+The term "server" in this context refers to **the environment in which the code is executed**, not the actual hardware running it. In our case, this means either the Dart VM during development, or a native binary when compiled for production. It **does not** refer to the device that is running the code, which may be your local machine (during development), a CI pipeline (during building in "static" mode) or an actual webserver (at runtime in "server" mode).
+  
+The counterpart to this is the "client" environment, which is either the JavaScript or WASM runtime in the browser that is displaying your website.   
+
+**Learning about and understanding the differences between these environments, and how components are rendered in either environment is crucial to building a successful app with Jaspr.**
+
+## Server Entrypoint
+
+By default in static and server mode, your application's server entrypoint is `lib/main.server.dart`. This file is only executed on the server, hence all components that are rendered from there (the root `Document` component and all its descendents) are rendered on the server.
+
+In your entrypoint, you should call the `runApp()` method, which will start a HTTP server to render your root component and serve any assets in the `/web` directory.
+
+You can have multiple entrypoints, e.g. for different flavors, by following the `<filename>.server.dart` naming convention (doesn't have to be in root of `lib`). You can then change the default entrypoint via the `--input=lib/somedir/somefile.server.dart` flag when running `jaspr serve` and `jaspr build`.
+
+## Component Scopes
+
+With server-side rendering, you can think of your application as being split into two (overlapping) parts:
+
+- **Server Scope**: Includes all components that are server-side rendered.
+- **Client Scope**: Includes all components that are client-side rendered.
+
+A component may also be rendered in both environments and therefore be part of both scopes. It is often useful to think of the server scope as the "root" scope, and the client scope as the "child" scope, because usually the server scope defines the root of the component tree with only some component subtrees being rendered also on the client.
+
+Understanding where a component is rendered is crucial to building a successful app with Jaspr, because it defines how and when a component is built, what features can be used, and what platform libraries are available.
+
+<Warning>
+Not understanding where a component is rendered can quickly lead to errors and unexpected behavior. For example, if you try to import `dart:js_interop` from a component that is part of the server scope, you will get a compilation error. Same for importing e.g. `dart:io` from a component that is part of the client scope.
+</Warning>
+
+While you can manually determine where a component is rendered by back-tracking your import tree back to either a server or client entrypoint, Jaspr provides a more convenient way to do this via the **Jaspr VSCode Extension**.
+
+<Tabs>
+  <TabItem label="Using the VSCode Extension" value="vscode">
+
+    For each of your components, you will get a small hint directly in the editor whether that component is rendered on the server and/or on the client. The editor hints for a fullstack component look like this:
+
+    <Image caption="Component Scopes for Counter component" src="/releases/assets/comp_scopes.png" />
+
+    You can click on either server and client hint to see the root(s) of the respective scope, which for the server scope is always the `main()` method of the server entrypoint, and for the client scope is one or more `@client` components.
+
+    <Image caption="Client Scope for Counter component" src="/releases/assets/comp_scope_open.png" />
+
+    Scope hints can optionally be disabled in the settings.
+  </TabItem>
+  <TabItem label="Manual Reasoning" value="manual">
+
+    When you are not using VSCode, or prefer to manually reason about where a component is rendered, you can do so by back-tracking your import tree back to either a server entrypoint, a client entrypoint or a `@client` component.
+
+    <Accordion title="Here is an \"algorithm\" that describes this in more detail.">
+      1. Your apps server entrypoint is `main.server.dart`. This is only executed on the server, hence all components that are rendered from there (the root `Document` component and all its descendents) are rendered on the server.
+      2. Go through the component tree top down, starting at the root component and moving downwards through its descendents.
+      3. Any component annotated with `@client` is a client component. In addition to being rendered on the server, it is also attached as a root component on the client. This means:
+        - It will be rendered both on the server and client.
+        - All of its descendents are also rendered both on the server and client.
+      2. Additionally, your apps client entrypoint is `main.client.dart`. This is only executed on the client and automatically includes all `@client` components.
+
+      To find out if a particular component is rendered on the server or client, you can turn this around and move up the tree:
+
+      1. Start at the component you want to check.
+      2. If it or one of its ancestors is a client component, it is rendered on both the server and client.
+      3. Else, it is only rendered on the server.
+    </Accordion>
+
+  </TabItem>
+</Tabs>
+
+## Server-Only APIs
+
+
+
+## Using Platform Libraries
+
+
+
 
 As a result, some or your components will be:
 
@@ -17,11 +90,7 @@ As a result, some or your components will be:
 - **rendered both on the server and client** 
 - **only rendered on the client** (only rarely needed).
 
-<Info>
-  The terms "server" and "client" in this context refer to the environment in which the code is executed, not the actual hardware running it. Specifically, the "server" environment is the same whether you run it on your local machine (during development), a CI pipeline (during building in "static" mode) or an actual webserver (at runtime in "server" mode).
-</Info>
 
-Learning about and understanding the differences between these environments, and what causes a component to be rendered in which environment is crucial to building a successful app with Jaspr.
 
 ## Difference between Server and Client
 
