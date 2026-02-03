@@ -32,7 +32,7 @@ export class ComponentCodeLensProvider implements vs.CodeLensProvider, vs.Dispos
 
         if (result === "Learn More") {
           await vs.env.openExternal(
-            vs.Uri.parse("https://docs.jaspr.site/get_started/server_client")
+            vs.Uri.parse("https://docs.jaspr.site/dev/server#component-scopes")
           );
         } else if (result === "Never Show Again") {
           await vs.workspace

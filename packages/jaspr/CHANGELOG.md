@@ -217,7 +217,7 @@
 
   Exclude routes from the sitemap through the `--sitemap-exclude` option to `jaspr build`.
 
-  Read more about [Generating a Sitemap](https://docs.jaspr.site/concepts/static_sites#generating-a-sitemap).
+  Read more about [Generating a Sitemap](https://docs.jaspr.site/dev/static_sites#generating-a-sitemap).
 
 - Added support `@client` components from other packages.
 

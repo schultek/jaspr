@@ -98,7 +98,7 @@ jaspr serve
 This will spin up a development server that automatically watches your project files for changes and
 rebuild your project. 
 
-How your website is served depends on your selected [**Rendering Mode**](/concepts/modes):
+How your website is served depends on your selected [**Rendering Mode**](/dev/modes):
 
 <Tabs groupId="mode">
   <TabItem label="Static Mode" value="static">
@@ -137,7 +137,7 @@ When it's time to deploy your application, you can build it using the following 
 jaspr build
 ```
 
-This will build the app inside the `build/jaspr/` directory according to your selected [**Rendering Mode**](/concepts/modes):
+This will build the app inside the `build/jaspr/` directory according to your selected [**Rendering Mode**](/dev/modes):
 
 <Tabs groupId="mode">
   <TabItem label="Static Mode" value="static">
@@ -145,7 +145,7 @@ This will build the app inside the `build/jaspr/` directory according to your se
     Jaspr will start the server entrypoint of your project and pre-render all pages into separate `.html` files.
     The pre-rendered pages and all files from `web/` are built to the `build/jaspr/` directory, which you can deploy to any static hosting provider.
 
-    Learn more about generating static sites [here](/concepts/static_sites).
+    Learn more about generating static sites [here](/dev/static_sites).
   </TabItem>
 
   <TabItem label="Server Mode" value="server">

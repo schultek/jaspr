@@ -59,7 +59,7 @@ class Features extends StatelessComponent {
           icon: 'test-tube',
           title: 'Testing',
           description: 'Write tests for your components and pages with Jasprs testing library.',
-          link: 'https://docs.jaspr.site/concepts/testing',
+          link: 'https://docs.jaspr.site/dev/testing',
         ),
       ]),
     ]);

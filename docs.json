@@ -65,15 +65,15 @@
       "tab": "root",
       "pages": [
         {
-          "title": "\uD83D\uDCD6 Overview",
+          "title": "📖 Overview",
           "href": "/"
         },
         {
-          "title": "\uD83E\uDD4A Jaspr vs Flutter Web",
+          "title": "🥊 Jaspr vs Flutter Web",
           "href": "/jaspr-vs-flutter-web"
         },
         {
-          "title": "\uD83D\uDEEB Quickstart",
+          "title": "🛫 Quickstart",
           "href": "/quick_start"
         }
       ]
@@ -83,39 +83,31 @@
       "group": "Development",
       "pages": [
         {
-          "title": "\uD83D\uDCDF Rendering Modes",
-          "href": "/dev/modes"
-        },
-        {
-          "title": "🗃️ Files and Folders",
-          "href": "/dev/project"
-        },
-        {
-          "title": "⚙️ Configuration",
-          "href": "/dev/configuration"
-        },
-        {
-          "title": "\uD83D\uDD79 Jaspr CLI",
+          "title": "🕹️ Jaspr CLI",
           "href": "/dev/cli"
         },
         {
-          "title": "\uD83C\uDD9A Server-Side Rendering",
-          "href": "/dev/ssr"
+          "title": "📟 Rendering Modes",
+          "href": "/dev/modes"
         },
         {
-          "title": "\uD83D\uDCA7 Hydration",
-          "href": "/dev/hydration"
+          "title": "☁️ Server-Side",
+          "href": "/dev/server"
         },
         {
-          "title": "\ud83c\udfd7\ufe0f Static Sites",
+          "title": "⛳️ Client-Side",
+          "href": "/dev/client"
+        },
+        {
+          "title": "🏗️ Static Sites",
           "href": "/dev/static_sites"
         },
         {
-          "title": "\uD83E\uDDEA Testing",
+          "title": "🧪 Testing",
           "href": "/dev/testing"
         },
         {
-          "title": "\uD83C\uDF10 Deploying",
+          "title": "🌐 Deploying",
           "href": "/dev/deploying"
         }
       ]
@@ -125,27 +117,27 @@
       "group": "Concepts",
       "pages": [
         {
-          "title": "\uD83E\uDDF1 Component System",
+          "title": "🧱 Component System",
           "href": "/concepts/components"
         },
         {
-          "title": "\uD83D\uDD8D Writing HTML",
+          "title": "🖍️ Writing HTML",
           "href": "/concepts/html"
         },
         {
-          "title": "\uD83C\uDFA8 Styling",
+          "title": "🎨 Styling",
           "href": "/concepts/styling"
         },
         {
-          "title": "\uD83E\uDDED Routing",
+          "title": "🧭 Routing",
           "href": "/concepts/routing"
         },
         {
-          "title": "\uD83D\uDCE1 Data Fetching",
+          "title": "📡 Data Fetching",
           "href": "/concepts/data_fetching"
         },
         {
-          "title": "\uD83D\uDD0E SEO & Meta",
+          "title": "🔎 SEO & Meta",
           "href": "/concepts/seo"
         }
       ]
@@ -155,15 +147,15 @@
       "group": "Going Further",
       "pages": [
         {
-          "title": "\uD83D\uDC99 Flutter Embedding",
+          "title": "💙 Flutter Embedding",
           "href": "/going_further/flutter_embedding"
         },
         {
-          "title": "\uD83E\uDE90 Custom Backend",
+          "title": "🪐 Custom Backend",
           "href": "/going_further/backend"
         },
         {
-          "title": "\uD83C\uDF1F Contributing",
+          "title": "🌟 Contributing",
           "href": "/going_further/contributing"
         },
         {
@@ -186,11 +178,15 @@
       "tab": "api",
       "pages": [
         {
-          "title": "Overview",
+          "title": "📖 Overview",
           "href": "/api"
         },
         {
-          "title": "\uD83E\uDDF9 Linting",
+          "title": "⚙️ Configuration",
+          "href": "/api/config"
+        },
+        {
+          "title": "🧹 Linting",
           "href": "/api/linting"
         }
       ]
@@ -313,11 +309,11 @@
       "tab": "content",
       "pages": [
         {
-          "title": "\uD83D\uDCD6 Overview",
+          "title": "📖 Overview",
           "href": "/content"
         },
         {
-          "title": "\uD83D\uDEEB Quick Start",
+          "title": "🛫 Quick Start",
           "href": "/content/quick_start"
         }
       ]
