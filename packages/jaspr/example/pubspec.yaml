@@ -1,0 +1,8 @@
+name: example
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  jaspr:
+    path: ../
