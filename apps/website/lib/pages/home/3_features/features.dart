@@ -35,7 +35,7 @@ class Features extends StatelessComponent {
           icon: 'database',
           title: 'State Management',
           description: 'Use your favorite state management solution, like Riverpod or Provider.',
-          link: 'https://docs.jaspr.site/eco/packages#state-management-packages',
+          link: 'https://docs.jaspr.site/going_further/packages#state-management-packages',
         ),
         LinkCard(
           icon: 'picture-in-picture',
