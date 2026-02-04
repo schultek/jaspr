@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:mason/mason.dart' show ExitCode;
-import 'package:pub_updater/pub_updater.dart';
 
 import '../command_runner.dart';
 import '../logging.dart';
