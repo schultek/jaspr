@@ -15,7 +15,6 @@ import '../migrations/dom_import_migration.dart';
 import '../migrations/entrypoint_migration.dart';
 import '../migrations/html_helper_migration.dart';
 import '../migrations/migration_models.dart';
-import '../utils.dart';
 import 'base_command.dart';
 
 class MigrateCommand extends BaseCommand {
