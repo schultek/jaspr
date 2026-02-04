@@ -98,7 +98,7 @@ class MigrateCommand extends BaseCommand {
     var targetJasprVersion = targetVersion;
     if (targetJasprVersion == null) {
       try {
-        targetJasprVersion = await PubUpdater(null, getPubDevBaseUrl()).getLatestVersion(packageName);
+        targetJasprVersion = await updater.getLatestVersion(packageName);
       } catch (error) {
         logger.write('$error', level: Level.error);
         logger.write(
