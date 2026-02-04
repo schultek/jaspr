@@ -7,6 +7,8 @@
 
 - Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
 
+- Added an example to show on pub.dev.
+
 ## 0.22.1
 
 - Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.
