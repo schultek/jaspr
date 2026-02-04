@@ -7,6 +7,8 @@
 
 - Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
 
+- Added an example to show on pub.dev.
+
 - Respect `PUB_HOSTED_URL` environment variable for custom pub mirrors.
 
 ## 0.22.1
