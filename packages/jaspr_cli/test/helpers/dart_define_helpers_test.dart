@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:test/test.dart';
-
-// Import the private regex class by testing through public API
-import 'package:jaspr_cli/src/helpers/dart_define_helpers.dart';
-import 'package:jaspr_cli/src/commands/base_command.dart';
 import 'package:args/command_runner.dart';
+import 'package:jaspr_cli/src/commands/base_command.dart';
+import 'package:jaspr_cli/src/helpers/dart_define_helpers.dart';
+import 'package:test/test.dart';
 
 // Test command that exposes dart define functionality
 class TestCommand extends BaseCommand {

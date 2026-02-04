@@ -58,7 +58,7 @@ extension AddDartDefine on BaseCommand {
       help:
           'The path of a .json or .env file containing key-value pairs that will be available as environment variables.\n'
           'These can be accessed using the String.fromEnvironment, bool.fromEnvironment, and int.fromEnvironment constructors.\n'
-          'Multiple defines can be passed by repeating "--dart-define-from-file" multiple times.\n'
+          'Multiple files can be passed by repeating "--dart-define-from-file" multiple times.\n'
           'Entries from "--dart-define" with identical keys take precedence over entries from these files.',
       valueHelp: 'config.json|.env',
       splitCommas: false,
