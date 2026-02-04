@@ -1,9 +1,9 @@
-// A minimal jaspr example demonstrating the Flutter-like component model.
+// A minimal Jaspr example demonstrating the Flutter-like component model.
 //
 // Jaspr lets you build websites with a familiar component model that
 // supports server-side rendering out of the box.
 //
-// To create and run a full jaspr project:
+// To create and run a full Jaspr project:
 //   dart pub global activate jaspr_cli
 //   jaspr create my_website
 //   cd my_website && jaspr serve
@@ -25,14 +25,14 @@ void main() {
   );
 }
 
-/// A simple app demonstrating jaspr's component model.
+/// A simple app demonstrating Jaspr's component model.
 class App extends StatelessComponent {
   const App({super.key});
 
   @override
   Component build(BuildContext context) {
     return div([
-      h1([Component.text('Jaspr Counter Example')]),
+      h1([.text('Jaspr Counter Example')]),
       const Counter(),
     ]);
   }
@@ -52,14 +52,14 @@ class CounterState extends State<Counter> {
   @override
   Component build(BuildContext context) {
     return div([
-      p([Component.text('Count: $count')]),
+      p([.text('Count: $count')]),
       button(
         onClick: () => setState(() => count--),
-        [Component.text('-')],
+        [.text('-')],
       ),
       button(
         onClick: () => setState(() => count++),
-        [Component.text('+')],
+        [.text('+')],
       ),
     ]);
   }
