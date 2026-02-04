@@ -19,7 +19,35 @@ The counterpart to this is the "client" environment, which is either the JavaScr
 
 By default in static and server mode, your application's server entrypoint is `lib/main.server.dart`. This file is only executed on the server, hence all components that are rendered from there (the root `Document` component and all its descendents) are rendered on the server.
 
-In your entrypoint, you should call the `runApp()` method, which will start a HTTP server to render your root component and serve any assets in the `/web` directory.
+In your entrypoint, you should:
+- import `package:jaspr/server.dart` and the generated `<filename>.server.options.dart`,
+- call `Jaspr.initializeAll(options: defaultServerOptions);` and
+- call the `runApp()` method, which will start a HTTP server to render your root component and serve any assets in the `/web` directory.
+
+```dart title="lib/main.server.dart"
+// Server-specific Jaspr import.
+import 'package:jaspr/server.dart';
+
+// This file is generated automatically by Jaspr, do not remove or edit.
+import 'main.server.options.dart';
+
+void main() {
+  // Initializes the server environment with the generated default options.
+  Jaspr.initializeAll(options: defaultServerOptions);
+
+  // Starts serving the app.
+  runApp(
+    Document(
+      title: 'My Jaspr Website',
+      body: MyApp(),
+    ),
+  );
+}
+```
+
+The [Document](/api/components/document) component is a special component that renders the standard HTML document structure including `<html>`, `<head>` and `<body>` tags and should be used at the root of your component tree to add a title, metadata and other resources to the document. 
+
+### Multiple Entrypoints
 
 You can have multiple entrypoints, e.g. for different flavors, by following the `<filename>.server.dart` naming convention (doesn't have to be in root of `lib`). You can then change the default entrypoint via the `--input=lib/somedir/somefile.server.dart` flag when running `jaspr serve` and `jaspr build`.
 
