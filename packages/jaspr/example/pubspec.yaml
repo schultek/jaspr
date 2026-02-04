@@ -6,3 +6,6 @@ environment:
 dependencies:
   jaspr:
     path: ../
+
+dev_dependencies:
+  lints: ^5.1.1
