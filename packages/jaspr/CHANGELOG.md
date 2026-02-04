@@ -1,5 +1,8 @@
 ## Unreleased patch
 
+- Added `--web-port` and `--proxy-port` options to `jaspr serve` for configuring webdev and proxy server ports.
+  - Allows running multiple Jaspr projects simultaneously with different ports.
+
 - Fixed `testComponents` failing with `RawText` components due to `MarkupRenderObject` cast error.
   - Added `RawableRenderObject` and `RawableRenderText` interfaces for raw HTML text rendering support.
   - `MarkupRenderObject` and `TestRenderObject` now implement `RawableRenderObject`.
