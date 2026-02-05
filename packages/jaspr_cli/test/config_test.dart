@@ -3,22 +3,16 @@ import 'package:jaspr_cli/src/logging.dart';
 import 'package:jaspr_cli/src/project.dart';
 import 'package:test/test.dart';
 
-class TestLogger implements Logger {
-  TestLogger({this.verbose = false});
-
-  @override
-  final bool verbose;
+class TestLogger extends Logger {
+  TestLogger({super.verbose = false}) : super.base();
 
   final messages = <String>[];
-
-  @override
-  MasonLogger? get logger => null;
 
   @override
   void complete(bool success) {}
 
   @override
-  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
+  void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     messages.add(message);
   }
 }

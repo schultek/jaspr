@@ -38,40 +38,59 @@ mixin ProxyHelper on BaseCommand {
       if (flutterHandler != null && req.url.path == 'flutter_bootstrap.js') {
         return await flutterHandler(req.change(body: body));
       }
+      try {
+        // First try to load the resource from the webdev process.
+        var res = await webdevHandler(req.change(body: body));
 
-      // First try to load the resource from the webdev process.
-      var res = await webdevHandler(req.change(body: body));
+        // The bootstrap script hardcodes the host:port url for the dwds handler endpoint,
+        // so we have to change it to our server url to be able to intercept it.
+        if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
+          var basePath = req.headers['jaspr_base_path'] ?? '/';
+          if (!basePath.endsWith('/')) basePath += '/';
+          if (!basePath.startsWith('/')) basePath = '/$basePath';
+          final body = await res.readAsString();
+          // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<webPort>/$dwdsSseHandler";'
+          return res.change(
+            body: body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort$basePath'),
+          );
+        }
 
-      // The bootstrap script hardcodes the host:port url for the dwds handler endpoint,
-      // so we have to change it to our server url to be able to intercept it.
-      if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
-        var basePath = req.headers['jaspr_base_path'] ?? '/';
-        if (!basePath.endsWith('/')) basePath += '/';
-        if (!basePath.startsWith('/')) basePath = '/$basePath';
-        final body = await res.readAsString();
-        // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<webPort>/$dwdsSseHandler";'
-        return res.change(body: body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort$basePath'));
+        // Temporary fix for Safari until build_web_compilers is fixed.
+        if (res.statusCode == 200 && req.url.path.endsWith('.dart.js')) {
+          final body = await res.readAsString();
+          return res.change(
+            body: body.replaceFirst(
+              '// Safari.\n    return lines[0].match(/(.+):\\d+:\\d+\$/)[1];',
+              '// Safari.\n    return lines[0].match(/[@](.+):\\d+:\\d+\$/)[1];',
+            ),
+          );
+        }
+
+        // Second try to load the resource from the flutter process.
+        if (flutterHandler != null && res.statusCode == 404 && allowedFlutterPaths.hasMatch(req.url.path)) {
+          res = await flutterHandler(req.change(body: body));
+        }
+
+        if (res.statusCode == 404 && redirectNotFound) {
+          return webdevHandler(
+            Request(
+              req.method,
+              req.requestedUri.replace(path: '/'),
+              protocolVersion: req.protocolVersion,
+              headers: req.headers,
+              body: body,
+              encoding: req.encoding,
+            ),
+          );
+        }
+
+        return res;
+      } catch (e, st) {
+        logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
+        logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
+
+        return Response.internalServerError();
       }
-
-      // Second try to load the resource from the flutter process.
-      if (flutterHandler != null && res.statusCode == 404 && allowedFlutterPaths.hasMatch(req.url.path)) {
-        res = await flutterHandler(req.change(body: body));
-      }
-
-      if (res.statusCode == 404 && redirectNotFound) {
-        return webdevHandler(
-          Request(
-            req.method,
-            req.requestedUri.replace(path: '/'),
-            protocolVersion: req.protocolVersion,
-            headers: req.headers,
-            body: body,
-            encoding: req.encoding,
-          ),
-        );
-      }
-
-      return res;
     });
 
     final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
