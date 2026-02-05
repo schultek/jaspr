@@ -38,6 +38,16 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: 'exe',
     );
+    argParser.addOption(
+      'target-os',
+      help: 'Compile to a specific target operating system (only in server mode)',
+      allowed: ['linux', 'macos', 'windows'],
+    );
+    argParser.addOption(
+      'target-arch',
+      help: 'Compile to a specific target architecture (only in server mode)',
+      allowed: ['arm', 'arm64', 'riscv64', 'x64'],
+    );
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
     argParser.addMultiOption(
       'extra-js-compiler-option',
@@ -158,17 +168,38 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.requireMode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
+      final String? targetOS = argResults!.option('target-os');
+      final String? targetArch = argResults!.option('target-arch');
+
       final compileTarget = argResults!.option('target')!;
       final extension = switch (compileTarget) {
-        'exe' when Platform.isWindows => '.exe',
+        'exe' when Platform.isWindows && targetOS == null => '.exe',
         'aot-snapshot' => '.aot',
         'kernel' => '.dill',
         _ => '',
       };
 
+      // if the compile target is NOT exe or aot-snapshot, but targetOS and/or targetArch isn't null
+      // then throw an error letting the user know that cross-compilation isn't supported
+      if (!['exe', 'aot-snapshot'].contains(compileTarget) && (targetOS != null || targetArch != null)) {
+        logger.write(
+          'Cross-compilation (--target-os or --target-arch) is only supported with --target=exe or --target=aot-snapshot. Current target: $compileTarget',
+          level: Level.error,
+        );
+        return 1;
+      }
+
       final process = await Process.start('dart', [
         'compile',
         compileTarget,
+        if (targetOS != null) ...[
+          '--target-os',
+          targetOS,
+        ],
+        if (targetArch != null) ...[
+          '--target-arch',
+          targetArch,
+        ],
         entryPoint!,
         '-o',
         './build/jaspr/app$extension',
