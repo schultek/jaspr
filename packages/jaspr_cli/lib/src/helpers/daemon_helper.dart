@@ -35,8 +35,8 @@ mixin DaemonHelper on BaseCommand {
   }
 }
 
-class DaemonLogger implements Logger {
-  DaemonLogger();
+class DaemonLogger extends Logger {
+  DaemonLogger() : super.base();
 
   static Stream<Map<String, Object?>> get stdinCommandStream => stdin
       .transform<String>(utf8.decoder)
@@ -60,16 +60,7 @@ class DaemonLogger implements Logger {
   bool get verbose => true;
 
   @override
-  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
-    message = message.trim();
-    if (message.contains('\n')) {
-      final lines = message.split('\n');
-      for (final l in lines) {
-        write(l, tag: tag, level: level, progress: progress);
-      }
-      return;
-    }
-
+  void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     if (tag == Tag.server) {
       const vmUriPrefix = 'The Dart VM service is listening on ';
       if (message.startsWith(vmUriPrefix)) {
