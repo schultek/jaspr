@@ -109,6 +109,10 @@
         {
           "title": "🌐 Deploying",
           "href": "/dev/deploying"
+        },
+        {
+          "title": "🤖 AI",
+          "href": "/dev/ai"
         }
       ]
     },
