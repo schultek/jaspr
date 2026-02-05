@@ -173,7 +173,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       final compileTarget = argResults!.option('target')!;
       final extension = switch (compileTarget) {
-        'exe' when Platform.isWindows => '.exe',
+        'exe' when Platform.isWindows && targetOS == null => '.exe',
         'aot-snapshot' => '.aot',
         'kernel' => '.dill',
         _ => '',
