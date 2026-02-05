@@ -10,6 +10,8 @@
 
 - Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
 
+- Added `--dart-define-from-file` option to `serve` and `build` commands.
+
 - Added an example to show on pub.dev.
 
 ## 0.22.1
