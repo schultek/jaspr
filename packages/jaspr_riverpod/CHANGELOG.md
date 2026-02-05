@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.4.4
 
 - Fix `.syncWith` incorrectly applying codec when decoding values.
 
