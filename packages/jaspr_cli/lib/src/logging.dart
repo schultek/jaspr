@@ -29,11 +29,11 @@ enum Tag {
 enum ProgressState { running, completed }
 
 abstract class Logger {
-  Logger.base();
-  factory Logger(bool verbose) = _Logger;
+  Logger.base({this.verbose = false, this.logger});
+  factory Logger(bool verbose) => _Logger(verbose: verbose);
 
-  MasonLogger? get logger;
-  bool get verbose;
+  final MasonLogger? logger;
+  final bool verbose;
 
   void complete(bool success);
   void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
@@ -62,13 +62,7 @@ abstract class Logger {
 }
 
 class _Logger extends Logger {
-  _Logger(this.verbose) : super.base();
-
-  @override
-  final bool verbose;
-
-  @override
-  final MasonLogger logger = MasonLogger();
+  _Logger({super.verbose = false}) : super.base(logger: MasonLogger());
 
   m.Progress? _progress;
 
@@ -95,7 +89,7 @@ class _Logger extends Logger {
     final String log = '${tag?.format() ?? ''}${level.format(message.trim())}';
 
     if (showAsProgress) {
-      _progress ??= logger.progress(log);
+      _progress ??= logger?.progress(log);
       if (progress == ProgressState.completed) {
         if (level.index <= Level.info.index) {
           _progress!.complete(log);

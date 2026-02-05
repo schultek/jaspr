@@ -36,7 +36,7 @@ mixin DaemonHelper on BaseCommand {
 }
 
 class DaemonLogger extends Logger {
-  DaemonLogger() : super.base();
+  DaemonLogger() : super.base(verbose: true);
 
   static Stream<Map<String, Object?>> get stdinCommandStream => stdin
       .transform<String>(utf8.decoder)
@@ -50,14 +50,6 @@ class DaemonLogger extends Logger {
   static void stdoutCommandResponse(Map<String, Object?> command) {
     stdout.writeln('[${json.encode(command)}]');
   }
-
-  @override
-  MasonLogger? get logger => null;
-
-  final MasonLogger _logger = MasonLogger();
-
-  @override
-  bool get verbose => true;
 
   @override
   void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
@@ -89,6 +81,6 @@ class DaemonLogger extends Logger {
   }
 
   void event(String event, Map<String, Object?> params) {
-    _logger.write('[${jsonEncode({'event': event, 'params': params})}]\n');
+    stdout.writeln('[${jsonEncode({'event': event, 'params': params})}]');
   }
 }
