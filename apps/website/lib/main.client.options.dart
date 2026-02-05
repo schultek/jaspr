@@ -6,7 +6,7 @@
 
 import 'package:jaspr/client.dart';
 
-import 'package:website/layout/header.dart' deferred as _header;
+import 'package:website/components/layout/header.dart' deferred as _header;
 import 'package:website/pages/home/0_hero/components/install_command.dart'
     deferred as _install_command;
 import 'package:website/pages/home/0_hero/components/meet_jaspr_button.dart'

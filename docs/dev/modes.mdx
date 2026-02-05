@@ -6,24 +6,36 @@ description: Jaspr comes with three different rendering modes - static, server a
 ---
 
 **Jaspr** is a full-stack web framework, meaning it can run both on the server and the client. Depending on what you
-want to build, you can choose how your app should be built and executed using Jaspr.
+want to build, you can choose how your website should be built and executed using Jaspr.
 
-Therefore, Jaspr supports the following three rendering modes:
+Jaspr supports the following three rendering modes:
 
-- **static** (also known as static-site-generation)
-- **server** (also known as server-side-rendering)
-- **client**
+<Card title="Static Mode" icon="1">
+  In static mode Jaspr performs **static rendering** (also known as Static Site Generation) at build time, generating a fully static site that you can deploy anywhere.
+</Card>
+<Card title="Server Mode" icon="2">
+  In server mode Jaspr builds a **server application** that pre-renders your components for each incoming request (also known as Server Side Rendering).
+</Card>
+<Card title="Client Mode" icon="3">
+  If you want, you can skip the server and pre-rendering part of Jaspr completely and use it as a client-side only framework.
+</Card>
 
-Each mode is explained in detail below. The following table gives a quick overview:
+Each mode is explained in more detail below. The following table gives a quick comparison:
 
 |                               | **static**         | **server**           | **client** |
 | :---------------------------- | ------------------ | -------------------- | ---------- |
-| **No HTML/CSS**               | ✅                 | ✅                   | ❌         |
-| **Pre-Rendering**             | ✅ (at build time) | ✅ (at request time) | ❌         |
 | **Client-Side Interactivity** | ✅                 | ✅                   | ✅         |
-| **Needs Server**              | ❌                 | ✅                   | ❌         |
+| **Pre-Rendering**             | ✅ (at build time) | ✅ (at request time) | ❌         |
+| **Pure Dart**                 | ✅                 | ✅                   | ❌         |
 | **Static Deployment**         | ✅                 | ❌                   | ✅         |
-| **Custom Backend**            | ❌                 | ✅                   | ❌         |
+| **Backend Integration**       | ❌                 | ✅                   | ❌         |
+
+You can configure the rendering mode for your project in `pubspec.yaml`:
+
+```yaml
+jaspr:
+  mode: static # or 'server' or 'client'
+```
 
 ---
 
@@ -40,7 +52,7 @@ Additionally, you can set up hydration on the client in order to make your site 
   HTML/CSS files during build.
 </Info>
 
-To lean more about generating static sites with Jaspr, check out the [Static Sites](/concepts/static_sites) guide.
+To lean more about generating static sites with Jaspr, check out the [Static Sites](/dev/static_sites) guide.
 
 If you want to build a **content-driven** site (like a blog or documentation site) check out [Jaspr Content](/content).
 
@@ -52,7 +64,7 @@ In this mode Jaspr runs and builds a server application that pre-renders your co
 You can use either Jaspr's inbuilt webserver or choose to integrate it into your favorite Dart backend framework.
 Additionally, you can set up hydration on the client in order to make your site interactive.
 
-To deploy your site, you either need a service that supports Dart deployments or otherwise bundle your application with e.g. Docker. See the [Deploying](/concepts/deploying) guide for more information.
+To deploy your site, you either need a service that supports Dart deployments or otherwise bundle your application with e.g. Docker. See the [Deploying](/dev/deploying) guide for more information.
 
 During server-side rendering, you can access the request url, [headers](/api/utils/headers) and [cookies](/api/utils/cookies) through context extensions (e.g. `context.url`). You can also modify the response [headers](/api/utils/headers#contextsetheader), [cookies](/api/utils/cookies#contextsetcookie) and [status code](/api/utils/set_status_code).
 

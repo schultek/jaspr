@@ -36,18 +36,23 @@
   "tabs": [
     {
       "id": "root",
-      "title": "Guides",
+      "title": "Docs",
       "href": "/"
     },
     {
-      "id": "api",
-      "title": "API",
-      "href": "/api"
+      "id": "guides",
+      "title": "Guides",
+      "href": "/guides"
     },
     {
       "id": "content",
       "title": "Content",
       "href": "/content"
+    },
+    {
+      "id": "api",
+      "title": "Reference",
+      "href": "/api"
     },
     {
       "id": "releases",
@@ -60,88 +65,84 @@
       "tab": "root",
       "pages": [
         {
-          "title": "\uD83D\uDCD6 Overview",
+          "title": "📖 Overview",
           "href": "/"
         },
         {
-          "title": "\uD83E\uDD4A Jaspr vs Flutter Web",
+          "title": "🥊 Jaspr vs Flutter Web",
           "href": "/jaspr-vs-flutter-web"
+        },
+        {
+          "title": "🛫 Quickstart",
+          "href": "/quick_start"
         }
       ]
     },
     {
       "tab": "root",
-      "group": "Get Started",
+      "group": "Development",
       "pages": [
         {
-          "title": "\uD83D\uDEEB Quickstart",
-          "href": "/get_started/quick_start"
+          "title": "🕹️ Jaspr CLI",
+          "href": "/dev/cli"
         },
         {
-          "title": "\uD83D\uDCDF Rendering Modes",
-          "href": "/get_started/modes"
+          "title": "📟 Rendering Modes",
+          "href": "/dev/modes"
         },
         {
-          "title": "\uD83C\uDD9A Server vs Client",
-          "href": "/get_started/server_client"
+          "title": "☁️ Server-Side",
+          "href": "/dev/server"
         },
         {
-          "title": "\uD83D\uDD79 Jaspr CLI",
-          "href": "/get_started/cli"
+          "title": "⛳️ Client-Side",
+          "href": "/dev/client"
         },
         {
-          "title": "\uD83D\uDCE6 Configuration",
-          "href": "/get_started/configuration"
+          "title": "🏗️ Static Sites",
+          "href": "/dev/static_sites"
         },
         {
-          "title": "\uD83E\uDDF9 Linting",
-          "href": "/get_started/linting"
+          "title": "🧪 Testing",
+          "href": "/dev/testing"
+        },
+        {
+          "title": "🌐 Deploying",
+          "href": "/dev/deploying"
+        },
+        {
+          "title": "🤖 AI",
+          "href": "/dev/ai"
         }
       ]
     },
     {
       "tab": "root",
-      "group": "Key Concepts",
+      "group": "Concepts",
       "pages": [
         {
-          "title": "\uD83E\uDDF1 Component System",
+          "title": "🧱 Component System",
           "href": "/concepts/components"
         },
         {
-          "title": "\uD83D\uDD8D Writing HTML",
+          "title": "🖍️ Writing HTML",
           "href": "/concepts/html"
         },
         {
-          "title": "\uD83C\uDFA8 Styling",
+          "title": "🎨 Styling",
           "href": "/concepts/styling"
         },
         {
-          "title": "\uD83E\uDDED Routing",
+          "title": "🧭 Routing",
           "href": "/concepts/routing"
         },
         {
-          "title": "\uD83D\uDCE1 Data Fetching",
+          "title": "📡 Data Fetching",
           "href": "/concepts/data_fetching"
         },
         {
-          "title": "\uD83D\uDD0E SEO & Meta",
+          "title": "🔎 SEO & Meta",
           "href": "/concepts/seo"
-        },
-        {
-          "title": "\ud83c\udfd7\ufe0f Static Sites",
-          "href": "/concepts/static_sites"
-        },
-        {
-          "title": "\uD83D\uDCA7 Hydration",
-          "href": "/concepts/hydration"
-        },
-        {
-          "title": "\uD83E\uDDEA Testing",
-          "href": "/concepts/testing"
-        },
-        {
-          "title": "\uD83C\uDF10 Deploying",
-          "href": "/concepts/deploying"
         }
       ]
     },
@@ -150,34 +151,30 @@
       "group": "Going Further",
       "pages": [
         {
-          "title": "\uD83D\uDC99 Flutter Embedding",
+          "title": "💙 Flutter Embedding",
           "href": "/going_further/flutter_embedding"
         },
         {
-          "title": "\uD83E\uDE90 Custom Backend",
+          "title": "🪐 Custom Backend",
           "href": "/going_further/backend"
         },
         {
-          "title": "\uD83C\uDF1F Contributing",
+          "title": "🌟 Contributing",
           "href": "/going_further/contributing"
-        }
-      ]
-    },
-    {
-      "tab": "root",
-      "group": "Ecosystem",
-      "pages": [
-        {
-          "title": "\uD83C\uDF0A Riverpod",
-          "href": "/eco/riverpod"
         },
         {
-          "title": "\uD83C\uDF2C️ Tailwind",
-          "href": "/eco/tailwind"
-        },
-        {
-          "title": "\uD83D\uDCDA Third-Party Packages",
-          "href": "/eco/packages"
+          "group": "📦 Packages",
+          "href": "/going_further/packages",
+          "pages": [
+            {
+              "title": "jaspr_riverpod",
+              "href": "https://pub.dev/packages/jaspr_riverpod"
+            },
+            {
+              "title": "jaspr_tailwind (3rd party)",
+              "href": "https://pub.dev/packages/jaspr_tailwind"
+            }
+          ]
         }
       ]
     },
@@ -185,8 +182,16 @@
       "tab": "api",
       "pages": [
         {
-          "title": "Overview",
+          "title": "📖 Overview",
           "href": "/api"
+        },
+        {
+          "title": "⚙️ Configuration",
+          "href": "/api/config"
+        },
+        {
+          "title": "🧹 Linting",
+          "href": "/api/linting"
         }
       ]
     },
@@ -308,11 +313,11 @@
       "tab": "content",
       "pages": [
         {
-          "title": "\uD83D\uDCD6 Overview",
+          "title": "📖 Overview",
           "href": "/content"
         },
         {
-          "title": "\uD83D\uDEEB Quick Start",
+          "title": "🛫 Quick Start",
           "href": "/content/quick_start"
         }
       ]
@@ -450,6 +455,15 @@
         {
           "title": "PostBreak",
           "href": "/content/components/post_break"
+        }
+      ]
+    },
+    {
+      "tab": "guides",
+      "pages": [
+        {
+          "title": "Overview",
+          "href": "/guides"
         }
       ]
     },

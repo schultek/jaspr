@@ -4,13 +4,13 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
 
-import '../components/github_button.dart';
-import '../components/link_button.dart';
-import '../components/logo.dart';
-import '../components/menu_button.dart';
-import '../components/theme_toggle.dart';
-import '../constants/theme.dart';
-import '../utils/events.dart';
+import '../../constants/theme.dart';
+import '../../utils/events.dart';
+import '../github_button.dart';
+import '../link_button.dart';
+import '../logo.dart';
+import '../menu_button.dart';
+import '../theme_toggle.dart';
 
 @client
 class Header extends StatefulComponent {
