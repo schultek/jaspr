@@ -3,8 +3,8 @@ import 'dart:io';
 
 import '../logging.dart';
 
-class DaemonLogger implements Logger {
-  DaemonLogger();
+class DaemonLogger extends Logger {
+  DaemonLogger() : super.base(verbose: true);
 
   static Stream<Map<String, Object?>> get stdinCommandStream => stdin
       .transform<String>(utf8.decoder)
@@ -20,24 +20,7 @@ class DaemonLogger implements Logger {
   }
 
   @override
-  MasonLogger? get logger => null;
-
-  final MasonLogger _logger = MasonLogger();
-
-  @override
-  bool get verbose => true;
-
-  @override
-  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
-    message = message.trim();
-    if (message.contains('\n')) {
-      final lines = message.split('\n');
-      for (final l in lines) {
-        write(l, tag: tag, level: level, progress: progress);
-      }
-      return;
-    }
-
+  void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     if (tag == Tag.server) {
       const vmUriPrefix = 'The Dart VM service is listening on ';
       if (message.startsWith(vmUriPrefix)) {
@@ -66,6 +49,6 @@ class DaemonLogger implements Logger {
   }
 
   void event(String event, Map<String, Object?> params) {
-    _logger.write('[${jsonEncode({'event': event, 'params': params})}]\n');
+    stdout.writeln('[${jsonEncode({'event': event, 'params': params})}]');
   }
 }

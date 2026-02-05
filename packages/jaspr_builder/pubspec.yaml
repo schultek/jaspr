@@ -1,6 +1,6 @@
 name: jaspr_builder
 description: Builders for jaspr
-version: 0.22.1
+version: 0.22.2
 homepage: https://jaspr.site
 repository: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
@@ -25,7 +25,7 @@ dependencies:
   collection: ^1.15.0
   dart_style: ^3.0.0
   glob: ^2.1.1
-  jaspr: 0.22.1
+  jaspr: 0.22.2
   path: ^1.8.0
   source_gen: ^4.0.0
   yaml: ^3.1.2

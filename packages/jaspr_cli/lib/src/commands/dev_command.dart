@@ -45,6 +45,14 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           'Specify a port to run the dev server on. '
           'Defaults to {jaspr.port} from pubspec.yaml or "$defaultServePort".',
     );
+    argParser.addOption(
+      'web-port',
+      help: 'Specify a port for the webdev server. Defaults to "5467". Change this to run multiple projects.',
+    );
+    argParser.addOption(
+      'proxy-port',
+      help: 'Specify a port for the proxy server. Defaults to "5567". Change this to run multiple projects.',
+    );
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
@@ -74,6 +82,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final release = argResults!.flag('release');
   late final mode = argResults!.option('mode')!;
   late final port = argResults!.option('port') ?? project.port ?? defaultServePort;
+  late final customProxyPort = argResults!.option('proxy-port') ?? serverProxyPort;
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
   late final skipServer = argResults!.flag('skip-server');
@@ -97,7 +106,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       );
     }
 
-    final proxyPort = project.requireMode == JasprMode.client ? port : serverProxyPort;
+    final proxyPort = project.requireMode == JasprMode.client ? port : customProxyPort;
 
     final workflow = await _runClient(proxyPort);
     if (workflow == null) {

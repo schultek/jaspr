@@ -1,7 +1,7 @@
 ---
 title: Version 0.21.0
 description: Release notes and breaking changes.
-next: /releases/packages/jaspr-code-v0.2.1
+next: /releases/packages/jaspr-code-v0.2.2
 nextTitle: VSCode Extension Release Notes
 ---
 
@@ -21,7 +21,7 @@ Version 0.21.0 comes with a major overhaul of the component syntax, making it ea
 
 ---
 
-Additionally, a new version of the [**Jaspr VSCode extension**](https://marketplace.visualstudio.com/items?itemName=schultek.jaspr-code) was released that contains a major improvement to the developer experience. Read more in the [Extension Release Notes](/releases/packages/jaspr-code-v0.2.1).
+Additionally, a new version of the [**Jaspr VSCode extension**](https://marketplace.visualstudio.com/items?itemName=schultek.jaspr-code) was released that contains a major improvement to the developer experience. Read more in the [Extension Release Notes](/releases/packages/jaspr-code-v0.2.2).
 
 ---
 
@@ -74,7 +74,7 @@ In case you need or want to manually migrate single components to the new build 
 
 1. Change the method signature to `Component build(BuildContext context)` for normal components/builders, and `Future<Component> build(BuildContext context)` for [async components/builders](/api/components/async_components).
 2. For build methods `yield`ing a single child, simply remove the `sync*` modifier and `return` that child intead.
-3. For build methods `yield`ing multiple children, return a [`Fragment`](/api/components/fragment) and provide the children as a `List<Component>`.
+3. For build methods `yield`ing multiple children, return a `Fragment` and provide the children as a `List<Component>`.
 
 ### Reason for the Change
 

@@ -39,6 +39,16 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
       defaultsTo: 'exe',
     );
+    argParser.addOption(
+      'target-os',
+      help: 'Compile to a specific target operating system (only in server mode)',
+      allowed: ['linux', 'macos', 'windows'],
+    );
+    argParser.addOption(
+      'target-arch',
+      help: 'Compile to a specific target architecture (only in server mode)',
+      allowed: ['arm', 'arm64', 'riscv64', 'x64'],
+    );
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
     argParser.addMultiOption(
       'extra-js-compiler-option',
@@ -162,17 +172,38 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.requireMode == JasprMode.server) {
       logger.write('Building server app...', progress: ProgressState.running);
 
+      final String? targetOS = argResults!.option('target-os');
+      final String? targetArch = argResults!.option('target-arch');
+
       final compileTarget = argResults!.option('target')!;
       final extension = switch (compileTarget) {
-        'exe' when Platform.isWindows => '.exe',
+        'exe' when Platform.isWindows && targetOS == null => '.exe',
         'aot-snapshot' => '.aot',
         'kernel' => '.dill',
         _ => '',
       };
 
+      // if the compile target is NOT exe or aot-snapshot, but targetOS and/or targetArch isn't null
+      // then throw an error letting the user know that cross-compilation isn't supported
+      if (!['exe', 'aot-snapshot'].contains(compileTarget) && (targetOS != null || targetArch != null)) {
+        logger.write(
+          'Cross-compilation (--target-os or --target-arch) is only supported with --target=exe or --target=aot-snapshot. Current target: $compileTarget',
+          level: Level.error,
+        );
+        return 1;
+      }
+
       final process = await ProcessRunner.instance.start(dartExecutable, [
         'compile',
         compileTarget,
+        if (targetOS != null) ...[
+          '--target-os',
+          targetOS,
+        ],
+        if (targetArch != null) ...[
+          '--target-arch',
+          targetArch,
+        ],
         entryPoint!,
         '-o',
         './build/jaspr/app$extension',
@@ -341,7 +372,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         }
 
         final excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
-        final now = DateTime.now().copyWith(millisecond: 0, microsecond: 0).toIso8601String();
+        final now = DateTime.now().toW3CDateTimeString();
 
         for (final route in generatedRoutes.entries) {
           if (excludePattern != null && excludePattern.hasMatch(route.key)) {
@@ -355,7 +386,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
           content.writeln('  <url>');
           content.writeln('    <loc>$domain${route.key}</loc>');
-          content.writeln('    <lastmod>${sitemapData.lastmod ?? now}</lastmod>');
+          content.writeln('    <lastmod>${sitemapData.lastmod?.toW3CDateTimeFormat() ?? now}</lastmod>');
           if (sitemapData.changefreq != null) {
             content.writeln('    <changefreq>${sitemapData.changefreq}</changefreq>');
           }
@@ -519,5 +550,27 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         file.writeAsStringSync(file.readAsStringSync().replaceAll('org-dartlang-app://', ''));
       }
     }
+  }
+}
+
+extension on DateTime {
+  String toW3CDateTimeString() {
+    final year = this.year.toString().padLeft(4, '0');
+    final month = this.month.toString().padLeft(2, '0');
+    final day = this.day.toString().padLeft(2, '0');
+    final hour = this.hour.toString().padLeft(2, '0');
+    final minute = this.minute.toString().padLeft(2, '0');
+    final second = this.second.toString().padLeft(2, '0');
+    final timeZoneSign = timeZoneOffset.inMinutes >= 0 ? '+' : '-';
+    final timeZoneHours = timeZoneOffset.inHours.abs().toString().padLeft(2, '0');
+    final timeZoneMinutes = timeZoneOffset.inMinutes.abs().remainder(60).toString().padLeft(2, '0');
+    final timeZone = isUtc ? 'Z' : '$timeZoneSign$timeZoneHours:$timeZoneMinutes';
+    return '$year-$month-${day}T$hour:$minute:$second$timeZone';
+  }
+}
+
+extension on String {
+  String toW3CDateTimeFormat() {
+    return DateTime.parse(this).toW3CDateTimeString();
   }
 }

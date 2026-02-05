@@ -1,23 +1,24 @@
-import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+import 'package:jaspr_content/theme.dart';
 
-import 'app.dart';
-
+import 'layouts/home_layout.dart';
+import 'layouts/imprint_layout.dart';
 import 'main.server.options.dart';
 
 void main() {
   Jaspr.initializeApp(options: defaultServerOptions);
 
   runApp(
-    Document(
-      title: 'Jaspr | Dart Web Framework',
-      lang: 'en',
-      head: [link(rel: 'icon', type: 'image/x-icon', href: 'favicon.ico')],
-      styles: [
-        css('html.light .on-dark').styles(display: .none),
-        css('html.dark .on-light').styles(display: .none),
+    ContentApp(
+      parsers: [
+        MarkdownParser(),
       ],
-      body: App(),
+      layouts: [
+        HomeLayout(),
+        ImprintLayout(),
+      ],
+      theme: ContentTheme.none(),
     ),
   );
 }

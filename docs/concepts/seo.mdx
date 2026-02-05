@@ -18,7 +18,7 @@ This page is about what features Jaspr has that relate to SEO, not an in-depth g
 
 Pre-rendering can improve SEO performance in a meaningful way, since the browser immediately receives the full html of your website and doesn't need to wait until the javascript is loaded to display your content.
 
-This is a core feature of Jaspr and supported by both **static** and **server** mode. See [Rendering Modes](/get_started/modes) for more details on this topic.
+This is a core feature of Jaspr and supported by both **static** and **server** mode. See [Rendering Modes](/dev/modes) for more details on this topic.
 
 ---
 
@@ -74,7 +74,7 @@ that needs to be loaded by the browser.
 
 An important consideration for this is to think about what part of your website actually needs to be interactive, and then only shipping javascript for that part.
 
-For example if you are building a blog site with mostly static content but with one small "Like" button on the page, its rather inefficient to ship the whole component tree to the client just to make that button interactive. Rather you should use targeted [hydration](/concepts/hydration) to only ship the button component.
+For example if you are building a blog site with mostly static content but with one small "Like" button on the page, its rather inefficient to ship the whole component tree to the client just to make that button interactive. Rather you should use targeted [hydration](/dev/client#hydration) to only ship the button component.
 
 If you are using [@client](/api/utils/at_client) component, this translates to "move the `@client` annotation as much down the component tree as possible".
 

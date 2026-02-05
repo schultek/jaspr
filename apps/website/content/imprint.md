@@ -1,3 +1,8 @@
+---
+title: Imprint
+layout: imprint
+---
+
 ### Imprint
 
 Kilian Schulte  

@@ -17,6 +17,7 @@ import 'commands/serve_command.dart';
 import 'commands/tooling_daemon_command.dart';
 import 'commands/update_command.dart';
 import 'helpers/analytics.dart';
+import 'utils.dart';
 import 'version.dart';
 
 /// The package name.
@@ -44,7 +45,7 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
   }
 
   final Logger _logger = Logger();
-  final PubUpdater _updater = PubUpdater();
+  final _updater = PubUpdater(null, getPubDevBaseUrl());
 
   @override
   final bool enableAutoInstall;

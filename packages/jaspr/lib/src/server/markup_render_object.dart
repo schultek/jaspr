@@ -6,7 +6,7 @@ import '../../server.dart';
 import '../dom/validator.dart';
 import 'child_nodes.dart';
 
-abstract class MarkupRenderObject extends RenderObject {
+abstract class MarkupRenderObject extends RenderObject implements RawableRenderObject {
   @override
   MarkupRenderObject? parent;
   @override
@@ -234,7 +234,7 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
   }
 }
 
-class MarkupRenderText extends MarkupRenderObject implements RenderText {
+class MarkupRenderText extends MarkupRenderObject implements RawableRenderText {
   MarkupRenderText(this.text, this.rawHtml);
 
   String text;

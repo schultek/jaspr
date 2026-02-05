@@ -1,0 +1,366 @@
+---
+title: Client-Side Jaspr
+description: Learn about client-side rendering and hydration in Jaspr.
+---
+
+*This page is relevant for **all** modes.*
+
+---
+
+The client environment is where all interactivity, event handling, and access to browser APIs happens. In client mode, your app is entirely executed on the client, while in server and static mode, the client-side rendering is started after the initial server-side rendering.
+
+*When using **static** or **server** mode, make sure to also read the [Server-Side Jaspr](/dev/server) page to understand the difference between server and client environments.*
+
+You can choose to compile the client-side part of your app to either JavaScript (default) or WebAssembly (by using the `--experimental-wasm` flag when running `jaspr serve` or `jaspr build`).
+
+## Client Entrypoint
+
+By default, your application's client entrypoint is `lib/main.client.dart`. This file is automatically used by the Jaspr when serving or building your application.
+
+In your entrypoint, you should:
+- import `package:jaspr/client.dart` and the generated `<filename>.client.options.dart`,
+- call `Jaspr.initializeAll(options: defaultClientOptions);` and
+- call the `runApp()` method, which will start the [Hydration](#hydration) process described below.
+
+```dart title="lib/main.client.dart"
+// Client-specific Jaspr import.
+import 'package:jaspr/client.dart';
+
+// This file is generated automatically by Jaspr, do not remove or edit.
+import 'main.client.options.dart';
+
+void main() {
+  // Initializes the client environment with the generated default options.
+  Jaspr.initializeAll(options: defaultClientOptions);
+
+  // Starts running the app.
+  runApp(
+    ...
+  );
+}
+```
+
+The root component depends on your rendering mode:
+
+<Tabs groupId="mode_combined">
+  <TabItem value="static|server" label="Static & Server Mode">
+
+    ```dart
+    runApp(
+      ClientApp(),
+    );
+    ```
+
+    The `ClientApp` component automatically loads and renders all components annotated with `@client` that have been pre-rendered on the server.
+
+    You can wrap this component with additional components such as an `InheritedComponent` to share state across multiple `@client` components.
+
+    <Warning>
+      Avoid wrapping `ClientApp` with any HTML components, as this may break the hydration process.
+    </Warning>
+    
+  </TabItem>
+  <TabItem value="client" label="Client Mode">
+    You can use any component as your root component. You can choose where to mount it by setting the `attachTo` parameter to any valid css selector.
+
+    ```dart
+    // Attaches the MyApp component to the body element (default).
+    runApp(MyApp(), attachTo: 'body');
+
+    // Attaches the MyApp component to the element with id "app".
+    runApp(MyApp(), attachTo: '#app');
+    ```
+
+    You can also selectively attach components to specific parts of your page, which is described further down in the [Hydration](#hydration) section.
+  </TabItem>
+</Tabs>
+
+### Multiple Entrypoints
+
+You can have multiple entrypoints, e.g. for different flavors, by following the `<filename>.client.dart` naming convention (doesn't have to be in root of `lib`). All files matching this pattern will be compiled to either JavaScript or WebAssembly (depending on the `--experimental-wasm` flag) and form a separate client bundle. You can then specify which bundle to use depending on the rendering mode:
+
+<Tabs groupId="mode_combined">
+  <TabItem value="static|server" label="Static & Server Mode">
+
+    If you have a peer `<filename>.server.dart` file next to your `<filename>.client.dart` entrypoint, the client bundle is **automatically included** during the server-side rendering.
+
+    For standalone client entrypoints, you need to manually include a script tag pointing to `<filename>.client.dart.js` in your page (usually in `Document(head: [...])`): 
+
+    ```dart
+    script(src: 'somefile.client.dart.js', defer: true),
+    ```
+    
+    The `src` path is defined relative to the `lib/` directory and may point to a file in a sub-directory.
+  </TabItem>
+  <TabItem value="client" label="Client Mode">
+
+    Your client bundle is included as a `<script>` element in your HTML file. You can change the `src` attribute of this element to any entrypoint file as `somefile.client.dart.js`.
+    
+    ```html
+    <script src="somefile.client.dart.js" defer></script>
+    ```
+
+    The `src` path is defined relative to the `lib/` directory and may point to a file in a sub-directory.
+  </TabItem>
+</Tabs>
+
+## Hydration
+
+Hydration is the process of making a web page interactive by attaching event handlers to the existing html during the initial build phase.
+
+How Jaspr handles hydration depends on the rendering mode:
+
+<Tabs groupId="mode_combined">
+  <TabItem value="static|server" label="Static & Server Mode">
+
+    While pre-rendering your components on the server (or at built time with 'static' mode) allows for a fast "first contentful paint" (when useful content is first displayed to the user), the site is **not interactive** (e.g. responding to button clicks) until the client-side rendering is started and event handlers have been attached.
+
+    In static and server mode your apps lifecycle always **starts on the server**, which builds your components once and render them to html. Then when the browser has loaded your site along with additional files like `.js` or images, your app is executed **again on the client** to continue rendering on the client.
+
+    ---
+
+    To optimize the initial load time, you can selectively hydrate only specific components, instead of your entire app. This is done by using the `@client` annotation on components you want to hydrate.
+
+    A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle, this is like 'resuming' the rendering for a component on the client and picking up where the server-side rendering has left off.
+
+    <Info>
+      `@client` components also have other features such as passing data from server to client or hydrating components dynamically based on server-side state.
+
+      Read more about `@client` components and how to best use them [here](/api/utils/at_client).
+    </Info>
+
+    For `@client` components to hydrate, all you have to do is provide the `ClientApp()` component to your `runApp()` call.
+
+    ---
+
+    *Although it is not recommended, you can choose to not use `@client` components and instead setup hydration manually. You will loose many of the benefits of using `@client` components, such as passing data from server to client or hydrating components dynamically based on server-side state. If you choose to do so, follow the setup described in the **Client Mode** tab.*
+
+  </TabItem>
+  <TabItem value="client" label="Client Mode">
+
+    For basic hydration, simply provide your `App` component to the `runApp()` method and optionally choose an element to attach to.
+
+    ```dart title="lib/main.client.dart"
+    // Attaches the app component to the <body> tag
+    // and hydrates the component / makes it interactive.
+    runApp(App(), attachTo: 'body');
+    ```
+     
+    This approach mounts your whole app on the client, which is fine for smaller or highly interactive apps. 
+    
+    However, when you are building a more content-heavy or mostly static website (static meaning without much user interaction) you probably don't need to ship your whole app structure to the client, but rather want only certain parts of your app to be interactive.
+
+    You can choose which part(s) of your app you want to hydrate by mounting only that part in your client entrypoint. This can be done in Jaspr by using the `SlottedChildView` component.
+
+    Assuming you have a page layout like this:
+
+    ```html title="web/index.html"
+    <html>
+      <head>...</head>
+      <body>
+      <header>...</header>
+      <main>
+          <div id="content">...</div>
+          <div id="sidebar">...</div>
+      </main>
+      <footer>...</footer>
+      </body>
+    </html>
+    ```
+
+    Then you can set up selective hydration like this:
+
+    ```dart
+    runApp(
+      SlottedChildView(slots: [
+        ChildSlot.fromQuery('header', child: Header()),
+        ChildSlot.fromQuery('#sidebar', child: Sidebar()),
+        ChildSlot.fromQuery('#content', child: Content()),
+      ]),
+    );
+    ```
+
+    This will attach the `Header`, `Sidebar` and `Content` components to the specified elements using css selectors.
+
+    The advantage of this approach is that you can leave other parts of your app, e.g. a static footer,
+    out of the bundled JavaScript (or WASM) and thereby reducing loading and startup time.
+
+    <Info>
+      If you are looking for an easier setup that doesn't require you to manually write the HTML and hydration code, consider switching to [**static**](/dev/modes#static-mode) mode instead. It provides a much simpler way to achieve similar results, and comes with additional benefits such as writing your entire app in Dart, automatic code splitting, and more.
+    </Info>
+
+  </TabItem>
+</Tabs>
+
+## Adding Interactivity
+
+Interactivity in Jaspr is handled through standard HTML events and either `StatefulComponent`s or other state management solutions.
+
+All HTML components in Jaspr accept an `events` parameter to listen to DOM events. Some HTML components, like `button`, `input`, etc. also have special event handler parameters, such as `onClick`, `onChange`, etc.
+
+```dart
+// Using the onClick parameter.
+button(
+  onClick: () {
+    print('Button clicked');
+  },
+  [.text('Click me')]
+)
+
+// Using the standard events parameter.
+div(
+  events: {'click': (web.Event event) {
+    print('Button clicked');
+  }},
+  [.text('Click me')]
+)
+```
+
+There is also a [`events()`](/api/utils/events) helper function that can be used to create event callbacks with type safety on any component.
+
+## Working with the DOM
+
+The DOM (Document Object Model) is the browser's representation of the page's structure. It is a tree of nodes that represent the HTML elements of the page.
+
+While Jaspr handles most DOM updates for you, sometimes you need direct access to the underlying DOM elements or browser APIs.
+
+### Accessing Elements
+
+To access the DOM node of a specific component, you can use a [`GlobalNodeKey`](/api/utils/global_node_key). Pass this key to the component you want to access, and use `key.currentNode` to get the element.
+
+```dart
+import 'package:universal_web/web.dart' as web;
+
+final GlobalNodeKey<web.HTMLInputElement> inputKey = GlobalNodeKey();
+
+// In your build method:
+input(key: inputKey, []);
+
+// Later, e.g. in a button click handler:
+void focusInput() {
+  inputKey.currentNode?.focus();
+}
+```
+
+### Browser APIs
+
+The recommended way to access browser APIs depends on your rendering mode:
+
+<Tabs groupId="mode_combined">
+  <TabItem value="static|server" label="Static & Server Mode">
+  
+    To access browser APIs like `window` or `document`, use `package:universal_web`. This package provides a consistent API across both server (where it mocks the APIs) and client environments.
+
+    Make sure to wrap access to browser APIs in a `kIsWeb` check, otherwise you will get an exception during server-side rendering.
+
+    ```dart
+    import 'package:universal_web/web.dart' as web;
+
+    void logSize() {
+      if (kIsWeb) {
+        print('Window size: ${web.window.innerWidth}x${web.window.innerHeight}');
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem value="client" label="Client Mode">
+
+    To access browser APIs like `window` or `document`, use `package:web`.
+
+    ```dart
+    import 'package:web/web.dart' as web;
+
+    void logSize() {
+      print('Window size: ${web.window.innerWidth}x${web.window.innerHeight}');
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+
+### Global Events
+
+To listen to global events like `window.resize` or `document.scroll`, you can use `EventStreamProviders`. These provide a typed `Stream` of events.
+
+```dart
+import 'package:universal_web/web.dart' as web;
+
+// In your State class:
+StreamSubscription? sub;
+
+@override
+void initState() {
+  super.initState();
+  
+  if (kIsWeb) {
+    sub = web.EventStreamProviders.resizeEvent.forTarget(web.window).listen((e) {
+      print('Window resized');
+    });
+  }
+}
+
+@override
+void dispose() {
+  sub?.cancel();
+  super.dispose();
+}
+```
+
+## Using js_interop
+
+Since Jaspr compiles to JavaScript (or WebAssembly), you can easily interact with existing JavaScript libraries or snippets through Dart's `js_interop` mechanism.
+
+<Tabs groupId="mode_combined">
+  <TabItem value="static|server" label="Static & Server Mode">
+    
+    Use `package:universal_web/js_interop` to safely import Dart's `js_interop` library across server (where it mocks the APIs) and client environments.
+
+    ```dart
+    import 'package:universal_web/js_interop.dart';
+    ```
+
+  </TabItem>
+  <TabItem value="client" label="Client Mode">
+
+    Use `dart:js_interop` to access JavaScript APIs.
+
+    ```dart
+    import 'dart:js_interop';
+    ```
+
+  </TabItem>
+</Tabs>
+
+Use `@JS()` to access top-level JavaScript functions or variables.
+
+```dart
+@JS()
+external void alert(JSString message);
+
+void showAlert() {
+  alert('Hello from Dart!'.toJS);
+}
+```
+
+Use extension types to access members of JavaScript objects.
+
+```dart
+extension type Console._(JSObject _) implements JSObject {
+  external void log(JSAny? item);
+}
+
+@JS()
+external Console get console;
+
+void logToConsole() {
+  console.log('Hello from Dart!'.toJS);
+}
+```
+
+<Info>
+For standard web APIs, always prefer using the `package:web` or `package:universal_web` package. Use `js_interop` only for external libraries or advanced use cases.
+</Info>
+
+For more complex interactions or using external libraries, refer to the [official Dart documentation on JS interop](https://dart.dev/interop/js-interop).
+
+

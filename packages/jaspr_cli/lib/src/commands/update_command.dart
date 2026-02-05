@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:mason/mason.dart' show ExitCode;
-import 'package:pub_updater/pub_updater.dart';
 
 import '../command_runner.dart';
 import '../logging.dart';
@@ -10,8 +9,6 @@ import 'base_command.dart';
 
 class UpdateCommand extends BaseCommand {
   UpdateCommand({super.logger});
-
-  final PubUpdater _updater = PubUpdater();
 
   @override
   final String description = 'Update the Jaspr cli.';
@@ -27,7 +24,7 @@ class UpdateCommand extends BaseCommand {
     logger.write('Checking for updates...', progress: ProgressState.running);
     late final String latestVersion;
     try {
-      latestVersion = await _updater.getLatestVersion(packageName);
+      latestVersion = await updater.getLatestVersion(packageName);
     } catch (error) {
       logger.complete(false);
       logger.write('$error', level: Level.error);
@@ -44,7 +41,7 @@ class UpdateCommand extends BaseCommand {
     logger.write('Updating jaspr_cli to $latestVersion...', progress: ProgressState.running);
     late final ProcessResult result;
     try {
-      result = await _updater.update(packageName: packageName, versionConstraint: latestVersion);
+      result = await updater.update(packageName: packageName, versionConstraint: latestVersion);
     } catch (error) {
       logger.complete(false);
       logger.write('$error', level: Level.error);

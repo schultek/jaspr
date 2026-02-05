@@ -1,0 +1,186 @@
+---
+title: Jaspr CLI
+description: Create, serve and build projects using the Jaspr CLI.
+---
+
+---
+
+## Commands
+
+Jaspr comes with a cli tool to create, serve and build your website.
+
+- `jaspr create`: Create a new Jaspr project.
+- `jaspr serve`: Serve the project and automatically refresh when you make changes.
+- `jaspr build`: Build the project according to the selected rendering mode.
+
+Additionally, there are the following service commands available:
+
+- `jaspr doctor`: Show information about the environment and current project.
+- `jaspr clean`: Delete the `build/` and `.dart_tool/` directories.
+- `jaspr analyze`: Report Jaspr specific lint warnings and apply fixes.
+- `jaspr update`: Update the Jaspr cli.
+
+## Creating a new Project
+
+The easiest way to create a new project is to start the scaffolding system with:
+
+```shell
+jaspr create my_website
+```
+
+This will walk you through a series of options to configure your starter project to your needs.
+
+<Accordion title="Click me to see all options">
+  You can configure the following options:
+
+  <Property name="Rendering Mode">
+    Select one of the three rendering modes Jaspr supports.
+  </Property>
+
+  ---
+
+  <Property name="Routing">
+    Whether to set up routing. Selecting **Yes** will setup a basic `Routing` with two routes ('/home' and '/about'). This gives you a convenient starting point when you plan to develop a website with multiple pages.
+  </Property>
+
+  ---
+
+  <Property name="Multi-Page Routing" type="conditional">
+    Whether to set up multi-page or single-page routing, also called server-side or client-side routing respectively. This defined how navigating
+    between routes will behave. Either a "real" page load is performed when navigating to a new route (aka. the browser requests the new page using its url from the server).
+    Or the routing happens purely on the client without any request to the server.
+
+    <Info>
+        There are different advantages and disadvantages for both types. To help you decide you can find many [articles](https://www.google.com/search?q=multi+page+vs+single+page+site) about this topic.
+    </Info>
+
+    Read more about routing [here](/concepts/routing).
+  </Property>
+
+  ---
+
+  <Property name="Flutter Embedding">
+    Whether to setup an embedded Flutter application with your site. This will use Jaspr's first-party integration for [Flutter element embedding](https://docs.flutter.dev/deployment/web#embedding-a-flutter-app-into-an-html-page) and create a simple Flutter counter app that synchronizes its state with your Jaspr site.
+  </Property>
+
+  ---
+
+  <Property name="Plugin Support">
+    Whether to enable support for Flutter web plugins. This will enable Jaspr's compiler customizations which allows the use of most Flutter web plugins in your Jaspr site without any additional setup.  
+    *Flutter web plugins* refers to any Flutter plugin from pub.dev that supports web and is not concerned with widgets or rendering. This includes packages like `shared_preferences` or `firebase`.
+  </Property>
+
+  ---
+
+  <Property name="Custom Backend" type="conditional">
+    Whether to use a custom backend package or framework for the server part of your project. You can choose between:
+    - **None**: No backend setup. This is the default option and is recommended if you are just starting out.
+    - **Shelf**: A simple and lightweight web server for Dart. This is a good choice if you want to build a custom backend for your project.
+    - *Want your favorite Dart backend here? Let us know.*
+
+    Read more about backends [here](/going_further/backend).
+  </Property>
+</Accordion>
+
+
+Alternatively, you can select a pre-made template using the `--template` option, with the following templates being available:
+
+- `docs`: A template for documentation websites using [`jaspr_content`](/content).
+
+## Development Server
+
+You can start your Jaspr project in development mode using:
+
+```shell
+jaspr serve
+```
+
+This will spin up a development server that automatically watches your project files for changes and
+rebuild your project. 
+
+How your website is served depends on your selected [**Rendering Mode**](/dev/modes):
+
+<Tabs groupId="mode">
+  <TabItem label="Static Mode" value="static">
+
+    Jaspr will execute the server entrypoint of your project and start a HTTP server to server-side render your components. During development, all server-side rendering is done on-demand when opening a page in the browser. This is the same behavior as when using `server` mode. 
+
+    Any client entrypoints are compiled to JavaScript and served by the development server, along with any HTML files or other assets from the `web/` directory.
+    
+    The `kDebugMode` constant will be `true` during development, which allows you to write code that behaves differently in development and production.
+
+    **Only when building will Jaspr pre-render all pages into static `.html` files.**
+  </TabItem>
+
+  <TabItem label="Server Mode" value="server">
+   
+    Jaspr will execute the server entrypoint of your project and start a HTTP server to server-side render your components. All server-side rendering is done on-demand when opening a page in the browser.
+
+    Any client entrypoints are compiled to JavaScript and served by the development server, along with any HTML files or other assets from the `web/` directory.
+
+    The `kDebugMode` constant will be `true` during development, which allows you to write code that behaves differently in development and production.
+  </TabItem>
+
+  <TabItem label="Client Mode" value="client">
+
+    Your client entrypoints are compiled to JavaScript and served directly by the development server, along with any HTML files or other assets from the `web/` directory.
+
+    The `kDebugMode` constant will be `true` during development, which allows you to write code that behaves differently in development and production.
+  </TabItem>
+</Tabs>
+
+## Building
+
+When it's time to deploy your application, you can build it using the following command:
+
+```shell
+jaspr build
+```
+
+This will build the app inside the `build/jaspr/` directory according to your selected [**Rendering Mode**](/dev/modes):
+
+<Tabs groupId="mode">
+  <TabItem label="Static Mode" value="static">
+
+    Jaspr will start the server entrypoint of your project and pre-render all pages into separate `.html` files.
+    The pre-rendered pages and all files from `web/` are built to the `build/jaspr/` directory, which you can deploy to any static hosting provider.
+
+    Learn more about generating static sites [here](/dev/static_sites).
+  </TabItem>
+
+  <TabItem label="Server Mode" value="server">
+    Jaspr will build a server runnable as well as static assets from `web/`. For the server runnable you can choose whether to build a standalone executable (default), an aot snapshot or kernel module with the `--target` option.
+
+    Your server app will be compiled to `build/jaspr/app<.exe/.aot/.dill>`.
+    Your static files and assets will be built to the `build/jaspr/web` directory, which must be kept alongside the server executable during deployment.
+
+    #### Cross-compilation
+
+    To use cross-compilation, include the following flags:
+
+    `--target-os=linux`: Target OS for the compiled executable (Only the Linux operating system is supported at this time.)
+
+    `--target-arch=x64`: Target architecture for the compiled executable. 
+
+    The architecture can be:
+    - `arm`: 32-bit ARM processor
+    - `arm64`: 64-bit ARM processor
+    - `riscv64`: 64-bit RISC-V processor
+    - `x64`: x86-64 processor
+
+    The following command demonstrates how to cross-compile your server app from Linux/Windows/MacOS (x86-64 or arm64) to Linux x86-64.
+
+    ```shell
+    jaspr build --target exe \
+      --target-os=linux \
+      --target-arch=x64
+    ```
+    
+    Read more about dart's cross-compilation in the [dart documentation](https://dart.dev/tools/dart-compile#cross-compilation-exe).
+  </TabItem>
+
+  <TabItem label="Client Mode" value="client">
+    All files are built to the `build/jaspr/` directory, which you can deploy to any static hosting provider.
+  </TabItem>
+</Tabs>
+
