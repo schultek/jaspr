@@ -5,10 +5,12 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
+import 'package:pub_updater/pub_updater.dart';
 
 import '../helpers/analytics.dart';
 import '../logging.dart';
 import '../project.dart';
+import '../utils.dart';
 
 abstract class BaseCommand extends Command<int> {
   Set<FutureOr<void> Function()> guards = {};
@@ -24,6 +26,7 @@ abstract class BaseCommand extends Command<int> {
   late final bool verbose = argResults?.flag('verbose') ?? false;
 
   late final Project project = Project(logger);
+  late final updater = PubUpdater(null, getPubDevBaseUrl());
 
   @override
   @mustCallSuper
