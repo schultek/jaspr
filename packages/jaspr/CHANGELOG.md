@@ -9,13 +9,14 @@
   - `MarkupRenderText` and `TestRenderText` now implement `RawableRenderText`.
 
 - Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
+- Fixed launching debug builds in Safari.
 
 - Added `--target-os` and `--target-arch` options to the build command to cross-compile server binaries.
 - Added `--dart-define-from-file` option to the serve and build commands.
+- Respect `PUB_HOSTED_URL` environment variable for custom pub mirrors.
 
 - Added an example to show on pub.dev.
 
-- Respect `PUB_HOSTED_URL` environment variable for custom pub mirrors.
 
 ## 0.22.1
 
