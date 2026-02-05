@@ -39,13 +39,6 @@ abstract class Logger {
   void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     message = message.trimRight();
 
-    if (tag == Tag.server &&
-        level == Level.error &&
-        message.contains('FormatException: Scheme not starting with alphabetic character') &&
-        message.contains('@http://')) {
-      Future.delayed(const Duration(milliseconds: 100), () => writeSafariWarning());
-    }
-
     if (message.contains('\n')) {
       final lines = message.split('\n');
       for (final l in lines) {
@@ -141,17 +134,6 @@ extension ServerLogger on Logger {
         level: Level.error,
       );
     }
-  }
-
-  void writeSafariWarning() {
-    write(
-      'Launching debug builds in Safari is currently not supported due to a known bug.\n\n'
-      'See the following issues for more information:\n'
-      '- https://github.com/dart-lang/webdev/issues/1499\n'
-      '- https://github.com/schultek/jaspr/issues/58',
-      tag: Tag.cli,
-      level: Level.warning,
-    );
   }
 }
 

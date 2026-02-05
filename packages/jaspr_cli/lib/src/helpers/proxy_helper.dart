@@ -55,6 +55,17 @@ mixin ProxyHelper on BaseCommand {
           );
         }
 
+        // Temporary fix for Safari until build_web_compilers is fixed.
+        if (res.statusCode == 200 && req.url.path.endsWith('.dart.js')) {
+          final body = await res.readAsString();
+          return res.change(
+            body: body.replaceFirst(
+              '// Safari.\n    return lines[0].match(/(.+):\\d+:\\d+\$/)[1];',
+              '// Safari.\n    return lines[0].match(/[@](.+):\\d+:\\d+\$/)[1];',
+            ),
+          );
+        }
+
         // Second try to load the resource from the flutter process.
         if (flutterHandler != null && res.statusCode == 404 && allowedFlutterPaths.hasMatch(req.url.path)) {
           res = await flutterHandler(req.change(body: body));
@@ -77,12 +88,6 @@ mixin ProxyHelper on BaseCommand {
       } catch (e, st) {
         logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
         logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
-
-        if (e is FormatException &&
-            e.message.contains('Scheme not starting with alphabetic character') &&
-            e.source.toString().contains('@http://')) {
-          logger.writeSafariWarning();
-        }
 
         return Response.internalServerError();
       }
