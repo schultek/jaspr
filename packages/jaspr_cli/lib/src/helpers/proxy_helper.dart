@@ -86,6 +86,9 @@ mixin ProxyHelper on BaseCommand {
 
         return res;
       } catch (e, st) {
+        if (e is HijackException) {
+          rethrow;
+        }
         logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
         logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
 
