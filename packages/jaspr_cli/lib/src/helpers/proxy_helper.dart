@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
@@ -70,7 +71,7 @@ mixin ProxyHelper on BaseCommand {
           res = await flutterHandler(req.change(body: body));
         }
 
-        if (res.statusCode == 404 && redirectNotFound) {
+        if (res.statusCode == 404 && redirectNotFound && path.extension(req.url.path).isEmpty) {
           return webdevHandler(
             Request(
               req.method,
@@ -85,6 +86,9 @@ mixin ProxyHelper on BaseCommand {
 
         return res;
       } catch (e, st) {
+        if (e is HijackException) {
+          rethrow;
+        }
         logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
         logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
 
