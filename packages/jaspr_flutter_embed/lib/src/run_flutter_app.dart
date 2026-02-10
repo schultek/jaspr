@@ -14,89 +14,35 @@ import 'view_constraints.dart';
 
 Map<int, flt.Widget> _viewWidgets = {};
 
-Future<FlutterApp> _flutterApp = Future(() {
-  final completer = Completer<FlutterApp>();
-
-  flutter!.loader!.didCreateEngineInitializer = (EngineInitializer engineInitializer) {
-    return Future(() async {
-      final engine = await engineInitializer
-          .initializeEngine(InitializeEngineOptions(multiViewEnabled: true, renderer: 'canvaskit'))
-          .toDart;
-      final app = await engine.runApp().toDart;
-      completer.complete(app);
-    }).toJS;
-  }.toJS;
-
-  ui_web.bootstrapEngine(
-    runApp: () {
-      flt.runWidget(MultiViewApp(viewBuilder: (viewId) => _viewWidgets[viewId]));
-    },
+Future<void> _flutterApp = Future(() async {
+  await ui_web.bootstrapEngineServices(
+    jsConfiguration: ui_web.EngineConfiguration(
+      multiViewEnabled: true,
+      renderer: 'canvaskit',
+    ),
   );
-
-  return completer.future;
+  await ui_web.bootstrapEngineUi();
+  flt.runWidget(MultiViewApp(viewBuilder: (viewId) => _viewWidgets[viewId]));
 });
 
 Future<void> preloadEngine() => _flutterApp;
 
+final viewManager = ui_web.engineDispatcher.viewManager;
+
 Future<int> addView(Element target, ViewConstraints? constraints, flt.Widget widget) async {
-  final app = await _flutterApp;
-  final id = app.addView(ViewOptions(hostElement: target, viewConstraints: constraints));
+  await _flutterApp;
+  final id = viewManager
+      .createAndRegisterView(ViewOptions(hostElement: target, viewConstraints: constraints) as ui_web.ViewOptions)
+      .viewId;
   _viewWidgets[id] = widget;
   return id;
 }
 
 Future<void> removeView(int viewId) async {
-  final app = await _flutterApp;
-  app.removeView(viewId);
-}
-
-/// Handle to the [_flutter] object defined by the 'flutter.js' script.
-@JS('_flutter')
-external FlutterInterop? flutter;
-
-// Below are some js bindings to interact with the flutter loader script
-// from dart in a type-safe way.
-
-extension type FlutterInterop._(JSObject _) {
-  external FlutterInterop({FlutterLoader? loader});
-
-  external FlutterLoader? loader;
-}
-
-extension type FlutterLoader._(JSObject _) {
-  external FlutterLoader({JSFunction? didCreateEngineInitializer});
-
-  external JSPromise<JSAny?> load(LoadOptions options);
-
-  external JSFunction? didCreateEngineInitializer;
-}
-
-extension type LoadOptions._(JSObject _) {
-  external LoadOptions({String? entrypointUrl, JSFunction? onEntrypointLoaded});
-}
-
-extension type EngineInitializer._(JSObject _) {
-  external EngineInitializer();
-
-  external JSPromise<AppRunner> initializeEngine(InitializeEngineOptions options);
-}
-
-extension type InitializeEngineOptions._(JSObject _) {
-  external InitializeEngineOptions({Element? hostElement, bool? multiViewEnabled, String? renderer});
-}
-
-extension type AppRunner._(JSObject _) implements JSObject {
-  external AppRunner();
-
-  external JSPromise<FlutterApp> runApp();
+  await _flutterApp;
+  viewManager.disposeAndUnregisterView(viewId);
 }
 
 extension type ViewOptions._(JSObject _) {
   external ViewOptions({Element? hostElement, JSAny? initialData, ViewConstraints? viewConstraints});
-}
-
-extension type FlutterApp._(JSObject _) implements JSObject {
-  external int addView(ViewOptions options);
-
-  external void removeView(int viewId);
 }
