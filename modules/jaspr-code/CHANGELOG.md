@@ -1,3 +1,9 @@
+## 0.4.0
+
+- Jaspr is now installed using `dart install jaspr_cli` instead of `dart pub global activate jaspr_cli`. 
+  This requires Dart 3.10 or later.
+- The extension now expects the `jaspr` command to be available on the system PATH.
+
 ## 0.3.1
 
 - Fix issue where the entry file was not opened after project creation.

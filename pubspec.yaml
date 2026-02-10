@@ -3,7 +3,7 @@ publish_to: none
 repository: https://github.com/schultek/jaspr
 
 environment:
-  sdk: '>=3.8.0 <4.0.0'
+  sdk: ">=3.8.0 <4.0.0"
 
 workspace:
   - packages/jaspr
@@ -54,20 +54,35 @@ melos:
       exec:
         concurrency: 1
       packageFilters:
-        scope: [ jaspr, jaspr_builder, jaspr_cli, jaspr_content, jaspr_riverpod, jaspr_router ]
+        scope:
+          [
+            jaspr,
+            jaspr_builder,
+            jaspr_cli,
+            jaspr_content,
+            jaspr_riverpod,
+            jaspr_router,
+          ]
     coverage:
       run: |
-        dart test --coverage=coverage --exclude-tags=cli &&
+        dart test --coverage=coverage --exclude-tags=cli-integration-test &&
         dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/\$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
       exec:
         concurrency: 1
       packageFilters:
-        scope: [jaspr, jaspr_builder, jaspr_cli, jaspr_content, jaspr_riverpod, jaspr_router]
-    coverage:cli:
+        scope:
+          [
+            jaspr,
+            jaspr_builder,
+            jaspr_cli,
+            jaspr_content,
+            jaspr_riverpod,
+            jaspr_router,
+          ]
+    test:cli:integration:
       run: |
         cd packages/jaspr_cli &&
-        dart test --coverage=coverage --tags="$VARIANT" &&
-        dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "../../coverage/jaspr_cli_$(echo $VARIANT)_lcov.info" -i ./coverage
+        dart test --tags="$VARIANT"
     coverage:all:
       run: |
         melos run coverage --no-select

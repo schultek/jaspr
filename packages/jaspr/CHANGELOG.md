@@ -1,3 +1,8 @@
+## Unreleased breaking
+
+- Jaspr can now be installed with `dart install jaspr_cli` instead of `dart pub global activate jaspr_cli`.
+- Improved logging and stability of the CLI.
+
 ## 0.22.2
 
 - Added `--web-port` and `--proxy-port` options to `jaspr serve` for configuring webdev and proxy server ports.

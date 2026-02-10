@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:jaspr_cli/src/daemon/daemon.dart';
 import 'package:jaspr_cli/src/domains/scopes_domain.dart';
-import 'package:jaspr_cli/src/helpers/daemon_helper.dart';
 import 'package:jaspr_cli/src/logging.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';

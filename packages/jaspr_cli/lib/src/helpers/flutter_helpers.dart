@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 
 import '../commands/base_command.dart';
 import '../logging.dart';
+import '../process_runner.dart';
 import '../project.dart';
 
 mixin FlutterHelper on BaseCommand {
@@ -19,17 +20,17 @@ mixin FlutterHelper on BaseCommand {
     return flutterDefines;
   }
 
-  Future<Process> serveFlutter(String flutterPort, bool wasm) async {
+  Future<Process> serveFlutter(bool wasm) async {
     await _ensureTarget();
 
-    final flutterProcess = await Process.start(
+    final flutterProcess = await ProcessRunner.instance.start(
       'flutter',
       [
         'run',
         '--device-id=web-server',
         '-t',
         '.dart_tool/jaspr/flutter_target.dart',
-        '--web-port=$flutterPort',
+        '--web-port=$flutterProxyPort',
         if (wasm) '--wasm',
         if (argResults!.flag('release')) '--release',
       ],
@@ -45,7 +46,7 @@ mixin FlutterHelper on BaseCommand {
   Future<void> buildFlutter(bool wasm) async {
     await _ensureTarget();
 
-    final flutterProcess = await Process.start(
+    final flutterProcess = await ProcessRunner.instance.start(
       'flutter',
       [
         'build',
@@ -84,8 +85,8 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
   while (moveTargets.isNotEmpty) {
     final moveTarget = moveTargets.removeAt(0);
     final file = File('$from/$moveTarget').absolute;
-    final isDir = file.statSync().type == FileSystemEntityType.directory;
-    if (isDir) {
+    final stat = file.statSync();
+    if (stat.type case FileSystemEntityType.directory) {
       await Directory('$to/$moveTarget').absolute.create(recursive: true);
 
       final files = Directory('$from/$moveTarget').absolute.list(recursive: true);
@@ -93,7 +94,7 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
         final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
         moveTargets.add(path);
       }
-    } else {
+    } else if (stat.type case FileSystemEntityType.file || FileSystemEntityType.link) {
       moves.add(file.copy(File('$to/$moveTarget').absolute.path));
     }
   }
@@ -102,7 +103,7 @@ Future<void> copyFiles(String from, String to, [List<String> targets = const [''
 }
 
 final flutterInfo = (() {
-  final result = Process.runSync(
+  final result = ProcessRunner.instance.runSync(
     'flutter',
     ['doctor', '--version', '--machine'],
     stdoutEncoding: utf8,
@@ -127,10 +128,11 @@ final flutterInfo = (() {
   }
   return output;
 })();
+
 final webSdkDir = (() {
   final webSdkPath = p.join(flutterInfo['flutterRoot'] as String, 'bin', 'cache', 'flutter_web_sdk');
   if (!Directory(webSdkPath).existsSync()) {
-    Process.runSync('flutter', ['precache', '--web'], runInShell: true);
+    ProcessRunner.instance.runSync('flutter', ['precache', '--web'], runInShell: true);
   }
   if (!Directory(webSdkPath).existsSync()) {
     throw UnsupportedError(
@@ -141,4 +143,5 @@ final webSdkDir = (() {
   }
   return webSdkPath;
 })();
+
 final flutterVersion = flutterInfo['flutterVersion'] as String;
