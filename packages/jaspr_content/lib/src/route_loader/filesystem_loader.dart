@@ -19,6 +19,7 @@ import 'route_loader.dart';
 class FilesystemLoader extends RouteLoaderBase {
   FilesystemLoader(
     this.directory, {
+    this.filterExtensions,
     this.keepSuffixPattern,
     super.debugPrint,
     @visibleForTesting this.fileSystem = const LocalFileSystem(),
@@ -27,6 +28,11 @@ class FilesystemLoader extends RouteLoaderBase {
 
   /// The directory to load pages from.
   final String directory;
+
+  /// A set of file extensions to filter for.
+  ///
+  /// Files in the content directory with other extensions are skipped.
+  final Set<String>? filterExtensions;
 
   /// A pattern to keep the file suffix for all matching pages.
   final Pattern? keepSuffixPattern;
@@ -43,7 +49,10 @@ class FilesystemLoader extends RouteLoaderBase {
   StreamSubscription<WatchEvent>? _watcherSub;
 
   @override
-  Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
+  Future<List<RouteBase>> loadRoutes(
+    ConfigResolver resolver,
+    bool eager,
+  ) async {
     if (kDebugMode) {
       _watcherSub ??= watcherFactory(directory).events.listen((event) {
         // It looks like event.path is relative on most platforms, but an
@@ -97,6 +106,9 @@ class FilesystemLoader extends RouteLoaderBase {
       for (final entry in dir.listSync()) {
         final path = entry.path.substring(root.path.length + 1);
         if (entry is File) {
+          if (filterExtensions != null && !filterExtensions!.contains(p.extension(entry.path))) {
+            continue;
+          }
           entities.add(
             FilePageSource(
               path,
@@ -117,6 +129,9 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   void addFile(String path) {
+    if (filterExtensions != null && !filterExtensions!.contains(p.extension(path))) {
+      return;
+    }
     addSource(
       FilePageSource(
         path.substring(directory.length + 1),
@@ -161,7 +176,13 @@ class FilesystemLoader extends RouteLoaderBase {
 }
 
 class FilePageSource extends PageSource {
-  FilePageSource(super.path, this.file, super.loader, {super.keepSuffix, super.context});
+  FilePageSource(
+    super.path,
+    this.file,
+    super.loader, {
+    super.keepSuffix,
+    super.context,
+  });
 
   final File file;
 
@@ -169,6 +190,12 @@ class FilePageSource extends PageSource {
   Future<Page> buildPage() async {
     final content = await file.readAsString();
 
-    return Page(path: path, url: url, content: content, config: config, loader: loader);
+    return Page(
+      path: path,
+      url: url,
+      content: content,
+      config: config,
+      loader: loader,
+    );
   }
 }

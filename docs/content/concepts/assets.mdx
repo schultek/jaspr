@@ -1,0 +1,178 @@
+---
+title: Assets
+description: Handling assets like images, videos, etc. in content-driven sites.
+---
+
+
+When building content-driven websites, you often have assets like images, videos, or other files that belong to a specific page or section. Managing these assets can become difficult if they are all stored in a central directory.
+
+The `AssetManager` allows you to **co-locate your assets** with your content files. It handles the resolution of relative paths in your content and data, ensuring that they point to the correct location in the final build.
+
+Additionally, it can process your assets during the build, like adding a hash for cache busting, scaling and optimizing images and more.
+
+---
+
+## Setup
+
+To use the `AssetManager`, you need to set it up in your `main.dart` file.
+
+1. Create an instance of `AssetManager`.
+2. Add the `assetManager.middleware` to the server app.
+3. Add `assetManager.dataLoader` and `assetManager.pageExtension` to your `ContentApp`.
+
+```dart
+import 'package:jaspr/server.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+
+void main() {
+  // 1. Initialize AssetManager
+  final assetManager = AssetManager(
+    // The root directory where your assets are located. Usually, this is the same as your content directory.
+    directory: 'content', 
+    // Optional: Configure which properties in your frontmatter contain asset paths.
+    dataProperties: {'image', 'meta.thumbnail'}, 
+  );
+
+  // 2. Add middleware to serve assets during development.
+  ServerApp.addMiddleware(assetManager.middleware);
+
+  runApp(ContentApp(
+    // ...
+    dataLoaders: [
+      // ...
+      // 3a. Process relative asset paths in page data.
+      assetManager.dataLoader,
+    ],
+    extensions: [
+      // ...
+      // 3b. Process relative asset paths in page content (markdown/html).
+      assetManager.pageExtension,
+    ],
+  ));
+}
+```
+
+## Directory Structure
+
+With `AssetManager`, you can organize your assets alongside your content.
+
+```text
+content/
+  images/
+    logo.png
+  blog/
+    my-post.md
+    image.png
+    cover.jpg
+    media/
+      thumbnail.jpg
+      video.mp4
+```
+
+## Usage
+
+Once set up, you can reference your assets using relative or absolute paths. The `AssetManager` will automatically resolve these paths to the correct absolute URL, both during development and in the static build.
+
+- Relative asset paths are resolved relative to the **current page's directory**. This allows you to organize your assets alongside your content files.
+
+- Absolute paths are resolved relative to the **asset root directory**.
+
+
+### In Content (Markdown/HTML)
+
+You can use relative paths in standard HTML tags like `<img>`, `<video>`, `<audio>`, and `<source>`. This works in both Markdown files and raw HTML.
+
+```markdown
+<!-- In content/blog/my-post.md -->
+
+# My Post
+
+Here is an image located in the same directory:
+![My Image](image.png)
+
+And here is a video in a subdirectory:
+<video src="media/video.mp4" controls></video>
+
+This is an image in another directory:
+![Logo](/images/logo.png)
+```
+
+These would resolve to:
+
+- `content/blog/image.png`
+- `content/blog/media/video.mp4`
+- `content/images/logo.png`
+
+### In Frontmatter
+
+If you reference assets in your page's frontmatter (e.g., for a thumbnail or cover image), you need to tell the `AssetManager` which properties to process using the `dataProperties` option during setup.
+
+```yaml
+---
+title: My Post
+image: cover.jpg
+meta:
+  thumbnail: media/thumbnail.jpg
+---
+```
+
+With `dataProperties: {'image', 'meta.thumbnail'}`, `AssetManager` will resolve `cover.jpg` and `media/thumbnail.jpg` relative to the content file.
+
+### In Components
+
+When building custom components, you can resolve asset paths using the `context.resolveAsset()` extension method.
+
+```dart
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+
+class MyComponent extends StatelessComponent {
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    // Resolve 'image.png' relative to the current page.
+    final imagePath = context.resolveAsset('image.png');
+
+    yield img(src: iconPath);
+      
+    // You can also resolve absolute paths (relative to the asset root).
+    final logoPath = context.resolveAsset('/images/logo.png');
+      
+    yield img(src: logoPath);
+  }
+}
+```
+
+## Asset Transformers
+
+Assets are processed during the build. By default, `AssetManager` uses the `HashingAssetTransformer`, which adds a content hash to the filename for cache busting (e.g., `image.a1b2c3d4.png`).
+
+You can customize this behavior or add your own transformers by passing a list of `AssetTransformer`s to the `AssetManager` constructor.
+
+```dart
+final assetManager = AssetManager(
+  directory: 'content',
+  assetTransformers: [
+    // Add your custom transformer
+    MyCustomTransformer(),
+    // Use default hashing
+    HashingAssetTransformer(),
+  ],
+);
+```
+
+### Custom Transformers
+
+To create a custom transformer, extend `AssetTransformer` and implement the `transform` method.
+
+```dart
+class MyCustomTransformer extends AssetTransformer {
+  @override
+  Asset transform(Asset asset, [Object? aspect]) {
+    // Transform the asset (e.g. compress images, optimize svg, etc.)
+    // Return a new Asset or the same asset.
+    return asset;
+  }
+}
+```
+
+The `aspect` option is passed through as a parameter from `context.resolveAsset(aspect: ...)` and can be used to generate asset variants, e.g. differently resized images.

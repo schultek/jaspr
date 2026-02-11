@@ -1,3 +1,14 @@
+## Unreleased minor
+
+- New `AssetManager` class for handling content assets. Assets like images, videos, etc. can be co-located with the content and referenced by their relative path from a page.
+  - Assets paths are resolved across markdown files, page data and components using `context.resolveAsset('some/asset.png')`.
+  - Only used assets are copied to the build output.
+  - Assets can be hashed and otherwise transformed (e.g. resized) during build by using `AssetTransformer`s.
+
+- Added `filterExtensions` parameter to `FilesystemLoader`, which allows filtering for specific file extensions. This can be used when co-locating assets and data files with the content to prevent them from being treated as pages.
+
+- Fixed `FilesystemDataLoader` to ignore files it cannot parse. This allows for co-locating data files with the content.
+
 ## 0.4.5
 
 - Ensure `context.page` and `context.pages` is only called on the server.
