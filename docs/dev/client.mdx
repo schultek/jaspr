@@ -19,7 +19,7 @@ By default, your application's client entrypoint is `lib/main.client.dart`. This
 
 In your entrypoint, you should:
 - import `package:jaspr/client.dart` and the generated `<filename>.client.options.dart`,
-- call `Jaspr.initializeAll(options: defaultClientOptions);` and
+- call `Jaspr.initializeApp(options: defaultClientOptions);` and
 - call the `runApp()` method, which will start the [Hydration](#hydration) process described below.
 
 ```dart title="lib/main.client.dart"
@@ -31,7 +31,7 @@ import 'main.client.options.dart';
 
 void main() {
   // Initializes the client environment with the generated default options.
-  Jaspr.initializeAll(options: defaultClientOptions);
+  Jaspr.initializeApp(options: defaultClientOptions);
 
   // Starts running the app.
   runApp(
