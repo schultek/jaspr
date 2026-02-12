@@ -20,9 +20,7 @@ abstract class DataLoader {
   Future<void> loadData(Page page);
 
   static bool canParse(String name) {
-    return name.endsWith('.json') ||
-        name.endsWith('.yaml') ||
-        name.endsWith('.yml');
+    return name.endsWith('.json') || name.endsWith('.yaml') || name.endsWith('.yml');
   }
 
   /// Parses the raw data from a source with the given [name].

@@ -23,8 +23,7 @@ class FilesystemDataLoader implements DataLoader {
     );
   }
 
-  static DirectoryWatcher _defaultWatcherFactory(String path) =>
-      DirectoryWatcher(path);
+  static DirectoryWatcher _defaultWatcherFactory(String path) => DirectoryWatcher(path);
 
   static final Map<String, FilesystemDataLoader> _instance = {};
 

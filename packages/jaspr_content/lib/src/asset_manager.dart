@@ -179,10 +179,15 @@ class AssetManager {
 
   final Map<(String, Object?), String> _assets = {};
 
+  /// Resolves the asset at [path] relative to the current page. If [path] starts with a slash, it is resolved
+  /// relative to the asset root.
+  ///
+  /// The optional [aspect] parameter can be used to provide additional information to the asset transformers during build.
+  /// Requires an [AssetManager] to be setup.
   String resolveAsset(String path, Page page, [Object? aspect]) {
-    final resolvedPath = path.startsWith('/')
-        ? path.substring(1)
-        : p.normalize(p.join(p.dirname(page.path), path));
+    if (path.startsWith('http')) return path;
+
+    final resolvedPath = path.startsWith('/') ? path.substring(1) : p.normalize(p.join(p.dirname(page.path), path));
 
     if (kGenerateMode) {
       final sourcePath = p.normalize(p.join(directory, resolvedPath));
@@ -299,9 +304,7 @@ class HashingAssetTransformer extends AssetTransformer {
     final digest = md5.convert(inputBytes);
     final hex = digest.toString();
 
-    final pathWithoutExt = flattenPath
-        ? p.basenameWithoutExtension(asset.path)
-        : p.withoutExtension(asset.path);
+    final pathWithoutExt = flattenPath ? p.basenameWithoutExtension(asset.path) : p.withoutExtension(asset.path);
     final outputPath = '$pathWithoutExt.$hex${p.extension(asset.path)}';
 
     return Asset.fromBytes(outputPath, inputBytes);
@@ -339,10 +342,7 @@ class _AssetDataLoader implements DataLoader {
       if (currentData is Map<String, Object?>) {
         final value = currentData[segments.last];
         if (value is String) {
-          currentUpdates[segments.last] = assetManager.resolveAsset(
-            value,
-            page,
-          );
+          currentUpdates[segments.last] = assetManager.resolveAsset(value, page);
         }
       }
     }
@@ -378,7 +378,7 @@ class _AssetPageExtension implements PageExtension {
       if (targetElements.containsKey(tag)) {
         final attribute = targetElements[tag]!;
         final assetPath = node.attributes[attribute];
-        if (assetPath != null && !assetPath.startsWith('http')) {
+        if (assetPath != null) {
           return ElementNode(node.tag, {
             ...node.attributes,
             attribute: assetManager.resolveAsset(assetPath, page),
