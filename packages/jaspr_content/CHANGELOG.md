@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Added `TaxonomyLoader` route loader for generating taxonomy and term pages from page front matter.
+- Added `TaxonomyContext` extension on `BuildContext` with helpers like `taxonomyTermPages`, `taxonomyTermPage`, `pagesForTerm`, and `taxonomyTermPagesWithCount`.
+
 ## 0.4.5
 
 - Ensure `context.page` and `context.pages` is only called on the server.

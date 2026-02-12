@@ -13,11 +13,14 @@ void main() {
           taxonomy: 'tags',
         );
 
-        expect(result, equals({
-          'page': {
-            TaxonomyUtils.taxonomyKey: 'tags',
-          },
-        }));
+        expect(
+          result,
+          equals({
+            'page': {
+              TaxonomyUtils.taxonomyKey: 'tags',
+            },
+          }),
+        );
         // _term key is omitted entirely (not set to null)
         // when no term is provided, via null-aware ?term syntax.
         expect((result['page'] as Map).containsKey(TaxonomyUtils.termKey), isFalse);
@@ -30,17 +33,22 @@ void main() {
           term: 'dart',
         );
 
-        expect(result, equals({
-          'page': {
-            TaxonomyUtils.taxonomyKey: 'tags',
-            TaxonomyUtils.termKey: 'dart',
-          },
-        }));
+        expect(
+          result,
+          equals({
+            'page': {
+              TaxonomyUtils.taxonomyKey: 'tags',
+              TaxonomyUtils.termKey: 'dart',
+            },
+          }),
+        );
       });
 
       test('preserves user data at the top level', () {
         final result = TaxonomyLoader.withTaxonomyData(
-          {'site': {'name': 'My Site'}},
+          {
+            'site': {'name': 'My Site'},
+          },
           taxonomy: 'tags',
           term: 'dart',
         );
@@ -60,11 +68,14 @@ void main() {
           term: 'dart',
         );
 
-        expect(result['page'], equals({
-          'title': 'Posts tagged: dart',
-          TaxonomyUtils.taxonomyKey: 'tags',
-          TaxonomyUtils.termKey: 'dart',
-        }));
+        expect(
+          result['page'],
+          equals({
+            'title': 'Posts tagged: dart',
+            TaxonomyUtils.taxonomyKey: 'tags',
+            TaxonomyUtils.termKey: 'dart',
+          }),
+        );
       });
 
       test('taxonomy metadata takes precedence over user page data', () {
@@ -80,11 +91,14 @@ void main() {
           term: 'dart',
         );
 
-        expect(result['page'], equals({
-          'title': 'My Page',
-          TaxonomyUtils.taxonomyKey: 'tags',
-          TaxonomyUtils.termKey: 'dart',
-        }));
+        expect(
+          result['page'],
+          equals({
+            'title': 'My Page',
+            TaxonomyUtils.taxonomyKey: 'tags',
+            TaxonomyUtils.termKey: 'dart',
+          }),
+        );
       });
     });
 
