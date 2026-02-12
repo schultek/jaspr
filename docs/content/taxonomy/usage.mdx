@@ -23,16 +23,8 @@ ContentApp.custom(
     TaxonomyLoader(
       taxonomy: 'tags',
       directory: 'content',
-      termPageBuilder: (context, taxonomy, term) {
-        final posts = context.pagesForTerm(taxonomy, term);
-        return div([
-          h1([text('Posts tagged: $term')]),
-          ul([
-            for (final post in posts)
-              li([a(href: post.url, [text(post.data.page['title'] as String)])]),
-          ]),
-        ]);
-      },
+      taxonomyPageBuilder: (context, taxonomy) => TagsPage(),
+      termPageBuilder: (context, taxonomy, term) => TagPage(term: term),
     ),
   ],
   configResolver: PageConfig.all(
@@ -48,6 +40,10 @@ ContentApp.custom(
 ## Querying Taxonomy Data
 
 The `TaxonomyContext` extension on `BuildContext` provides methods to query taxonomy data from within component builders.
+
+<Info>
+These methods are **server-only**. They throw an `UnsupportedError` when called on the client. Wrap calls with a `!kIsWeb` check or use them only in server-rendered components.
+</Info>
 
 ### taxonomyTermPages
 
@@ -118,41 +114,45 @@ for (final page in termPages) {
 
 ## Full Example
 
-Here is a complete example setting up a tags taxonomy with an index page showing a tag cloud and individual term pages listing tagged posts:
+Here is a complete example of the `TagsPage` and `TagPage` components referenced in the [Setup](#setup) above.
+
+### TagsPage
+
+The `TagsPage` component renders the taxonomy index page at `/tags/`. It uses `taxonomyTermPagesWithCount()` to get all tag term pages along with the number of content pages for each tag, and displays them as a tag cloud. Each tag links to its individual term page using the `url` from the term page and displays the tag name via the `taxonomyTerm` getter from the `TaxonomyPage` extension.
 
 ```dart
-ContentApp.custom(
-  eagerlyLoadAllPages: true,
-  loaders: [
-    FilesystemLoader('content'),
-    TaxonomyLoader(
-      taxonomy: 'tags',
-      // Index page at /tags/ listing all tags with counts.
-      taxonomyPageBuilder: (context, taxonomy) {
-        final tagCloud = context.taxonomyTermPagesWithCount(taxonomy);
-        return div(classes: 'tag-cloud', [
-          for (final MapEntry(:key, :value) in tagCloud.entries)
-            a(href: key.url, [text('${key.taxonomyTerm} ($value)')]),
-        ]);
-      },
-      // Individual term pages at /tags/{term}.
-      termPageBuilder: (context, taxonomy, term) {
-        final posts = context.pagesForTerm(taxonomy, term);
-        return div([
-          h1([text('Posts tagged: $term')]),
-          ul([
-            for (final post in posts)
-              li([
-                a(href: post.url, [text(post.data.page['title'] as String)]),
-              ]),
-          ]),
-        ]);
-      },
-    ),
-  ],
-  configResolver: PageConfig.all(
-    enableFrontmatter: true,
-    parsers: [MarkdownParser()],
-  ),
-);
+class TagsPage extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    final tagCloud = context.taxonomyTermPagesWithCount('tags');
+    return div(classes: 'tag-cloud', [
+      for (final MapEntry(:key, :value) in tagCloud.entries)
+        a(href: key.url, [text('${key.taxonomyTerm} ($value)')]),
+    ]);
+  }
+}
+```
+
+### TagPage
+
+The `TagPage` component renders an individual term page at `/tags/{term}` (e.g., `/tags/dart`). It receives the normalized term string and uses `pagesForTerm()` to find all content pages that have this tag in their frontmatter. Each matching post is rendered as a link using the post's URL and title from its page data.
+
+```dart
+class TagPage extends StatelessComponent {
+  const TagPage({required this.term});
+
+  final String term;
+
+  @override
+  Component build(BuildContext context) {
+    final posts = context.pagesForTerm('tags', term);
+    return div([
+      h1([text('Posts tagged: $term')]),
+      ul([
+        for (final post in posts)
+          li([a(href: post.url, [text(post.data.page['title'] as String)])]),
+      ]),
+    ]);
+  }
+}
 ```

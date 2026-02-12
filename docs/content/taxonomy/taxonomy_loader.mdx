@@ -1,54 +1,17 @@
 ---
-title: Taxonomy
-description: Classify content with taxonomies like tags and categories.
+title: TaxonomyLoader
+description: Reference for the TaxonomyLoader route loader and its properties.
 ---
 
 ---
 
-Taxonomies let you classify content using frontmatter fields like **tags** or **categories**. The `TaxonomyLoader` scans your content files, extracts all unique terms, and generates pages for each one. The `TaxonomyContext` extension then lets you query this data from within component builders.
+The `TaxonomyLoader` is a `RouteLoader` that scans content files for a frontmatter field matching the given taxonomy name, extracts all unique values (terms), normalizes them, and generates in-memory pages for each one.
+
+For a general introduction to taxonomies, see the [Taxonomy overview](/content/concepts/taxonomy). For setup and querying, see [Using Taxonomy](/content/taxonomy/usage).
 
 ---
 
-For example, given blog posts with a `tags` field in their frontmatter:
-
-```markdown title="content/posts/hello-world.md"
----
-title: Hello World
-tags: [dart, jaspr]
----
-
-Welcome to my blog!
-```
-
-The `TaxonomyLoader` will discover the terms "dart" and "jaspr" and generate pages at `/tags/dart` and `/tags/jaspr`.
-
-## Setup
-
-Add a `TaxonomyLoader` alongside your other loaders using `ContentApp.custom()`. Eager loading must be enabled for the taxonomy context extensions to work.
-
-```dart
-ContentApp.custom(
-  eagerlyLoadAllPages: true,
-  loaders: [
-    FilesystemLoader('content'),
-    TaxonomyLoader(
-      taxonomy: 'tags',
-      termPageBuilder: (context, taxonomy, term) {
-        return h1([text('Posts tagged: $term')]);
-      },
-    ),
-  ],
-  configResolver: PageConfig.all(
-    // ... your config
-  ),
-);
-```
-
-## TaxonomyLoader
-
-The `TaxonomyLoader` scans content files for a frontmatter field matching the given taxonomy name, extracts all unique values (terms), and generates in-memory pages for each one.
-
-Terms are normalized to lowercase with spaces replaced by dashes (e.g., "My Tag" becomes "my-tag").
+## Properties
 
 <Card title="Properties" icon="sliders">
   <Property name="taxonomy" type="String" required>
@@ -59,6 +22,10 @@ Terms are normalized to lowercase with spaces replaced by dashes (e.g., "My Tag"
 
   <Property name="termPageBuilder" type="TaxonomyTermPageBuilder" required>
     Builder function for individual term pages. Receives the `BuildContext`, the taxonomy name, and the normalized term string.
+
+    ```dart
+    termPageBuilder: (context, taxonomy, term) => TagPage(term: term),
+    ```
   </Property>
 
   ---
@@ -69,21 +36,19 @@ Terms are normalized to lowercase with spaces replaced by dashes (e.g., "My Tag"
 
   ---
 
+  <Property name="taxonomyPageBuilder" type="TaxonomyPageBuilder?">
+    Optional builder for the taxonomy index page. Receives the `BuildContext` and the taxonomy name. If not provided, no index page is generated.
+
+    ```dart
+    taxonomyPageBuilder: (context, taxonomy) => TagsPage(),
+    ```
+  </Property>
+
+  ---
+
   <Property name="taxonomySlug" type="String?">
     The URL slug for the taxonomy index page. Defaults to the taxonomy name.
     For example, with `taxonomy: 'tags'` and `taxonomySlug: 'labels'`, the index page is generated at `/labels/` instead of `/tags/`.
-  </Property>
-
-  ---
-
-  <Property name="taxonomyPageBuilder" type="TaxonomyPageBuilder?">
-    Optional builder for the taxonomy index page. Receives the `BuildContext` and the taxonomy name. If not provided, no index page is generated.
-  </Property>
-
-  ---
-
-  <Property name="taxonomyInitialDataBuilder" type="TaxonomyInitialDataBuilder?">
-    Optional function to provide initial data for the taxonomy index page. Receives the taxonomy name.
   </Property>
 
   ---
@@ -96,7 +61,25 @@ Terms are normalized to lowercase with spaces replaced by dashes (e.g., "My Tag"
   ---
 
   <Property name="initialTermDataBuilder" type="TaxonomyTermInitialDataBuilder?">
-    Optional function to provide initial data for each term page. Receives the taxonomy name and the normalized term string.
+    Optional function to provide initial data for each term page. Receives the taxonomy name and the normalized term string. The returned map is merged with the taxonomy metadata under the `page` namespace.
+
+    ```dart
+    initialTermDataBuilder: (taxonomy, term) => {
+      'page': {'title': 'Posts tagged: $term'},
+    },
+    ```
+  </Property>
+
+  ---
+
+  <Property name="taxonomyInitialDataBuilder" type="TaxonomyInitialDataBuilder?">
+    Optional function to provide initial data for the taxonomy index page. Receives the taxonomy name.
+
+    ```dart
+    taxonomyInitialDataBuilder: (taxonomy) => {
+      'page': {'title': 'All $taxonomy'},
+    },
+    ```
   </Property>
 
   ---
@@ -106,125 +89,37 @@ Terms are normalized to lowercase with spaces replaced by dashes (e.g., "My Tag"
   </Property>
 </Card>
 
-## Context Extensions
+## Initial Data
 
-The `TaxonomyContext` extension on `BuildContext` provides methods to query taxonomy data from within component builders.
-
-<Info>
-These methods require **eager loading** to be enabled (`eagerlyLoadAllPages: true`), as they depend on `context.pages` being fully populated.
-</Info>
-
-### taxonomyTermPages
-
-Returns all term pages for the given taxonomy. The taxonomy index page is excluded.
+You can provide initial data for generated pages using the `initialTermDataBuilder` and `taxonomyInitialDataBuilder` callbacks. This data is merged with the taxonomy metadata that `TaxonomyLoader` injects automatically — the taxonomy metadata always takes precedence.
 
 ```dart
-termPageBuilder: (context, taxonomy, term) {
-  // Get all term pages for the 'tags' taxonomy.
-  final termPages = context.taxonomyTermPages('tags');
-  // Each page corresponds to a unique tag.
-}
-```
-
-### taxonomyTermPage
-
-Returns the term page for a specific taxonomy and term, or `null` if no such page exists. The term is normalized before matching, so both `'Dart'` and `'dart'` will find the same page.
-
-```dart
-termPageBuilder: (context, taxonomy, term) {
-  // Get the page for the 'dart' tag.
-  final dartPage = context.taxonomyTermPage('tags', 'dart');
-  if (dartPage != null) {
-    // Link to the dart tag page.
-    return a(href: dartPage.url, [text('Dart')]);
-  }
-}
-```
-
-### pagesForTerm
-
-Returns all content pages that have the given term in their frontmatter taxonomy field. Taxonomy pages themselves are excluded.
-
-```dart
-termPageBuilder: (context, taxonomy, term) {
-  // Get all blog posts tagged with this term.
-  final posts = context.pagesForTerm(taxonomy, term);
-  return ul([
-    for (final post in posts)
-      li([a(href: post.url, [text(post.data.page['title'] as String)])]),
-  ]);
-}
-```
-
-### taxonomyTermPagesWithCount
-
-Returns a map of term pages to their content page counts. Each key is a term `Page` and each value is the number of content pages with that term. Only terms that have a corresponding term page are included.
-
-Use the `TaxonomyPage` extension (`.taxonomyTerm`) to access the term name from each page key.
-
-```dart
-taxonomyPageBuilder: (context, taxonomy) {
-  final tagCloud = context.taxonomyTermPagesWithCount(taxonomy);
-  return div([
-    for (final MapEntry(:key, :value) in tagCloud.entries)
-      a(href: key.url, [text('${key.taxonomyTerm} ($value)')]),
-  ]);
-}
-```
-
-## TaxonomyPage Extension
-
-The `TaxonomyPage` extension on `Page` provides convenient getters to access taxonomy metadata from pages created by `TaxonomyLoader`.
-
-- **`page.taxonomy`** — Returns the taxonomy name (e.g., `'tags'`), or `null` if not a taxonomy page.
-- **`page.taxonomyTerm`** — Returns the term name (e.g., `'dart'`), or `null` if not a term page.
-
-```dart
-final termPages = context.taxonomyTermPages('tags');
-for (final page in termPages) {
-  // page.taxonomy == 'tags'
-  // page.taxonomyTerm == 'dart', 'flutter', etc.
-  // page.url == '/tags/dart', '/tags/flutter', etc.
-}
-```
-
-## Full Example
-
-Here is a complete example setting up a tags taxonomy with an index page showing a tag cloud and individual term pages listing tagged posts:
-
-```dart
-ContentApp.custom(
-  eagerlyLoadAllPages: true,
-  loaders: [
-    FilesystemLoader('content'),
-    TaxonomyLoader(
-      taxonomy: 'tags',
-      // Index page at /tags/ listing all tags with counts.
-      taxonomyPageBuilder: (context, taxonomy) {
-        final tagCloud = context.taxonomyTermPagesWithCount(taxonomy);
-        return div(classes: 'tag-cloud', [
-          for (final MapEntry(:key, :value) in tagCloud.entries)
-            a(href: key.url, [text('${key.taxonomyTerm} ($value)')]),
-        ]);
-      },
-      // Individual term pages at /tags/{term}.
-      termPageBuilder: (context, taxonomy, term) {
-        final posts = context.pagesForTerm(taxonomy, term);
-        return div([
-          h1([text('Posts tagged: $term')]),
-          ul([
-            for (final post in posts)
-              li([
-                a(href: post.url, [text(post.data.page['title'] as String)]),
-              ]),
-          ]),
-        ]);
-      },
-    ),
-  ],
-  configResolver: PageConfig.all(
-    enableFrontmatter: true,
-    parsers: [MarkdownParser()],
-  ),
+TaxonomyLoader(
+  taxonomy: 'tags',
+  // Data for each term page.
+  initialTermDataBuilder: (taxonomy, term) => {
+    'page': {'title': 'Posts tagged: $term', 'layout': 'archive'},
+  },
+  // Data for the index page.
+  taxonomyInitialDataBuilder: (taxonomy) => {
+    'page': {'title': 'All $taxonomy'},
+  },
+  termPageBuilder: (context, taxonomy, term) => TagPage(term: term),
+  taxonomyPageBuilder: (context, taxonomy) => TagsPage(),
 );
+```
+
+This data is accessible via `context.page.data` in layouts and templates, just like frontmatter data from content files.
+
+## URL Customization
+
+By default, generated pages use the taxonomy name as the URL prefix. Use `taxonomySlug` and `termSlug` to customize the URL structure:
+
+```dart
+TaxonomyLoader(
+  taxonomy: 'tags',
+  taxonomySlug: 'labels',  // Index page at /labels/ instead of /tags/
+  termSlug: 'label',       // Term pages at /label/dart instead of /tags/dart
+  // ...
+)
 ```
