@@ -1,0 +1,83 @@
+---
+title: Taxonomy
+description: Classify content with taxonomies like tags and categories.
+---
+
+---
+
+Taxonomies let you classify content using frontmatter fields like **tags** or **categories**. A taxonomy is a classification system where each unique value is called a **term**. For example, a "tags" taxonomy might have the terms "dart", "flutter", and "jaspr".
+
+The `TaxonomyLoader` scans your content files, extracts all unique terms from a frontmatter field, and generates pages for each one. Combined with the `TaxonomyContext` extension, you can query taxonomy data from within component builders.
+
+---
+
+## How It Works
+
+Given blog posts with a `tags` field in their frontmatter:
+
+```markdown title="content/posts/hello-world.md"
+---
+title: Hello World
+tags: [Dart, Flutter]
+---
+
+Welcome to my blog!
+```
+
+```markdown title="content/posts/building-with-jaspr.md"
+---
+title: Building with Jaspr
+tags: [Dart, Jaspr]
+---
+
+Let's build something!
+```
+
+The `TaxonomyLoader` will:
+
+1. Scan the content directory for files with frontmatter.
+2. Extract unique values from the `tags` field: "Dart", "Flutter", "Jaspr".
+3. Normalize them to lowercase with dashes: `dart`, `flutter`, `jaspr`.
+4. Generate a page for each term at `/tags/dart`, `/tags/flutter`, `/tags/jaspr`.
+5. Optionally generate a taxonomy index page at `/tags/`.
+
+Each generated page carries metadata identifying its taxonomy and term, which the context extensions use for querying.
+
+## Term Normalization
+
+All terms are normalized before use. The normalization converts values to lowercase and replaces spaces with dashes:
+
+- `"Dart"` → `dart`
+- `"My Tag"` → `my-tag`
+- `"Hello World"` → `hello-world`
+
+This means `tags: [Dart]` and `tags: [dart]` in different files refer to the same term.
+
+## Multiple Taxonomies
+
+You can use multiple `TaxonomyLoader`s for different classification systems:
+
+```dart
+ContentApp.custom(
+  eagerlyLoadAllPages: true,
+  loaders: [
+    FilesystemLoader('content'),
+    TaxonomyLoader(
+      taxonomy: 'tags',
+      termPageBuilder: (context, taxonomy, term) { /* ... */ },
+    ),
+    TaxonomyLoader(
+      taxonomy: 'categories',
+      termPageBuilder: (context, taxonomy, term) { /* ... */ },
+    ),
+  ],
+  // ...
+);
+```
+
+Each taxonomy operates independently — terms from one taxonomy do not interfere with another.
+
+## Next Steps
+
+- [**Usage**](/content/taxonomy/usage): Learn how to set up taxonomy and query taxonomy data from components.
+- [**TaxonomyLoader**](/content/taxonomy/taxonomy_loader): Detailed reference for all TaxonomyLoader properties and options.

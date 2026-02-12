@@ -1,0 +1,158 @@
+---
+title: Using Taxonomy
+description: Set up taxonomy and query taxonomy data from components.
+---
+
+---
+
+This page covers how to set up a taxonomy, query taxonomy data from within component builders, and access taxonomy metadata on pages.
+
+For a general introduction to taxonomies, see the [Taxonomy overview](/content/concepts/taxonomy). For all `TaxonomyLoader` properties, see the [TaxonomyLoader reference](/content/taxonomy/taxonomy_loader).
+
+---
+
+## Setup
+
+Add a `TaxonomyLoader` alongside your other loaders using `ContentApp.custom()`:
+
+```dart
+ContentApp.custom(
+  eagerlyLoadAllPages: true,
+  loaders: [
+    FilesystemLoader('content'),
+    TaxonomyLoader(
+      taxonomy: 'tags',
+      directory: 'content',
+      termPageBuilder: (context, taxonomy, term) {
+        final posts = context.pagesForTerm(taxonomy, term);
+        return div([
+          h1([text('Posts tagged: $term')]),
+          ul([
+            for (final post in posts)
+              li([a(href: post.url, [text(post.data.page['title'] as String)])]),
+          ]),
+        ]);
+      },
+    ),
+  ],
+  configResolver: PageConfig.all(
+    // ... your config
+  ),
+);
+```
+
+<Info>
+**Eager loading** must be enabled (`eagerlyLoadAllPages: true`) for the taxonomy context extensions to work, as they depend on `context.pages` being fully populated.
+</Info>
+
+## Querying Taxonomy Data
+
+The `TaxonomyContext` extension on `BuildContext` provides methods to query taxonomy data from within component builders.
+
+### taxonomyTermPages
+
+Returns all term pages for a given taxonomy. The taxonomy index page is excluded.
+
+```dart
+// Get all term pages for the 'tags' taxonomy.
+final termPages = context.taxonomyTermPages('tags');
+// Returns pages for /tags/dart, /tags/flutter, etc.
+```
+
+### taxonomyTermPage
+
+Returns the term page for a specific taxonomy and term, or `null` if no such page exists. The term is normalized before matching, so both `'Dart'` and `'dart'` will find the same page.
+
+```dart
+// Both of these find the same page at /tags/dart.
+final dartPage = context.taxonomyTermPage('tags', 'dart');
+final samePage = context.taxonomyTermPage('tags', 'Dart');
+
+if (dartPage != null) {
+  // Link to the dart tag page.
+  return a(href: dartPage.url, [text('Dart')]);
+}
+```
+
+### pagesForTerm
+
+Returns all content pages that have the given term in their frontmatter taxonomy field. Taxonomy pages themselves are excluded from the results.
+
+```dart
+// Get all blog posts tagged "dart".
+final dartPosts = context.pagesForTerm('tags', 'dart');
+
+return ul([
+  for (final post in dartPosts)
+    li([a(href: post.url, [text(post.data.page['title'] as String)])]),
+]);
+```
+
+### taxonomyTermPagesWithCount
+
+Returns a map of term pages to their content page counts. Each key is a term `Page` and each value is the number of content pages with that term. Use the `TaxonomyPage` extension to access the term name from each page key.
+
+```dart
+final tagCloud = context.taxonomyTermPagesWithCount('tags');
+for (final MapEntry(:key, :value) in tagCloud.entries) {
+  // key.taxonomyTerm == 'dart', 'flutter', etc.
+  // key.url == '/tags/dart', '/tags/flutter', etc.
+  // value == number of posts with this tag
+}
+```
+
+## TaxonomyPage Extension
+
+The `TaxonomyPage` extension on `Page` provides getters to access taxonomy metadata from pages created by `TaxonomyLoader`:
+
+- **`page.taxonomy`** — Returns the taxonomy name (e.g., `'tags'`), or `null` if not a taxonomy page.
+- **`page.taxonomyTerm`** — Returns the normalized term (e.g., `'dart'`), or `null` if not a term page (e.g., the index page).
+
+```dart
+final termPages = context.taxonomyTermPages('tags');
+for (final page in termPages) {
+  print('${page.taxonomy}: ${page.taxonomyTerm}');
+  // Output: tags: dart, tags: flutter, tags: jaspr
+}
+```
+
+## Full Example
+
+Here is a complete example setting up a tags taxonomy with an index page showing a tag cloud and individual term pages listing tagged posts:
+
+```dart
+ContentApp.custom(
+  eagerlyLoadAllPages: true,
+  loaders: [
+    FilesystemLoader('content'),
+    TaxonomyLoader(
+      taxonomy: 'tags',
+      // Index page at /tags/ listing all tags with counts.
+      taxonomyPageBuilder: (context, taxonomy) {
+        final tagCloud = context.taxonomyTermPagesWithCount(taxonomy);
+        return div(classes: 'tag-cloud', [
+          for (final MapEntry(:key, :value) in tagCloud.entries)
+            a(href: key.url, [text('${key.taxonomyTerm} ($value)')]),
+        ]);
+      },
+      // Individual term pages at /tags/{term}.
+      termPageBuilder: (context, taxonomy, term) {
+        final posts = context.pagesForTerm(taxonomy, term);
+        return div([
+          h1([text('Posts tagged: $term')]),
+          ul([
+            for (final post in posts)
+              li([
+                a(href: post.url, [text(post.data.page['title'] as String)]),
+              ]),
+          ]),
+        ]);
+      },
+    ),
+  ],
+  configResolver: PageConfig.all(
+    enableFrontmatter: true,
+    parsers: [MarkdownParser()],
+  ),
+);
+```
