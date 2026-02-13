@@ -236,6 +236,7 @@ class PageConfig {
       layouts: layouts,
       theme: theme,
     );
+
     return (_) => config;
   }
 

@@ -1,0 +1,125 @@
+---
+title: TaxonomyLoader
+description: Reference for the TaxonomyLoader route loader and its properties.
+---
+
+---
+
+The `TaxonomyLoader` is a `RouteLoader` that scans content files for a frontmatter field matching the given taxonomy name, extracts all unique values (terms), normalizes them, and generates in-memory pages for each one.
+
+For a general introduction to taxonomies, see the [Taxonomy overview](/content/concepts/taxonomy). For setup and querying, see [Using Taxonomy](/content/taxonomy/usage).
+
+---
+
+## Properties
+
+<Card title="Properties" icon="sliders">
+  <Property name="taxonomy" type="String" required>
+    The frontmatter key to extract terms from (e.g., `'tags'`, `'categories'`).
+  </Property>
+
+  ---
+
+  <Property name="termPageBuilder" type="TaxonomyTermPageBuilder" required>
+    Builder function for individual term pages. Receives the `BuildContext`, the taxonomy name, and the normalized term string.
+
+    ```dart
+    termPageBuilder: (context, taxonomy, term) => TagPage(term: term),
+    ```
+  </Property>
+
+  ---
+
+  <Property name="directory" type="String">
+    The directory to scan for content files. Defaults to `'content'`.
+  </Property>
+
+  ---
+
+  <Property name="taxonomyPageBuilder" type="TaxonomyPageBuilder?">
+    Optional builder for the taxonomy index page. Receives the `BuildContext` and the taxonomy name. If not provided, no index page is generated.
+
+    ```dart
+    taxonomyPageBuilder: (context, taxonomy) => TagsPage(),
+    ```
+  </Property>
+
+  ---
+
+  <Property name="taxonomySlug" type="String?">
+    The URL slug for the taxonomy index page. Defaults to the taxonomy name.
+    For example, with `taxonomy: 'tags'` and `taxonomySlug: 'labels'`, the index page is generated at `/labels/` instead of `/tags/`.
+  </Property>
+
+  ---
+
+  <Property name="termSlug" type="String?">
+    The URL slug for individual term pages. Defaults to the taxonomy name.
+    For example, with `taxonomy: 'tags'` and `termSlug: 'tag'`, term pages are generated at `/tag/dart` instead of `/tags/dart`.
+  </Property>
+
+  ---
+
+  <Property name="initialTermDataBuilder" type="TaxonomyTermInitialDataBuilder?">
+    Optional function to provide initial data for each term page. Receives the taxonomy name and the normalized term string. The returned map is merged with the taxonomy metadata under the `page` namespace.
+
+    ```dart
+    initialTermDataBuilder: (taxonomy, term) => {
+      'page': {'title': 'Posts tagged: $term'},
+    },
+    ```
+  </Property>
+
+  ---
+
+  <Property name="taxonomyInitialDataBuilder" type="TaxonomyInitialDataBuilder?">
+    Optional function to provide initial data for the taxonomy index page. Receives the taxonomy name.
+
+    ```dart
+    taxonomyInitialDataBuilder: (taxonomy) => {
+      'page': {'title': 'All $taxonomy'},
+    },
+    ```
+  </Property>
+
+  ---
+
+  <Property name="supportedExtensions" type="List&lt;String&gt;">
+    File extensions to scan for frontmatter. Defaults to `['.md', '.html']`.
+  </Property>
+</Card>
+
+## Initial Data
+
+You can provide initial data for generated pages using the `initialTermDataBuilder` and `taxonomyInitialDataBuilder` callbacks. This data is merged with the taxonomy metadata that `TaxonomyLoader` injects automatically — the taxonomy metadata always takes precedence.
+
+```dart
+TaxonomyLoader(
+  taxonomy: 'tags',
+  // Data for each term page.
+  initialTermDataBuilder: (taxonomy, term) => {
+    'page': {'title': 'Posts tagged: $term', 'layout': 'archive'},
+  },
+  // Data for the index page.
+  taxonomyInitialDataBuilder: (taxonomy) => {
+    'page': {'title': 'All $taxonomy'},
+  },
+  termPageBuilder: (context, taxonomy, term) => TagPage(term: term),
+  taxonomyPageBuilder: (context, taxonomy) => TagsPage(),
+);
+```
+
+This data is accessible via `context.page.data` in layouts and templates, just like frontmatter data from content files.
+
+## URL Customization
+
+By default, generated pages use the taxonomy name as the URL prefix. Use `taxonomySlug` and `termSlug` to customize the URL structure:
+
+```dart
+TaxonomyLoader(
+  taxonomy: 'tags',
+  taxonomySlug: 'labels',  // Index page at /labels/ instead of /tags/
+  termSlug: 'label',       // Term pages at /label/dart instead of /tags/dart
+  // ...
+)
+```

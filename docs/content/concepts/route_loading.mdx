@@ -126,6 +126,22 @@ ContentApp.custom(
 );
 ```
 
+### TaxonomyLoader
+
+The `TaxonomyLoader` generates pages from taxonomy terms (like tags or categories) extracted from content frontmatter.
+
+- **Source**: Frontmatter fields in content files.
+- **Behavior**: Scans a directory for content files, extracts unique values from a specified frontmatter field, and generates a page for each term.
+- **Use Cases**:
+  - Tag or category archive pages for a blog.
+  - Any classification-based page generation.
+- **Features**:
+  - Automatic term extraction and normalization.
+  - Optional taxonomy index page.
+  - Context extensions for querying taxonomy data.
+
+[Learn more about Taxonomy](/content/concepts/taxonomy).
+
 ## Creating Custom Route Loaders
 
 If the built-in loaders don't fit your needs, you can create a custom `RouteLoader` implementation. At minimum, you'll need to:

@@ -421,6 +421,23 @@
         {
           "title": "Secondary Outputs",
           "href": "/content/concepts/secondary_outputs"
+        },
+        {
+          "group": "Taxonomy",
+          "pages": [
+            {
+              "title": "Overview",
+              "href": "/content/concepts/taxonomy"
+            },
+            {
+              "title": "Usage",
+              "href": "/content/taxonomy/usage"
+            },
+            {
+              "title": "TaxonomyLoader",
+              "href": "/content/taxonomy/taxonomy_loader"
+            }
+          ]
         }
       ]
     },
