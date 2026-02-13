@@ -173,6 +173,13 @@ class AssetManager {
 
   final Map<(String, Object?), String> _assets = {};
 
+  /// Retrieves the [AssetManager] for the given [page].
+  static AssetManager? of(Page page) {
+    final maybeAssetManager = page.data[_dataKey];
+    if (maybeAssetManager is! AssetManager) return null;
+    return maybeAssetManager;
+  }
+
   /// Resolves the asset at [path] relative to the current page. If [path] starts with a slash, it is resolved
   /// relative to the asset root.
   ///
@@ -230,8 +237,8 @@ extension ResolveAssetExtension on BuildContext {
   /// The optional [aspect] parameter can be used to provide additional information to the asset transformers during build.
   /// Requires an [AssetManager] to be setup.
   String resolveAsset(String path, {Object? aspect}) {
-    final assetManager = page.data[AssetManager._dataKey];
-    if (assetManager is! AssetManager) {
+    final assetManager = AssetManager.of(page);
+    if (assetManager == null) {
       throw StateError(
         'AssetManager not found for page ${page.path}. Make sure to add `assetManager.dataLoader` to your `ContentApp`.',
       );
