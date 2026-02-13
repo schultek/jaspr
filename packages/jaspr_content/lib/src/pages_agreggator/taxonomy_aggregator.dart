@@ -6,7 +6,7 @@ import '../page.dart';
 import '../route_loader/memory_loader.dart';
 import '../route_loader/route_loader.dart';
 import '../taxonomy.dart';
-import 'routes_aggregator.dart';
+import 'pages_aggregator.dart';
 
 /// Builder for an individual term page.
 ///
@@ -32,7 +32,7 @@ typedef TaxonomyPageBuilder = Component Function(BuildContext context, String ta
 /// Receives the [taxonomy] name.
 typedef TaxonomyInitialDataBuilder = Map<String, dynamic> Function(String taxonomy);
 
-class TaxonomyAggregator extends RoutesAggregator {
+class TaxonomyAggregator extends PagesAggregator {
   /// The frontmatter key to extract terms from
   /// (e.g., `'tags'`, `'categories'`).
   final String taxonomy;

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import '../page.dart';
 import '../route_loader/route_loader.dart';
-import 'routes_aggregator.dart';
+import 'pages_aggregator.dart';
 
-class PagesCountAggregator extends RoutesAggregator {
+class PagesCountAggregator extends PagesAggregator {
   PagesCountAggregator();
 
   @override

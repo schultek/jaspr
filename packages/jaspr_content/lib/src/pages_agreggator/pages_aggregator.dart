@@ -10,15 +10,22 @@ library;
 
 import 'dart:async';
 
+import 'package:jaspr_router/jaspr_router.dart';
+
 import '../page.dart';
 import '../route_loader/memory_loader.dart';
 import '../route_loader/route_loader.dart';
 
 /// Base class for content aggregators.
 ///
-/// Aggregators analyze loaded pages and produce additional pages/routes.
-/// Implement [aggregate] to return pages that should be added to the site.
-abstract class RoutesAggregator extends RouteLoaderBase {
+/// Aggregators analyze loaded pages and produce additional routes.
+/// Implement [aggregatePages] to return routes that should be added to the site.
+abstract class PagesAggregatorBase {
+  Future<List<RouteBase>> aggregatePages(List<Page> pages);
+}
+
+/// TODO: remove
+abstract class PagesAggregator extends RouteLoaderBase {
   /// Called after all pages/routes are loaded (including those from previous aggregators).
   ///
   /// [pages] is the current list of all loaded pages (read-only view of RouteLoader._pages).

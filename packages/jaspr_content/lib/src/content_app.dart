@@ -14,7 +14,7 @@ import 'page_extension/page_extension.dart';
 import 'page_parser/page_parser.dart';
 import 'route_loader/filesystem_loader.dart';
 import 'route_loader/route_loader.dart';
-import 'routes_aggregator/routes_aggregator.dart';
+import 'pages_agreggator/pages_aggregator.dart';
 import 'template_engine/template_engine.dart';
 import 'theme/theme.dart';
 
@@ -89,8 +89,12 @@ class ContentApp extends AsyncStatelessComponent {
 
     /// The [ContentTheme] to use for the pages.
     ContentTheme? theme,
+
+    /// A list of [PagesAggregator]s to use for generating additional routes based on the loaded pages.
+    this.pagesAggregators = const [],
+
+    /// Whether to print debug information about the loaded routes and pages.
     bool debugPrint = false,
-    this.aggregators = const [],
   }) : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
        configResolver = PageConfig.all(
          enableFrontmatter: enableFrontmatter,
@@ -119,11 +123,13 @@ class ContentApp extends AsyncStatelessComponent {
     /// Use [PageConfig.all] to resolve the same config for all pages.
     this.configResolver = _defaultConfigResolver,
 
+    /// A list of [PagesAggregator]s to use for generating additional routes based on the loaded pages.
+    this.pagesAggregators = const [],
+
     /// A custom builder function to use for building the main [Router] component.
     ///
     /// This can be used to customize the [Router] component like add additional routes or inserting components above the router.
     this.routerBuilder = _defaultRouterBuilder,
-    this.aggregators = const [],
   }) {
     _overrideGlobalOptions();
   }
@@ -137,7 +143,7 @@ class ContentApp extends AsyncStatelessComponent {
   }
 
   final List<RouteLoader> loaders;
-  final List<RoutesAggregator> aggregators;
+  final List<PagesAggregator> pagesAggregators;
   final bool eagerlyLoadAllPages;
   final ConfigResolver configResolver;
   final Component Function(List<List<RouteBase>> routes) routerBuilder;
@@ -153,7 +159,7 @@ class ContentApp extends AsyncStatelessComponent {
     // 2. Run aggregators sequentially.
     // Each aggregator can access RouteLoader._pages which contains all loaded pages
     // After each aggregator, its produced pages are loaded so subsequent aggregators can see them
-    for (final aggregator in aggregators) {
+    for (final aggregator in pagesAggregators) {
       // Pass current pages to aggregator (read-only view)
       final aggregatorRoutes = await aggregator.loadRoutes(configResolver, eagerlyLoadAllPages);
 
