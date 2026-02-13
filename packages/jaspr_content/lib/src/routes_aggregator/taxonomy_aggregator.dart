@@ -1,11 +1,12 @@
-import 'dart:io';
+import 'dart:async';
 
-import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/jaspr.dart';
 
+import '../page.dart';
+import '../route_loader/memory_loader.dart';
+import '../route_loader/route_loader.dart';
 import '../taxonomy.dart';
-import 'memory_loader.dart';
-import 'route_loader.dart';
+import 'routes_aggregator.dart';
 
 /// Builder for an individual term page.
 ///
@@ -31,58 +32,7 @@ typedef TaxonomyPageBuilder = Component Function(BuildContext context, String ta
 /// Receives the [taxonomy] name.
 typedef TaxonomyInitialDataBuilder = Map<String, dynamic> Function(String taxonomy);
 
-/// A route loader that generates taxonomy pages
-/// from content frontmatter.
-///
-/// A taxonomy is a classification system for content.
-/// For example, a blog might use "tags" or "categories" as taxonomies.
-/// Each unique value within a taxonomy is called a "term"
-/// (e.g., "dart", "flutter" are terms of the "tags" taxonomy).
-///
-/// This loader scans content files in the given [directory]
-/// for a frontmatter field matching [taxonomy],
-/// extracts all unique terms, and generates:
-/// - A page for each term (using [termPageBuilder]).
-/// - Optionally, an index page for the taxonomy
-///   (using [taxonomyPageBuilder]).
-///
-/// Terms are normalized to lowercase with spaces replaced by dashes
-/// (e.g., "My Tag" becomes "my-tag").
-///
-/// Use the [TaxonomyContext] extension on `BuildContext`
-/// to query taxonomy data from within component builders.
-///
-/// ```dart
-/// // Given content/post.md with frontmatter:
-/// // ---
-/// // title: My Post
-/// // tags: [Dart, Flutter]
-/// // ---
-///
-/// TaxonomyLoader(
-///   taxonomy: 'tags',
-///   directory: 'content',
-///   // Builds a page for each term (e.g., /tags/dart).
-///   termPageBuilder: (context, taxonomy, term) {
-///     final posts = context.pagesForTerm(taxonomy, term);
-///     return ul([for (final post in posts) li([text(post.url)])]);
-///   },
-///   // Builds an index page listing all terms (e.g., /tags/).
-///   taxonomyPageBuilder: (context, taxonomy) {
-///     final terms = context.taxonomyTermPagesWithCount(taxonomy);
-///     return ul([
-///       for (final MapEntry(:key, :value) in terms.entries)
-///         li([a(href: key.url, [text('${key.taxonomyTerm} ($value)')])])
-///     ]);
-///   },
-/// )
-/// ```
-class TaxonomyLoader extends RouteLoaderBase {
-  /// The directory to scan for content files with frontmatter.
-  ///
-  /// Defaults to `'content'`.
-  final String directory;
-
+class TaxonomyAggregator extends RoutesAggregator {
   /// The frontmatter key to extract terms from
   /// (e.g., `'tags'`, `'categories'`).
   final String taxonomy;
@@ -119,10 +69,9 @@ class TaxonomyLoader extends RouteLoaderBase {
   final List<String> supportedExtensions;
   static const List<String> _defaultSupportedExtensions = ['.md', '.html'];
 
-  TaxonomyLoader({
+  TaxonomyAggregator({
     required this.taxonomy,
     required this.termPageBuilder,
-    this.directory = 'content',
     this.taxonomySlug,
     this.taxonomyPageBuilder,
     this.taxonomyInitialDataBuilder,
@@ -133,48 +82,12 @@ class TaxonomyLoader extends RouteLoaderBase {
 
   @override
   Future<List<PageSource>> loadPageSources() async {
+    final previouslyLoadedPages = List<Page>.unmodifiable(RouteLoader.pages);
+
     return [
-      for (final page in createMemoryPages())
-        MemoryPageSource(
-          page,
-          page.path,
-          this,
-          keepSuffix: page.keepSuffix,
-        ),
+      for (final page in createMemoryPages(pages: previouslyLoadedPages))
+        MemoryPageSource(page, page.path, this, keepSuffix: page.keepSuffix),
     ];
-  }
-
-  /// Extracts all unique taxonomy terms from content files in [directory].
-  ///
-  /// Recursively scans for files matching [supportedExtensions],
-  /// parses their frontmatter,
-  /// and collects all values from the [taxonomy] field.
-  /// Returns a set of normalized term strings.
-  @visibleForTesting
-  Set<String> extractTaxonomyTerms({required String directory, required String taxonomy}) {
-    final taxonomyTerms = <String>{};
-    final dir = Directory(directory);
-
-    if (!dir.existsSync()) return taxonomyTerms;
-
-    for (final entity in dir.listSync(recursive: true)) {
-      if (entity is File && supportedExtensions.any((ext) => entity.path.endsWith(ext))) {
-        final content = entity.readAsStringSync();
-        try {
-          final document = fm.parse(content);
-          final data = document.data;
-          if (data[taxonomy] is List) {
-            for (final term in data[taxonomy] as List) {
-              taxonomyTerms.add(TaxonomyUtils.normalize(term.toString()));
-            }
-          }
-        } catch (_) {
-          // Ignore parsing errors
-        }
-      }
-    }
-
-    return taxonomyTerms;
   }
 
   /// Generates [MemoryPage]s for each taxonomy term
@@ -186,18 +99,15 @@ class TaxonomyLoader extends RouteLoaderBase {
   /// This metadata is used by [TaxonomyContext]
   /// to identify and filter taxonomy pages.
   @visibleForTesting
-  List<MemoryPage> createMemoryPages() {
-    final allTerms = extractTaxonomyTerms(directory: directory, taxonomy: taxonomy);
+  List<MemoryPage> createMemoryPages({required List<Page> pages}) {
+    final allTerms = extractTaxonomyTerms(pages: pages, taxonomy: taxonomy);
 
     return [
       // Taxonomy index page (e.g., /tags/index.html)
       if (taxonomyPageBuilder != null)
         MemoryPage.builder(
           path: TaxonomyUtils.normalize('${taxonomySlug ?? taxonomy}/index.html'),
-          initialData: withTaxonomyData(
-            taxonomyInitialDataBuilder?.call(taxonomy),
-            taxonomy: taxonomy,
-          ),
+          initialData: withTaxonomyData(taxonomyInitialDataBuilder?.call(taxonomy), taxonomy: taxonomy),
           builder: (page) => taxonomyPageBuilder!(page, taxonomy),
         ),
 
@@ -205,14 +115,41 @@ class TaxonomyLoader extends RouteLoaderBase {
       for (final term in allTerms)
         MemoryPage.builder(
           path: TaxonomyUtils.normalize('${termSlug ?? taxonomy}/$term.html'),
-          initialData: withTaxonomyData(
-            initialTermDataBuilder?.call(taxonomy, term),
-            taxonomy: taxonomy,
-            term: term,
-          ),
+          initialData: withTaxonomyData(initialTermDataBuilder?.call(taxonomy, term), taxonomy: taxonomy, term: term),
           builder: (page) => termPageBuilder(page, taxonomy, term),
         ),
     ];
+  }
+
+  /// Extracts all unique taxonomy terms from the provided [pages].
+  ///
+  /// Iterates through each page's data,
+  /// and collects all values from the [taxonomy] field.
+  /// Returns a set of normalized term strings.
+  @visibleForTesting
+  Set<String> extractTaxonomyTerms({required List<Page> pages, required String taxonomy}) {
+    final terms = <String>{};
+
+    for (final page in pages) {
+      final pageSuffix = page.path.split('.').last;
+
+      // Skip pages that don't match supported extensions
+      if (!supportedExtensions.contains('.$pageSuffix')) {
+        continue;
+      }
+
+      final pageData = page.data.page;
+      final taxonomyList = pageData[taxonomy];
+
+      // If the taxonomy field is a list, extract terms.
+      if (taxonomyList is List) {
+        for (final term in taxonomyList) {
+          terms.add(TaxonomyUtils.normalize(term.toString()));
+        }
+      }
+    }
+
+    return terms;
   }
 
   /// Merges taxonomy metadata into the given [data],

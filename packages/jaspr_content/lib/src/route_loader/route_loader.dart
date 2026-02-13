@@ -40,7 +40,14 @@ abstract class RouteLoader {
   /// - immediately in eager mode.
   void invalidatePage(Page page);
 
+  /// All loaded pages across all loaders.
   static final List<Page> _pages = [];
+
+  /// Returns all currently loaded pages across all loaders.
+  ///
+  /// ! This is primarily used by aggregators to analyze all pages.
+  @protected
+  static List<Page> get pages => _pages;
 }
 
 /// A base class for [RouteLoader] implementations.
@@ -102,6 +109,7 @@ abstract class RouteLoaderBase implements RouteLoader {
     final sources = _sources ??= await loadPageSources();
 
     final List<RouteBase> routes = [];
+    final List<Future<void>> loadFutures = [];
     for (final source in sources) {
       if (source.path.isEmpty || source.private) {
         continue;
@@ -111,7 +119,7 @@ abstract class RouteLoaderBase implements RouteLoader {
       source.config = config;
 
       if (_eager) {
-        source.load();
+        loadFutures.add(source.load());
       }
       final pageBuilder = AsyncBuilder(builder: (_) => source.load());
 
@@ -127,6 +135,11 @@ abstract class RouteLoaderBase implements RouteLoader {
           );
         }
       }
+    }
+
+    // In eager mode, wait for all pages to load so aggregators can access them.
+    if (_eager && loadFutures.isNotEmpty) {
+      await Future.wait(loadFutures);
     }
 
     if (debugPrint) {
