@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:jaspr_content/jaspr_content.dart';
 import 'package:mocktail/mocktail.dart';
@@ -169,6 +170,54 @@ void main() {
         expect(assetManager.resolveAsset('image.png', page), '/assets/dir/image.png');
         expect(assetManager.resolveAsset('/absolute.png', page), '/assets/absolute.png');
         expect(assetManager.resolveAsset('https://example.com/logo.png', page), 'https://example.com/logo.png');
+        expect(assetManager.resolveAsset('http://example.com/logo.png', page), 'http://example.com/logo.png');
+      });
+    });
+
+    group('HashingAssetTransformer', () {
+      test('flattens path and adds hash (default)', () {
+        const transformer = HashingAssetTransformer();
+        final asset = Asset.fromBytes('images/foo.png', Uint8List.fromList([1, 2, 3]));
+        final transformed = transformer.transform(asset);
+
+        expect(transformed.path, matches(r'^foo\.[a-f0-9]{32}\.png$'));
+        expect(transformed.readAsBytes(), asset.readAsBytes());
+      });
+
+      test('preserves path and adds hash', () {
+        const transformer = HashingAssetTransformer(flattenPath: false);
+        final asset = Asset.fromBytes('images/foo.png', Uint8List.fromList([1, 2, 3]));
+        final transformed = transformer.transform(asset);
+
+        expect(transformed.path, matches(r'^images/foo\.[a-f0-9]{32}\.png$'));
+      });
+
+      test('produces same hash for same content', () {
+        const transformer = HashingAssetTransformer();
+        final asset1 = Asset.fromBytes('foo.png', Uint8List.fromList([1, 2, 3]));
+        final asset2 = Asset.fromBytes('bar.png', Uint8List.fromList([1, 2, 3]));
+
+        final t1 = transformer.transform(asset1);
+        final t2 = transformer.transform(asset2);
+
+        final hash1 = t1.path.split('.')[1];
+        final hash2 = t2.path.split('.')[1];
+
+        expect(hash1, hash2);
+      });
+
+      test('produces different hash for different content', () {
+        const transformer = HashingAssetTransformer();
+        final asset1 = Asset.fromBytes('foo.png', Uint8List.fromList([1, 2, 3]));
+        final asset2 = Asset.fromBytes('foo.png', Uint8List.fromList([4, 5, 6]));
+
+        final t1 = transformer.transform(asset1);
+        final t2 = transformer.transform(asset2);
+
+        final hash1 = t1.path.split('.')[1];
+        final hash2 = t2.path.split('.')[1];
+
+        expect(hash1, isNot(hash2));
       });
     });
   });

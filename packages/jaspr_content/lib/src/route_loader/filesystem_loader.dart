@@ -19,7 +19,7 @@ import 'route_loader.dart';
 class FilesystemLoader extends RouteLoaderBase {
   FilesystemLoader(
     this.directory, {
-    this.filterExtensions,
+    this.filterExtensions = const {},
     this.keepSuffixPattern,
     super.debugPrint,
     @visibleForTesting this.fileSystem = const LocalFileSystem(),
@@ -32,7 +32,7 @@ class FilesystemLoader extends RouteLoaderBase {
   /// A set of file extensions to filter for.
   ///
   /// Files in the content directory with other extensions are skipped.
-  final Set<String>? filterExtensions;
+  final Set<String> filterExtensions;
 
   /// A pattern to keep the file suffix for all matching pages.
   final Pattern? keepSuffixPattern;
@@ -106,7 +106,7 @@ class FilesystemLoader extends RouteLoaderBase {
       for (final entry in dir.listSync()) {
         final path = entry.path.substring(root.path.length + 1);
         if (entry is File) {
-          if (filterExtensions != null && !filterExtensions!.contains(p.extension(entry.path))) {
+          if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.extension(entry.path))) {
             continue;
           }
           entities.add(
@@ -129,7 +129,7 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   void addFile(String path) {
-    if (filterExtensions != null && !filterExtensions!.contains(p.extension(path))) {
+    if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.extension(path))) {
       return;
     }
     addSource(

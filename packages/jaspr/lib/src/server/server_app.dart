@@ -25,7 +25,7 @@ final class ServerApp {
   static final StreamController<Object> _reassembleController = StreamController.broadcast();
   static Stream<Object> get onReassemble => _reassembleController.stream;
 
-  static final _middleware = <Middleware>[];
+  static final List<Middleware> _middleware = [];
 
   /// Adds a shelf middleware to the server application.
   ///

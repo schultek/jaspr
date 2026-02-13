@@ -1,7 +1,7 @@
 ## Unreleased minor
 
 - New `AssetManager` class for handling content assets. Assets like images, videos, etc. can be co-located with the content and referenced by their relative path from a page.
-  - Assets paths are resolved across markdown files, page data and components using `context.resolveAsset('some/asset.png')`.
+  - Asset paths are resolved across Markdown files, page data and components using `context.resolveAsset('some/asset.png')`.
   - Only used assets are copied to the build output.
   - Assets can be hashed and otherwise transformed (e.g. resized) during build by using `AssetTransformer`s.
 

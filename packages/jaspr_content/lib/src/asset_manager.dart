@@ -1,3 +1,6 @@
+/// @docImport 'package:jaspr/server.dart';
+library;
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,23 +11,6 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../jaspr_content.dart';
-
-extension ResolveAssetExtension on BuildContext {
-  /// Resolves the asset at [path] relative to the current page. If [path] starts with a slash, it is resolved
-  /// relative to the asset root.
-  ///
-  /// The optional [aspect] parameter can be used to provide additional information to the asset transformers during build.
-  /// Requires an [AssetManager] to be setup.
-  String resolveAsset(String path, {Object? aspect}) {
-    final assetManager = page.data[AssetManager._dataKey];
-    if (assetManager is! AssetManager) {
-      throw StateError(
-        'AssetManager not found for page ${page.path}. Make sure to add `assetManager.dataLoader` to your `ContentApp`.',
-      );
-    }
-    return assetManager.resolveAsset(path, page, aspect);
-  }
-}
 
 /// Manages assets and resolves relative asset paths in rendered pages.
 ///
@@ -38,21 +24,20 @@ extension ResolveAssetExtension on BuildContext {
 ///
 /// ```dart
 /// void main() {
-///
-///   final assetManager = AssetManager(...);
+///   final assetManager = AssetManager(/* ... */);
 ///
 ///   // Add middleware to serve assets.
-///   Jaspr.addMiddleware(assetManager.middleware);
+///   ServerApp.addMiddleware(assetManager.middleware);
 ///
 ///   runApp(ContentApp(
-///     ...,
+///     // ...,
 ///     dataLoaders: [
-///       ...,
+///       // ...,
 ///       // Add data loader to process relative asset paths in page data.
 ///       assetManager.dataLoader,
 ///     ],
 ///     extensions: [
-///       ...,
+///       // ...,
 ///       // Add extension to process relative asset paths in page content.
 ///       assetManager.pageExtension,
 ///     ],
@@ -62,7 +47,7 @@ extension ResolveAssetExtension on BuildContext {
 ///
 /// ## Usage
 ///
-/// There are three ways to relative asset paths are resolved:
+/// There are three ways relative asset paths are resolved:
 ///
 /// 1. Relative paths in properties of the page data are resolved using [dataProperties].
 ///
@@ -74,7 +59,7 @@ extension ResolveAssetExtension on BuildContext {
 ///
 ///    This also works for images in markdown content.
 ///
-/// 3. To resolve relative paths in your own components, use the [resolveAsset] extension method on [BuildContext].
+/// 3. To resolve relative paths in your own components, use the [ResolveAssetExtension.resolveAsset] extension method on [BuildContext].
 ///
 ///    ```dart
 ///    @override
@@ -88,15 +73,21 @@ extension ResolveAssetExtension on BuildContext {
 ///
 /// During development, assets are served directly from the [directory].
 ///
-/// When building (in static mode), assets are copied to the build/jaspr/[outputPrefix] directory.
+/// When building (in `static` mode), assets are copied to the build/jaspr/[outputPrefix] directory.
 class AssetManager {
+  /// The default set of file extensions treated as assets.
+  ///
+  /// This is the default value for [assetExtensions] and includes
+  /// common image, video, and audio formats.
   static const defaultAssetExtensions = {
     '.png',
     '.jpg',
     '.jpeg',
+    '.jxl',
     '.gif',
     '.svg',
     '.webp',
+    '.avif',
     '.ico',
     '.mp4',
     '.webm',
@@ -131,7 +122,10 @@ class AssetManager {
   /// sets the output directory for the assets relative to the build directory.
   final String outputPrefix;
 
-  /// The extensions of the assets to be handled.
+  /// The file extensions recognized as assets, including
+  /// the leading dot (such as `'.png'` for PNG images).
+  ///
+  /// If not specified, defaults to [defaultAssetExtensions].
   final Set<String> assetExtensions;
 
   /// The page properties to be processed.
@@ -185,12 +179,14 @@ class AssetManager {
   /// The optional [aspect] parameter can be used to provide additional information to the asset transformers during build.
   /// Requires an [AssetManager] to be setup.
   String resolveAsset(String path, Page page, [Object? aspect]) {
-    if (path.startsWith('http')) return path;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
 
-    final resolvedPath = path.startsWith('/') ? path.substring(1) : p.normalize(p.join(p.dirname(page.path), path));
+    final resolvedPath = path.startsWith('/')
+        ? path.substring(1)
+        : p.url.normalize(p.url.join(p.url.dirname(page.path), path));
 
     if (kGenerateMode) {
-      final sourcePath = p.normalize(p.join(directory, resolvedPath));
+      final sourcePath = p.normalize(p.join(directory, p.fromUri(resolvedPath)));
       if (_assets.containsKey((sourcePath, aspect))) {
         return _assets[(sourcePath, aspect)]!;
       }
@@ -203,38 +199,55 @@ class AssetManager {
       switch (asset) {
         case FileAsset(file: final file):
           final outFile = File(
-            p.join('build', 'jaspr', outputPrefix, asset.path),
+            p.join('build', 'jaspr', outputPrefix, p.fromUri(asset.path)),
           );
           outFile.createSync(recursive: true);
           file.copySync(outFile.path);
         case MemoryAsset(bytes: final bytes):
           final outFile = File(
-            p.join('build', 'jaspr', outputPrefix, asset.path),
+            p.join('build', 'jaspr', outputPrefix, p.fromUri(asset.path)),
           );
           outFile
             ..createSync(recursive: true)
             ..writeAsBytesSync(bytes);
       }
 
-      return _assets[(sourcePath, aspect)] = p.join(
-        '/',
-        outputPrefix,
-        asset.path,
-      );
+      return _assets[(sourcePath, aspect)] = p.url.join('/', outputPrefix, asset.path);
     }
 
-    return p.normalize(p.join('/', outputPrefix, resolvedPath));
+    return p.url.normalize(p.url.join('/', outputPrefix, resolvedPath));
+  }
+
+  bool _shouldProcessPage(Page page) {
+    return filterPages == null || filterPages!(page);
+  }
+}
+
+extension ResolveAssetExtension on BuildContext {
+  /// Resolves the asset at [path] relative to the current page. If [path] starts with a slash, it is resolved
+  /// relative to the asset root.
+  ///
+  /// The optional [aspect] parameter can be used to provide additional information to the asset transformers during build.
+  /// Requires an [AssetManager] to be setup.
+  String resolveAsset(String path, {Object? aspect}) {
+    final assetManager = page.data[AssetManager._dataKey];
+    if (assetManager is! AssetManager) {
+      throw StateError(
+        'AssetManager not found for page ${page.path}. Make sure to add `assetManager.dataLoader` to your `ContentApp`.',
+      );
+    }
+    return assetManager.resolveAsset(path, page, aspect);
   }
 }
 
 /// Represents an asset that can be processed by [AssetTransformer].
 sealed class Asset {
-  Asset._();
+  const Asset();
 
-  /// Creates an asset from bytes.
+  /// Creates an asset from the specified [bytes].
   factory Asset.fromBytes(String path, Uint8List bytes) = MemoryAsset;
 
-  /// Creates an asset from a file.
+  /// Creates an asset from the specified [file].
   factory Asset.fromFile(String path, File file) = FileAsset;
 
   /// The path of the asset.
@@ -244,9 +257,9 @@ sealed class Asset {
   Uint8List readAsBytes();
 }
 
-/// An asset that is stored in memory.
+/// An asset that is stored in memory as [bytes].
 class MemoryAsset extends Asset {
-  MemoryAsset(this.path, this.bytes) : super._();
+  const MemoryAsset(this.path, this.bytes);
 
   @override
   final String path;
@@ -256,11 +269,11 @@ class MemoryAsset extends Asset {
   Uint8List readAsBytes() => bytes;
 }
 
-/// An asset that is stored in a file.
+/// An asset that is stored in a [file].
 class FileAsset extends Asset {
-  FileAsset(this.path, this.file) : super._() {
+  FileAsset(this.path, this.file) {
     if (!file.existsSync()) {
-      throw StateError('[ERROR] Asset not found: ${file.path}');
+      throw StateError('Asset file not found: ${file.path}');
     }
   }
 
@@ -294,8 +307,8 @@ class HashingAssetTransformer extends AssetTransformer {
 
   /// Whether to flatten the path of the asset.
   ///
-  /// If true, the path will be flattened to a single level, e.g. `images/foo/bar.png` becomes `bar.<hash>.png`.
-  /// If false, the path will be preserved, e.g. `images/foo/bar.png` becomes `images/foo/bar.<hash>.png`.
+  /// If `true`, the path will be flattened to a single level, e.g. `images/foo/bar.png` becomes `bar.<hash>.png`.
+  /// If `false`, the path will be preserved, e.g. `images/foo/bar.png` becomes `images/foo/bar.<hash>.png`.
   final bool flattenPath;
 
   @override
@@ -304,8 +317,10 @@ class HashingAssetTransformer extends AssetTransformer {
     final digest = md5.convert(inputBytes);
     final hex = digest.toString();
 
-    final pathWithoutExt = flattenPath ? p.basenameWithoutExtension(asset.path) : p.withoutExtension(asset.path);
-    final outputPath = '$pathWithoutExt.$hex${p.extension(asset.path)}';
+    final pathWithoutExt = flattenPath
+        ? p.url.basenameWithoutExtension(asset.path)
+        : p.url.withoutExtension(asset.path);
+    final outputPath = '$pathWithoutExt.$hex${p.url.extension(asset.path)}';
 
     return Asset.fromBytes(outputPath, inputBytes);
   }
@@ -318,7 +333,7 @@ class _AssetDataLoader implements DataLoader {
 
   @override
   Future<void> loadData(Page page) async {
-    if (assetManager.filterPages != null && !assetManager.filterPages!(page)) {
+    if (!assetManager._shouldProcessPage(page)) {
       return;
     }
 
@@ -340,9 +355,9 @@ class _AssetDataLoader implements DataLoader {
         }
       }
       if (currentData is Map<String, Object?>) {
-        final value = currentData[segments.last];
-        if (value is String) {
-          currentUpdates[segments.last] = assetManager.resolveAsset(value, page);
+        final lastSegment = segments.last;
+        if (currentData[lastSegment] case final String pathValue) {
+          currentUpdates[lastSegment] = assetManager.resolveAsset(pathValue, page);
         }
       }
     }
@@ -358,7 +373,7 @@ class _AssetPageExtension implements PageExtension {
 
   @override
   Future<List<Node>> apply(Page page, List<Node> nodes) async {
-    if (assetManager.filterPages != null && !assetManager.filterPages!(page)) {
+    if (!assetManager._shouldProcessPage(page)) {
       return nodes;
     }
 
@@ -375,8 +390,7 @@ class _AssetPageExtension implements PageExtension {
     return nodes.map((node) {
       if (node is! ElementNode) return node;
       final tag = node.tag.toLowerCase();
-      if (targetElements.containsKey(tag)) {
-        final attribute = targetElements[tag]!;
+      if (targetElements[tag] case final attribute?) {
         final assetPath = node.attributes[attribute];
         if (assetPath != null) {
           return ElementNode(node.tag, {
@@ -385,11 +399,11 @@ class _AssetPageExtension implements PageExtension {
           }, node.children);
         }
       }
-      if (node.children != null) {
+      if (node.children case final children?) {
         return ElementNode(
           node.tag,
           node.attributes,
-          _processNodes(node.children!, page),
+          _processNodes(children, page),
         );
       }
       return node;
