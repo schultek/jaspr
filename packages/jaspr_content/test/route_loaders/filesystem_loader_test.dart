@@ -97,7 +97,7 @@ void main() {
           sources,
           equals([
             pageSource('index.md', '/', private: false),
-            pageSource(r'blog\post-1.md', '/blog/post-1', private: false),
+            pageSource(r'blog/post-1.md', '/blog/post-1', private: false),
           ]),
         );
       });
@@ -210,6 +210,44 @@ void main() {
 
         final partialPath = fileSystem.path.join('pages', '_includes', 'header.html');
         fileSystem.file(partialPath)
+          ..createSync(recursive: true)
+          ..writeAsStringSync('Old Header');
+        pagesDir.childFile('index.md')
+          ..createSync()
+          ..writeAsStringSync('Page Content');
+
+        // Initial load to activate the watcher
+        await loader.loadRoutes((_) => PageConfig(), false);
+
+        // Build the page once to cache the result
+        final pageSource = loader.sources.firstWhere((s) => s.path == 'index.md');
+        await pageSource.load();
+        expect(pageSource.page?.content, equals('Page Content'));
+
+        // Establish dependency by reading the partial
+        loader.readPartialSync(partialPath, pageSource.page!);
+
+        // Act: Simulate a modify event on the partial
+        eventController.add(WatchEvent(ChangeType.MODIFY, partialPath));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The page was invalidated
+        expect(pageSource.page, isNull);
+      });
+
+      test('invalidates dependent page when partial changes on windows', () async {
+        // Arrange
+        final mockWatcher = MockDirectoryWatcher();
+        final eventController = StreamController<WatchEvent>.broadcast();
+        when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
+
+        final fs = MemoryFileSystem(style: FileSystemStyle.windows);
+
+        final pagesDir = fs.directory('pages')..createSync();
+        final loader = FilesystemLoader('pages', fileSystem: fs, watcherFactory: (_) => mockWatcher);
+
+        final partialPath = fs.path.join('pages', '_includes', 'header.html');
+        fs.file(partialPath)
           ..createSync(recursive: true)
           ..writeAsStringSync('Old Header');
         pagesDir.childFile('index.md')

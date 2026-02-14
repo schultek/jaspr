@@ -9,6 +9,9 @@
 
 - Fixed `FilesystemDataLoader` to ignore files it cannot parse. This allows for co-locating data files with the content.
 
+- **Breaking**: `RouteLoaderBase` now accepts a generic type parameter for specifying the respective `PageSource` subclass.
+- **Breaking**: `Page.path` is now always in posix format (using forward slashes), independent of the operating system.
+
 ## 0.4.5
 
 - Ensure `context.page` and `context.pages` is only called on the server.

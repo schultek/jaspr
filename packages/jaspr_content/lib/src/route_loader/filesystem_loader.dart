@@ -16,7 +16,7 @@ import 'route_loader.dart';
 /// Routes are constructed based on the recursive folder structure under the root [directory].
 /// Index files (index.*) are treated as the page for the containing folder.
 /// Files and folders starting with an underscore (_) are ignored.
-class FilesystemLoader extends RouteLoaderBase {
+class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   FilesystemLoader(
     this.directory, {
     this.filterExtensions = const {},
@@ -44,7 +44,7 @@ class FilesystemLoader extends RouteLoaderBase {
 
   static DirectoryWatcher _defaultWatcherFactory(String path) => DirectoryWatcher(path);
 
-  final Map<String, Set<PageSource>> dependentSources = {};
+  final Map<String, Set<FilePageSource>> dependentSources = {};
 
   StreamSubscription<WatchEvent>? _watcherSub;
 
@@ -95,27 +95,30 @@ class FilesystemLoader extends RouteLoaderBase {
   }
 
   @override
-  Future<List<PageSource>> loadPageSources() async {
+  Future<List<FilePageSource>> loadPageSources() async {
     final root = fileSystem.directory(directory);
     if (!await root.exists()) {
       return [];
     }
 
-    List<PageSource> loadFiles(Directory dir) {
-      final List<PageSource> entities = [];
+    List<FilePageSource> loadFiles(Directory dir) {
+      final List<FilePageSource> entities = [];
       for (final entry in dir.listSync()) {
-        final path = entry.path.substring(root.path.length + 1);
         if (entry is File) {
           if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.extension(entry.path))) {
             continue;
           }
+
+          // Convert the file path to a posix path.
+          final posixPath = p.posix.fromUri(
+            fileSystem.path.toUri(fileSystem.path.relative(entry.path, from: directory)),
+          );
           entities.add(
             FilePageSource(
-              path,
+              posixPath,
               entry,
               this,
-              keepSuffix: keepSuffixPattern?.matchAsPrefix(entry.path) != null,
-              context: fileSystem.path,
+              keepSuffix: keepSuffixPattern?.matchAsPrefix(posixPath) != null,
             ),
           );
         } else if (entry is Directory) {
@@ -132,37 +135,39 @@ class FilesystemLoader extends RouteLoaderBase {
     if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.extension(path))) {
       return;
     }
+    // Convert the file path to a posix path.
+    final posixPath = p.posix.fromUri(
+      fileSystem.path.toUri(fileSystem.path.relative(path, from: directory)),
+    );
     addSource(
       FilePageSource(
-        path.substring(directory.length + 1),
+        posixPath,
         fileSystem.file(path),
         this,
-        keepSuffix: keepSuffixPattern?.matchAsPrefix(path) != null,
-        context: fileSystem.path,
+        keepSuffix: keepSuffixPattern?.matchAsPrefix(posixPath) != null,
       ),
     );
   }
 
   void removeFile(String path) {
-    final source = sources.whereType<FilePageSource>().where((source) => source.file.path == path).firstOrNull;
+    final source = sources.where((source) => source.file.path == path).firstOrNull;
     if (source != null) {
       removeSource(source);
     }
   }
 
   void invalidateFile(String path, {bool rebuild = true}) {
-    final source = sources.whereType<FilePageSource>().where((source) => source.file.path == path).firstOrNull;
+    final source = sources.where((source) => source.file.path == path).firstOrNull;
     if (source != null) {
       invalidateSource(source, rebuild: rebuild);
     }
   }
 
   @override
-  void invalidateSource(PageSource source, {bool rebuild = true}) {
+  void invalidateSource(FilePageSource source, {bool rebuild = true}) {
     super.invalidateSource(source, rebuild: rebuild);
-    final fullPath = fileSystem.path.join(directory, source.path);
-    final dependencies = {...?dependentSources[fullPath]};
-    dependentSources[fullPath]?.clear();
+    final dependencies = {...?dependentSources[source.file.path]};
+    dependentSources[source.file.path]?.clear();
     for (final dependent in dependencies) {
       invalidateSource(dependent, rebuild: rebuild);
     }
@@ -181,7 +186,6 @@ class FilePageSource extends PageSource {
     this.file,
     super.loader, {
     super.keepSuffix,
-    super.context,
   });
 
   final File file;

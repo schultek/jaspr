@@ -174,28 +174,34 @@ class AssetManager {
   final Map<(String, Object?), String> _assets = {};
 
   /// Retrieves the [AssetManager] for the given [page].
+  ///
+  /// Requires [AssetManager.dataLoader] to be added to your `ContentApp`.
   static AssetManager? of(Page page) {
     final maybeAssetManager = page.data[_dataKey];
     if (maybeAssetManager is! AssetManager) return null;
     return maybeAssetManager;
   }
 
-  /// Resolves the asset at [path] relative to the current page. If [path] starts with a slash, it is resolved
-  /// relative to the asset root.
+  /// Resolves the asset at [path] relative to the current page.
+  ///
+  /// If [path] starts with a forward slash (`/`), it is resolved relative to the asset root.
   ///
   /// The optional [aspect] parameter can be used to provide additional information to the asset transformers during build.
-  /// Requires an [AssetManager] to be setup.
   String resolveAsset(String path, Page page, [Object? aspect]) {
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
 
+    // Resolved path is relative to the asset root, always in posix format.
     final resolvedPath = path.startsWith('/')
         ? path.substring(1)
-        : p.url.normalize(p.url.join(p.url.dirname(page.path), path));
+        : p.posix.normalize(p.posix.join(p.posix.dirname(page.path), path));
 
     if (kGenerateMode) {
+      // Source path is relative to the current working directory, os specific.
       final sourcePath = p.normalize(p.join(directory, p.fromUri(resolvedPath)));
-      if (_assets.containsKey((sourcePath, aspect))) {
-        return _assets[(sourcePath, aspect)]!;
+
+      final assetKey = (sourcePath, aspect);
+      if (_assets[assetKey] case final cachedAsset?) {
+        return cachedAsset;
       }
 
       var asset = Asset.fromFile(resolvedPath, File(sourcePath));
@@ -203,39 +209,38 @@ class AssetManager {
         asset = transformer.transform(asset, aspect);
       }
 
+      // Output path is in the build directory, os specific.
+      final outPath = p.join('build', 'jaspr', outputPrefix, p.fromUri(asset.path));
+      final outFile = File(outPath)..createSync(recursive: true);
+
       switch (asset) {
-        case FileAsset(file: final file):
-          final outFile = File(
-            p.join('build', 'jaspr', outputPrefix, p.fromUri(asset.path)),
-          );
-          outFile.createSync(recursive: true);
+        case FileAsset(:final file):
           file.copySync(outFile.path);
-        case MemoryAsset(bytes: final bytes):
-          final outFile = File(
-            p.join('build', 'jaspr', outputPrefix, p.fromUri(asset.path)),
-          );
-          outFile
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(bytes);
+        case MemoryAsset(:final bytes):
+          outFile.writeAsBytesSync(bytes);
       }
 
-      return _assets[(sourcePath, aspect)] = p.url.join('/', outputPrefix, asset.path);
+      // Return path is absolute url to the asset.
+      return _assets[assetKey] = p.url.normalize(p.url.join('/', outputPrefix, asset.path));
     }
 
+    // Return path is absolute url to the asset.
     return p.url.normalize(p.url.join('/', outputPrefix, resolvedPath));
   }
 
-  bool _shouldProcessPage(Page page) {
-    return filterPages == null || filterPages!(page);
-  }
+  /// Whether to process the specified [page] with the asset manager.
+  bool _shouldProcessPage(Page page) => filterPages?.call(page) ?? true;
 }
 
+/// Provides the [resolveAsset] extension to resolve assets relative to the current page.
 extension ResolveAssetExtension on BuildContext {
-  /// Resolves the asset at [path] relative to the current page. If [path] starts with a slash, it is resolved
-  /// relative to the asset root.
+  /// Resolves the asset at [path] relative to the current page.
+  ///
+  /// If [path] starts with a forward slash (`/`), it is resolved relative to the asset root.
   ///
   /// The optional [aspect] parameter can be used to provide additional information to the asset transformers during build.
-  /// Requires an [AssetManager] to be setup.
+  ///
+  /// Requires [AssetManager.dataLoader] to be added to your `ContentApp`.
   String resolveAsset(String path, {Object? aspect}) {
     final assetManager = AssetManager.of(page);
     if (assetManager == null) {
@@ -258,6 +263,9 @@ sealed class Asset {
   factory Asset.fromFile(String path, File file) = FileAsset;
 
   /// The path of the asset.
+  ///
+  /// This path is relative to the asset root and defined in posix format.
+  /// It is used to determine the output location of the asset.
   String get path;
 
   /// Reads the asset as bytes.
@@ -325,9 +333,9 @@ class HashingAssetTransformer extends AssetTransformer {
     final hex = digest.toString();
 
     final pathWithoutExt = flattenPath
-        ? p.url.basenameWithoutExtension(asset.path)
-        : p.url.withoutExtension(asset.path);
-    final outputPath = '$pathWithoutExt.$hex${p.url.extension(asset.path)}';
+        ? p.posix.basenameWithoutExtension(asset.path)
+        : p.posix.withoutExtension(asset.path);
+    final outputPath = '$pathWithoutExt.$hex${p.posix.extension(asset.path)}';
 
     return Asset.fromBytes(outputPath, inputBytes);
   }
