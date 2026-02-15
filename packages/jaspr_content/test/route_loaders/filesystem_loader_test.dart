@@ -13,16 +13,11 @@ class MockDirectoryWatcher extends Mock implements DirectoryWatcher {}
 class MockPage extends Mock implements Page {}
 
 void main() {
-  late MemoryFileSystem fileSystem;
-
-  setUp(() {
-    fileSystem = MemoryFileSystem();
-  });
-
   group('FilesystemLoader', () {
     group('loadPageSources()', () {
       test('loads basic file structure', () async {
         // Arrange
+        final fileSystem = MemoryFileSystem();
         final pagesDir = fileSystem.directory('pages')..createSync();
         pagesDir.childFile('index.md').createSync();
         pagesDir.childFile('about.html').createSync();
@@ -36,11 +31,15 @@ void main() {
         expect(sources, hasLength(2));
         expect(
           sources,
-          equals([pageSource('index.md', '/', private: false), pageSource('about.html', '/about', private: false)]),
+          equals([
+            pageSource('index.md', '/', private: false),
+            pageSource('about.html', '/about', private: false),
+          ]),
         );
       });
 
       test('loads files with dots in their name', () async {
+        final fileSystem = MemoryFileSystem();
         final pagesDir = fileSystem.directory('pages')..createSync();
         pagesDir.childFile('release-0.1.0.md').createSync();
 
@@ -57,6 +56,7 @@ void main() {
 
       test('loads nested file structure', () async {
         // Arrange
+        final fileSystem = MemoryFileSystem();
         final pagesDir = fileSystem.directory('pages')..createSync();
         pagesDir.childFile('index.md').createSync();
         fileSystem.directory('pages/blog').createSync();
@@ -79,14 +79,14 @@ void main() {
       });
 
       test('loads nested file structure on windows', () async {
-        final MemoryFileSystem fs = MemoryFileSystem(style: FileSystemStyle.windows);
         // Arrange
-        final pagesDir = fs.directory('pages')..createSync();
+        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+        final pagesDir = fileSystem.directory('pages')..createSync();
         pagesDir.childFile('index.md').createSync();
-        fs.directory(r'pages\blog').createSync();
-        fs.file(r'pages\blog\post-1.md').createSync();
+        fileSystem.directory(r'pages\blog').createSync();
+        fileSystem.file(r'pages\blog\post-1.md').createSync();
 
-        final loader = FilesystemLoader('pages', fileSystem: fs);
+        final loader = FilesystemLoader('pages', fileSystem: fileSystem);
 
         // Act
         final sources = await loader.loadPageSources();
@@ -104,6 +104,7 @@ void main() {
 
       test('marks files and directories starting with an underscore as private', () async {
         // Arrange
+        final fileSystem = MemoryFileSystem();
         final pagesDir = fileSystem.directory('pages')..createSync();
         pagesDir.childFile('index.md').createSync();
         pagesDir.childFile('_config.yaml').createSync();
@@ -129,6 +130,7 @@ void main() {
 
       test('keeps suffix for matching patterns', () async {
         // Arrange
+        final fileSystem = MemoryFileSystem();
         final pagesDir = fileSystem.directory('pages')..createSync();
         pagesDir.childFile('sitemap.xml').createSync();
         pagesDir.childFile('feed.rss').createSync();
@@ -148,6 +150,27 @@ void main() {
           ]),
         );
       });
+
+      test('skips files that do not match the filter extensions', () async {
+        // Arrange
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        pagesDir.childFile('index.md').createSync();
+        pagesDir.childFile('about.yaml').createSync();
+
+        final loader = FilesystemLoader(
+          'pages',
+          fileSystem: fileSystem,
+          filterExtensions: {'.md'},
+        );
+
+        // Act
+        final sources = await loader.loadPageSources();
+
+        // Assert
+        expect(sources, hasLength(1));
+        expect(sources, equals([pageSource('index.md', '/', private: false)]));
+      });
     });
 
     group('File Watching', () {
@@ -159,21 +182,37 @@ void main() {
         mockWatcher = MockDirectoryWatcher();
         eventController = StreamController<WatchEvent>.broadcast();
         when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
-
-        fileSystem.directory('pages').createSync();
-        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
       });
 
       test('adds new source on file add event', () async {
         // Arrange
+        final fileSystem = MemoryFileSystem();
+        fileSystem.directory('pages').createSync();
+        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
         await loader.loadRoutes((_) => PageConfig(), false);
         expect(loader.sources, isEmpty);
 
         // Act
-        final filePath = fileSystem.path.join('pages', 'about.md');
-        fileSystem.file(filePath).createSync();
+        fileSystem.file('pages/about.md').createSync();
+        eventController.add(WatchEvent(ChangeType.ADD, 'pages/about.md'));
+        await Future<void>.delayed(Duration.zero);
 
-        eventController.add(WatchEvent(ChangeType.ADD, filePath));
+        // Assert
+        expect(loader.sources, hasLength(1));
+        expect(loader.sources.first.url, equals('/about'));
+      });
+
+      test('adds new source on file add event on windows', () async {
+        // Arrange
+        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+        fileSystem.directory('pages').createSync();
+        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
+        await loader.loadRoutes((_) => PageConfig(), false);
+        expect(loader.sources, isEmpty);
+
+        // Act
+        fileSystem.file(r'pages\about.md').createSync();
+        eventController.add(WatchEvent(ChangeType.ADD, r'pages\about.md'));
         await Future<void>.delayed(Duration.zero);
 
         // Assert
@@ -183,14 +222,34 @@ void main() {
 
       test('removes source on file remove event', () async {
         // Arrange
-        final filePath = fileSystem.path.join('pages', 'about.md');
-        fileSystem.file(filePath).createSync();
+        final fileSystem = MemoryFileSystem();
+        fileSystem.directory('pages').createSync();
+        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
+        fileSystem.file('pages/about.md').createSync();
 
         await loader.loadRoutes((_) => PageConfig(), false);
         expect(loader.sources, hasLength(1));
 
         // Act
-        eventController.add(WatchEvent(ChangeType.REMOVE, filePath));
+        eventController.add(WatchEvent(ChangeType.REMOVE, 'pages/about.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert
+        expect(loader.sources, isEmpty);
+      });
+
+      test('removes source on file remove event on windows', () async {
+        // Arrange
+        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+        fileSystem.directory('pages').createSync();
+        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
+        fileSystem.file(r'pages\about.md').createSync();
+
+        await loader.loadRoutes((_) => PageConfig(), false);
+        expect(loader.sources, hasLength(1));
+
+        // Act
+        eventController.add(WatchEvent(ChangeType.REMOVE, r'pages\about.md'));
         await Future<void>.delayed(Duration.zero);
 
         // Assert
@@ -205,10 +264,11 @@ void main() {
         final eventController = StreamController<WatchEvent>.broadcast();
         when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
 
+        final fileSystem = MemoryFileSystem();
         final pagesDir = fileSystem.directory('pages')..createSync();
         final loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
 
-        final partialPath = fileSystem.path.join('pages', '_includes', 'header.html');
+        final partialPath = 'pages/_includes/header.html';
         fileSystem.file(partialPath)
           ..createSync(recursive: true)
           ..writeAsStringSync('Old Header');
@@ -241,13 +301,12 @@ void main() {
         final eventController = StreamController<WatchEvent>.broadcast();
         when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
 
-        final fs = MemoryFileSystem(style: FileSystemStyle.windows);
+        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        final loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
 
-        final pagesDir = fs.directory('pages')..createSync();
-        final loader = FilesystemLoader('pages', fileSystem: fs, watcherFactory: (_) => mockWatcher);
-
-        final partialPath = fs.path.join('pages', '_includes', 'header.html');
-        fs.file(partialPath)
+        final partialPath = r'pages\_includes\header.html';
+        fileSystem.file(partialPath)
           ..createSync(recursive: true)
           ..writeAsStringSync('Old Header');
         pagesDir.childFile('index.md')

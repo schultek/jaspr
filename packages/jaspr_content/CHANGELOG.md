@@ -7,8 +7,7 @@
 
 - Added `filterExtensions` parameter to `FilesystemLoader`, which allows filtering for specific file extensions. This can be used when co-locating assets and data files with the content to prevent them from being treated as pages.
 
-- Fixed `FilesystemDataLoader` to ignore files it cannot parse. This allows for co-locating data files with the content.
-
+- **Breaking** `FilesystemDataLoader` now ignores files it cannot parse (non json or yaml files), instead of returning a `String`.
 - **Breaking**: `RouteLoaderBase` now accepts a generic type parameter for specifying the respective `PageSource` subclass.
 - **Breaking**: `Page.path` is now always in posix format (using forward slashes), independent of the operating system.
 

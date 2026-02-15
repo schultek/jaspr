@@ -40,7 +40,12 @@ The `FilesystemDataLoader` loads data from files in a directory of your project.
 
 The files are parsed based on their extension:
 - **.yaml** and **.json** files are loaded and parsed into a `Map<String, dynamic>`
-- all other files are loaded as a raw `String`
+- all other files are **ignored**.
+
+<Info>
+
+You can also set the data directory to the same directory as your content files, which allows co-locating data with your content. In that case, you should use the `filterExtensions` parameter on [`FilesystemLoader`](/content/concepts/route_loading#filesystemloader) to prevent the data files from being treated as pages.
+</Info>
 
 #### Directory Structure to Data Access
 
