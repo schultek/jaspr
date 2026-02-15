@@ -1,0 +1,115 @@
+# Jaspr - A Web Framework for Dart
+
+Jaspr is a modern web framework for building websites in Dart with support for both client-side and server-side rendering. It is designed to look and feel like Flutter but renders normal HTML and CSS.
+
+> **Note**: This file provides a curated index of the Jaspr documentation to help LLMs understand the framework structure and concepts.
+
+## Getting Started
+
+- [Quick Start](https://docs.jaspr.site/quick_start): How to install Jaspr, create a new project, and run your first website. Covers installation via CLI or VSCode extension, rendering modes, and project structure.
+- [Jaspr vs Flutter Web](https://docs.jaspr.site/jaspr-vs-flutter-web): Comparison between Jaspr and Flutter Web, and when to use which.
+
+## Core Concepts
+
+Understanding these core concepts is essential for building applications with Jaspr.
+
+- [Components](https://docs.jaspr.site/concepts/components): Jaspr's component system is similar to Flutter's widgets.
+    - `StatelessComponent`: For static UI.
+    - `StatefulComponent`: For UI with mutable state.
+    - `InheritedComponent`: For propagating data down the tree.
+    - Foundational components: `Component.element()`, `Component.text()`, `Component.fragment()`.
+- [HTML Structure](https://docs.jaspr.site/concepts/html): How to write HTML using Jaspr components. Using `div()`, `span()`, `h1()`, etc., instead of raw strings.
+- [Styling](https://docs.jaspr.site/concepts/styling): Styling websites using CSS-in-Dart (`Styles` class), global stylesheets, or external CSS frameworks like Tailwind or Bulma.
+- [Routing](https://docs.jaspr.site/concepts/routing): Handling navigation and URLs.
+    - Supports both **multi-page** (server-side) and **single-page** (client-side) routing.
+    - Uses `Router` component and `jaspr_router` package.
+    - Supports lazy loading for code splitting.
+- [Data Fetching](https://docs.jaspr.site/concepts/data_fetching): Strategies for fetching data on the server (during pre-rendering) and synchronizing it with the client.
+- [SEO](https://docs.jaspr.site/concepts/seo): Managing document metadata (title, description) for Search Engine Optimization.
+
+## Development & Features
+
+Detailed guides on Jaspr's specific features and development workflows.
+
+- [Rendering Modes](https://docs.jaspr.site/dev/modes):
+    - **Static Mode**: Generates static HTML at build time (SSG). Good for content sites.
+    - **Server Mode**: Renders pages on demand on the server (SSR). Good for dynamic apps.
+    - **Client Mode**: Renders purely on the client (SPA). No pre-rendering.
+- [CLI Tool](https://docs.jaspr.site/dev/cli): Using the `jaspr` command-line tool to create (`jaspr create`), serve (`jaspr serve`), and build (`jaspr build`) projects.
+- [Server-Side Rendering](https://docs.jaspr.site/dev/server): Deep dive into server-side execution.
+    - **Note**: `main.server.dart` is the server entrypoint.
+    - Access to request/response context (`context.url`, `context.headers`).
+    - Using pure Dart libraries (e.g., `dart:io`).
+- [Client-Side Rendering](https://docs.jaspr.site/dev/client): Deep dive into client-side execution (hydration).
+    - **Note**: `main.client.dart` is the client entrypoint.
+    - **Hydration**: Attaching interactivity to pre-rendered HTML.
+    - Use `@client` annotation to mark components for client-side hydration.
+    - Accessing DOM and Browser APIs (`package:universal_web`).
+- [Static Site Generation](https://docs.jaspr.site/dev/static_sites): Generating static sites with `static` mode. Generating dynamic routes and sitemaps.
+- [Deploying](https://docs.jaspr.site/dev/deploying): How to deploy Jaspr apps to different providers (Firebase, GitHub Pages, Docker, Globe).
+- [Testing](https://docs.jaspr.site/dev/testing): Testing Jaspr components using `jaspr_test`.
+    - `testComponents`: Unit testing.
+    - `testClient`: Browser testing.
+    - `testServer`: Server-side rendering testing.
+- [Configuration](https://docs.jaspr.site/api/config): Configuring Jaspr via `pubspec.yaml` (rendering mode, Flutter embedding, plugins).
+- [Linting](https://docs.jaspr.site/api/linting): Using `jaspr_lints` to enforce best practices.
+
+## Advanced Topics
+
+Explore advanced topics and integrations.
+
+- [Custom Backend](https://docs.jaspr.site/going_further/backend): Integrating Jaspr with custom backends like Shelf, Serverpod, or Dart Frog.
+- [Flutter Embedding](https://docs.jaspr.site/going_further/flutter_embedding): Embedding Flutter apps within a Jaspr website (`jaspr_flutter_embed`).
+- [Third-Party Packages](https://docs.jaspr.site/going_further/packages): Ecosystem packages (State Management, UI/Styling).
+- [Contributing](https://docs.jaspr.site/going_further/contributing): How to contribute to the Jaspr project.
+
+## Guides
+
+- [Guides Index](https://docs.jaspr.site/guides/index): Collection of practical guides and tutorials.
+
+## API Reference
+
+### Key Components
+
+Located in `api/components/`:
+- [Document](https://docs.jaspr.site/api/components/document): Root component for HTML structure.
+- [Router](https://docs.jaspr.site/api/components/router): Handles routing.
+- [Link](https://docs.jaspr.site/api/components/link): Navigation link (`<a>`).
+- [Style](https://docs.jaspr.site/api/components/style): Embeds CSS styles.
+- [AsyncBuilder](https://docs.jaspr.site/api/components/async_components): Builds based on a Future/Stream.
+
+### Utilities & Annotations
+
+Located in `api/utils/`:
+- [@client](https://docs.jaspr.site/api/utils/at_client): Annotation to mark components for client-side execution.
+- [@css](https://docs.jaspr.site/api/utils/at_css): Annotation for defining CSS rules.
+- [@Import](https://docs.jaspr.site/api/utils/at_import): Platform-specific imports.
+- [Styles](https://docs.jaspr.site/api/utils/styles): CSS-in-Dart styling utility.
+- [GlobalNodeKey](https://docs.jaspr.site/api/utils/global_node_key): Access underlying DOM elements.
+
+## Content Driven Sites (jaspr_content)
+
+Build content-heavy sites like documentation or blogs using the `jaspr_content` package.
+
+- [Overview](https://docs.jaspr.site/content): Introduction to `jaspr_content`, features, and quick start.
+- [Quick Start](https://docs.jaspr.site/content/quick_start): How to create a content-driven site using `jaspr_content`.
+- **Guides**:
+    - [Writing Content](https://docs.jaspr.site/content/guides/writing_content): Writing pages using Markdown and frontmatter.
+    - [Adding Pages](https://docs.jaspr.site/content/guides/adding_pages): Structuring pages and routing.
+    - [Assembling the Site](https://docs.jaspr.site/content/guides/assembling_the_site): Building the final site structure.
+    - [Customizing Rendering](https://docs.jaspr.site/content/guides/customizing_rendering): Customizing how content is rendered.
+- **Concepts**:
+    - [Pages & Collections](https://docs.jaspr.site/content/concepts/pages): Understanding how content is structured into pages and collections.
+    - [Data Loading](https://docs.jaspr.site/content/concepts/data_loading): How markdown files and frontmatter are loaded.
+    - [Templating](https://docs.jaspr.site/content/concepts/templating): Using mustache templates for content.
+    - [Theming](https://docs.jaspr.site/content/concepts/theming): Customizing the look and feel (light/dark mode).
+    - [Page Parsing](https://docs.jaspr.site/content/concepts/page_parsing): How markdown is parsed into components.
+    - [Custom Components](https://docs.jaspr.site/content/concepts/custom_components): Registering custom components to be used in markdown.
+- **Built-in Components**:
+    - [Callout](https://docs.jaspr.site/content/components/callout): Info/Warning boxes.
+    - [Tabs](https://docs.jaspr.site/content/components/tabs): Tabbed content.
+    - [Code Block](https://docs.jaspr.site/content/components/code_block): Syntax highlighted code.
+    - [Image](https://docs.jaspr.site/content/components/image): Optimized images.
+- **Layouts**:
+    - [DocsLayout](https://docs.jaspr.site/content/layouts/docs_layout): Standard documentation layout.
+    - [BlogLayout](https://docs.jaspr.site/content/layouts/blog_layout): Standard blog layout.

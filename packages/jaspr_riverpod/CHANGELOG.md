@@ -1,3 +1,7 @@
+## 0.4.4
+
+- Fix `.syncWith` incorrectly applying codec when decoding values.
+
 ## 0.4.3
 
 - Fix compilation errors with `riverpod` versions `^3.1.0`

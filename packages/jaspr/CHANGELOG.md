@@ -4,6 +4,27 @@
 - **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
 - Added stateful server-side reload feature.
 
+- Added `ServerApp.addMiddleware()` method to add custom middleware to Jaspr's HTTP server.
+
+## 0.22.2
+
+- Added `--web-port` and `--proxy-port` options to `jaspr serve` for configuring webdev and proxy server ports.
+  - Allows running multiple Jaspr projects simultaneously with different ports.
+
+- Fixed `testComponents` failing with `RawText` components due to `MarkupRenderObject` cast error.
+  - Added `RawableRenderObject` and `RawableRenderText` interfaces for raw HTML text rendering support.
+  - `MarkupRenderObject` and `TestRenderObject` now implement `RawableRenderObject`.
+  - `MarkupRenderText` and `TestRenderText` now implement `RawableRenderText`.
+
+- Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
+- Fixed launching debug builds in Safari.
+
+- Added `--target-os` and `--target-arch` options to the build command to cross-compile server binaries.
+- Added `--dart-define-from-file` option to the serve and build commands.
+- Respect `PUB_HOSTED_URL` environment variable for custom pub mirrors.
+
+- Added an example to show on pub.dev.
+
 ## 0.22.1
 
 - Fixed bug when using `flutter: plugins` or `flutter: embedded` on Windows.
@@ -22,6 +43,7 @@
   - The project can contain at least one client entrypoint file ending in `.client.dart` (e.g. `lib/main.client.dart`) for client-side rendering (also available in **client** mode).
   - A new client-side Jaspr options file is generated alongside the client entrypoint (e.g. as `lib/main.client.options.dart`) containing `defaultClientOptions`.
   - Added a new `ClientApp` component that should be used inside the client entrypoint like this:
+
     ```dart
     // This file is lib/main.client.dart
 
@@ -40,7 +62,7 @@
     ```
 
 - **Breaking** Renamed `package:jaspr/browser.dart` library to `package:jaspr/client.dart`, as well as:
-  
+
   - Renamed `BrowserAppBinding` class to `ClientAppBinding`.
   - Renamed `package:jaspr_test/browser_test.dart` library to `package:jaspr_test/client_test.dart`.
   - Renamed `testBrowser()` class to `testClient()`.
@@ -49,7 +71,7 @@
 
   This reduces the "pollution" of the global namespace when importing `package:jaspr/jaspr.dart` and allows for more fine-grained control of imported APIs.
 
-- **Breaking** All html components are now implemented as classes instead of functions, and can thereby used with `const`. 
+- **Breaking** All html components are now implemented as classes instead of functions, and can thereby used with `const`.
 
   This is mostly a structural change, as all components keep their lowercase names to have the familiar html-like syntax and differentiate to other Components. All standard uses of these components should still work as before, with a few exceptions when used with inferred typing (such as `var child = div([]);`), which may now require an explicit type annotation (such as `Component child = div([]);`) when assigning other values (such as `child = span([]);`).
 
@@ -69,18 +91,18 @@
 
 - Added `dl`, `dt`, and `dd` html components to `package:jaspr/dom.dart`.
 
-- **Breaking** Removed deprecated `package:jaspr/ui.dart` library. 
+- **Breaking** Removed deprecated `package:jaspr/ui.dart` library.
 
 - **Breaking** Removed support for `jaspr.dev-command` option in `pubspec.yaml`.
 
-- Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`. 
+- Added support for `jaspr.port` option in `pubspec.yaml` to specify the default port used by `jaspr serve`.
   This can still be overridden using the `--port` flag. If neither is set, the default port stays `8080`.
 
 - Added support for `jaspr.flutter` option in `pubspec.yaml` to specify either support for Flutter embedding with `'embedded'` or support for Flutter plugins with `'plugins'`.
 
   This replaces the dependency on `jaspr_web_compilers` package, which is now discontinued. Instead, make sure to depend on `build_web_compilers` with a minimum version constraint of `4.4.6` or higher.
 
-- **Breaking**: Removed `jaspr analyze` command, as the latest version of `jaspr_lints` can now be used directly with `dart analyze`.  
+- **Breaking**: Removed `jaspr analyze` command, as the latest version of `jaspr_lints` can now be used directly with `dart analyze`.
 
 - **Breaking**: `ResponseLike.body` (returned from `renderComponent()`) is now a `Uint8List` instead of `String`.
 - Allow binary responses in `AppContext.setStatusCode`.
@@ -172,8 +194,7 @@
 - **Breaking**: Removed deprecated `Border.all` constructor.
 
 - Added `withOpacity()`, `withLightness()`, `withHue()` and `withValues()` methods to `Color`.
-  
-- Added `figure` and `figcaption` html methods.  
+- Added `figure` and `figcaption` html methods.
 - Added the `wbr` html method for creating a line-break opportunity element.
 
 - Moved `DomValidator` class to foundation library.
@@ -193,7 +214,7 @@
 ## 0.19.0
 
 - **BREAKING** `JasprOptions.useIsolates` is now `false` by default (was `true`).
-  
+
   If you want to keep the old behaviour of rendering each request in a separate isolate, use `Jaspr.initializeApp(..., useIsolates: true)`.
 
 - Added `allowedPathSuffixes` option to `Jaspr.initializeApp()` to enable handling route paths with extensions other than `html`.
@@ -204,7 +225,7 @@
 
   Exclude routes from the sitemap through the `--sitemap-exclude` option to `jaspr build`.
 
-  Read more about [Generating a Sitemap](https://docs.jaspr.site/concepts/static_sites#generating-a-sitemap).
+  Read more about [Generating a Sitemap](https://docs.jaspr.site/dev/static_sites#generating-a-sitemap).
 
 - Added support `@client` components from other packages.
 
@@ -254,7 +275,7 @@
     .box(width: 100.px, height: 100.px)
     .text(align: TextAlign.center)
     .background(color: Colors.blue);
-  ````
+  ```
 
   **After:**
 

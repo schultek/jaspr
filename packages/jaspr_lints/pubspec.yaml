@@ -4,7 +4,7 @@ version: 0.6.0
 homepage: https://jaspr.site
 repository: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
-documentation: https://docs.jaspr.site/get_started/linting
+documentation: https://docs.jaspr.site/api/linting
 funding:
   - https://github.com/sponsors/schultek
 
@@ -14,13 +14,13 @@ topics:
   - lints
 
 environment:
-  sdk: '>=3.8.0 <4.0.0'
+  sdk: ">=3.8.0 <4.0.0"
 
 resolution: workspace
 
 dependencies:
   analysis_server_plugin: ^0.3.0
-  analyzer: '>=8.0.0 <10.0.0'
+  analyzer: ">=8.0.0 <10.0.0"
   analyzer_plugin: any
   path: ^1.9.0
   yaml: ^3.1.2

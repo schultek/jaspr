@@ -4,22 +4,40 @@ description: Jaspr comes with its own set of lint rules and code assists.
 ---
 
 Jaspr has its own linting and analyzer package called `jaspr_lints`. This comes pre-configured
-with every new project and enables the following set of lint rules and code assists:
+with every new project and enables a set of lint rules and code assists.
+
+## Setup:
+
+Add `jaspr_lints` as a plugin to your `analysis_options.yaml` file:
+
+```yaml
+plugins:
+  jaspr_lints:
+    version: ^0.6.0
+    diagnostics:
+      sort_children_last: true
+      prefer_html_components: true
+      styles_ordering: true
+```
+
+After running `dart pub get` you now see additional Jaspr lints 
+when invoking code assist on a component function like `div()` or `p()` files.
+
 
 ## Lint Rules
 
 <Card>
-    <Property name="prefer_html_methods" type="Fix available">
-        Prefer using html methods like `div(...)` over `DomComponent(tag: 'div', ...)`.
+    <Property name="prefer_html_components" type="Fix available">
+        Prefer using HTML components like `div(...)` over `Component.element(tag: 'div', ...)`.
 
         **BAD:**
         ```dart
-        return DomComponent(
+        return .element(
           tag: 'div',
           children: [
-            DomComponent(
+            .element(
               tag: 'p',
-              child: Text('Hello World'),
+              children: [.text('Hello World')],
             ),
           ],
         );
@@ -28,29 +46,29 @@ with every new project and enables the following set of lint rules and code assi
         **GOOD:**
         ```dart
         return div([
-          p([text('Hello World')]),
+          p([.text('Hello World')]),
         ]);
         ```
     </Property>
 </Card>
 
 <Card>
-    <Property name="sort_children_properties_last" type="Fix available">
-        Sort children properties last in html component methods.
+    <Property name="sort_children_last" type="Fix available">
+        Sort children properties last in HTML component methods.
 
-        This improves readability and best represents actual html.
+        This improves readability and best represents actual HTML.
 
         **BAD:**
         ```dart
         return div([
-          p([text('Hello World')], classes: 'text-red'),
+          p([.text('Hello World')], classes: 'text-red'),
         ], id: 'main');
         ```
 
         **GOOD:**
         ```dart
         return div(id: 'main', [
-          p(classes: 'text-red', [text('Hello World')]),
+          p(classes: 'text-red', [.text('Hello World')]),
         ]);
         ```
     </Property>

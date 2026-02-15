@@ -1,3 +1,7 @@
+## 0.3.1
+
+- Fix issue where the entry file was not opened after project creation.
+
 ## 0.3.0
 
 - Added the `Serve` code-lens to `main` functions for launching Jaspr, and hide the default `Run / Debug` code lenses.

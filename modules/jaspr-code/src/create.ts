@@ -410,7 +410,7 @@ async function handleJasprCreateTrigger(wf: vs.WorkspaceFolder): Promise<void> {
   if (success) {
     const entryFile = path.join(
       fsPath(wf.uri),
-      json?.mode === "client" ? "web/main.dart" : "lib/main.dart"
+      json?.mode === "client" ? "lib/main.client.dart" : "lib/main.server.dart"
     );
     vs.commands.executeCommand("vscode.open", vs.Uri.file(entryFile));
 

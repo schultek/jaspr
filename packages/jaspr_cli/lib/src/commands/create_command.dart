@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:mason/mason.dart' as m show Logger;
 import 'package:mason/mason.dart' hide Level;
 import 'package:path/path.dart' as p;
-import 'package:pub_updater/pub_updater.dart';
 
 import '../bundles/bundles.dart';
 import '../bundles/scaffold/scaffold_bundle.dart';
@@ -125,8 +124,6 @@ class CreateCommand extends BaseCommand {
       if (useMode.useServer) useBackend ?? 'base',
     };
 
-    final updater = PubUpdater();
-
     final [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
@@ -190,8 +187,6 @@ class CreateCommand extends BaseCommand {
     if (bundle == null) {
       usageException('Template "$template" not found.');
     }
-
-    final updater = PubUpdater();
 
     final [
       jasprFlutterEmbedVersion,

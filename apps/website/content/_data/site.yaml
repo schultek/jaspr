@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=site.yaml
+banner:
+  enabled: false
+  text: "Jaspr 0.22.0 is here! With less magic and more power. Read the {{link}} to learn more."
+  linkText: "Release Notes"
+  link: "https://docs.jaspr.site/releases/v/0.22.0"
+versions:
+  latestCore: "0.22.0"
+  latestRouter: "0.8.0"
+  latestContent: "0.4.5"
+  latestLints: "0.6.0"

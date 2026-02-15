@@ -8,7 +8,7 @@ import 'dart:collection';
 
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
-import 'package:path/path.dart' as pkg_path;
+import 'package:path/path.dart' as p;
 
 import '../page.dart';
 import '../secondary_output/secondary_output.dart';
@@ -44,14 +44,14 @@ abstract class RouteLoader {
 }
 
 /// A base class for [RouteLoader] implementations.
-abstract class RouteLoaderBase implements RouteLoader {
+abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   RouteLoaderBase({this.debugPrint = false});
 
   final bool debugPrint;
 
   Future<List<RouteBase>>? _routes;
-  List<PageSource>? _sources;
-  List<PageSource> get sources => UnmodifiableListView(_sources ?? []);
+  List<T>? _sources;
+  List<T> get sources => UnmodifiableListView(_sources ?? []);
 
   ConfigResolver? _resolver;
   ConfigResolver get resolver {
@@ -73,7 +73,7 @@ abstract class RouteLoaderBase implements RouteLoader {
     throw UnsupportedError('Reading partial files is not supported for $runtimeType');
   }
 
-  PageSource? getSourceForPage(Page page) {
+  T? getSourceForPage(Page page) {
     return _sources?.where((source) => source.page == page).firstOrNull;
   }
 
@@ -136,7 +136,7 @@ abstract class RouteLoaderBase implements RouteLoader {
     return routes;
   }
 
-  Future<List<PageSource>> loadPageSources();
+  Future<List<T>> loadPageSources();
 
   @override
   void invalidatePage(Page page) {
@@ -146,18 +146,18 @@ abstract class RouteLoaderBase implements RouteLoader {
     }
   }
 
-  void addSource(PageSource source) {
+  void addSource(T source) {
     _sources ??= [];
     _sources!.add(source);
     invalidateRoutes();
   }
 
-  void removeSource(PageSource source) {
+  void removeSource(T source) {
     _sources?.remove(source);
     invalidateRoutes();
   }
 
-  void invalidateSource(PageSource source, {bool rebuild = true}) {
+  void invalidateSource(T source, {bool rebuild = true}) {
     source.invalidate(rebuild: rebuild);
     ServerApp.reloadClients(source.url);
   }
@@ -174,10 +174,10 @@ abstract class RouteLoaderBase implements RouteLoader {
 }
 
 abstract class PageSource {
-  PageSource(this.path, this.loader, {bool keepSuffix = false, pkg_path.Context? context}) {
-    final pathContext = context ?? pkg_path.context;
-    final segments = pathContext.split(path).where((segment) => segment.isNotEmpty).toList();
+  PageSource(this.path, this.loader, {bool keepSuffix = false}) {
+    assert(!path.contains(p.windows.separator), 'PageSource path must be in posix format (using forward slashes).');
 
+    final segments = p.posix.split(path).where((segment) => segment.isNotEmpty).toList();
     if (segments.isEmpty) {
       url = '/';
       return;
@@ -186,7 +186,7 @@ abstract class PageSource {
     private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
 
     if (!keepSuffix) {
-      final lastSegmentName = pathContext.basenameWithoutExtension(segments.last);
+      final lastSegmentName = p.basenameWithoutExtension(segments.last);
       if (lastSegmentName == 'index') {
         segments.removeLast();
       } else {

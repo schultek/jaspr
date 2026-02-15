@@ -5,7 +5,25 @@ description: Finalize and deploy your site as a static site or server-rendered a
 
 ---
 
-This guide covers advanced topics for finalizing your site, including how to generate secondary outputs like markdown versions of your pages or an RSS feed, add normal Jaspr routes alongside your pages, and finally build and deploy your site.
+This guide covers advanced topics for finalizing your site, including how to handle static assets, generate secondary outputs like markdown versions of your pages or an RSS feed, add normal Jaspr routes alongside your pages, and finally build and deploy your site.
+
+## Handling Assets
+
+Most sites need to serve static assets like images, videos, or fonts. While you can put them in a global `web` folder, `jaspr_content` allows you to co-locate assets with your content files.
+
+This is done using the `AssetManager`, which resolves relative paths in your content and data to the correct location in the final build, as well as hashes and optimizes assets.
+
+To use it, you need to set up the `AssetManager` in your `main.dart`:
+
+```dart
+final assetManager = AssetManager(directory: 'content');
+
+// ...
+```
+
+This allows you to reference images in your markdown files like `![Image](image.png)` where `image.png` is right next to your markdown file.
+
+[Read more about Assets](/content/concepts/assets).
 
 ## Secondary Outputs
 
@@ -98,4 +116,4 @@ You can use `jaspr_content` in either **static** or **server** mode.
 
 Building and deploying your site is the same as with normal Jaspr apps. Simply use the `jaspr build` command to build your site.
 
-Checkout the general [Deploying](/concepts/deploying) guide for more information on how to deploy your site after building.
+Checkout the general [Deploying](/dev/deploying) guide for more information on how to deploy your site after building.
