@@ -229,20 +229,20 @@ class Page extends StatelessComponent {
               'character': 7,
             },
           ],
-          'serverScopeRoots': [
-            {
-              'path': '$projectPath/lib/other.server.dart',
-              'name': 'main',
-              'line': 4,
-              'character': 6,
-            },
+          'serverScopeRoots': unorderedEquals([
             {
               'path': '$projectPath/lib/main.server.dart',
               'name': 'main',
               'line': 4,
               'character': 6,
             },
-          ],
+            {
+              'path': '$projectPath/lib/other.server.dart',
+              'name': 'main',
+              'line': 4,
+              'character': 6,
+            },
+          ]),
         },
       });
     });

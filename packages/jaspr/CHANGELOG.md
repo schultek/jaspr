@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Added `ServerApp.addMiddleware()` method to add custom middleware to Jaspr's HTTP server.
+
 ## 0.22.2
 
 - Added `--web-port` and `--proxy-port` options to `jaspr serve` for configuring webdev and proxy server ports.
