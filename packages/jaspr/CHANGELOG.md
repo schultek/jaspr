@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.22.3
 
 - Added `ServerApp.addMiddleware()` method to add custom middleware to Jaspr's HTTP server.
 

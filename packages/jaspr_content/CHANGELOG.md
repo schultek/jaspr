@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.5.0
 
 - New `AssetManager` class for handling content assets. Assets like images, videos, etc. can be co-located with the content and referenced by their relative path from a page.
   - Asset paths are resolved across Markdown files, page data and components using `context.resolveAsset('some/asset.png')`.
