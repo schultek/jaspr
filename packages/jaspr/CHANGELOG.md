@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Allow `analyzer` versions 10.x.
+
 ## 0.22.3
 
 - Added `ServerApp.addMiddleware()` method to add custom middleware to Jaspr's HTTP server.

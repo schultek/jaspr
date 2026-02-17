@@ -20,7 +20,7 @@ topics:
   - build-runner
 
 dependencies:
-  analyzer: '>=8.1.0 <10.0.0'
+  analyzer: '>=8.1.0 <11.0.0'
   build: ^4.0.0
   collection: ^1.15.0
   dart_style: ^3.0.0
