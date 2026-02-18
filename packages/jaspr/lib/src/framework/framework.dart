@@ -143,6 +143,7 @@ abstract class Component {
   ///
   const factory Component.wrapElement({
     Key? key,
+    String selector,
     String? id,
     String? classes,
     Styles? styles,
