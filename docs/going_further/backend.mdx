@@ -9,33 +9,33 @@ In the standard configuration, `jaspr` creates its own http server to handle inc
 render your components. For this it uses the popular `shelf` package.
 
 If you want, you can replace the server handling with your own backend setup.
-This allows also the use of your favorite dart backend framework.
+This allows also the use of your favorite Dart backend framework.
 
 <Info>
 Since `jaspr` is built with `shelf`, this works best when the backend framework is also compatible with shelf.
 However you can work around this if that is not the case.
 </Info>
 
-There are two main functions, that enable this:
+There are two main functions that enable this:
 
 - `Handler serveApp(AppHandler handler)` bundles everything jaspr does on the server into a custom shelf handler.
   The handler can then be passed to your backend or server implementation.
-- `String renderComponent(Component app)` directly renders the provided component into a html string.
+- `String renderComponent(Component app)` directly renders the provided component into an HTML string.
 
 <Warning>
-When using your own backend setup, you can still do `jaspr serve`, however auto-reload won't work 
+When using your own backend setup, you can still do `jaspr serve`, however auto-reload won't work
 on the server automatically.
 </Warning>
 
 ## Shelf
 
-[`shelf`](https://pub.dev/packages/shelf) is a widely-used package for building server apps with dart that is 
+[`shelf`](https://pub.dev/packages/shelf) is a widely-used package for building server apps with dart that is
 maintained by the Dart team.
 
 > Shelf makes it easy to create and compose web servers and parts of web servers.
 
-Since jaspr used shelf internally, it is pretty straightforward to built a custom backend for jaspr using
-shelf. 
+Since jaspr used shelf internally, it is pretty straightforward to build a custom backend for jaspr using
+shelf.
 
 ```dart title="lib/main.server.dart"
 void main() async {
@@ -66,7 +66,7 @@ You can use Serverpod and Jaspr together using our official [**Serverpod Integra
 to build robust and scalable fullstack websites leveraging Serverpods builtin webserver and additional components.
 
 To get started with combining Jaspr and Serverpod head over to the [documentation of the integration package](https://pub.dev/packages/jaspr_serverpod)
-or checkout the [example](https://github.com/schultek/jaspr/tree/main/examples/backend_serverpod).
+or check out the [example](https://github.com/schultek/jaspr/tree/main/examples/backend_serverpod).
 
 ## Dart Frog
 

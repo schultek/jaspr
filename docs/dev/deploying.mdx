@@ -21,7 +21,7 @@ can just take the `/build/jaspr` folder and deploy it to any static hosting prov
 
 ### Firebase Hosting
 
-To deploy your site to [Firebase Hosting](https://firebase.google.com/docs/hosting) follow these steps:
+To deploy your site to [Firebase Hosting](https://firebase.google.com/docs/hosting), follow these steps:
 
 1. Run `jaspr build`
 
@@ -40,17 +40,17 @@ To deploy your site to [Firebase Hosting](https://firebase.google.com/docs/hosti
   website will be shown.
 </Info>
 
-### Github Pages
+### GitHub Pages
 
-With [Github Pages](https://pages.github.com/) you can automatically deploy your when you push to a configured repository
+With [GitHub Pages](https://pages.github.com/) you can automatically deploy your site when you push to a configured repository
 and branch. Since you need to run `jaspr build` before deploying, it's recommended to set up a custom
-[Github Actions](https://github.com/features/actions) workflow to build and deploy your site automatically when pushed.
+[GitHub Actions](https://github.com/features/actions) workflow to build and deploy your site automatically when pushed.
 
-First we set up the repository to deploy from your repository:
+First, we set up the repository to deploy from your repository:
 
 <Info>
   This will roughly follow the steps from [this
-  guide](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#ver%C3%B6ffentlichen-mit-einem-benutzerdefinierten-github-actions-workflow)
+  guide](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)
   of the official documentation.
 </Info>
 
@@ -58,7 +58,7 @@ First we set up the repository to deploy from your repository:
 2. Set the "Source" to "GitHub Actions"
 3. Find the suggested "Static HTML" workflow and click "Configure"
 4. Edit the default workflow script to the following:
-   1. After the "Setup Pages" step add the following two step:
+   1. After the "Setup Pages" step, add the following two steps:
       ```yaml
       - name: 'Setup Dart'
         uses: dart-lang/setup-dart@v1.3
@@ -80,8 +80,8 @@ First we set up the repository to deploy from your repository:
 If you are deploying from the special `<username>.github.io` repository you are all set and you can view your deployed
 site at `https://<username>.github.io.`.
 
-If you are deploying from any other repository, the site url will be `http://<username>.github.io/<repository>`. For this
-to correctly load all files you need to set the `<base>` url of your site to the repository name.
+If you are deploying from any other repository, the site's URL will be `http://<username>.github.io/<repository>`. For this
+to correctly load all files, you need to set the `<base>` url of your site to the repository name.
 
 In static mode, provide the `base` parameter to the `Document` constructor:
 
@@ -104,10 +104,10 @@ Finally, make sure all links and asset paths are **relative urls** (they don't s
 
 #### Flutter support
 
-If your project is using Flutter embedding or Flutter plugins, you need to modify the created workflow file to also 
+If your project is using Flutter embedding or Flutter plugins, you need to modify the created workflow file to also
 pull in flutter, otherwise the build will result in an error.
 
-- After the "Setup Dart" step add the following step:
+- After the "Setup Dart" step, add the following step:
   ```yaml
   - name: 'Setup Flutter'
     uses: subosito/flutter-action@v2
@@ -130,7 +130,7 @@ Lots of cloud hosting services support deploying docker containers, like:
 - [AWS Amplify](https://docs.amplify.aws/gen1/flutter/tools/cli/usage/containers)
 - [fly.io](https://fly.io/docs/languages-and-frameworks/dockerfile/)
 - [Digital Ocean](https://docs.digitalocean.com/products/app-platform/how-to/deploy-from-container-images/)
-- any many more...
+- and many more...
 
 The main thing to set up when using docker is the `Dockerfile`, a build script that creates the container image.
 
@@ -173,17 +173,17 @@ Running `docker build` from your project directory will then build a container i
 
 #### Flutter support
 
-If your project is using Flutter embedding or Flutter plugins you need to modify the `Dockerfile` to also have 
+If your project is using Flutter embedding or Flutter plugins, you need to modify the `Dockerfile` to also have
 Flutter installed in the build image, otherwise the build will result in an error.
 
-First change the first lines to the following:
+First, change the first lines to the following:
 
 ```dockerfile
 # We need a docker image that has flutter installed.
 FROM ghcr.io/cirruslabs/flutter:stable as build
 ```
 
-Next replace the script starting from "FROM scratch" with the following:
+Next, replace the script starting from "FROM scratch" with the following:
 
 ```dockerfile
 # This image is additionally needed for the dart runtime libs.
@@ -228,5 +228,5 @@ Globe will then build and deploy your application, providing you with a unique U
 
 ### Flutter Support
 
-No additional configuration is needed. Globe's build pipeline automatically detects and sets up projects that use 
+No additional configuration is needed. Globe's build pipeline automatically detects and sets up projects that use
 Flutter for element embedding or plugins.
