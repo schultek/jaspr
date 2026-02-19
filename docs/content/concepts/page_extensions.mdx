@@ -24,7 +24,7 @@ To use extensions, add them to your `ContentApp`:
 
 ```dart
 ContentApp(
-  parsers: [
+  extensions: [
     HeadingAnchorsExtension(),
     TableOfContentsExtension(),
   ],
@@ -74,7 +74,7 @@ Page extensions can be used to analyze nodes without modifying them. This is use
 
 When analyzing, your extension traverses the node tree and collects information, but returns the original nodes unchanged. The extracted data can be stored in the page's metadata or used in other ways.
 
-As an example, the following example extimates the reading time for the page content and saves it to the `page.readingTime` data property:
+As an example, the following extension estimates the reading time for the page content and saves it to the `page.readingTime` data property:
 
 ```dart
 class ReadingTimeExtension extends PageExtension {
@@ -114,7 +114,7 @@ class ReadingTimeExtension extends PageExtension {
 
 Extensions can also modify nodes to transform your content. They can traverse the node tree, find specific nodes, and apply changes to them.
 
-Here's an example that generate alt text for images that don't have any:
+Here's an example that generates alt text for images that don't have any:
 
 ```dart
 class ImageAltTextExtension extends PageExtension {
@@ -129,8 +129,7 @@ class ImageAltTextExtension extends PageExtension {
 
   Future<Node> _processNode(Node node) async {
     // Find images with no alt text.
-    if (node is ElementNode && node.tag == 'img' && node.attributes['alt'] == null) {       
-      
+    if (node is ElementNode && node.tag == 'img' && node.attributes['alt'] == null) {
       final imgSrc = node.attributes['src'] ?? '';
       try {
         // Generate alt text, e.g. using an AI model.
@@ -140,14 +139,14 @@ class ImageAltTextExtension extends PageExtension {
           tag: node.tag,
           attributes: {...node.attributes, 'alt': altText},
           children: node.children,
-        ));
+        );
       } catch (e) {
         print('Failed to generate alt text for $imgSrc: $e');
 
-        result.add(node);
+        return node;
       }
     }
-    
+
     if (node is ElementNode && node.children != null) {
       // Process children recursively.
       return ElementNode(
@@ -167,7 +166,7 @@ class ImageAltTextExtension extends PageExtension {
 
 This extension finds images without alt text, then uses some service to analyze the image and generate descriptive alt text. This improves accessibility and SEO without manual effort.
 
-## Futher Ideas
+## Further Ideas
 
 Page extensions open up a wide range of possibilities. Some ideas include:
 

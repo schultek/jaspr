@@ -1,6 +1,6 @@
 ---
 title: FlutterEmbedView
-description: Embed a flutter app in your Jaspr side.
+description: Embed a flutter app in your Jaspr site.
 ---
 
 ---
@@ -16,9 +16,9 @@ Requires Flutter 3.24.0 or newer.
 
 With the `FlutterEmbedView` component you can embed any Flutter widget as part of your
 Jaspr component tree. The component takes care of initializing the Flutter engine and attaching the provided widget
-to the root of Flutters widget tree. It internally calls Flutters `runApp` method with the provided widget.
+to the root of Flutter's widget tree. It internally calls Flutter's `runApp` method with the provided widget.
 
-It renders a `<div></div>` element and mounts the flutter app inside.
+It renders a `<div></div>` element and mounts the Flutter app inside.
 
 ## Usage
 
@@ -27,19 +27,19 @@ You can provide the following parameters:
 - `id`: Optional id for the created `<div>` element.
 - `classes`: Optional class name for the created `<div>` element.
 - `styles`: Optional styles for the created `<div>` element.
-- `constraints`: Optional view constraints for the flutter view.
-- `loader`: An optional component that is displayed while the flutter app is initializing.
+- `constraints`: Optional view constraints for the Flutter view.
+- `loader`: An optional component that is displayed while the Flutter app is initializing.
 - `widget`: The widget that will be run as your embedded Flutter app.
 
 ```dart
 return FlutterEmbedView(
-  // provide an optional loader component that will be displayed while the flutter app loads
+  // Provide an optional loader component that will be displayed while the Flutter app loads.
   loader: MyCustomLoader(),
-  // provide your flutter app widget
+  // Provide your Flutter app widget.
   widget: MyFlutterApp(
-    // provide any widget properties or callbacks
-    // this way you can pass and share state between jaspr and flutter
-    // without needing js interop
+    // Provide any widget properties or callbacks,
+    // this way you can pass and share state between Jaspr and Flutter
+    // without needing JS interop.
     title: 'My Embedded Flutter App',
   ),
 );
@@ -69,5 +69,5 @@ return FlutterEmbedView.deferred(
 ---
 
 <Info>
-Read more about Jasprs support for [Flutter Embedding](/going_further/flutter_embedding).
+Read more about Jaspr's support for [Flutter Embedding](/going_further/flutter_embedding).
 </Info>

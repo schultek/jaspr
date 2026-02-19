@@ -28,9 +28,9 @@ void main() {
   // 1. Initialize and configure AssetManager.
   final assetManager = AssetManager(
     // The root directory where your assets are located. Usually, this is the same as your content directory.
-    directory: 'content', 
+    directory: 'content',
     // Optional: Configure which properties in your frontmatter contain asset paths.
-    dataProperties: {'image', 'meta.thumbnail'}, 
+    dataProperties: {'image', 'meta.thumbnail'},
   );
 
   // 2. Add middleware to serve assets during development.
@@ -135,7 +135,7 @@ class MyComponent extends StatelessComponent {
     final logoPath = context.resolveAsset('/images/logo.png');
 
     return .fragment([
-      img(src: iconPath),
+      img(src: imagePath),
       img(src: logoPath),
     ]);
   }

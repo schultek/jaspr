@@ -1,7 +1,7 @@
 
 # Concept: Jaspr Precompiler
 
-Purpose: Precompiles things like smart components and outputs dart source targets for ssg, ssr and csr.
+Purpose: Precompiles things like smart components and outputs Dart source targets for ssg, ssr and csr.
 
 
 Compiles only source in current project.

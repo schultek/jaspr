@@ -10,7 +10,7 @@
 
 - Pros: Single logic block for client & server
 - Cons: Not compile safe (when using plain strings,
-  but routes could be made constants (like riverpod providers) and be compile safe)
+  but routes could be made constants (like riverpod providers) and be compiled safe)
 
 ```dart
 

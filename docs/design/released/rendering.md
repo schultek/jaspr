@@ -3,13 +3,13 @@
 
 1. Build synchronization
 
-- Flutter has a build phase where all dirty widgets are build, before having a unified rendering phase
-- All widgets must be build before any widget is rendered
+- Flutter has a build phase where all dirty widgets are built, before having a unified rendering phase
+- All widgets must be built before any widget is rendered
 
-- In html we can rebuild and update elements at any time, independent from other elements
-- It still makes sense to batch updates to
+- In HTML, we can rebuild and update elements at any time, independent from other elements
+- It still makes sense to batch updates to:
   - not update the same widget multiple times for a single frame
-  - not make unneccessary updates if some changes in the upper tree affect the lower tree
+  - not make unnecessary updates if some changes in the upper tree affect the lower tree
 
 Therefore:
 
