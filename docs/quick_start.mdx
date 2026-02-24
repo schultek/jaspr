@@ -1,6 +1,74 @@
----
+import 'package:flutter/material.dart';
+
+class HomeScreen extends StatelessWidget {
+  final List<Map<String, String>> products = [
+    {"name": "Shoes", "price": "\$50"},
+    {"name": "Watch", "price": "\$100"},
+    {"name": "Headphones", "price": "\$70"},
+    {"name": "Mobile", "price": "\$300"},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("ShopMark"),
+        actions: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.shopping_cart)),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(products[index]['name']!),
+            subtitle: Text(products[index]['price']!),
+            trailing: Icon(Icons.add_shopping_cart),
+            onTap: () {
+              // Go to product detail
+            },
+          );
+        },
+      ),
+    );
+  }
+}dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^2.10.0
+  firebase_auth: ^5.5.0
+  cloud_firestore: ^5.5.0
+  provider: ^6.0.5void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(ShopMarkApp());
+}{
+  "name": "Smart Watch",
+  "price": 50,
+  "image": "https://linktoimage.com/watch.png",
+  "category": "Electronics"
+}flutter_stripe: ^8.0.0flutter build apk --release---import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
+
+void main() {
+  runApp(ShopMarkApp());
+}
+
+class ShopMarkApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'ShopMark',
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+      ),
+      home: HomeScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
 title: Quickstart
-description: Get started with Jaspr and build your first website in Dart.
+description: Get stlarted with Jaspr and build your first website in Dart.
 ---
 
 ---
