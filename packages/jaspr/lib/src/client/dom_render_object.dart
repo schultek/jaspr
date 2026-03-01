@@ -421,6 +421,12 @@ class DomRenderFragment extends DomRenderObject
 
   @override
   void remove(DomRenderObject child) {
+    if (child == _firstChild) {
+      _firstChild = child.nextSibling;
+    }
+    if (child == _lastChild) {
+      _lastChild = child.previousSibling;
+    }
     if (!isAttached) {
       removeChild(child);
     } else {
@@ -543,6 +549,12 @@ mixin MultiChildDomRenderObject on DomRenderObject {
   void removeChild(DomRenderObject child) {
     if (child case DomRenderFragment(isAttached: true)) {
       child.removeChildren(this);
+      final prev = child.previousSibling;
+      final next = child.nextSibling;
+      prev?.nextSibling = next;
+      next?.previousSibling = prev;
+      child.previousSibling = null;
+      child.nextSibling = null;
       child.parent = null;
       return;
     }
@@ -554,6 +566,12 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     assert(node == child.node.parentNode, 'Child node must be a child of this element.');
 
     node.removeChild(child.node);
+    final prev = child.previousSibling;
+    final next = child.nextSibling;
+    prev?.nextSibling = next;
+    next?.previousSibling = prev;
+    child.previousSibling = null;
+    child.nextSibling = null;
     child.parent = null;
   }
 }
