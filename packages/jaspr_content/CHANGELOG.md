@@ -1,3 +1,8 @@
+## Unreleased patch
+
+- Fixed eager page loading exhausting file descriptors on macOS
+  when building sites with a large number of file-sourced pages.
+
 ## 0.5.0
 
 - New `AssetManager` class for handling content assets. Assets like images, videos, etc. can be co-located with the content and referenced by their relative path from a page.

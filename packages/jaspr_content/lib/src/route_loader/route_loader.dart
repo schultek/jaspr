@@ -6,6 +6,7 @@ library;
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:path/path.dart' as p;
@@ -89,11 +90,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
     _resolver = resolver;
     _eager = eager;
 
-    _routes ??= _buildRoutes();
-    if (_sources case final sources? when eager) {
-      await [for (final source in sources) source.onLoad].wait;
-    }
-    return _routes ?? [];
+    return _routes ??= _buildRoutes();
   }
 
   void onReassemble() {}
@@ -102,6 +99,8 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
     final sources = _sources ??= await loadPageSources();
 
     final List<RouteBase> routes = [];
+    final List<T> eagerSources = [];
+
     for (final source in sources) {
       if (source.path.isEmpty || source.private) {
         continue;
@@ -111,7 +110,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
       source.config = config;
 
       if (_eager) {
-        source.load();
+        eagerSources.add(source);
       }
       final pageBuilder = AsyncBuilder(builder: (_) => source.load());
 
@@ -126,6 +125,14 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
             ),
           );
         }
+      }
+    }
+
+    // Load page sources in batches to avoid running out of file descriptors.
+    if (eagerSources.isNotEmpty) {
+      const maxConcurrentLoads = 32;
+      for (final batch in eagerSources.slices(maxConcurrentLoads)) {
+        await batch.map((s) => s.load()).wait;
       }
     }
 
@@ -207,11 +214,9 @@ abstract class PageSource {
   Future<Component>? _future;
 
   Page? get page => _page;
-  Future<void> get onLoad => _future ?? Future.value();
 
   Future<Component> load() async {
-    _future ??= loadPage();
-    return _future!;
+    return _future ??= loadPage();
   }
 
   Future<Component> loadPage() async {

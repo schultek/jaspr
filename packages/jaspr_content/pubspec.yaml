@@ -20,6 +20,7 @@ environment:
 resolution: workspace
 
 dependencies:
+  collection: ^1.19.1
   crypto: ^3.0.7
   fbh_front_matter: ^0.0.1
   file: ^7.0.1
