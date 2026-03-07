@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
 import '../../server.dart';
@@ -23,6 +24,15 @@ final class ServerApp {
 
   static final StreamController<Object> _reassembleController = StreamController.broadcast();
   static Stream<Object> get onReassemble => _reassembleController.stream;
+
+  static final List<Middleware> _middleware = [];
+
+  /// Adds a shelf middleware to the server application.
+  ///
+  /// This will be applied the next time `runApp` is called.
+  static void addMiddleware(Middleware middleware) {
+    _middleware.add(middleware);
+  }
 
   final SetupFunction _setup;
 
@@ -65,8 +75,13 @@ final class ServerApp {
   Future<(http.Client, HttpServer)> _createServer() async {
     final port = int.parse(Platform.environment['PORT'] ?? '8080');
     final client = http.Client();
+    var pipeline = const Pipeline();
+    for (final middleware in _middleware) {
+      pipeline = pipeline.addMiddleware(middleware);
+    }
+    _middleware.clear();
     final handler = createHandler((_, render) => render(_setup), client: client);
-    return (client, await shelf_io.serve(handler, InternetAddress.anyIPv4, port, shared: true));
+    return (client, await shelf_io.serve(pipeline.addHandler(handler), InternetAddress.anyIPv4, port, shared: true));
   }
 
   static final _requestedRoutes = <String, (String?, String?, double?)>{};
