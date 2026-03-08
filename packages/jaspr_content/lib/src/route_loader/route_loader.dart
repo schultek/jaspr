@@ -90,8 +90,8 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
     _eager = eager;
 
     _routes ??= _buildRoutes();
-    if (eager && _sources != null) {
-      await Future.wait([for (final s in _sources!) s.onLoad]);
+    if (_sources case final sources? when eager) {
+      await [for (final source in sources) source.onLoad].wait;
     }
     return _routes ?? [];
   }
