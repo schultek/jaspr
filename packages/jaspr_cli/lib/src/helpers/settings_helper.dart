@@ -8,38 +8,35 @@ const String _settingsFileName = 'jaspr.json';
 
 T? getSetting<T>(String key) {
   try {
-    return _settings?[key] as T?;
+    return _settings[key] as T?;
   } catch (_) {
     return null;
   }
 }
 
 void updateSetting(String key, Object value) {
-  (_settings ?? {})[key] = value;
+  _settings[key] = value;
   _writeSettings();
 }
 
-Map<String, Object?>? _settings = _loadSettings();
+Map<String, Object?> _settings = _loadSettings() ?? {};
 
 Map<String, Object?>? _loadSettings() {
-  if (settingsFile == null) {
-    return null;
+  if (settingsFile case final settingsFile?) {
+    try {
+      final str = settingsFile.readAsStringSync();
+      return jsonDecode(str) as Map<String, Object?>;
+    } catch (_) {}
   }
-  try {
-    final str = settingsFile!.readAsStringSync();
-    return jsonDecode(str) as Map<String, Object?>;
-  } catch (_) {
-    return null;
-  }
+  return null;
 }
 
 void _writeSettings() {
-  if (settingsFile == null) {
-    return;
+  if (settingsFile case final settingsFile?) {
+    try {
+      settingsFile.writeAsStringSync(jsonEncode(_settings));
+    } catch (_) {}
   }
-  try {
-    settingsFile!.writeAsStringSync(jsonEncode(_settings ?? {}));
-  } catch (_) {}
 }
 
 final File? settingsFile = () {
@@ -72,8 +69,8 @@ final File? settingsFile = () {
 ///
 /// Typically, the directory is `~/.dart/`.
 ///
-/// This can return null under some conditions, including when the user's home
-/// directory does not exist.
+/// This can return `null` under some conditions, including when
+/// the user's home directory does not exist.
 Directory? getSettingsDirectory() {
   final dir = homeDir;
   if (dir == null) {
