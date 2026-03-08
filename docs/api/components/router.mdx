@@ -10,7 +10,7 @@ This component is part of the `jaspr_router` package. Make sure to add this to y
 the component.
 </Info>
 
-Use can use the `Router` component to add routing to your website. It takes a list of `Route`s to render based on the
+You can use the `Router` component to add routing to your website. It takes a list of `Route`s to render based on the
 current URL.
 
 A simple use looks like this:
@@ -33,7 +33,7 @@ class App extends StatelessComponent {
 ```
 
 <Info>
-`Router` has a similar api than `GoRouter` from the [`go_router`](https://pub.dev/packages/go_router) flutter package.
+`Router` has a similar API to `GoRouter` from the [`go_router`](https://pub.dev/packages/go_router) Flutter package.
 If you know `go_router` a lot of the core concepts should feel familiar.
 </Info>
 
@@ -115,7 +115,7 @@ ShellRoute(
     ]);
   },
   routes: <RouteBase>[
-    GoRoute(
+    Route(
       path: 'details',
       builder: (context, state) => const DetailsScreen(),
     ),
@@ -166,7 +166,7 @@ To push a new route, call `context.push()` with a URL:
 context.push('/users/123');
 ```
 
-This is shorthand for calling `Router.of(context).push('/users/123)` and will navigate to the target URL.
+This is shorthand for calling `Router.of(context).push('/users/123')` and will navigate to the target URL.
 
 `push()` will add a new entry to the browser history and enables use of the browsers back button. Alternatively you
 can use `context.replace()` to replace the current history entry with a new URL.

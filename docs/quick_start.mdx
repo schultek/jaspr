@@ -5,14 +5,14 @@ description: Get started with Jaspr and build your first website in Dart.
 
 ---
 
-Welcome to the Jaspr Getting Started guide. In it, you'll install Jaspr, setup a new project and learn the basics of Jaspr.
+Welcome to the Jaspr Getting Started guide. In it, you'll install Jaspr, set up a new project and learn the basics of Jaspr.
 
 ## 1. Install Jaspr
-  
+
 You can install Jaspr either through our **VSCode Extension** or by installing the **Jaspr CLI** in the terminal. The CLI lets you manage the project from the command line, while the extension provides a more integrated experience within your IDE.
 
-- <Icon name="cubes" /> Use the Jaspr VSCode Extension to setup and serve your website with full debugging support from inside VSCode.
-- <Icon name="terminal" /> Use the Jaspr CLI to setup and serve your website from the command line.
+- <Icon name="cubes" /> Use the Jaspr VSCode Extension to set up and serve your website with full debugging support from inside VSCode.
+- <Icon name="terminal" /> Use the Jaspr CLI to set up and serve your website from the command line.
 
 <Tabs groupId="tooling">
   <TabItem label="VSCode Extension" value="extension">
@@ -23,18 +23,18 @@ You can install Jaspr either through our **VSCode Extension** or by installing t
   <TabItem label="Jaspr CLI" value="cli">
     Install the Jaspr CLI via:
 
-    ```js
+    ```shell
     dart pub global activate jaspr_cli
     ```
 
     The `jaspr` command will be available in your terminal.
   </TabItem>
 </Tabs>
-    
+
 ## 2. Choose a Rendering Mode
 
-The first thing to do when starting a new project with Jaspr is to decide on a **Rendering Mode** to use. 
-The rendering mode defines how your website is executed and built and each one has it's own advantages and disadvantages based on what you want to build.
+The first thing to do when starting a new project with Jaspr is to decide on a **Rendering Mode** to use.
+The rendering mode defines how your website is executed and built and each one has its own advantages and disadvantages based on what you want to build.
 
 Jaspr supports these three rendering modes:
 
@@ -58,7 +58,7 @@ All modes support client-side interactivity and can be used to build interactive
 
 <Tabs groupId="tooling">
   <TabItem label="VSCode Extension" value="extension">
-    To create a new Jaspr project, open the command palette (`Ctrl+Shift+P`) and select **Jaspr: New Project**. You are ask to choose from several templates and set a project folder.
+    To create a new Jaspr project, open the command palette (`Ctrl+Shift+P`) and select **Jaspr: New Project**. You are asked to choose from several templates and set a project folder.
 
     ![New Project](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/new_project.png?raw=true)
 
@@ -71,7 +71,7 @@ All modes support client-side interactivity and can be used to build interactive
   <TabItem label="Jaspr CLI" value="cli">
     To create a new project run:
 
-    ```
+    ```shell
     jaspr create my_website
     ```
 
@@ -88,16 +88,16 @@ All modes support client-side interactivity and can be used to build interactive
 </Tabs>
 
 ## 4. Run your Project
-    
+
 <Tabs groupId="tooling">
   <TabItem label="VSCode Extension" value="extension">
-    To run and debug a Jaspr applications, launch it using F5 or the Debug menu. The extension will start the debug process and attach the Dart debugger to it. 
+    To run and debug a Jaspr application, launch it using F5 or the Debug menu. The extension will start the debug process and attach the Dart debugger to it.
 
     ---
 
     When developing a Jaspr project in `static` or `server` mode, this will open **two** separate debugging sessions, one for the server and one for the client. Switch between the two using the debugging sidebar or process dropdown.
 
-    | Sidebar | Dropdown. |
+    | Sidebar | Dropdown |
     |---|---|
     | ![Sidebar](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/sidebar.png?raw=true) | ![Dropdown](https://github.com/schultek/jaspr/blob/main/modules/jaspr-code/media/screenshots/dropdown.png?raw=true)
 
@@ -133,5 +133,3 @@ Check out the following resources to continue your journey with Jaspr:
 - [Server-Side Jaspr](dev/server): Learn about server-side rendering, component scopes and everything server-side in Jaspr. *Relevant for static and server mode.*
 - [Client-Side Jaspr](dev/client): Learn about hydration, interactivity, DOM and everything client-side in Jaspr. *Relevant for all modes.*
 - [Static Sites](dev/static_sites): Learn about static site generation in Jaspr. *Relevant for static mode.*
-
-  
