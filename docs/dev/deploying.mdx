@@ -203,30 +203,3 @@ WORKDIR /app
 EXPOSE 8080
 CMD ["./app"]
 ```
-
----
-
-## Globe
-
-[Globe](https://globe.dev/) is a hosting platform for Dart & Flutter applications from Invertase. It offers a streamlined deployment experience, automatically detecting your Jaspr project's configuration and rendering mode.
-
-1. Install the Globe CLI:
-
-   ```bash
-   dart pub global activate globe_cli
-   ```
-
-2. Run the deployment command from your project's root directory:
-
-   ```bash
-   globe deploy --prod
-   ```
-
-3. For your first deployment, the CLI will guide you through creating and linking a new Globe project.
-
-Globe will then build and deploy your application, providing you with a unique URL (e.g., `https://your-project-name.globeapp.dev`).
-
-### Flutter Support
-
-No additional configuration is needed. Globe's build pipeline automatically detects and sets up projects that use
-Flutter for element embedding or plugins.
