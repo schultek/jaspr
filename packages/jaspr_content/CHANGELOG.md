@@ -1,7 +1,10 @@
 ## Unreleased minor
 
-- Added `TaxonomyLoader` route loader for generating taxonomy and term pages from page front matter.
-- Added `TaxonomyContext` extension on `BuildContext` with helpers like `taxonomyTermPages`, `taxonomyTermPage`, `pagesForTerm`, and `taxonomyTermPagesWithCount`.
+- Added `PagesAggregator` base class for generating additional routes from loaded pages.
+- Added `AggregatedRouteInfo` base class for route metadata produced by aggregators, accessible via `context.currentRouteInfo<T>()` inside aggregator route builders.
+- Added `TaxonomyAggregator` — a `PagesAggregator` that generates taxonomy index and term routes from page frontmatter.
+- Added `TaxonomyRouteInfo` and `TaxonomyTermRouteInfo` data classes for taxonomy route metadata.
+- Added `TaxonomyContext` extension on `BuildContext` with helpers: `taxonomyTermRefs`, `taxonomyTermRef`, `taxonomyIndexRef`, `pagesForTerm`, and `taxonomyTermRefsWithCount`.
 
 ## 0.5.0
 

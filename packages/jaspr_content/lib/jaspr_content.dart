@@ -1,6 +1,7 @@
 /// A package for building content-driven sites with Jaspr.
 library;
 
+export 'src/aggregated_route.dart' hide InheritedAggregatedContext, InheritedAggregatedRoute;
 export 'src/asset_manager.dart';
 export 'src/content.dart';
 export 'src/content_app.dart';
@@ -18,13 +19,12 @@ export 'src/page_extension/table_of_contents_extension.dart';
 export 'src/page_parser/html_parser.dart';
 export 'src/page_parser/markdown_parser.dart';
 export 'src/page_parser/page_parser.dart';
+export 'src/pages_aggregator/pages_aggregator.dart';
+export 'src/pages_aggregator/taxonomy_aggregator.dart';
 export 'src/route_loader/filesystem_loader.dart';
 export 'src/route_loader/github_loader.dart';
 export 'src/route_loader/memory_loader.dart';
 export 'src/route_loader/route_loader.dart';
-export 'src/pages_agreggator/pages_count_aggregator.dart';
-export 'src/pages_agreggator/pages_aggregator.dart';
-export 'src/pages_agreggator/taxonomy_aggregator.dart';
 export 'src/secondary_output/markdown_output.dart';
 export 'src/secondary_output/rss_output.dart';
 export 'src/secondary_output/secondary_output.dart';
