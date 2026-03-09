@@ -549,27 +549,24 @@ mixin MultiChildDomRenderObject on DomRenderObject {
   void removeChild(DomRenderObject child) {
     if (child case DomRenderFragment(isAttached: true)) {
       child.removeChildren(this);
-      final prev = child.previousSibling;
-      final next = child.nextSibling;
-      prev?.nextSibling = next;
-      next?.previousSibling = prev;
-      child.previousSibling = null;
-      child.nextSibling = null;
-      child.parent = null;
-      return;
+    } else {
+      if (kVerboseMode) {
+        print('Remove child ${child.node} of $node');
+      }
+
+      assert(
+        node == child.node.parentNode,
+        'Child node must be a child of this element.',
+      );
+
+      node.removeChild(child.node);
     }
 
-    if (kVerboseMode) {
-      print('Remove child ${child.node} of $node');
-    }
-
-    assert(node == child.node.parentNode, 'Child node must be a child of this element.');
-
-    node.removeChild(child.node);
-    final prev = child.previousSibling;
-    final next = child.nextSibling;
-    prev?.nextSibling = next;
-    next?.previousSibling = prev;
+    // Unlink the removed child from its siblings.
+    final oldPreviousSibling = child.previousSibling;
+    final oldNextSibling = child.nextSibling;
+    oldPreviousSibling?.nextSibling = oldNextSibling;
+    oldNextSibling?.previousSibling = oldPreviousSibling;
     child.previousSibling = null;
     child.nextSibling = null;
     child.parent = null;
