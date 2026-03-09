@@ -237,9 +237,9 @@ class RouteLoader {
   bool isPending;
 
   static Future<void> wait(Iterable<RouteLoader> loaders) {
-    final pendingLoaders = loaders.where((l) => l.isPending).map((l) => l.future);
+    final pendingLoaders = loaders.where((l) => l.isPending).toList(growable: false);
     if (pendingLoaders.isNotEmpty) {
-      return pendingLoaders.wait;
+      return [for (final loader in pendingLoaders) loader.future].wait;
     } else {
       return SynchronousFuture(null);
     }

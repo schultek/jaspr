@@ -11,7 +11,7 @@ This guide explores some **advanced customization** options for `jaspr_content`.
 
 Extensions enhance the rendering of your content by adding features or modifying the output. They can **transform content**, add capabilities, or generate additional data during the rendering process.
 
-Page extensions are applied after the parsing of your content but before any rendering. They operate on a tree of `Nodes`, which represent the parsed content in a structured way. 
+Page extensions are applied after the parsing of your content but before any rendering. They operate on a tree of `Nodes`, which represent the parsed content in a structured way.
 
 <Info>
 Read more about `Nodes` and how they are structured in the [Page Extensions](/content/concepts/page_extensions) docs.
@@ -35,10 +35,10 @@ class MyExtension implements PageExtension {
 }
 ```
 
-There is lots you can do with custom extensions, for example:
+There is a lot you can do with custom extensions, for example:
 
-- Customize standard elements like paragraphs, headings, blockquotes, images etc.
-- Analyze the structure of your content to generate things like table of contents, references, glossary etc.
+- Customize standard elements like paragraphs, headings, blockquotes, images, etc.
+- Analyze the structure of your content to generate things like table of contents, references, glossary, etc.
 - Add new dynamic elements to the content.
 - *Whatever else you come up with*
 
@@ -52,13 +52,13 @@ In the previous [Writing Content](/content/guides/writing_content) guide, we int
 
 ### Using Jaspr Components
 
-You can make any normal Jaspr component available in your content using the html-like `<Component>` syntax. 
+You can make any normal Jaspr component available in your content using the html-like `<Component>` syntax.
 
 Say you have written a `class Card extends StatelessComponent` class that takes a `String? title` and `Component child`, you can add it to your page configuration like this:
 
 ```dart
 ContentApp(
-  ...
+  // ...
   components: [
     CustomComponent(
       pattern: 'Card',
@@ -97,7 +97,7 @@ class CustomCard implements CustomComponent {
 
   @override
   Component? create(Node node, NodesBuilder builder) {
-    ...
+    // ...
   }
 }
 ```
@@ -121,7 +121,7 @@ Component? create(Node node, NodesBuilder builder) {
 ```
 
 <Info>
-You can also use this in combination with custom markdown syntaxes. Checkout the [Markdown Parsing](/content/concepts/page_parsing#markdown) docs for more info.
+You can also use this in combination with custom markdown syntaxes. Check out the [Markdown Parsing](/content/concepts/page_parsing#markdown) docs for more info.
 </Info>
 
 ### Using Page Data in Components
@@ -158,10 +158,10 @@ To use a layout, simply add it to the page configuration like this:
 
 ```dart
 ContentApp(
-  ...
+  // ...
   layouts: [
     DocsLayout(
-      ...
+      // ...
     )
   ]
 );
@@ -236,7 +236,7 @@ ContentApp(
   theme: ContentTheme(
     // Primary color for buttons, links, etc.
     primary: ThemeColor(Color('#01589B'), dark: Color('#41C3FE')),
-    
+
     // Background color for the site
     background: ThemeColor(Colors.white, dark: Color('#0b0d0e')),
   ),
@@ -269,10 +269,11 @@ theme: ContentTheme(
 
 // ...
 
-// Use it in your components
+// Use it in your components.
 css('.my-component').styles(
-  // A [ColorToken] can be used anywhere a [Color] is expected and automatically respects light and dark mode.
-  backgroundColor: myColorToken, 
+  // A [ColorToken] can be used anywhere a [Color] is expected and
+  // automatically respects light and dark mode.
+  backgroundColor: myColorToken,
   border: Border(color: ContentColors.quoteBorders)
 ),
 ```
@@ -319,7 +320,7 @@ void main() {
         // Add heading anchors.
         HeadingAnchorsExtension(),
       ],
-      components: {
+      components: [
         // Support <Info>, <Warning>, <Error> and <Success> components.
         Callout(),
         // Support zoomable images with captions.
@@ -331,7 +332,7 @@ void main() {
           pattern: 'Card',
           builder: (_, _, child) => Card(child: child),
         ),
-      }
+      ],
       layouts: [
         // Render content in a docs layout with header and sidebar.
         DocsLayout(

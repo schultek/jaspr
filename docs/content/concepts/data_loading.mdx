@@ -13,7 +13,7 @@ Data loading is done by the configured `DateLoader`s. The default `ContentApp` c
 
 ```dart
 ContentApp(
-  // Default configuration loads data from content/_data directory
+  // Default configuration loads data from content/_data directory.
   dataDirectory: 'content/_data',
 )
 ```
@@ -36,7 +36,7 @@ ContentApp.custom(
 
 ### FilesystemDataLoader
 
-The `FilesystemDataLoader` loads data from files in a directory of your project. 
+The `FilesystemDataLoader` loads data from files in a directory of your project.
 
 The files are parsed based on their extension:
 - **.yaml** and **.json** files are loaded and parsed into a `Map<String, dynamic>`
@@ -136,7 +136,7 @@ class MyCustomDataLoader implements DataLoader {
   Future<void> loadData(Page page) async {
     // Load data from anywhere: APIs, databases, etc.
     final myData = await fetchDataFromExternalSource();
-    
+
     // Add your custom data to the page.
     page.apply(data: {'myCustomData': myData});
   }

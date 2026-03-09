@@ -171,11 +171,12 @@ class ContentApp extends AsyncStatelessComponent {
 
   @override
   Future<Component> build(BuildContext context) async {
-    final List<List<RouteBase>> allRoutes = [];
-
     // 1. Load all content routes from loaders in parallel.
-    final loadersRoutes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)));
-    allRoutes.addAll(loadersRoutes);
+    final allRoutes = [
+      ...await [
+        for (final loader in loaders) loader.loadRoutes(configResolver, eagerlyLoadAllPages),
+      ].wait,
+    ];
 
     // 2. Run aggregators — each receives the same pages from loaders and appends to the shared routeInfos list.
     // Route builders capture this list via closure; since builders are invoked lazily (on navigation),
@@ -183,8 +184,7 @@ class ContentApp extends AsyncStatelessComponent {
     final pages = RouteLoader.loadedPages;
     final allRouteInfos = <AggregatedRouteInfo>[];
     for (final aggregator in pagesAggregators) {
-      final aggregatorRoutes = await aggregator.aggregatePages(pages, allRouteInfos);
-      allRoutes.add(aggregatorRoutes);
+      allRoutes.add(await aggregator.aggregatePages(pages, allRouteInfos));
     }
 
     // 3. Ensure all path suffixes used in the routes are allowed by Jaspr, and build the router.

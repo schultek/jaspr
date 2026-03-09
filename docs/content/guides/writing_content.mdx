@@ -41,7 +41,7 @@ The `MarkdownParser` can also be customized to support custom syntaxes or resolv
 
 Each content file may start with a frontmatter block, written in YAML. This block defines metadata for the page, such as the title, description, and other custom fields. This metadata can then be used by any other part of the content rendering pipeline, like the template engine, extensions or layouts.
 
-A frontmatter blog is wrapped in '---' and looks like this:
+A frontmatter block is wrapped in '---' and looks like this:
 
 ```markdown
 ---
@@ -121,7 +121,7 @@ You can choose a template engine by providing its respective `TemplateEngine` in
 
 ```dart
 ContentApp(
-  ...
+  // ...
   templateEngine: MustacheTemplateEngine(),
 );
 ```
@@ -167,10 +167,10 @@ With **eager loading**, all pages are loaded at startup and their data is made a
 
 ```dart
 ContentApp(
-  ...
+  // ...
   eagerlyLoadAllPages: true,
 );
-````
+```
 
 You can then use this to e.g. display a list of links to other pages:
 
@@ -191,7 +191,7 @@ If you want to customize your content even further, you can integrate and use **
 Jaspr provides a set of components out of the box to enhance your content. These components include callouts, tabs, code blocks, and more. You can also create custom components to suit your needs.
 
 <Info>
-For a full list of available components, checkout the **Components** section in the sidebar menu.
+For a full list of available components, check out the **Components** section in the sidebar menu.
 </Info>
 
 ### Usage
@@ -202,11 +202,11 @@ To include components in your content, you can use the html-like `<Component>` s
 <Info>This draws attention to useful page information.</Info>
 ```
 
-To enable this, simply add the choosen components to the `components` list of `ContentApp`:
+To enable this, simply add the chosen components to the `components` list of `ContentApp`:
 
 ```dart
 ContentApp(
-  ...
+  // ...
   components: [
     Callout(), // Enables callout boxes like <Info>, <Warning>, <Error> and more.
   ],

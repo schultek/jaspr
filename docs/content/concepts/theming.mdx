@@ -130,13 +130,13 @@ css('.my-custom-component').styles(
 
 <Info>
 You can use the built-in [`ThemeToggle`](/content/concepts/page_layouts#themetoggle) component anywhere on your page to enable switching between light and dark mode.
-</Info> 
+</Info>
 
 ## Content Styles
 
 ### The `not-content` class
 
-Sometimes, you might have parts of your page (like custom html snippets in markdown files) that should not inherit the default content typography and styles (e.g., paragraph margins, heading sizes). You can add the class `not-content` to any element in your content. Elements with this class will be excluded from the global content styling.
+Sometimes, you might have parts of your page (like custom HTML snippets in markdown files) that should not inherit the default content typography and styles (e.g., paragraph margins, heading sizes). You can add the class `not-content` to any element in your content. Elements with this class will be excluded from the global content styling.
 
 ```markdown
 ## Markdown Content
@@ -206,12 +206,12 @@ ContentTheme(
 )
 ```
 
-You can also create your own theme extension by extending `ThemeExtension<T>`. 
+You can also create your own theme extension by extending `ThemeExtension<T>`.
 If you create a [Custom Component](/content/concepts/custom_components) that requires theming, you should return a default instance of your theme extension in the `theme` getter of your `CustomComponent`.
 
 ## Disable Theming
 
-By default (even without any configuration) `jaspr_content` will apply a set of global reset styles and the default content styles to the page. You can opt-out of that (e.g. to use your own custom theming solution) by using `ContentTheme.none()`.
+By default (even without any configuration) `jaspr_content` will apply a set of global reset styles and the default content styles to the page. You can opt out of that (e.g. to use your own custom theming solution) by using `ContentTheme.none()`.
 
 ```dart
 ContentApp(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:jaspr/server.dart';
 import 'package:path/path.dart' as path;
 
@@ -50,31 +51,27 @@ Future<Response> getSample(Request request, String id) async {
 Future<List<Sample>> loadSamples() async {
   var dirs = await Directory(samplesPath).list().toList();
 
-  var loadedSamples = (await Future.wait(
-    dirs.map((dir) async {
-      var id = path.basename(dir.path);
-      var description = id;
-      int? index;
-      var mainFile = File(path.join(dir.path, 'main.dart'));
+  var loadedSamples = (await dirs.map((dir) async {
+    var id = path.basename(dir.path);
+    var description = id;
+    int? index;
+    var mainFile = File(path.join(dir.path, 'main.dart'));
 
-      if (await mainFile.exists()) {
-        var config = SampleConfig.from(await mainFile.readAsString());
-        if (config != null) {
-          if (config.hidden) {
-            return null;
-          }
-          description = config.description;
-          index = config.index;
+    if (await mainFile.exists()) {
+      var config = SampleConfig.from(await mainFile.readAsString());
+      if (config != null) {
+        if (config.hidden) {
+          return null;
         }
-      } else {
-        return null;
+        description = config.description;
+        index = config.index;
       }
+    } else {
+      return null;
+    }
 
-      return Sample(id, description, index);
-    }),
-  )).whereType<Sample>().toList();
-
-  loadedSamples.sort();
+    return Sample(id, description, index);
+  }).wait).nonNulls.sorted();
 
   return loadedSamples;
 }

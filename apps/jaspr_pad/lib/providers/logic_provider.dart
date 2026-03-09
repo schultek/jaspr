@@ -101,14 +101,14 @@ class Logic {
 
     if (proj == null) return;
 
-    await Future.wait([
+    await [
       for (var e in proj.allDartFiles.entries)
         ref.read(dartServiceProvider).format(e.value).then(
           (res) {
             ref.read(editProjectProvider.notifier).updateContent(e.key, res.newString);
           },
         ),
-    ]);
+    ].wait;
   }
 
   Future<void> compileFiles() async {

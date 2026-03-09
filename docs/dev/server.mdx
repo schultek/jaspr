@@ -9,20 +9,20 @@ description: Understand server-side rendering and how it works with Jaspr.
 
 When using Jaspr in **static** or **server** mode, part of your code will be executed on the server to generate the HTML and CSS for your site. This is what is commonly referred to as "server-side rendering".
 
-The term "server" in this context refers to **the environment in which the code is executed**, not the actual hardware running it. In our case, this means either the Dart VM during development, or a native binary when compiled for production. It **does not** refer to the device that is running the code, which may be your local machine (during development), a CI pipeline (during building in "static" mode) or an actual webserver (at runtime in "server" mode).
-  
-The counterpart to this is the "client" environment, which is either the JavaScript or WASM runtime in the browser that is displaying your website. All interactivity, event handling, and access to browser APIs needs to happen in the client environment.
+The term "server" in this context refers to **the environment in which the code is executed**, not the actual hardware running it. In our case, this means either the Dart VM during development or a native binary when compiled for production. It **does not** refer to the device that is running the code, which may be your local machine (during development), a CI pipeline (during building in "static" mode) or an actual webserver (at runtime in "server" mode).
 
-**Learning about and understanding the differences between these environments, and how components are rendered in either environment is crucial to building a successful app with Jaspr.**
+The counterpart to this is the "client" environment, which is either the JavaScript or WASM runtime in the browser that is displaying your website. All interactivity, event handling, and access to browser APIs need to happen in the client environment.
+
+**Learning about and understanding the differences between these environments and how components are rendered in either environment is crucial to building a successful app with Jaspr.**
 
 ## Server Entrypoint
 
-By default in static and server mode, your application's server entrypoint is `lib/main.server.dart`. This file is only executed on the server, hence all components that are rendered from there (the root `Document` component and all its descendents) are rendered on the server.
+By default, in static and server mode, your application's server entrypoint is `lib/main.server.dart`. This file is only executed on the server, hence all components that are rendered from there (the root `Document` component and all its descendents) are rendered on the server.
 
 In your entrypoint, you should:
 - import `package:jaspr/server.dart` and the generated `<filename>.server.options.dart`,
 - call `Jaspr.initializeAll(options: defaultServerOptions);` and
-- call the `runApp()` method, which will start a HTTP server to render your root component and serve any assets in the `/web` directory.
+- call the `runApp()` method, which will start an HTTP server to render your root component and serve any assets in the `/web` directory.
 
 ```dart title="lib/main.server.dart"
 // Server-specific Jaspr import.
@@ -45,7 +45,7 @@ void main() {
 }
 ```
 
-The [Document](/api/components/document) component is a special component that renders the standard HTML document structure including `<html>`, `<head>` and `<body>` tags and should be used at the root of your component tree to add a title, metadata and other resources to the document. 
+The [Document](/api/components/document) component is a special component that renders the standard HTML document structure including `<html>`, `<head>` and `<body>` tags and should be used at the root of your component tree to add a title, metadata and other resources to the document.
 
 ### Multiple Entrypoints
 
@@ -129,7 +129,7 @@ Some Jaspr APIs are only available in the server environment. These are typicall
     <Property name="AsyncBuilder" type="Component">
       An async variant of the `Builder` component. [Read More](/api/components/async_components)
     </Property>
-    
+
   </Accordion>
 
   <Accordion title="Request & Response" defaultOpen>
@@ -172,21 +172,21 @@ Some Jaspr APIs are only available in the server environment. These are typicall
   </Accordion>
 </AccordionGroup>
 
-If you want to access such an server-only API in a component that is also rendered on the client, you must wrap it in a `if (!kIsWeb)` check as well as use conditional imports to import the correct library depending on the environment. See next section on how to do this.
+If you want to access such a server-only API in a component that is also rendered on the client, you must wrap it in a `if (!kIsWeb)` check as well as use conditional imports to import the correct library depending on the environment. See the next section on how to do this.
 
 ## Using Platform Libraries
 
-Another difference between the server and client environments are the platform libraries from the Dart SDK that are available:
+Another difference between the server and client environments is the platform libraries from the Dart SDK that are available:
 
 - The server environment has access to [Native platform libraries](https://dart.dev/libraries#native-platform-libraries)
 - The client environment has access to [Web platform libraries](https://dart.dev/libraries#web-platform-libraries)
-  
-Therefore, accessing a web-specific library like `dart:js_interop` in a server-rendered component will result in a compilation error. 
+
+Therefore, accessing a web-specific library like `dart:js_interop` in a server-rendered component will result in a compilation error.
 
 If you must access one of these libraries in a component that is rendered in both environments, you have several options:
 
 1. Instead of using [`package:web`](https://pub.dev/packages/web) (or the legacy `dart:html` library) you should use [`package:universal_web`](https://pub.dev/packages/universal_web) which already works across **client and server** environments. No need to use conditional imports or the `@Import` annotation shown below.
-2. Instead of using `dart:js_interop` you should use `package:universal_web` and import `package:universal_web/js_interop.dart`. 
+2. Instead of using `dart:js_interop` you should use `package:universal_web` and import `package:universal_web/js_interop.dart`.
 3. For any other library (dart or package) you should use the [`@Import`](/api/utils/at_import) annotation to import a library in only one of the environments. This is more convenient then using [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) manually as all APIs are automatically stubbed for the other environment.
 4. Alternatively, you can use Dart's [conditional imports](https://dart.dev/guides/libraries/create-packages#conditionally-importing-and-exporting-library-files) to import different libraries depending on the environment. This requires more boilerplate and manual stubbing compared to using the `@Import` annotation, but is still a valid option.
 

@@ -7,7 +7,7 @@ description: Understand how pages are built in jaspr_content.
 
 Pages are the core of any content-driven site. They represent a single piece of content that can be requested through its url.
 
-For example, you might have a `about.md` file that is rendered as a page at the `/about` url. 
+For example, you might have a `about.md` file that is rendered as a page at the `/about` url.
 
 ## Rendering Pipeline
 
@@ -65,7 +65,7 @@ The `Page` class is the main data object that holds all information about a sing
   ---
 
   <Property name="config" type="PageConfig">
-    The configuration for the page. 
+    The configuration for the page.
 
     This determines how the page is built.
   </Property>
@@ -103,13 +103,13 @@ In some cases you might want to access all, or a subset of all pages of your sit
 You can achieve this by using the `context.pages` extension getter on `BuildContext`. **For this to work, you need to enable eager loading of all pages by setting `eagerlyLoadAllPages: true` in your `ContentApp` configuration.**
 
 ```dart
-// in main.server.dart
+// In main.server.dart:
 ContentApp(
   eagerlyLoadAllPages: true,
-  ...
+  // ...
 )
 
-// in your component
+// In your component:
 Component build(BuildContext context) {
   final allPages = context.pages;
 
@@ -188,7 +188,7 @@ The `PageConfig` class is the main configuration object for a page. It holds all
     Therefore a page can choose its layout by setting 'layout: ___' in its frontmatter.
     When no key is set or matching, the first provided layout is used.
   </Property>
-  
+
   ---
 
   <Property name="theme" type="ContentTheme">
@@ -198,7 +198,7 @@ The `PageConfig` class is the main configuration object for a page. It holds all
 
 There are two ways to create a `PageConfig`:
 
-- The `ContentApp()` constructor creates a single `PageConfig` that is used for all pages. 
+- The `ContentApp()` constructor creates a single `PageConfig` that is used for all pages.
 
 - Alternatively the `ContentApp.custom()` constructor takes a `ConfigResolver` function that can return different `PageConfig`s for different pages. This allows you to have different configurations for different parts of your site. In addition to writing a custom function, you can:
 
