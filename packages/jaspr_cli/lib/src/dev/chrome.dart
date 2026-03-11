@@ -33,11 +33,6 @@ Future<Chrome?> startChrome(int port, Logger logger) async {
 
 final Directory? chromeUserDir = () {
   final settingsDir = getSettingsDirectory();
-  if (settingsDir == null) {
-    // Some systems don't support user home directories.
-    return null;
-  }
-
   if (!settingsDir.existsSync()) {
     try {
       settingsDir.createSync();

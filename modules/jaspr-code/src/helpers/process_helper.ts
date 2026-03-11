@@ -2,6 +2,7 @@ import { cwd } from "process";
 import { dartExtensionApi } from "../api";
 import { checkJasprInstalled } from "./install_helper";
 import { getFolderToRunCommandIn } from "./project_helper";
+import { SpawnedProcess } from "dart-code/src/shared/interfaces";
 
 export async function runJaspr(
   args: string[],
@@ -35,15 +36,22 @@ export async function runJasprInFolder(
   return result?.exitCode;
 }
 
+export async function runCommand(args: string[]): Promise<string> {
+  const proc = await dartExtensionApi.sdk.startDart(cwd(), args);
+  if (!proc) {
+    throw "Failed to start Dart process.";
+  }
 
-export function runCommand(args: string[]): Thenable<string> {
-  return new Promise(async (resolve, reject) => {
-    const proc = await dartExtensionApi.sdk.startDart(cwd(), args);
-    if (!proc) {
-      reject("Failed to start Dart process.");
-      return;
-    }
+  const result = await runProcess(proc);
+  if (!result.exitCode) {
+    return result.stdout;
+  } else {
+    throw `Dart exited with code ${result.exitCode}.\n\n${result.stdout}\n\n${result.stderr}`;
+  }
+}
 
+export function runProcess(proc: SpawnedProcess): Thenable<{stdout: string, stderr: string, exitCode: number}> {
+  return new Promise(async (resolve) => {
     const stdout: string[] = [];
     const stderr: string[] = [];
     proc.stdout.on("data", (data: Buffer | string) =>
@@ -53,15 +61,7 @@ export function runCommand(args: string[]): Thenable<string> {
       stderr.push(data.toString())
     );
     proc.on("close", (code) => {
-      if (!code) {
-        resolve(stdout.join(""));
-      } else {
-        reject(
-          `Dart exited with code ${code}.\n\n${stdout.join(
-            ""
-          )}\n\n${stderr.join("")}`
-        );
-      }
+      resolve({stdout: stdout.join(""), stderr: stderr.join(""), exitCode: code || 0});
     });
   });
 }

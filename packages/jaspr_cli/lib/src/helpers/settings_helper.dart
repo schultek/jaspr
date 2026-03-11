@@ -41,11 +41,6 @@ void _writeSettings() {
 
 final File? settingsFile = () {
   final settingsDir = getSettingsDirectory();
-  if (settingsDir == null) {
-    // Some systems don't support user home directories.
-    return null;
-  }
-
   if (!settingsDir.existsSync()) {
     try {
       settingsDir.createSync();
@@ -69,14 +64,12 @@ final File? settingsFile = () {
 ///
 /// Typically, the directory is `~/.dart/`.
 ///
-/// This can return `null` under some conditions, including when
-/// the user's home directory does not exist.
-Directory? getSettingsDirectory() {
-  final dir = homeDir;
-  if (dir == null) {
-    return null;
-  }
-  return Directory(path.join(dir.path, _settingsDirectoryName)).absolute;
+/// When the user's home directory does not exist, a temporary directory is used.
+Directory getSettingsDirectory() {
+  final dir = homeDir ?? Directory(path.join(Directory.systemTemp.path, Platform.environment['USER'] ?? ''));
+  final settingsDir = Directory(path.join(dir.path, _settingsDirectoryName));
+  settingsDir.createSync(recursive: true);
+  return settingsDir.absolute;
 }
 
 /// Return the user's home directory for the current platform.
