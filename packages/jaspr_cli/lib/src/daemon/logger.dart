@@ -4,7 +4,7 @@ import 'dart:io';
 import '../logging.dart';
 
 class DaemonLogger extends Logger {
-  DaemonLogger() : super.base(verbose: true);
+  DaemonLogger({this.sendEvent}) : super.base(verbose: true);
 
   static Stream<Map<String, Object?>> get stdinCommandStream => stdin
       .transform<String>(utf8.decoder)
@@ -18,6 +18,8 @@ class DaemonLogger extends Logger {
   static void stdoutCommandResponse(Map<String, Object?> command) {
     stdout.writeln('[${json.encode(command)}]');
   }
+
+  void Function(Map<String, Object?>)? sendEvent;
 
   @override
   void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
@@ -48,7 +50,12 @@ class DaemonLogger extends Logger {
     event('daemon.log', data);
   }
 
-  void event(String event, Map<String, Object?> params) {
-    stdout.writeln('[${jsonEncode({'event': event, 'params': params})}]');
+  void event(String eventName, Map<String, Object?> params) {
+    final event = {'event': eventName, 'params': params};
+    if (sendEvent != null) {
+      sendEvent!(event);
+    } else {
+      stdout.writeln('[${jsonEncode(event)}]');
+    }
   }
 }

@@ -39,12 +39,17 @@ export function startJaspr(args: string[], cwd: string): SpawnedProcess {
   return child_process.spawn('jaspr', args, { cwd, shell: isWin });
 }
 
-export function runJaspr(args: string[], cwd: string): Thenable<string> {
+export async function runJaspr(args: string[], cwd: string): Promise<string> {
   const proc = startJaspr(args, cwd);
-  return collectProcessOutput(proc);
+  const result = await collectProcessOutput(proc);
+  if (!result.exitCode) {
+    return result.stdout;
+  } else {
+    throw `Jaspr exited with code ${result.exitCode}.\n\n${result.stdout}\n\n${result.stderr}`;
+  }
 }
 
-async function collectProcessOutput(proc: SpawnedProcess): Promise<string> {
+export async function collectProcessOutput(proc: SpawnedProcess): Promise<{ stdout: string, stderr: string, exitCode: number }> {
   return new Promise(async (resolve, reject) => {
     const stdout: string[] = [];
     const stderr: string[] = [];
@@ -58,13 +63,7 @@ async function collectProcessOutput(proc: SpawnedProcess): Promise<string> {
       reject(`Failed to run Jaspr: ${err}`);
     });
     proc.on("close", (code) => {
-      if (!code) {
-        resolve(stdout.join(""));
-      } else {
-        reject(
-          `Jaspr exited with code ${code}.\n\n${stdout.join("")}\n\n${stderr.join("")}`
-        );
-      }
+      resolve({ stdout: stdout.join(""), stderr: stderr.join(""), exitCode: code || 0 });
     });
   });
 }
@@ -85,7 +84,7 @@ export async function runJasprToOutput(folder: string, args: string[], alwaysSho
     cancellable: true,
     location: vs.ProgressLocation.Notification,
     title: `jaspr ${args.join(" ")}`,
-  }, (progress, token) => {
+  }, async (progress, token) => {
     channel.appendLine(`[${packageOrFolderDisplayName}] jaspr ${args.join(" ")}`);
 
     progress.report({ message: `${packageOrFolderDisplayName}...` });
@@ -102,7 +101,12 @@ export async function runJasprToOutput(folder: string, args: string[], alwaysSho
         channel.show(true);
     });
 
-    return collectProcessOutput(proc);
+    const result = await collectProcessOutput(proc);
+    if (!result.exitCode) {
+      return result.stdout;
+    } else {
+      throw `Jaspr exited with code ${result.exitCode}.\n\n${result.stdout}\n\n${result.stderr}`;
+    }
   });
 }
 

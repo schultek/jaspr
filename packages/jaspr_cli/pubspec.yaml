@@ -45,8 +45,10 @@ dependencies:
   pub_updater: ^0.5.0
   shelf: ^1.4.1
   shelf_proxy: ^1.0.4
+  shelf_web_socket: ^2.0.1
   vm_service: ^15.0.0
   watcher: ^1.1.2
+  web_socket_channel: ^3.0.3
   yaml: ^3.1.0
 
 dev_dependencies:

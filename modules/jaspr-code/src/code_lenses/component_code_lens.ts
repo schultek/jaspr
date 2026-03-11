@@ -17,6 +17,7 @@ export class ComponentCodeLensProvider implements vs.CodeLensProvider, vs.Dispos
     this.scopesDomain = scopesDomain;
     this.scopesDomain.onDidChangeScopes((results: ScopeResults) => {
       this.scopeResults = results;
+      console.log("Updated Scopes for Component Code Lenses:", results);
       this._onDidChangeCodeLenses.fire();
     });
 
@@ -47,6 +48,7 @@ export class ComponentCodeLensProvider implements vs.CodeLensProvider, vs.Dispos
     document: vs.TextDocument,
     token: vs.CancellationToken
   ): Promise<vs.CodeLens[] | undefined> {
+    console.log("Providing Component Code Lenses for:", document.uri.fsPath);
     const outline = await dartExtensionApi.workspace.getOutline(
       document,
       token
@@ -115,6 +117,8 @@ export class ComponentCodeLensProvider implements vs.CodeLensProvider, vs.Dispos
         );
       }
     }
+
+    console.log("Component Code Lenses:", results);
 
     return results;
   }
