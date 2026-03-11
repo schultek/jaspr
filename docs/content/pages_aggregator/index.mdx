@@ -1,0 +1,87 @@
+---
+title: Pages Aggregator
+description: Generate additional routes by analyzing all loaded pages.
+---
+
+---
+
+A `PagesAggregator` generates additional routes after all pages are loaded. Unlike route loaders, aggregators don't load pages from a source — they analyze the already-loaded pages and produce routes based on their content or metadata.
+
+This is useful for any case where the set of routes depends on the content of your pages, such as tag pages, category archives, or any other derived view.
+
+---
+
+## How It Works
+
+Aggregators run after all `RouteLoader`s have finished loading content pages. Each aggregator receives the full list of loaded content pages and returns a list of `Route`s to add to the router.
+
+```dart
+ContentApp.custom(
+  eagerlyLoadAllPages: true,
+  loaders: [FilesystemLoader('content')],
+  pagesAggregators: [
+    MyAggregator(),
+  ],
+  configResolver: PageConfig.all(/* ... */),
+);
+```
+
+<Info>
+**Eager loading** must be enabled (`eagerlyLoadAllPages: true`) when using aggregators, as they depend on all pages being loaded before generating routes.
+</Info>
+
+## Route Info
+
+Alongside routes, aggregators can produce `AggregatedRouteInfo` objects that carry metadata for each generated route. These are accessible from within a route builder via `context.currentRouteInfo<T>()`:
+
+```dart
+final info = context.currentRouteInfo<MyRouteInfo>();
+```
+
+This lets you pass structured data from the aggregator to the route builder without relying on closures or global state.
+
+## Built-in Aggregator: TaxonomyAggregator
+
+`jaspr_content` ships with a built-in aggregator for taxonomy use cases — `TaxonomyAggregator`. It scans page frontmatter for a given field (e.g., `tags`) and generates routes for each unique value (term):
+
+```dart
+TaxonomyAggregator(
+  taxonomy: 'tags',
+  termPageBuilder: (context, taxonomy, term) => TagPage(term: term),
+  taxonomyPageBuilder: (context, taxonomy) => TagsPage(),
+)
+```
+
+See the [Taxonomy](/content/pages_aggregator/taxonomy) page for details.
+
+## Custom Aggregators
+
+To create a custom aggregator, extend `PagesAggregator` and implement `aggregatePages`:
+
+```dart
+class ArchiveAggregator extends PagesAggregator {
+  @override
+  Future<List<Route>> aggregatePages(
+    List<Page> pages,
+    List<AggregatedRouteInfo> routeInfos,
+  ) async {
+    // Group pages by year based on a 'date' frontmatter field.
+    final byYear = <int, List<Page>>{};
+    for (final page in pages) {
+      final date = page.data.page['date'];
+      if (date is String) {
+        final year = DateTime.parse(date).year;
+        byYear.putIfAbsent(year, () => []).add(page);
+      }
+    }
+
+    return [
+      for (final entry in byYear.entries)
+        Route(
+          path: '/archive/${entry.key}',
+          builder: (context, _) => ArchivePage(year: entry.key, pages: entry.value),
+        ),
+    ];
+  }
+}
+```

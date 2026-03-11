@@ -1,0 +1,272 @@
+---
+title: Taxonomy
+description: Classify content with taxonomies like tags and categories.
+---
+
+---
+
+Taxonomies let you classify content using frontmatter fields like **tags** or **categories**. A taxonomy is a classification system where each unique value is called a **term**. For example, a "tags" taxonomy might have the terms "dart", "flutter", and "jaspr".
+
+`TaxonomyAggregator` is a built-in `PagesAggregator` that scans loaded content pages, extracts all unique terms from a frontmatter field, and generates routes for each one. See [Pages Aggregator](/content/pages_aggregator) for the general aggregation concept.
+
+---
+
+## Setup
+
+Add a `TaxonomyAggregator` to `ContentApp.custom()` via the `pagesAggregators` parameter:
+
+```dart
+ContentApp.custom(
+  eagerlyLoadAllPages: true,
+  loaders: [FilesystemLoader('content')],
+  pagesAggregators: [
+    TaxonomyAggregator(
+      taxonomy: 'tags',
+      taxonomyPageBuilder: (context, taxonomy) => TagsPage(),
+      termPageBuilder: (context, taxonomy, term) => TagPage(term: term),
+    ),
+  ],
+  configResolver: PageConfig.all(
+    // ... your config
+  ),
+);
+```
+
+<Info>
+**Eager loading** must be enabled (`eagerlyLoadAllPages: true`) when using aggregators, as they depend on all content pages being loaded before generating routes.
+</Info>
+
+## Term Normalization
+
+All terms are normalized before use. The normalization converts values to lowercase and replaces spaces with dashes:
+
+- `"Dart"` → `dart`
+- `"My Tag"` → `my-tag`
+- `"Hello World"` → `hello-world`
+
+This means `tags: [Dart]` and `tags: [dart]` in different files refer to the same term.
+
+## Querying Taxonomy Data
+
+The `TaxonomyContext` extension on `BuildContext` provides methods to query taxonomy data from within component builders.
+
+<Info>
+These methods are **server-only**. They throw an `UnsupportedError` when called on the client. Wrap calls with a `!kIsWeb` check or use them only in server-rendered components.
+</Info>
+
+### taxonomyTermRefs
+
+Returns all term refs for a given taxonomy. The taxonomy index ref is excluded.
+
+```dart
+final termRefs = context.taxonomyTermRefs('tags');
+// Returns refs for /tags/dart, /tags/flutter, etc.
+```
+
+### taxonomyTermRef
+
+Returns the term ref for a specific taxonomy and term, or `null` if no such ref exists. The term is normalized before matching, so both `'Dart'` and `'dart'` will find the same ref.
+
+```dart
+final dartRef = context.taxonomyTermRef('tags', 'Dart');
+
+if (dartRef != null) {
+  return a(href: dartRef.url, [text('Dart')]);
+}
+```
+
+### taxonomyIndexRef
+
+Returns the index ref for a given taxonomy, or `null` if no index route was generated.
+
+```dart
+final tagsIndexRef = context.taxonomyIndexRef('tags');
+```
+
+### pagesForTerm
+
+Returns all content pages that have the given term in their frontmatter taxonomy field.
+
+```dart
+final dartPosts = context.pagesForTerm('tags', 'dart');
+
+return ul([
+  for (final post in dartPosts)
+    li([a(href: post.url, [text(post.data.page['title'] as String)])]),
+]);
+```
+
+### taxonomyTermRefsWithCount
+
+Returns a map of term refs to their content page counts.
+
+```dart
+final tagCloud = context.taxonomyTermRefsWithCount('tags');
+for (final MapEntry(:key, :value) in tagCloud.entries) {
+  // key.term == 'dart', 'flutter', etc.
+  // key.url == '/tags/dart', '/tags/flutter', etc.
+  // value == number of content pages with this tag
+}
+```
+
+## Accessing Route Info
+
+Inside a route builder, use `context.currentRouteInfo<T>()` to access the `TaxonomyTermRouteInfo` or `TaxonomyRouteInfo` for the current route:
+
+```dart
+termPageBuilder: (context, taxonomy, term) {
+  final info = context.currentRouteInfo<TaxonomyTermRouteInfo>();
+  // info.term == normalized term string
+  // info.url == route URL
+  // info.data == data from initialTermDataBuilder
+  return TagPage(term: term);
+},
+```
+
+## Properties
+
+<Card title="Properties" icon="sliders">
+  <Property name="taxonomy" type="String" required>
+    The frontmatter key to extract terms from (e.g., `'tags'`, `'categories'`).
+  </Property>
+
+  ---
+
+  <Property name="termPageBuilder" type="TaxonomyTermPageBuilder" required>
+    Builder function for individual term routes. Receives the `BuildContext`, the taxonomy name, and the normalized term string.
+
+    ```dart
+    termPageBuilder: (context, taxonomy, term) => TagPage(term: term),
+    ```
+  </Property>
+
+  ---
+
+  <Property name="taxonomyPageBuilder" type="TaxonomyPageBuilder?">
+    Optional builder for the taxonomy index route. Receives the `BuildContext` and the taxonomy name. If not provided, no index route is generated.
+
+    ```dart
+    taxonomyPageBuilder: (context, taxonomy) => TagsPage(),
+    ```
+  </Property>
+
+  ---
+
+  <Property name="taxonomySlug" type="String?">
+    The URL slug for the taxonomy index route. Defaults to the taxonomy name.
+    For example, with `taxonomy: 'tags'` and `taxonomySlug: 'labels'`, the index route is generated at `/labels` instead of `/tags`.
+  </Property>
+
+  ---
+
+  <Property name="termSlug" type="String?">
+    The URL slug for individual term routes. Defaults to the taxonomy name.
+    For example, with `taxonomy: 'tags'` and `termSlug: 'tag'`, term routes are generated at `/tag/dart` instead of `/tags/dart`.
+  </Property>
+
+  ---
+
+  <Property name="initialTermDataBuilder" type="TaxonomyTermInitialDataBuilder?">
+    Optional function to provide additional data for each term route. Receives the taxonomy name and the normalized term string. The returned map is stored in `TaxonomyTermRouteInfo.data` and accessible via `context.currentRouteInfo<TaxonomyTermRouteInfo>()`.
+
+    ```dart
+    initialTermDataBuilder: (taxonomy, term) => {'title': 'Posts tagged: $term'},
+    ```
+  </Property>
+
+  ---
+
+  <Property name="taxonomyInitialDataBuilder" type="TaxonomyInitialDataBuilder?">
+    Optional function to provide additional data for the taxonomy index route. Receives the taxonomy name. The returned map is stored in `TaxonomyRouteInfo.data` and accessible via `context.currentRouteInfo<TaxonomyRouteInfo>()`.
+
+    ```dart
+    taxonomyInitialDataBuilder: (taxonomy) => {'title': 'All $taxonomy'},
+    ```
+  </Property>
+
+  ---
+
+  <Property name="supportedExtensions" type="List&lt;String&gt;">
+    File extensions to scan for frontmatter. Defaults to `['.md', '.html']`.
+  </Property>
+</Card>
+
+## URL Customization
+
+By default, generated routes use the taxonomy name as the URL prefix. Use `taxonomySlug` and `termSlug` to customize the URL structure:
+
+```dart
+TaxonomyAggregator(
+  taxonomy: 'tags',
+  taxonomySlug: 'labels',  // Index route at /labels instead of /tags
+  termSlug: 'label',       // Term routes at /label/dart instead of /tags/dart
+  // ...
+)
+```
+
+## Multiple Taxonomies
+
+You can use multiple `TaxonomyAggregator`s for different classification systems:
+
+```dart
+ContentApp.custom(
+  eagerlyLoadAllPages: true,
+  loaders: [FilesystemLoader('content')],
+  pagesAggregators: [
+    TaxonomyAggregator(
+      taxonomy: 'tags',
+      termPageBuilder: (context, taxonomy, term) { /* ... */ },
+    ),
+    TaxonomyAggregator(
+      taxonomy: 'categories',
+      termPageBuilder: (context, taxonomy, term) { /* ... */ },
+    ),
+  ],
+  // ...
+);
+```
+
+Each taxonomy operates independently — terms from one taxonomy do not interfere with another.
+
+## Full Example
+
+### TagsPage
+
+The `TagsPage` component renders the taxonomy index page at `/tags`. It uses `taxonomyTermRefsWithCount()` to display all tags as a tag cloud.
+
+```dart
+class TagsPage extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    final tagCloud = context.taxonomyTermRefsWithCount('tags');
+    return div(classes: 'tag-cloud', [
+      for (final MapEntry(:key, :value) in tagCloud.entries)
+        a(href: key.url, [text('${key.term} ($value)')]),
+    ]);
+  }
+}
+```
+
+### TagPage
+
+The `TagPage` component renders an individual term page at `/tags/{term}`. It uses `pagesForTerm()` to find all content pages with that tag.
+
+```dart
+class TagPage extends StatelessComponent {
+  const TagPage({required this.term});
+
+  final String term;
+
+  @override
+  Component build(BuildContext context) {
+    final posts = context.pagesForTerm('tags', term);
+    return div([
+      h1([text('Posts tagged: $term')]),
+      ul([
+        for (final post in posts)
+          li([a(href: post.url, [text(post.data.page['title'] as String)])]),
+      ]),
+    ]);
+  }
+}
+```

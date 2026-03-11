@@ -5,6 +5,7 @@ import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/server.dart';
 import 'package:path/path.dart' as p;
 
+import 'aggregated_route.dart';
 import 'content.dart';
 import 'data_loader/data_loader.dart';
 import 'layouts/page_layout.dart';
@@ -240,6 +241,7 @@ class PageConfig {
       layouts: layouts,
       theme: theme,
     );
+
     return (_) => config;
   }
 
@@ -399,11 +401,13 @@ extension PageContext on BuildContext {
       );
     }
 
-    final comp = dependOnInheritedComponentOfExactType<_InheritedPage>();
-    if (comp == null) {
-      throw StateError('No Page objects found in context. Make sure you are inside a page rendered by ContentApp.');
-    }
-    return comp.pages;
+    final pageComp = dependOnInheritedComponentOfExactType<_InheritedPage>();
+    if (pageComp != null) return pageComp.pages;
+
+    final aggComp = dependOnInheritedComponentOfExactType<InheritedAggregatedContext>();
+    if (aggComp != null) return aggComp.contentPages;
+
+    throw StateError('No Page objects found in context. Make sure you are inside a page rendered by ContentApp.');
   }
 }
 

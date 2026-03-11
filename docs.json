@@ -425,6 +425,19 @@
         {
           "title": "Secondary Outputs",
           "href": "/content/concepts/secondary_outputs"
+        },
+        {
+          "group": "Pages Aggregator",
+          "pages": [
+            {
+              "title": "Overview",
+              "href": "/content/pages_aggregator"
+            },
+            {
+              "title": "Taxonomy",
+              "href": "/content/pages_aggregator/taxonomy"
+            }
+          ]
         }
       ]
     },

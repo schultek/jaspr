@@ -7,11 +7,13 @@ import 'dart:async';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart' hide RouteLoader;
 
+import 'aggregated_route.dart';
 import 'data_loader/filesystem_data_loader.dart';
 import 'layouts/page_layout.dart';
 import 'page.dart';
 import 'page_extension/page_extension.dart';
 import 'page_parser/page_parser.dart';
+import 'pages_aggregator/pages_aggregator.dart';
 import 'route_loader/filesystem_loader.dart';
 import 'route_loader/route_loader.dart';
 import 'template_engine/template_engine.dart';
@@ -88,6 +90,14 @@ class ContentApp extends AsyncStatelessComponent {
 
     /// The [ContentTheme] to use for the pages.
     ContentTheme? theme,
+
+    /// A list of [PagesAggregator]s to use for generating additional routes based on the loaded pages.
+    ///
+    /// Aggregators run after all pages are loaded and receive the full list of loaded pages.
+    /// Requires [eagerlyLoadAllPages] to be `true`.
+    this.pagesAggregators = const [],
+
+    /// Whether to print debug information about the loaded routes and pages.
     bool debugPrint = false,
   }) : loaders = [FilesystemLoader(directory, debugPrint: debugPrint)],
        configResolver = PageConfig.all(
@@ -102,6 +112,10 @@ class ContentApp extends AsyncStatelessComponent {
        ),
        routerBuilder = _defaultRouterBuilder {
     _overrideGlobalOptions();
+    assert(
+      pagesAggregators.isEmpty || eagerlyLoadAllPages,
+      'eagerlyLoadAllPages must be true when using pagesAggregators.',
+    );
   }
 
   /// Creates a [ContentApp].
@@ -117,12 +131,22 @@ class ContentApp extends AsyncStatelessComponent {
     /// Use [PageConfig.all] to resolve the same config for all pages.
     this.configResolver = _defaultConfigResolver,
 
+    /// A list of [PagesAggregator]s to use for generating additional routes based on the loaded pages.
+    ///
+    /// Aggregators run after all pages are loaded and receive the full list of loaded pages.
+    /// Requires [eagerlyLoadAllPages] to be `true`.
+    this.pagesAggregators = const [],
+
     /// A custom builder function to use for building the main [Router] component.
     ///
     /// This can be used to customize the [Router] component like add additional routes or inserting components above the router.
     this.routerBuilder = _defaultRouterBuilder,
   }) {
     _overrideGlobalOptions();
+    assert(
+      pagesAggregators.isEmpty || eagerlyLoadAllPages,
+      'eagerlyLoadAllPages must be true when using pagesAggregators.',
+    );
   }
 
   void _overrideGlobalOptions() {
@@ -136,15 +160,43 @@ class ContentApp extends AsyncStatelessComponent {
   final List<RouteLoader> loaders;
   final bool eagerlyLoadAllPages;
   final ConfigResolver configResolver;
+
+  /// Aggregators that produce additional routes based on loaded pages.
+  ///
+  /// Aggregators run after all [RouteLoader]s have loaded pages.
+  /// They receive the full list of loaded pages and return [Route]s.
+  final List<PagesAggregator> pagesAggregators;
+
   final Component Function(List<List<RouteBase>> routes) routerBuilder;
 
   @override
   Future<Component> build(BuildContext context) async {
-    final routes = await [
-      for (final loader in loaders) loader.loadRoutes(configResolver, eagerlyLoadAllPages),
-    ].wait;
-    _ensureAllowedSuffixes(routes);
-    return routerBuilder(routes);
+    // 1. Load all content routes from loaders in parallel.
+    final allRoutes = [
+      ...await [
+        for (final loader in loaders) loader.loadRoutes(configResolver, eagerlyLoadAllPages),
+      ].wait,
+    ];
+
+    // 2. Run aggregators — each receives the same pages from loaders and appends to the shared routeInfos list.
+    // Route builders capture this list via closure; since builders are invoked lazily (on navigation),
+    // the list is fully populated by the time any builder runs.
+    final pages = RouteLoader.loadedPages;
+    final allRouteInfos = <AggregatedRouteInfo>[];
+    for (final aggregator in pagesAggregators) {
+      allRoutes.add(await aggregator.aggregatePages(pages, allRouteInfos));
+    }
+
+    // 3. Ensure all path suffixes used in the routes are allowed by Jaspr, and build the router.
+    _ensureAllowedSuffixes(allRoutes);
+
+    // 4. Build the router, wrapped with aggregated context so all routes
+    //    can access content pages and route infos.
+    return InheritedAggregatedContext(
+      contentPages: pages,
+      routeInfos: allRouteInfos,
+      child: routerBuilder(allRoutes),
+    );
   }
 
   void _ensureAllowedSuffixes(List<List<RouteBase>> routes) {

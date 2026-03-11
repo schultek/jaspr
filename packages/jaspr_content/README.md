@@ -33,6 +33,8 @@ It provides **out-of-the-box tools** for loading, parsing, and rendering content
 
 - **🎨 Theming**: Use the built-in [theming system](https://docs.jaspr.site/content/concepts/theming) to customize the look and feel of your site. With light and dark mode out of the box.
 
+- **🗂️ Aggregation**: Use `PagesAggregator` to generate additional routes based on loaded pages. The built-in `TaxonomyAggregator` generates tag or category routes from page frontmatter.
+
 > `jaspr_content` is fully compatible with "normal" Jaspr. You can use components and pages you already have in your app and mix them with content from `jaspr_content`.
 
 ## Documentation

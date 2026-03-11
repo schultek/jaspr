@@ -8,6 +8,7 @@ import 'dart:collection';
 
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import '../page.dart';
@@ -40,7 +41,22 @@ abstract class RouteLoader {
   /// - immediately in eager mode.
   void invalidatePage(Page page);
 
+  /// All loaded pages across all loaders.
   static final List<Page> _pages = [];
+
+  static final StreamController<void> _pagesChanged = StreamController<void>.broadcast();
+
+  /// Returns all currently loaded pages across all loaders.
+  ///
+  /// For internal use by [ContentApp] to pass pages to aggregators.
+  @internal
+  static List<Page> get loadedPages => UnmodifiableListView(_pages);
+
+  /// Stream that fires whenever pages are added or removed.
+  ///
+  /// For internal use by [PagesAggregator] to detect page changes.
+  @internal
+  static Stream<void> get onPagesChanged => _pagesChanged.stream;
 }
 
 /// A base class for [RouteLoader] implementations.
@@ -102,6 +118,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
     final sources = _sources ??= await loadPageSources();
 
     final List<RouteBase> routes = [];
+    final List<Future<void>> loadFutures = [];
     for (final source in sources) {
       if (source.path.isEmpty || source.private) {
         continue;
@@ -111,7 +128,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
       source.config = config;
 
       if (_eager) {
-        source.load();
+        loadFutures.add(source.load());
       }
       final pageBuilder = AsyncBuilder(builder: (_) => source.load());
 
@@ -127,6 +144,11 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
           );
         }
       }
+    }
+
+    // In eager mode, wait for all pages to load so aggregators can access them.
+    if (_eager && loadFutures.isNotEmpty) {
+      await Future.wait(loadFutures);
     }
 
     if (debugPrint) {
@@ -223,6 +245,7 @@ abstract class PageSource {
 
     _page = newPage;
     RouteLoader._pages.add(newPage);
+    RouteLoader._pagesChanged.add(null);
 
     // Preserve original data to reapply
     // after first specifying our provided data.
@@ -250,6 +273,7 @@ abstract class PageSource {
   void invalidate({bool rebuild = true}) {
     if (_page != null) {
       RouteLoader._pages.remove(_page);
+      RouteLoader._pagesChanged.add(null);
       _page = null;
     }
     _future = null;

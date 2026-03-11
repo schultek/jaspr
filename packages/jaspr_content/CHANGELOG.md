@@ -1,3 +1,11 @@
+## Unreleased minor
+
+- Added `PagesAggregator` base class for generating additional routes from loaded pages.
+- Added `AggregatedRouteInfo` base class for route metadata produced by aggregators, accessible via `context.currentRouteInfo<T>()` inside aggregator route builders.
+- Added `TaxonomyAggregator` — a `PagesAggregator` that generates taxonomy index and term routes from page frontmatter.
+- Added `TaxonomyRouteInfo` and `TaxonomyTermRouteInfo` data classes for taxonomy route metadata.
+- Added `TaxonomyContext` extension on `BuildContext` with helpers: `taxonomyTermRefs`, `taxonomyTermRef`, `taxonomyIndexRef`, `pagesForTerm`, and `taxonomyTermRefsWithCount`.
+
 ## 0.5.0
 
 - New `AssetManager` class for handling content assets. Assets like images, videos, etc. can be co-located with the content and referenced by their relative path from a page.
