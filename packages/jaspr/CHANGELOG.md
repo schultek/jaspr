@@ -1,4 +1,7 @@
-## Unreleased patch
+## Unreleased breaking
+
+- Jaspr can now be installed with `dart install jaspr_cli` instead of `dart pub global activate jaspr_cli`.
+- Improved logging and stability of the CLI.
 
 - Allow `analyzer` versions 10.x.
 

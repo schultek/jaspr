@@ -123,7 +123,7 @@ extension ServerLogger on Logger {
       return;
     }
 
-    write(log, tag: Tag.builder, level: level);
+    write(log, tag: Tag.builder, level: level, progress: !verbose ? ProgressState.running : null);
 
     if (log.startsWith('build_web_compilers:entrypoint') &&
         log.contains('transitive libraries have sdk dependencies that not supported on this platform') &&

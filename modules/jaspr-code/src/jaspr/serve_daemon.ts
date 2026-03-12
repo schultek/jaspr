@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 
 import * as path from "path";
-import { dartExtensionApi, DartProcess } from "../api";
 import { checkJasprInstalled } from "../helpers/install_helper";
+import { SpawnedProcess, startJaspr } from "../helpers/process_helper";
 
 let chalk: any;
 (async () => {
@@ -25,7 +25,7 @@ export class JasprServeDaemon implements vscode.Disposable {
     new vscode.EventEmitter<string>();
   private terminal: vscode.Terminal | undefined;
   private sessions: vscode.DebugSession[] = [];
-  private process: DartProcess | undefined;
+  private process: SpawnedProcess | undefined;
 
   private status: "running" | "stopped" | "disposed" = "running";
   private folder: vscode.WorkspaceFolder | undefined;
@@ -151,10 +151,6 @@ export class JasprServeDaemon implements vscode.Disposable {
 
   async _startProcess(debugConfiguration?: vscode.DebugConfiguration) {
     const args = [
-      "pub",
-      "global",
-      "run",
-      "jaspr_cli:jaspr",
       "daemon",
       ...(debugConfiguration?.args ?? []),
     ];
@@ -164,7 +160,7 @@ export class JasprServeDaemon implements vscode.Disposable {
       folder = path.resolve(folder ?? "", debugConfiguration.cwd);
     }
 
-    this.process = await dartExtensionApi.sdk.startDart(folder ?? "", args);
+    this.process = startJaspr(args, folder ?? "");
     if (!this.process) {
       this.emitter.fire("Failed to start Jaspr process.\r\n");
       return;
