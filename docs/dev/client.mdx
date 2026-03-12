@@ -120,6 +120,20 @@ How Jaspr handles hydration depends on the rendering mode:
 
     To optimize the initial load time, you can selectively hydrate only specific components, instead of your entire app. This is done by using the `@client` annotation on components you want to hydrate.
 
+    ```dart title="lib/components/my_button.dart"
+    @client
+    class MyButton extends StatelessComponent {
+      @override
+      Component build(BuildContext context) {
+        return button(onClick: () {
+          print('Button clicked!');
+        }, [
+          .text('Click Me'),
+        ]);
+      }
+    }
+    ```
+
     A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle, this is like 'resuming' the rendering for a component on the client and picking up where the server-side rendering has left off.
 
     <Info>
@@ -129,6 +143,14 @@ How Jaspr handles hydration depends on the rendering mode:
     </Info>
 
     For `@client` components to hydrate, all you have to do is provide the `ClientApp()` component to your `runApp()` call.
+
+    ```dart title="lib/main.client.dart"
+    // Automatically detects and hydrates all @client components that
+    // have been pre-rendered on the server.
+    runApp(
+      ClientApp(),
+    );
+    ```
 
     ---
 
