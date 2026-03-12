@@ -14,7 +14,7 @@ void main() {
 
       expect(routes, hasLength(sourceCount));
       // Should match the maximum defined in the implementation.
-      const maxConcurrentLoads = 32;
+      const maxConcurrentLoads = 64;
       expect(tracker.maxConcurrent, equals(maxConcurrentLoads));
       expect(tracker.completedLoads, equals(sourceCount));
     });

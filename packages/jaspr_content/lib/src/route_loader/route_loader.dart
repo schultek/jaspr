@@ -131,7 +131,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
 
     // Use a pool to avoid running out of file descriptors.
     if (eagerSources.isNotEmpty) {
-      const maxConcurrentLoads = 32;
+      const maxConcurrentLoads = 64;
       final pool = Pool(maxConcurrentLoads);
       await eagerSources.map((s) => pool.withResource(s.load)).wait;
       await pool.close();
