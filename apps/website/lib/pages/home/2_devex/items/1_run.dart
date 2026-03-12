@@ -11,7 +11,7 @@ class Run extends StatelessComponent {
 
   final lines = const [
     ('[CLI] ', Colors.darkTurquoise, 'Running jaspr in static rendering mode.'),
-    ('[CLI] ', Colors.darkTurquoise, 'Starting web compiler...'),
+    ('[CLI] ', Colors.darkTurquoise, 'Starting web compilers...'),
     ('[BUILDER] ', Colors.purple, 'Connecting to the build daemon...'),
     ('[BUILDER] ', Colors.purple, 'About to build [web]...'),
     ('[CLI] ', Colors.darkTurquoise, 'Building web assets...'),

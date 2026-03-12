@@ -1,3 +1,10 @@
+## Unreleased breaking
+
+- Jaspr can now be installed with `dart install jaspr_cli` instead of `dart pub global activate jaspr_cli`.
+- Improved logging and stability of the CLI.
+
+- Allow `analyzer` versions 10.x.
+
 ## 0.22.3
 
 - Added `ServerApp.addMiddleware()` method to add custom middleware to Jaspr's HTTP server.

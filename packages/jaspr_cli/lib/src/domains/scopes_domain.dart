@@ -9,8 +9,10 @@ import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
 import '../commands/tooling_daemon_command.dart';
-import '../helpers/daemon_helper.dart';
+import '../daemon/daemon.dart';
+import '../daemon/domain.dart';
 import '../logging.dart';
+import '../project.dart';
 import 'scopes_isolate.dart';
 
 class ScopesDomain extends Domain {
@@ -332,7 +334,9 @@ class ScopesContext {
 
     this.entryPaths = entryPaths;
     this.allowServerLibsInClient = allowServerLibsInClient;
-    isolateMessagePort.send(InitializeMessage(entryPaths, allowServerLibsInClient, isolateEventPort.sendPort));
+    isolateMessagePort.send(
+      InitializeMessage(entryPaths, allowServerLibsInClient, isolateEventPort.sendPort, dartSdkDir),
+    );
   }
 
   Future<void> update({required List<String> entryPaths, required bool allowServerLibsInClient}) async {

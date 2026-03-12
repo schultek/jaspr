@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:path/path.dart' as path;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../daemon/logger.dart';
 import '../domains/html_domain.dart';
 import '../domains/scopes_domain.dart';
 import '../helpers/daemon_helper.dart';

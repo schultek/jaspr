@@ -17,7 +17,8 @@ class InitializeMessage extends ScopesIsolateMessage {
   final List<String> entryPaths;
   final bool allowServerLibsInClient;
   final SendPort sendPort;
-  InitializeMessage(this.entryPaths, this.allowServerLibsInClient, this.sendPort);
+  final String dartSdkDir;
+  InitializeMessage(this.entryPaths, this.allowServerLibsInClient, this.sendPort, this.dartSdkDir);
 }
 
 class UpdateMessage extends ScopesIsolateMessage {
@@ -56,6 +57,7 @@ class ScopesIsolate {
   List<String> entryPaths;
   bool allowServerLibsInClient;
   SendPort? eventPort;
+  String? dartSdkDir;
 
   AnalysisContextCollection? collection;
   final List<StreamSubscription<WatchEvent>> watcherSubscriptions = [];
@@ -74,6 +76,7 @@ class ScopesIsolate {
         entryPaths = message.entryPaths;
         allowServerLibsInClient = message.allowServerLibsInClient;
         eventPort = message.sendPort;
+        dartSdkDir = message.dartSdkDir;
         await initialize();
       } else if (message is UpdateMessage) {
         await dispose();
@@ -94,6 +97,7 @@ class ScopesIsolate {
     collection = AnalysisContextCollection(
       includedPaths: entryPaths,
       resourceProvider: PhysicalResourceProvider.INSTANCE,
+      sdkPath: dartSdkDir,
     );
 
     for (final context in collection!.contexts) {

@@ -1,17 +1,17 @@
 import * as vscode from "vscode";
 import { WebSocket } from "ws";
 
-import { dartExtensionApi, DartProcess } from "../api";
 import {
   checkJasprInstalled,
   checkJasprVersion,
 } from "../helpers/install_helper";
 import { spawn } from "child_process";
-import { runProcess } from "../helpers/process_helper";
+import { collectProcessOutput, getOutputChannel, SpawnedProcess, startJaspr } from "../helpers/process_helper";
 
 export class JasprToolingDaemon implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
 
+  private channel: vscode.OutputChannel | undefined;
   private statusItem: vscode.LanguageStatusItem | undefined;
   private socket: WebSocket | undefined;
 
@@ -19,7 +19,6 @@ export class JasprToolingDaemon implements vscode.Disposable {
     new vscode.EventEmitter<void>();
   public readonly onDidRestart: vscode.Event<void> = this._onDidRestart.event;
 
-  private _isDevMode: boolean = false;
   public jasprVersion: string | undefined;
 
   async start(context: vscode.ExtensionContext): Promise<void> {
@@ -27,9 +26,6 @@ export class JasprToolingDaemon implements vscode.Disposable {
     if (!isInstalled) {
       return;
     }
-
-    this._isDevMode =
-      context.extensionMode === vscode.ExtensionMode.Development;
 
     this._disposables.push(
       vscode.commands.registerCommand(
@@ -46,6 +42,7 @@ export class JasprToolingDaemon implements vscode.Disposable {
       ),
     );
 
+    this.channel = getOutputChannel('jaspr tooling-daemon');
     this.statusItem = vscode.languages.createLanguageStatusItem(
       "jaspr_tooling_daemon",
       {
@@ -76,24 +73,8 @@ export class JasprToolingDaemon implements vscode.Disposable {
 
     this.jasprVersion = await checkJasprVersion();
 
-    let process: DartProcess | undefined;
-
-    if (this._isDevMode) {
-      process = spawn("jaspr", ["tooling-daemon"], {
-        stdio: ["ignore", "pipe", "pipe"],
-        shell: true,
-      }) as any;
-    } else {
-      const args = [
-        "pub",
-        "global",
-        "run",
-        "jaspr_cli:jaspr",
-        "tooling-daemon",
-      ];
-
-      process = await dartExtensionApi.sdk.startDart("", args);
-    }
+    const args = ["tooling-daemon"];
+    const process = startJaspr(args, "");
 
     if (!process) {
       this.statusItem!.severity = vscode.LanguageStatusSeverity.Error;
@@ -106,12 +87,13 @@ export class JasprToolingDaemon implements vscode.Disposable {
       return;
     }
 
-    const result = await runProcess(process);
-
     var port: number | undefined;
+    var error: string | undefined;
 
-    if (!result.exitCode) {
-      const lines = result.stdout.split("\n");
+    try {
+      const output = await collectProcessOutput(process);
+
+      const lines = output.split("\n");
       for (const line of lines) {
         if (line.startsWith("[{") && line.endsWith("}]")) {
           try {
@@ -123,14 +105,12 @@ export class JasprToolingDaemon implements vscode.Disposable {
           } catch (e) {}
         }
       }
+    } catch (e) {
+      error = `${e}`;
     }
 
-    if (result.exitCode || !port) {
-      console.error(
-        "Failed to start Jaspr Tooling Daemon\n",
-        result.stdout,
-        result.stderr,
-      );
+    if (!port) {
+      this.channel?.appendLine(`Failed to start Jaspr Tooling Daemon: ${error}`);
 
       this.statusItem!.severity = vscode.LanguageStatusSeverity.Error;
       this.statusItem!.text = "Failed to start Jaspr Tooling Daemon";
@@ -148,7 +128,7 @@ export class JasprToolingDaemon implements vscode.Disposable {
       this.socket!.on("open", () => resolve());
       this.socket!.on("error", (e) => reject(e));
     }).catch((err) => {
-      console.error("Failed to connect to Jaspr Tooling Daemon:", err);
+      this.channel?.appendLine(`Failed to connect to Jaspr Tooling Daemon: ${err}`);
       this.socket = undefined;
     });
 
@@ -180,6 +160,8 @@ export class JasprToolingDaemon implements vscode.Disposable {
         return;
       }
 
+      this.channel?.appendLine(`Jaspr Tooling Daemon connection closed`);
+
       if (this.statusItem) {
         this.statusItem!.severity = vscode.LanguageStatusSeverity.Error;
         this.statusItem!.text = `Jaspr Tooling Daemon connection closed`;
@@ -193,20 +175,17 @@ export class JasprToolingDaemon implements vscode.Disposable {
   }
 
   handleData(data: string) {
+    let event: any;
     try {
       const json = JSON.parse(data);
       const event = json[0];
-      if (event && event.event) {
-        this.handleEvent(event);
-      } else if (event && event.id) {
-        this.handleResponse(event);
-      } else if (this._isDevMode) {
-        console.log("Tooling Daemon Log:", data);
-      }
-    } catch (e) {
-      if (this._isDevMode) {
-        console.log("Tooling Daemon Log (raw):", data);
-      }
+    } catch (e) {}
+    if (event && event.event) {
+      this.handleEvent(event);
+    } else if (event && event.id) {
+      this.handleResponse(event);
+    } else {
+      this.channel?.appendLine(`[Unknown message]: ${data}`);
     }
   }
 
@@ -214,19 +193,17 @@ export class JasprToolingDaemon implements vscode.Disposable {
     var eventName = event.event;
     var params = event.params;
     
-    if (this._isDevMode) {
-      if (eventName === "daemon.log") {
-        console.log("Tooling Daemon Log:", params.message);
-      } else {
-        console.log("Tooling Daemon Event:", eventName, params);
-      }
+    if (eventName === "daemon.log") {
+      this.channel?.appendLine(params.message);
+    } else {
+      this.channel?.appendLine(`[${eventName}]: ${JSON.stringify(params)}`);
     }
 
     if (this._eventListeners[eventName]) {
       try {
         this._eventListeners[eventName](params);
       } catch (e) {
-        console.error(`Error in event listener for ${eventName}:`, e);
+        this.channel?.appendLine(`Error in event listener for ${eventName}: ${e}`);
       }
     }
   }
@@ -236,14 +213,11 @@ export class JasprToolingDaemon implements vscode.Disposable {
     var result = response.result;
     var error = response.error;
 
-    if (this._isDevMode) {
-      console.log("Tooling Daemon Response:", id, result, error);
-    }
     if (this._responseListeners[id]) {
       try {
         this._responseListeners[id](result, error);
       } catch (e) {
-        console.error(`Error in response listener for ${id}:`, e);
+        this.channel?.appendLine(`Error in response listener for ${id}: ${e}`);
       }
     }
   }
@@ -258,7 +232,7 @@ export class JasprToolingDaemon implements vscode.Disposable {
     timeout?: number,
   ): Promise<any> {
     if (!this.socket) {
-      console.error("Tooling Daemon is not connected");
+      this.channel?.appendLine("Error: Tooling Daemon is not connected");
       return null;
     }
 

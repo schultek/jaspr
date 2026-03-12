@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import '../bundles/bundles.dart';
 import '../bundles/scaffold/scaffold_bundle.dart';
 import '../logging.dart';
+import '../process_runner.dart';
 import '../project.dart';
 import '../version.dart';
 import 'base_command.dart';
@@ -157,7 +158,10 @@ class CreateCommand extends BaseCommand {
     progress.complete('Generated ${files.length} file(s)');
 
     if (runPubGet) {
-      final process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+      final process = await ProcessRunner.instance.start(dartExecutable, [
+        'pub',
+        'get',
+      ], workingDirectory: dir.absolute.path);
 
       await watchProcess(
         'pub',
@@ -222,7 +226,10 @@ class CreateCommand extends BaseCommand {
     progress.complete('Generated ${files.length} file(s)');
 
     if (runPubGet) {
-      final process = await Process.start('dart', ['pub', 'get'], workingDirectory: dir.absolute.path);
+      final process = await ProcessRunner.instance.start(dartExecutable, [
+        'pub',
+        'get',
+      ], workingDirectory: dir.absolute.path);
 
       await watchProcess(
         'pub',
@@ -285,6 +292,9 @@ class CreateCommand extends BaseCommand {
       [final m] => RenderingMode.values.byName(m),
 
       _ => () {
+        if (!stdout.hasTerminal) {
+          throw usageException('No rendering mode specified.');
+        }
         final mode = logger.logger!.chooseOne(
           'Select a rendering mode:',
           choices: RenderingMode.values,
@@ -303,6 +313,9 @@ class CreateCommand extends BaseCommand {
       'single-page' => (true, false),
       'multi-page' => !useServer ? usageException('Cannot use multi-page routing in client mode.') : (true, true),
       _ => () {
+        if (!stdout.hasTerminal) {
+          return useServer ? (true, true) : (true, false);
+        }
         final routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
         final multiPage = routing && useServer
             ? logger.logger!.confirm(
@@ -324,6 +337,9 @@ class CreateCommand extends BaseCommand {
       'embedded' => FlutterMode.embedded,
       'plugins-only' => FlutterMode.plugins,
       _ => () {
+        if (!stdout.hasTerminal) {
+          return FlutterMode.none;
+        }
         final flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
         if (flutter) {
           return FlutterMode.embedded;
@@ -347,6 +363,9 @@ class CreateCommand extends BaseCommand {
       'none' => null,
       final String b => b,
       null => () {
+        if (!stdout.hasTerminal) {
+          return null;
+        }
         final backend = logger.logger!.confirm(
           'Use a custom backend package or framework for the server part of your project?',
           defaultValue: false,
@@ -358,18 +377,18 @@ class CreateCommand extends BaseCommand {
               'Select a backend framework:',
               choices: [
                 ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
-                (
-                  'dart_frog',
-                  'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.',
-                ),
+                // (
+                //   'dart_frog',
+                //   'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.',
+                // ),
               ],
               display: (o) => o.$2,
             )
             .$1;
 
-        if (b == 'dart_frog') {
-          usageException('Support for Dart Frog is coming soon.');
-        }
+        // if (b == 'dart_frog') {
+        //   usageException('Support for Dart Frog is coming soon.');
+        // }
 
         return b;
       }(),
