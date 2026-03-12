@@ -17,9 +17,20 @@ class HtmlDomain extends Domain {
 
   Future<String> convertHtml(Map<String, Object?> params) async {
     final html = params['html'] as String;
-    final parsed = parseFragment(html);
+    final query = params['query'] as String?;
+    final parsed = parse(html);
 
-    return _convertNode(parsed.firstChild, '').trimLeft();
+    List<Node> nodes = parsed.nodes;
+
+    if (query != null) {
+      nodes = parsed.querySelectorAll(query);
+    }
+
+    if (nodes.length == 1) {
+      return _convertNode(nodes.first, '').trimLeft();
+    }
+
+    return '.fragment([\n${nodes.map((node) => _convertNode(node, '  ')).where((c) => c.trim().isNotEmpty).join(',\n')}\n])';
   }
 
   String _convertNode(Node? node, String indent) {
@@ -31,7 +42,7 @@ class HtmlDomain extends Domain {
       if (text.trim().isEmpty) {
         return '';
       }
-      return '${indent}text(${_escapeString(text)})';
+      return '$indent.text(${_escapeString(text)})';
     } else if (node is Element) {
       final tagName = node.localName;
       final attrs = node.attributes;
@@ -158,6 +169,12 @@ class HtmlDomain extends Domain {
       result += ')';
 
       return result;
+    } else if (node is Comment) {
+      final data = node.data?.trimLeft();
+      if (data == null || data.isEmpty) {
+        return '';
+      }
+      return '$indent// $data';
     } else {
       return '';
     }
