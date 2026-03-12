@@ -10,6 +10,7 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:path/path.dart' as p;
+import 'package:pool/pool.dart' show Pool;
 
 import '../page.dart';
 import '../secondary_output/secondary_output.dart';
@@ -128,12 +129,12 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
       }
     }
 
-    // Load page sources in batches to avoid running out of file descriptors.
+    // Use a pool to avoid running out of file descriptors.
     if (eagerSources.isNotEmpty) {
       const maxConcurrentLoads = 32;
-      for (final batch in eagerSources.slices(maxConcurrentLoads)) {
-        await batch.map((s) => s.load()).wait;
-      }
+      final pool = Pool(maxConcurrentLoads);
+      await eagerSources.map((s) => pool.withResource(s.load)).wait;
+      await pool.close();
     }
 
     if (debugPrint) {
