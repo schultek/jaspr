@@ -153,9 +153,9 @@ class ScopesDomain extends Domain {
 
       final sw = Stopwatch()..start();
 
-      final results = await Future.wait([
+      final results = await [
         for (final target in targets) context.currentSession.getResolvedLibrary(target),
-      ]);
+      ].wait;
 
       sw.stop();
 

@@ -84,6 +84,36 @@ void main() {
       );
     });
 
+    test('ignores unsupported file types', () async {
+      // Arrange
+      final dataDir = fileSystem.directory('_data')..createSync();
+      dataDir.childFile('site.json').writeAsStringSync('{"name": "My Site"}');
+      dataDir.childFile('user.yaml').writeAsStringSync('name: Test User');
+      dataDir.childFile('unsupported.md').writeAsStringSync('This should be ignored');
+
+      final loader = FilesystemDataLoader('_data', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
+      final page = Page(
+        path: 'test.md',
+        url: '/test',
+        content: '',
+        config: PageConfig(dataLoaders: [loader]),
+        loader: mockLoader,
+      );
+
+      // Act
+      await page.loadData();
+
+      // Assert
+      expect(
+        page.data,
+        equals({
+          'site': {'name': 'My Site'},
+          'user': {'name': 'Test User'},
+          'page': <String, Object?>{},
+        }),
+      );
+    });
+
     test('does nothing if data directory does not exist', () async {
       // Arrange
       final loader = FilesystemDataLoader('_data', fileSystem: fileSystem);

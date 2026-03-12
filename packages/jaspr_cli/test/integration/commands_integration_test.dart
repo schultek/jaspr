@@ -102,7 +102,10 @@ TestRunner setupRunner() {
   });
 
   tearDown(() async {
-    await Future.wait(runner.runner.commands.values.whereType<BaseCommand>().map((c) => c.stop()));
+    await [
+      for (final command in runner.runner.commands.values)
+        if (command is BaseCommand) command.stop(),
+    ].wait;
   });
 
   return runner;

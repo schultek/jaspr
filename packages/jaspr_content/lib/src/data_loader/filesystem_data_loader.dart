@@ -91,8 +91,10 @@ class FilesystemDataLoader implements DataLoader {
       await for (final entity in dir.list()) {
         if (entity is File) {
           final name = entity.path.split(fileSystem.path.separator).last;
-          final key = name.split('.').first;
-          data[key] = DataLoader.parseData(name, await entity.readAsString());
+          if (DataLoader.canParse(name)) {
+            final key = name.split('.').first;
+            data[key] = DataLoader.parseData(name, await entity.readAsString());
+          }
         } else if (entity is Directory) {
           final key = entity.path.split(fileSystem.path.separator).last;
           data[key] = await _loadData(entity);

@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, implementation_imports
+// ignore_for_file: implementation_imports
 
 import 'dart:async';
 import 'dart:convert';
@@ -153,19 +153,18 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       });
     }
 
-    final webResult = _buildWeb();
-    var flutterResult = Future<void>.value();
-
-    if ((await webResult) != 0) {
+    var hasBuildError = (await _buildWeb()) != 0;
+    if (hasBuildError) {
       await stop();
       return 1;
     }
 
+    final Future<int>? flutterResult;
     if (project.flutterMode == FlutterMode.embedded) {
       flutterResult = buildFlutter(useWasm);
+    } else {
+      flutterResult = null;
     }
-
-    bool hasBuildError = false;
 
     final serverDefines = getServerDartDefines();
 
@@ -403,7 +402,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       dummyTargetIndex &= !(generatedRoutes.containsKey('/') || generatedRoutes.containsKey('/index'));
     }
 
-    await flutterResult;
+    if (flutterResult != null) {
+      hasBuildError |= (await flutterResult) != 0;
+    }
 
     if (dummyIndex) {
       if (indexHtml.existsSync()) indexHtml.deleteSync();

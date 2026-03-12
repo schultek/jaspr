@@ -114,9 +114,8 @@ class CustomParser implements PageParser {
   List<Node> parsePage(Page page) {
     // Parse the content into nodes.
     // This is where you convert your custom format into Jaspr's Node structure.
-    
     final nodes = <Node>[];
-    
+
     // Example: Converting a simple custom format.
     final lines = page.content.split('\n');
     for (final line in lines) {
@@ -128,7 +127,7 @@ class CustomParser implements PageParser {
         nodes.add(ElementNode('p', {}, [TextNode(line)]));
       }
     }
-    
+
     return nodes;
   }
 }
