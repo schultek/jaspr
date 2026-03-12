@@ -106,9 +106,12 @@ class ImportEntry {
 
       if (element case final ExtensionElement ext) {
         for (final child in ext.children) {
-          if (child.isSynthetic || child.isPrivate || child.name == null) continue;
+          if (child.isPrivate || child.name == null) continue;
           if (child is ExecutableElement && child.isStatic) continue;
           if (child is VariableElement && child.isStatic) continue;
+
+          // Skip synthetic fields generated for getters.
+          if (child is FieldElement && !child.isOriginDeclaration) continue;
 
           details.add(switch (child) {
             SetterElement() => 'set ${child.name!}(dynamic _) {}',

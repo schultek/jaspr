@@ -52,8 +52,8 @@ class StylesModuleBuilder implements Builder {
             .expand<Element>(
               (e) => switch (e) {
                 final ClassElement e => [...e.fields, ...e.getters],
-                final TopLevelVariableElement e when !e.isSynthetic => [e],
-                final TopLevelVariableElement e when e.isSynthetic && e.getter != null => [e.getter!],
+                final TopLevelVariableElement e when e.isOriginDeclaration => [e],
+                TopLevelVariableElement(:final getter?) when e.isOriginGetterSetter => [getter],
                 _ => [],
               },
             )

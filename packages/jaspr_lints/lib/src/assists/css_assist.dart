@@ -59,7 +59,8 @@ class AddStyles extends ResolvedCorrectionProducer {
         ? (classesArg!.expression as StringLiteral).stringValue?.split(' ').first
         : null;
 
-    final styles = comp.$1.members
+    final styles = comp.$1.body.childEntities
+        .whereType<ClassMember>()
         .where((m) => m.metadata.where((a) => a.name.name == 'css').isNotEmpty)
         .map(
           (m) => switch (m) {

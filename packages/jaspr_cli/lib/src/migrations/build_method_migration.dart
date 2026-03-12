@@ -39,13 +39,13 @@ class BuildMethodMigration implements Migration {
         if (!_isBuildableClass(declaration)) {
           continue;
         }
-        for (final member in declaration.members) {
+        for (final member in declaration.body.childEntities) {
           if (member is MethodDeclaration) {
             if (!_isBuildMethod(member)) {
               continue;
             }
 
-            _migrateBuildMethod(member, declaration.name.lexeme, context.reporter);
+            _migrateBuildMethod(member, declaration.namePart.typeName.lexeme, context.reporter);
           }
         }
       }
