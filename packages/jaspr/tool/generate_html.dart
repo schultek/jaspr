@@ -12,20 +12,28 @@ void main() {
 
   final cliSpecFile = File('../jaspr_cli/lib/src/html_spec.dart');
 
-  cliSpecFile.writeAsString('''
-// GENERATED FILE - DO NOT EDIT
-// Generated from packages/jaspr/tool/generate_html.dart
-//
-// dart format off
-// ignore_for_file: prefer_single_quotes
+  final formatter = DartFormatter(languageVersion: DartFormatter.latestLanguageVersion);
+  final header =
+      '// GENERATED FILE - DO NOT EDIT\n'
+      '// Generated from packages/jaspr/tool/generate_html.dart\n'
+      '//\n'
+      '// dart format off';
 
-const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
-''');
+  cliSpecFile.writeAsString(
+    '$header\n'
+    '// ignore_for_file: prefer_single_quotes\n'
+    '\n'
+    'const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};\n',
+  );
+
+  final tags = specJson['tags'] as Map<String, dynamic>;
+  final enums = specJson['enums'] as Map<String, dynamic>;
 
   final allTags = <String>{};
+  final allEnums = <String>{};
 
-  for (final key in specJson.keys) {
-    final group = specJson[key] as Map<String, dynamic>;
+  for (final key in tags.keys) {
+    final group = tags[key] as Map<String, dynamic>;
     final file = File('lib/src/dom/html/$key.dart');
 
     final library = Library((l) {
@@ -48,6 +56,8 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
         if (inherit != null) {
           attrs.addAll(schemas[inherit]!);
         }
+
+        final usedEnums = <String>{};
 
         l.body.add(
           Class((c) {
@@ -150,7 +160,7 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
 
             for (final attr in attrs.keys) {
               final name = attrs[attr]['name'] as String? ?? attr;
-              final type = attrs[attr]['type'];
+              final type = attrs[attr]['type'] as String?;
 
               if (type == null) {
                 throw ArgumentError('Attribute type is required for attribute $key.$tag.$attr');
@@ -176,18 +186,16 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
                       t.symbol = 'int';
                     } else if (type == 'double') {
                       t.symbol = 'double';
-                    } else if (type is String && type.startsWith('enum:')) {
+                    } else if (type.startsWith('enum:')) {
                       final name = type.split(':')[1];
+                      usedEnums.add(name);
                       t.symbol = name;
-                    } else if (type is String && type.startsWith('event:')) {
+                    } else if (type.startsWith('event:')) {
                       final [_, name, tt] = type.split(':');
                       events.add(name);
                       t.symbol = tt;
-                    } else if (type is String && type.startsWith('css:')) {
+                    } else if (type.startsWith('css:')) {
                       final [_, name] = type.split(':');
-                      t.symbol = name;
-                    } else if (type is Map<String, dynamic>) {
-                      final name = type['name'] as String?;
                       t.symbol = name;
                     } else if (type == 'content') {
                       t.symbol = 'String';
@@ -355,78 +363,70 @@ const htmlSpec = ${const JsonEncoder.withIndent('  ').convert(specJson)};
           }),
         );
 
-        for (final attr in attrs.keys) {
-          final type = attrs[attr]['type'];
+        for (final name in usedEnums) {
+          if (!allEnums.contains(name)) {
+            allEnums.add(name);
 
-          if (type is Map<String, dynamic>) {
-            if (type['values'] != null) {
-              final name = type['name'] as String;
-              final values = type['values'] as Map<String, dynamic>;
-              final doc = type['doc'] as String;
+            final type = enums[name] as Map<String, dynamic>?;
+            if (type == null) {
+              throw ArgumentError('Enum $name is not defined in the HTML spec.');
+            }
+            final values = type['values'] as Map<String, dynamic>;
+            final doc = type['doc'] as String;
 
-              l.body.add(
-                Enum((e) {
-                  e.name = name;
-                  e.docs.addAll(doc.split('\n').map((d) => '/// $d'));
+            l.body.add(
+              Enum((e) {
+                e.name = name;
+                e.docs.addAll(doc.split('\n').map((d) => '/// $d'));
 
-                  for (final name in values.keys) {
-                    final value = values[name]['value'] as String? ?? name;
+                for (final name in values.keys) {
+                  final value = values[name]['value'] as String? ?? name;
 
-                    e.values.add(
-                      EnumValue((ev) {
-                        ev.name = name;
-                        ev.docs.addAll((values[name]['doc'] as String).split('\n').map((d) => '/// $d'));
-                        ev.arguments.add(literalString(value));
+                  e.values.add(
+                    EnumValue((ev) {
+                      ev.name = name;
+                      ev.docs.addAll((values[name]['doc'] as String).split('\n').map((d) => '/// $d'));
+                      ev.arguments.add(literalString(value));
+                    }),
+                  );
+                }
+
+                e.constructors.add(
+                  Constructor((c) {
+                    c.constant = true;
+                    c.requiredParameters.add(
+                      Parameter((p) {
+                        p.name = 'value';
+                        p.toThis = true;
                       }),
                     );
-                  }
+                  }),
+                );
 
-                  e.constructors.add(
-                    Constructor((c) {
-                      c.constant = true;
-                      c.requiredParameters.add(
-                        Parameter((p) {
-                          p.name = 'value';
-                          p.toThis = true;
-                        }),
-                      );
-                    }),
-                  );
-
-                  e.fields.add(
-                    Field((f) {
-                      f.name = 'value';
-                      f.modifier = FieldModifier.final$;
-                      f.type = refer('String');
-                    }),
-                  );
-                }),
-              );
-            }
+                e.fields.add(
+                  Field((f) {
+                    f.name = 'value';
+                    f.modifier = FieldModifier.final$;
+                    f.type = refer('String');
+                  }),
+                );
+              }),
+            );
           }
         }
       }
     });
 
-    final formatter = DartFormatter(languageVersion: DartFormatter.latestLanguageVersion);
-    final header =
-        '// GENERATED FILE - DO NOT EDIT\n'
-        '// Generated from packages/jaspr/tool/generate_html.dart\n'
-        '//\n'
-        '// dart format off\n'
-        '// ignore_for_file: camel_case_types\n';
-
     file.writeAsStringSync(
-      '$header\n${formatter.format(library.accept(DartEmitter(useNullSafetySyntax: true)).toString())}',
+      '$header\n'
+      '// ignore_for_file: camel_case_types\n\n'
+      '${formatter.format(library.accept(DartEmitter(useNullSafetySyntax: true)).toString())}',
     );
   }
 
   final lintFile = File('../jaspr_lints/lib/src/all_html_tags.dart');
   lintFile.writeAsStringSync(
-    '// GENERATED FILE - DO NOT EDIT\n'
-    '// Generated from packages/jaspr/tool/generate_html.dart\n'
-    '//\n'
-    '// dart format off\n\n'
+    '$header\n\n'
     'const allHtmlTags = {${allTags.map((t) => "'$t'").join(', ')}};\n',
   );
 }

@@ -78,7 +78,7 @@ class DomApiUsageVisitor extends RecursiveAstVisitor<void> {
   bool get usesDomApis => _useDomApis;
 
   static final _allTags = {
-    for (final group in htmlSpec.values) ...group.keys,
+    for (final group in htmlSpec['tags']!.values) ...group.keys,
     'raw',
     'RawText',
   };

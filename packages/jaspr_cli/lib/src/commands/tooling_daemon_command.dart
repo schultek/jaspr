@@ -26,6 +26,9 @@ class ToolingDaemonCommand extends BaseCommand with DaemonHelper {
         ..addOption('url')
         ..addOption('query'),
     );
+    argParser.addCommand(
+      'lookup-tag',
+    );
   }
 
   @override
@@ -71,6 +74,19 @@ class ToolingDaemonCommand extends BaseCommand with DaemonHelper {
       }
 
       return runToolingDaemonCommand('html.convert', params, (response) {
+        return response.toString();
+      });
+    }
+
+    if (command == 'lookup-tag') {
+      final tag = argResults?.command?.rest.firstOrNull;
+
+      if (tag == null) {
+        stderr.writeln('Tag is required.');
+        return 1;
+      }
+
+      return runToolingDaemonCommand('html.lookupTag', {'tag': tag}, (response) {
         return response.toString();
       });
     }

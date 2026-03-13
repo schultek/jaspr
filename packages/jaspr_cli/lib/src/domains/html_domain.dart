@@ -11,6 +11,7 @@ import '../logging.dart';
 class HtmlDomain extends Domain {
   HtmlDomain(Daemon daemon, this.logger) : super(daemon, 'html') {
     registerHandler('convert', convertHtml);
+    registerHandler('lookupTag', lookupTag);
   }
 
   final Logger logger;
@@ -31,6 +32,96 @@ class HtmlDomain extends Domain {
     }
 
     return '.fragment([\n${nodes.map((node) => _convertNode(node, '  ')).where((c) => c.trim().isNotEmpty).join(',\n')}\n])';
+  }
+
+  Future<String> lookupTag(Map<String, Object?> params) async {
+    final tag = params['tag'] as String;
+    final spec = elementSpecs[tag] as Map<String, Object?>?;
+    if (spec == null) {
+      return 'No component found for tag $tag.';
+    }
+
+    final attributes = spec['attributes'] as Map<String, Object?>? ?? {};
+    final selfClosing = spec['self_closing'] == true;
+
+    final description = spec['doc'] as String? ?? '';
+
+    var signature = '';
+    if (description.isNotEmpty) {
+      signature += '/// ${description.split('\n').join('\n/// ')}\n';
+    }
+    signature += 'const $tag(';
+
+    if (!selfClosing) {
+      signature += '\n  List<Component> children, {\n';
+    } else {
+      signature += '{\n';
+    }
+
+    for (final attr in attributes.keys) {
+      final attribute = attributes[attr] as Map<String, Object?>;
+      final name = attribute['name'] as String? ?? attr;
+      final type = attribute['type'];
+      final required = attribute['required'] == true;
+      final explicitBool = attribute['explicit'] == true;
+      final docs = (attribute['doc'] as String).split('\n');
+
+      signature += '  /// ${docs.join('\n  /// ')}\n';
+
+      final isNullable = !required && (type != 'boolean' || explicitBool);
+      final nullSuffix = isNullable ? '?' : '';
+
+      String valuesHint = '';
+
+      signature += '  ';
+
+      if (required) {
+        signature += 'required ';
+      }
+      if (type == 'string') {
+        signature += 'String';
+      } else if (type == 'boolean') {
+        signature += 'bool';
+      } else if (type == 'int') {
+        signature += 'int';
+      } else if (type == 'double') {
+        signature += 'double';
+      } else if (type is String && type.startsWith('enum:')) {
+        final name = type.split(':')[1];
+        signature += name;
+
+        final enumSpec = htmlSpec['enums']![name] as Map<String, Object?>;
+        final values = (enumSpec['values'] as Map<String, Object?>).keys;
+        valuesHint = ' // One of ${values.map((v) => '`.$v`').join(', ')}';
+      } else if (type is String && type.startsWith('event:')) {
+        final [_, name, tt] = type.split(':');
+        signature += tt;
+      } else if (type is String && type.startsWith('css:')) {
+        final [_, name] = type.split(':');
+        signature += name;
+      } else if (type == 'content') {
+        signature += 'String';
+      }
+
+      signature += '$nullSuffix $name';
+
+      if (type == 'boolean' && !required && !explicitBool) {
+        signature += ' = false';
+      }
+
+      signature += ',$valuesHint\n';
+    }
+
+    signature += '  String? id,\n';
+    signature += '  String? classes,\n';
+    signature += '  Styles? styles,\n';
+    signature += '  Map<String, String>? attributes,\n';
+    signature += '  Map<String, void Function(Event)>? events,\n';
+    signature += '  Key? key,\n';
+
+    signature += '});';
+
+    return signature;
   }
 
   String _convertNode(Node? node, String indent) {
@@ -77,7 +168,7 @@ class HtmlDomain extends Domain {
         } else {
           if (specAttributes?[key] case final Map<String, Object?> attrSpec) {
             final attrName = (attrSpec['name'] ?? key) as String;
-            var attrType = attrSpec['type'];
+            final attrType = attrSpec['type'] as String;
 
             if (attrType == 'string') {
               paramStrings.add('$attrName: ${_escapeString(value)}');
@@ -87,12 +178,11 @@ class HtmlDomain extends Domain {
               paramStrings.add('$attrName: true');
               continue;
             }
-            if (attrType is String && attrType.startsWith('enum:')) {
+            if (attrType.startsWith('enum:')) {
               final enumName = attrType.substring(5);
-              attrType = enumSpecs[enumName];
-            }
-            if (attrType case {'name': final String enumName, 'values': final Map<String, Object?> enumValues}) {
-              final enumValue = enumValues.entries
+              final enumSpec = htmlSpec['enums']![enumName] as Map<String, Object?>;
+
+              final enumValue = (enumSpec['values'] as Map<String, Object?>).entries
                   .where(
                     (e) => ((e.value as Map<String, Object?>?)?['value'] ?? e.key) == value,
                   )
@@ -195,27 +285,13 @@ class HtmlDomain extends Domain {
 
 final elementSpecs = (() {
   final config = <String, Object?>{};
-  for (final group in htmlSpec.values) {
+  for (final group in htmlSpec['tags']!.values) {
     for (final entry in group.entries) {
       final name = entry.key;
-      final data = entry.value;
+      final data = entry.value as Map<String, Object?>;
       final tag = data['tag'] as String? ?? name;
       config[tag] = {...data, 'name': name};
     }
   }
   return config;
-})();
-
-final enumSpecs = (() {
-  final enums = <String, Map<String, Object?>>{};
-  for (final element in elementSpecs.values.cast<Map<String, Object?>>()) {
-    if (element['attributes'] case final Map<String, Object?> attrs) {
-      for (final attr in attrs.values.cast<Map<String, Object?>>()) {
-        if (attr['type'] case <String, Object?>{'name': String _, 'values': final Map<String, Object?> type}) {
-          enums[type['name'] as String] = type;
-        }
-      }
-    }
-  }
-  return enums;
 })();
