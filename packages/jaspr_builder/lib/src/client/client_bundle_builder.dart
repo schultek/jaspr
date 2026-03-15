@@ -54,3 +54,9 @@ extension ClientsLoader on BuildStep {
     return bundle;
   }
 }
+
+extension ClientsFilter on List<ClientModule> {
+  List<ClientModule> filterBySources(Set<AssetId> sources) {
+    return where((c) => sources.contains(c.id)).toList();
+  }
+}

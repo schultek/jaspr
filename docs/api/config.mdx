@@ -17,6 +17,7 @@ jaspr:
   mode: server
   port: 8080
   flutter: plugins
+  styles: standalone
 ```
 
 There are currently the following configuration options available:
@@ -46,6 +47,22 @@ There are currently the following configuration options available:
   - `none` or omitted: No Flutter support.
 
   Using either `embedded` or `plugins` requires the Flutter SDK to be installed and available in your system PATH, as well as a dependency on `build_web_compilers` with a minimum version constraint of `4.4.6` or higher.
+</Property>
+
+---
+
+<Property name="styles" type="Enum" optional>
+
+  Specifies how styles defined with [`@css`](/api/utils/at_css) are generated:
+
+  - `inline`: Styles are inlined into the pre-rendered HTML (Not supported in `client` mode).
+  - `standalone`: Styles are generated as a standalone CSS file.
+
+  It is optional and defaults to `inline` for **static** and **server** mode and `standalone` for **client** mode.
+
+  <Warning>
+    When using `standalone`, all libraries containing `@css` definitions are executed during the build process using the Dart VM. Importing web-only libraries like `dart:js_interop` or `package:web` will lead to build errors. See [Using Platform Libraries](/dev/server#using-platform-libraries) for ways to avoid this.
+  </Warning>
 </Property>
 
 ---

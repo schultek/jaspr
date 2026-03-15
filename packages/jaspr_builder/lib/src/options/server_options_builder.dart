@@ -41,8 +41,8 @@ class ServerOptionsBuilder implements Builder {
       '// Generated with jaspr_builder\n';
 
   Future<void> generateServerOptions(BuildStep buildStep) async {
-    final (mode, _) = await buildStep.loadProjectMode(options, buildStep);
-    if (mode != 'static' && mode != 'server') {
+    final (mode, _, stylesMode) = await buildStep.loadProjectMode();
+    if (mode == null || mode == JasprMode.client) {
       return;
     }
 
@@ -50,7 +50,7 @@ class ServerOptionsBuilder implements Builder {
 
     var (clients, styles, sources) = await (
       buildStep.loadClients(),
-      buildStep.loadStyles(),
+      stylesMode == StylesMode.standalone ? Future.value(<StylesModule>[]) : buildStep.loadStyles(),
       rootPath != null
           ? buildStep.loadTransitiveSourcesFor(AssetId(buildStep.inputId.package, rootPath))
           : buildStep.loadTransitiveSources(),
@@ -59,19 +59,8 @@ class ServerOptionsBuilder implements Builder {
     final package = buildStep.inputId.package;
 
     if (sources.isNotEmpty) {
-      clients = clients.where((c) => sources.contains(c.id)).toList();
-      styles = styles.map((s) {
-        if (sources.contains(s.id)) {
-          // For imported libraries include all styles.
-          return s;
-        } else if (s.id.package == buildStep.inputId.package) {
-          // For unimported libraries from the same package, include only global styles.
-          return StylesModule(id: s.id, elements: s.elements.where((e) => !e.contains('.')).toList());
-        } else {
-          // For unimported libraries from other packages, exclude all styles.
-          return StylesModule(id: s.id, elements: []);
-        }
-      }).toList();
+      clients = clients.filterBySources(sources);
+      styles = styles.filterBySources(sources, buildStep.inputId);
     }
 
     clients.sortByCompare((c) => '${c.import}/${c.name}', comparePaths);
@@ -103,6 +92,7 @@ class ServerOptionsBuilder implements Builder {
       ServerOptions get defaultServerOptions => ServerOptions(
         ${await buildClientIdEntry(buildStep)}
         ${buildClientEntries(clients, package)}
+        ${buildStylesIdEntry(stylesMode, buildStep)}
         ${buildStylesEntries(styles)}
       );
       
@@ -144,6 +134,12 @@ class ServerOptionsBuilder implements Builder {
           return 'Map<String, Object?> _[[${c.import}]]${c.name}([[${c.import}]].${c.name} c) => {${c.params.map((p) => "'${p.name}': ${p.encoder}").join(', ')}};';
         })
         .join('\n');
+  }
+
+  String buildStylesIdEntry(StylesMode? stylesOption, BuildStep buildStep) {
+    if (stylesOption != StylesMode.standalone) return '';
+    final stylesId = buildStep.inputId.path.replaceFirst('lib/', '').replaceFirst('.server.dart', '.css');
+    return "stylesId: '$stylesId',";
   }
 
   String buildStylesEntries(List<StylesModule> styles) {

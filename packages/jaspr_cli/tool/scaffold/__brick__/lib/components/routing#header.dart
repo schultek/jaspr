@@ -1,8 +1,8 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
-{{#server}}
-import '../constants/theme.dart';{{/server}}
+
+import '../constants/theme.dart';
 
 class Header extends StatelessComponent {
   const Header({super.key});
@@ -22,7 +22,7 @@ class Header extends StatelessComponent {
           ]),
       ]),
     ]);
-  }{{#server}}
+  }
 
   @css
   static List<StyleRule> get styles => [
@@ -68,5 +68,5 @@ class Header extends StatelessComponent {
         ])
       ]),
     ]),
-  ];{{/server}}
+  ];
 }

@@ -54,3 +54,20 @@ extension StylesLoader on BuildStep {
     return bundle;
   }
 }
+
+extension StylesFilter on List<StylesModule> {
+  List<StylesModule> filterBySources(Set<AssetId> sources, AssetId rootId) {
+    return map((s) {
+      if (sources.contains(s.id)) {
+        // For imported libraries include all styles.
+        return s;
+      } else if (s.id.package == rootId.package) {
+        // For unimported libraries from the same package, include only global styles.
+        return StylesModule(id: s.id, elements: s.elements.where((e) => !e.contains('.')).toList());
+      } else {
+        // For unimported libraries from other packages, exclude all styles.
+        return StylesModule(id: s.id, elements: []);
+      }
+    }).toList();
+  }
+}

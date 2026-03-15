@@ -17,10 +17,6 @@ class AddStyles extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    final config = readJasprConfig(file);
-    if (config == null || (config['mode'] != 'server' && config['mode'] != 'static')) {
-      return;
-    }
     if (node
         case NamedType(parent: ConstructorName(parent: final InstanceCreationExpression node)) ||
             SimpleIdentifier(parent: ConstructorName(parent: final InstanceCreationExpression node))) {
@@ -133,10 +129,6 @@ class ConvertToNestedStyles extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    final config = readJasprConfig(file);
-    if (config == null || (config['mode'] != 'server' && config['mode'] != 'static')) {
-      return;
-    }
     if (node case SimpleIdentifier(parent: final MethodInvocation node)) {
       final css = getCssInvocation(node);
       if (css != null) {

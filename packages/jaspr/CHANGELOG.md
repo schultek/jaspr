@@ -10,6 +10,10 @@
 
 - Allow `analyzer` versions 10.x.
 
+- Added new `jaspr.styles: standalone` option to `pubspec.yaml`. 
+  - When enabled, all `@css` declarations are output to a standalone `.css` file instead of being inlined in the HTML.
+  - This is enabled by default in client mode, which is why `@css` is now allowed in client mode projects.
+
 ## 0.22.3
 
 - Added `ServerApp.addMiddleware()` method to add custom middleware to Jaspr's HTTP server.

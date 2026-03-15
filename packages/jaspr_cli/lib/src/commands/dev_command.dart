@@ -343,6 +343,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final buildArgs = [
       if (release) '--release',
       '--delete-conflicting-outputs',
+      '--define=jaspr_builder:styles_output=jaspr-mode=${project.requireMode.name}',
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:ddc=generate-full-dill=true',
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
