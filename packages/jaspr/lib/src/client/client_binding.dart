@@ -8,6 +8,7 @@ import 'package:universal_web/web.dart' as web;
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
+import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'dom_render_object.dart';
 import 'utils.dart';
@@ -69,41 +70,6 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     web.console.error('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace'.toJS);
   }
 
-  /// Reloads the current page.
-  void reload([String? path]) async {
-    final response = await http.get(
-      Uri.parse(web.window.location.href).replace(path: path),
-      headers: {'X-Jaspr-Reload': 'true'},
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to reload page: ${response.statusCode} ${response.reasonPhrase}');
-    }
-
-    final doc = web.Document.parseHTMLUnsafe(response.body.toJS);
-    final body = doc.body;
-
-    if (body == null) {
-      throw Exception('Failed to reload page: No body found');
-    }
-    if (_attachTarget != 'body') {
-      throw Exception('Can only reload page when attached to body');
-    }
-
-    final sw = Stopwatch()..start();
-
-    final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;
-    final rootNode = rootRenderObject.node;
-
-    rootRenderObject.node = body;
-    rootRenderObject.toHydrate = [...body.childNodes.toIterable()];
-    rootElement!.owner.performReload(rootElement!);
-
-    rootNode.replaceWith(body);
-
-    sw.stop();
-    print('Page reloaded in ${sw.elapsedMilliseconds}ms');
-  }
-
   SseClient? _eventsClient;
 
   void initializeEvents() {
@@ -114,7 +80,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       (event) {
         final data = jsonDecode(event);
         if (data case ['ReloadRequest']) {
-          reload();
+          _reloadPage();
         }
       },
       onDone: () {
@@ -123,5 +89,41 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       },
     );
     _eventsClient!.sink.add(jsonEncode(['RouteInfo', web.window.location.pathname]));
+  }
+
+  void _reloadPage([String? path]) async {
+    final response = await http.get(
+      Uri.parse(web.window.location.href).replace(path: path),
+      headers: {'X-Jaspr-Reload': 'true'},
+    );
+    if (response.statusCode != 200) {
+      web.console.error('[Jaspr] Failed to reload page: ${response.statusCode} ${response.reasonPhrase}'.toJS);
+      return;
+    }
+
+    final doc = web.Document.parseHTMLUnsafe(response.body.toJS);
+    final body = doc.body;
+
+    if (body == null) {
+      web.console.error('[Jaspr] Failed to reload page: No body found'.toJS);
+      return;
+    }
+
+    final sw = Stopwatch()..start();
+
+    final newNode = _attachTarget == 'body' ? body : body.querySelector(_attachTarget)!;
+
+    final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;
+    rootRenderObject.node = newNode;
+    rootRenderObject.toHydrate = [...newNode.childNodes.toIterable()];
+    rootElement!.owner.performReload(rootElement!);
+
+    web.document.body!.replaceWith(body);
+
+    sw.stop();
+
+    if (kVerboseMode) {
+      print('Page reloaded in ${sw.elapsedMilliseconds}ms');
+    }
   }
 }
