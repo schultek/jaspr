@@ -78,8 +78,12 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
   @override
   ChildSlotRenderObject createRenderObject() {
     final slot = component as ChildSlot;
-    final parent = parentRenderObjectElement!.renderObject as SlottedDomRenderObject;
-    return slot.createRenderObject(parent);
+    final parent = parentRenderObjectElement!.renderObject as DomRenderObject;
+    assert(
+      parent is SlottedDomRenderObject,
+      'ChildSlot must be used as a direct child of SlottedDomRenderObject.',
+    );
+    return slot.createRenderObject(parent as SlottedDomRenderObject);
   }
 
   @override
@@ -103,7 +107,7 @@ class SlottedChildView extends Component {
   Element createElement() => SlottedChildViewElement(this);
 }
 
-class SlottedChildViewElement extends MultiChildRenderObjectElement {
+class SlottedChildViewElement extends DomRenderObjectElement {
   SlottedChildViewElement(SlottedChildView super.component);
 
   @override
@@ -119,18 +123,179 @@ class SlottedChildViewElement extends MultiChildRenderObjectElement {
   }
 
   @override
-  List<Component> buildChildren() {
+  List<Component> buildOwnChildren() {
     return component.slots;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    updateRenderObject(renderObject as SlottedDomRenderObject);
   }
 
   @override
   RenderObject createRenderObject() {
     final parent = parentRenderObjectElement!.renderObject;
-    return SlottedDomRenderObject.fromNodes(component.nodes, parent as DomRenderObject);
+    final renderObject = SlottedDomRenderObject.fromNodes(component.nodes, parent as DomRenderObject);
+    updateRenderObject(renderObject);
+    return renderObject;
   }
 
+  final Map<web.HTMLElement, WrapParams?> _appliedParams = {};
+  final Map<web.HTMLElement, Map<String, EventBinding>?> _appliedEvents = {};
+
   @override
-  void updateRenderObject(RenderObject renderObject) {}
+  void updateRenderObject(SlottedDomRenderObject renderObject) {
+    for (final element in _appliedParams.keys) {
+      resetElementParams(element);
+    }
+    _appliedParams.clear();
+
+    if (inheritedDomParams case final inheritedDomParams?) {
+      web.Node? current = renderObject.firstChildNode;
+      while (current != null) {
+        if (current.isElement) {
+          for (final param in inheritedDomParams.reversed) {
+            final elements = findMatchingElements(current as web.Element, param.target);
+
+            for (final element in elements) {
+              updateElementParams(element as web.HTMLElement, param);
+            }
+          }
+        }
+
+        if (current == renderObject.lastChildNode) {
+          break;
+        }
+        current = current.nextSibling;
+      }
+    }
+  }
+
+  List<web.Element> findMatchingElements(web.Element root, ApplyTarget target) {
+    final elements = <web.Element>[];
+
+    if (isMatchingElement(target, root)) {
+      elements.add(root);
+    }
+
+    if (!target.onlyChildren) {
+      final results = root.querySelectorAll(target.query);
+      for (int i = 0; i < results.length; i++) {
+        elements.add(results.item(i) as web.Element);
+      }
+    }
+
+    return elements;
+  }
+
+  bool isMatchingElement(ApplyTarget target, web.Element element) {
+    if (target.tag case final expectedTag? when element.localName != expectedTag) return false;
+    if (target.id case final expectedId? when element.id != expectedId) return false;
+    if (target.classes case final expectedClasses? when !expectedClasses.every((c) => element.classList.contains(c))) {
+      return false;
+    }
+
+    return true;
+  }
+
+  void resetElementParams(web.HTMLElement element) {
+    final appliedParams = _appliedParams[element];
+    if (appliedParams == null) return;
+
+    if (appliedParams.id != null && element.id == appliedParams.id) {
+      element.id = '';
+    }
+
+    if (appliedParams.classes case final appliedClasses?) {
+      for (final c in appliedClasses) {
+        element.classList.remove(c);
+      }
+    }
+
+    if (appliedParams.styles case final appliedStyles?) {
+      for (final e in appliedStyles.entries) {
+        element.style.removeProperty(e.key);
+      }
+    }
+
+    if (appliedParams.attributes case final appliedAttributes?) {
+      for (final e in appliedAttributes.entries) {
+        element.removeAttribute(e.key);
+      }
+    }
+
+    if (_appliedEvents[element] case final appliedEvents?) {
+      for (final e in appliedEvents.entries) {
+        e.value.clear();
+      }
+    }
+  }
+
+  void updateElementParams(web.HTMLElement element, WrapParams newParams) {
+    final appliedParams = _appliedParams[element];
+
+    String? appliedId = appliedParams?.id;
+    List<String>? appliedClasses = appliedParams?.classes;
+    Map<String, String>? appliedStyles = appliedParams?.styles;
+    Map<String, String>? appliedAttributes = appliedParams?.attributes;
+    Map<String, EventBinding>? appliedEvents = _appliedEvents[element];
+
+    if (newParams.id case final newId?) {
+      if (element.id.isEmpty) {
+        element.id = newId;
+        appliedId = newId;
+      }
+    }
+
+    if (newParams.classes case final newClasses?) {
+      appliedClasses ??= [];
+      for (final c in newClasses) {
+        if (!element.classList.contains(c)) {
+          element.classList.add(c);
+          appliedClasses.add(c);
+        }
+      }
+    }
+
+    if (newParams.styles case final newStyles?) {
+      appliedStyles ??= {};
+      for (final e in newStyles.entries) {
+        if (element.style.getPropertyValue(e.key).isEmpty) {
+          element.style.setProperty(e.key, e.value);
+          appliedStyles[e.key] = e.value;
+        }
+      }
+    }
+
+    if (newParams.attributes case final newAttributes?) {
+      appliedAttributes ??= {};
+      for (final e in newAttributes.entries) {
+        if (!element.hasAttribute(e.key)) {
+          element.setAttribute(e.key, e.value);
+          appliedAttributes[e.key] = e.value;
+        }
+      }
+    }
+
+    if (newParams.events case final newEvents?) {
+      appliedEvents ??= {};
+      for (final e in newEvents.entries) {
+        if (!appliedEvents.containsKey(e.key)) {
+          appliedEvents[e.key] = EventBinding(element, e.key, e.value);
+        }
+      }
+    }
+
+    _appliedParams[element] = WrapParams(
+      target: newParams.target,
+      id: appliedId,
+      classes: appliedClasses,
+      styles: appliedStyles,
+      attributes: appliedAttributes,
+    );
+    _appliedEvents[element] = appliedEvents;
+  }
 
   @override
   void unmount() {
@@ -223,13 +388,13 @@ class SlottedDomRenderObject extends DomRenderFragment {
 }
 
 class ChildSlotRenderObject extends DomRenderObject with MultiChildDomRenderObject, HydratableDomRenderObject {
-  ChildSlotRenderObject(this.node, SlottedDomRenderObject parent, [List<web.Node>? nodes]) {
+  ChildSlotRenderObject(this.node, DomRenderObject parent, [List<web.Node>? nodes]) {
     this.parent = parent;
     toHydrate = [...nodes ?? node.childNodes.toIterable()];
     beforeStart = toHydrate.firstOrNull?.previousSibling;
   }
 
-  factory ChildSlotRenderObject.between(SlottedDomRenderObject parent, web.Node start, web.Node end) {
+  factory ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end) {
     final nodes = <web.Node>[];
     web.Node? curr = start.nextSibling;
     while (curr != null && curr != end) {

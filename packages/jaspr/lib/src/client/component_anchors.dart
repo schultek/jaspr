@@ -3,10 +3,8 @@ import 'dart:convert';
 
 import 'package:universal_web/web.dart' as web;
 
-import '../../jaspr.dart';
+import '../../client.dart';
 import '../dom/validator.dart';
-import 'options.dart';
-import 'slotted_child_view.dart';
 
 sealed class ComponentAnchor {
   ComponentAnchor(this.name, this.key, this.startNode);

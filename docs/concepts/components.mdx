@@ -93,7 +93,7 @@ In every aspect, this component behaves the same as Flutters `InheritedWidget`.
 
 ## Foundation Components
 
-Jaspr has three foundational component types, which are accessible through factory constructors on the `Component` class: `Component.element()`, `Component.text()` and `Component.fragment()`. Additionally, there are two more `Component.empty()` and `Component.wrapElement()` which are all explained below.
+Jaspr has three foundational component types, which are accessible through factory constructors on the `Component` class: `Component.element()`, `Component.text()` and `Component.fragment()`. Additionally, there are two more `Component.empty()` and `Component.apply()` which are all explained below.
 
 <Info>
 Unlike Flutter, Jaspr has a fixed number of foundational components which make up all other components and represent the core building blocks of HTML: element nodes and text nodes. Flutter is different because it allows you to write custom render objects with your own layouting and painting logic. This isn't possible in Jaspr because with HTML, the browser handles both layouting and painting. 
@@ -210,14 +210,14 @@ This is useful when you want to return "nothing" from a build method.
 final component = Component.empty();
 ```
 
-### Component.wrapElement()
+### Component.apply()
 
-A component which applies its attributes and parameters (like `classes`, `styles`,) etc.) to its direct child element(s).
+A component which applies its attributes and parameters (like `classes`, `styles`,) etc.) to its target element(s).
 
-This does not create a HTML element itself. All properties are merged with the respective child element's properties, with the child's properties taking precedence where there are conflicts.
+This does not create a HTML element itself. All properties are merged with the respective target element's properties, with the target's properties taking precedence where there are conflicts.
 
 ```dart
-final component = Component.wrapElement(
+final component = Component.apply(
   classes: 'wrapping-class',
   styles: Styles(backgroundColor: Colors.blue, padding: Padding.all(8.px)),
   child: div(
@@ -235,6 +235,28 @@ The above component renders the following HTML:
 ```html
 <div class="wrapping-class some-class" style="padding: 8px; background-color: red;">
   Hello World
+</div>
+```
+
+By default, `Component.apply()` targets all of its direct children. You can change this by using the `ApplyTarget target` parameter to target elements, either direct children or descendants, by tag, id or class names.
+
+```dart
+final component = Component.apply(
+  target: ApplyTarget.descendantWith(tag: 'p'),
+  styles: Styles(color: Colors.blue),
+  child: div([
+    p([
+      .text('Hello World'),
+    ]),
+  ]),
+);
+```
+
+The above component renders the following HTML:
+
+```html
+<div>
+  <p style="color: blue;">Hello World</p>
 </div>
 ```
 

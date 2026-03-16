@@ -113,15 +113,16 @@ abstract class Component {
   }) = DomComponent._;
 
   /// Creates a component which applies its parameters (like [classes], [styles], etc.) to its
-  /// direct child element(s).
+  /// [target] element(s).
   ///
-  /// This does not create a html element itself. All properties are merged with the respective child element's
-  /// properties, with the child's properties taking precedence where there are conflicts.
+  /// This does not create a HTML element itself. All properties are merged with the respective target element's
+  /// properties. The target's properties take precedence where there are conflicts.
   ///
   /// Example:
   /// ```dart
-  /// return Component.wrapElement(
-  ///   classes: 'wrapping-class',
+  /// return Component.apply(
+  ///   target: ApplyTarget.anyChild,
+  ///   classes: 'applied-class',
   ///   styles: Styles(backgroundColor: Colors.blue, padding: Padding.all(8.px)),
   ///   child: Component.element(
   ///     tag: 'div',
@@ -136,21 +137,20 @@ abstract class Component {
   ///
   /// Renders:
   /// ```html
-  /// <div class="wrapping-class some-class" style="padding: 8px; background-color: red;">
+  /// <div class="applied-class some-class" style="padding: 8px; background-color: red;">
   ///   Hello World
   /// </div>
   /// ```
   ///
-  const factory Component.wrapElement({
-    Key? key,
-    String selector,
+  const factory Component.apply({
+    ApplyTarget target,
     String? id,
     String? classes,
     Styles? styles,
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
     required Component child,
-  }) = _WrappingDomComponent;
+  }) = _ApplyDomComponent;
 
   /// Creates a component which renders a list of child components without any wrapping element.
   ///

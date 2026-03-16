@@ -30,38 +30,15 @@ class DomComponent extends Component {
 
 typedef EventCallback = void Function(web.Event event);
 
-class DomElement extends MultiChildRenderObjectElement {
+class DomElement extends DomRenderObjectElement {
   DomElement(DomComponent super.component);
 
   @override
   DomComponent get component => super.component as DomComponent;
 
-  InheritedElement? _inheritedDomElement;
-
   @override
-  List<Component> buildChildren() {
-    if (_inheritedDomElement case final inheritedDomElement?) {
-      final inheritedDomComponent = dependOnInheritedElement(inheritedDomElement) as _InheritedDomComponent;
-      return _InheritedDomComponent.consume(
-        inheritedDomComponent.paramsBySelector,
-        component,
-        component.children ?? const [],
-      );
-    }
+  List<Component> buildOwnChildren() {
     return component.children ?? const [];
-  }
-
-  @override
-  void _updateInheritance() {
-    super._updateInheritance();
-    if (_inheritedElements case final originalInheritedElements?
-        when originalInheritedElements.containsKey(_InheritedDomComponent)) {
-      final updatedInheritedElements = HashMap<Type, InheritedElement>.of(originalInheritedElements);
-      _inheritedDomElement = updatedInheritedElements.remove(_InheritedDomComponent);
-      _inheritedElements = updatedInheritedElements;
-      return;
-    }
-    _inheritedDomElement = null;
   }
 
   @override
@@ -95,36 +72,67 @@ class DomElement extends MultiChildRenderObjectElement {
 
   @override
   void updateRenderObject(RenderElement renderObject) {
-    if (_inheritedDomElement != null) {
-      final inheritedComponent = dependOnInheritedElement(_inheritedDomElement!) as _InheritedDomComponent;
-      final params = _InheritedDomComponent.applyTo(component, inheritedComponent.paramsBySelector);
-      if (params != null) {
-        renderObject.update(
-          component.id ?? params.id,
-          _DomParams._joinString(params.classes, component.classes),
-          _DomParams._joinMap(params.styles?.properties, component.styles?.properties),
-          _DomParams._joinMap(params.attributes, component.attributes),
-          _DomParams._joinMap(params.events, component.events),
-        );
+    var id = component.id;
+    var classes = component.classes;
+    var styles = component.styles?.properties;
+    var attributes = component.attributes;
+    var events = component.events;
+
+    if (inheritedDomParams case final inheritedDomParams?) {
+      final classesSet = classes?.split(' ').toSet() ?? {};
+      styles = Map.of(styles ?? {});
+      attributes = Map.of(attributes ?? {});
+      events = Map.of(events ?? {});
+
+      for (final param in inheritedDomParams.reversed) {
+        if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
+        if (param.target.id case final expectedId? when expectedId != id) continue;
+        if (param.target.classes case final expectedClasses?
+            when !expectedClasses.every((c) => classesSet.contains(c))) {
+          continue;
+        }
+
+        id ??= param.id;
+
+        if (param.classes case final paramClasses?) {
+          classesSet.addAll(paramClasses);
+        }
+
+        if (param.styles case final stylesProps?) {
+          for (final MapEntry(:key, :value) in stylesProps.entries) {
+            if (!styles.containsKey(key)) {
+              styles[key] = value;
+            }
+          }
+        }
+
+        if (param.attributes case final attributesMap?) {
+          for (final MapEntry(:key, :value) in attributesMap.entries) {
+            if (!attributes.containsKey(key)) {
+              attributes[key] = value;
+            }
+          }
+        }
+
+        if (param.events case final eventsMap?) {
+          for (final MapEntry(:key, :value) in eventsMap.entries) {
+            if (!events.containsKey(key)) {
+              events[key] = value;
+            }
+          }
+        }
       }
 
-      return;
+      classes = classesSet.join(' ');
     }
 
-    renderObject.update(
-      component.id,
-      component.classes,
-      component.styles?.properties,
-      component.attributes,
-      component.events,
-    );
+    renderObject.update(id, classes, styles, attributes, events);
   }
 }
 
-class _WrappingDomComponent extends StatelessComponent implements DomComponent {
-  const _WrappingDomComponent({
-    super.key,
-    this.selector = '> *',
+class _ApplyDomComponent extends StatelessComponent implements DomComponent {
+  const _ApplyDomComponent({
+    this.target = ApplyTarget.anyChild,
     this.id,
     this.classes,
     this.styles,
@@ -133,7 +141,7 @@ class _WrappingDomComponent extends StatelessComponent implements DomComponent {
     required this.child,
   });
 
-  final String selector;
+  final ApplyTarget target;
 
   @override
   final String tag = '';
@@ -156,11 +164,11 @@ class _WrappingDomComponent extends StatelessComponent implements DomComponent {
   Component build(BuildContext context) {
     return _InheritedDomComponent.merge(
       context,
-      selector: DomSelector.parse(selector),
-      params: _DomParams(
+      params: WrapParams(
+        target: target,
         id: id,
-        classes: classes,
-        styles: styles,
+        classes: classes?.split(' '),
+        styles: styles?.properties,
         attributes: attributes,
         events: events,
       ),
@@ -169,135 +177,119 @@ class _WrappingDomComponent extends StatelessComponent implements DomComponent {
   }
 }
 
-class DomSelector {
-  const DomSelector(this.parts);
+/// Defines the target for a [Component.apply] component.
+///
+/// The target can select either a direct child or descendant, and optionally filter by tag, id, and classes.
+class ApplyTarget {
+  static const ApplyTarget anyChild = ApplyTarget.childWith();
 
-  final List<DomSelectorPart> parts;
+  const ApplyTarget.childWith({
+    this.tag,
+    this.id,
+    this.classes,
+  }) : onlyChildren = true;
 
-  static final _specifierRegex = RegExp(r'\*|[#.]?[^\s#.*]+');
+  const ApplyTarget.descendantWith({
+    this.tag,
+    this.id,
+    this.classes,
+  }) : onlyChildren = false;
 
-  static List<DomSelector> parse(String query) {
-    final selectors = <DomSelector>[];
-    final list = query.split(',');
-    for (final s in list) {
-      final parts = <({_Combinator combinator, String? tag, String? id, List<String>? classes})>[];
+  final bool onlyChildren;
+  final String? tag;
+  final String? id;
+  final Set<String>? classes;
 
-      final selectorParts = s.trim().split(RegExp(r'\s+'));
-      _Combinator? combinator;
-      for (final part in selectorParts) {
-        if (part == '>') {
-          if (combinator != null) {
-            throw FormatException('Invalid selector: $s');
-          }
-          combinator = _Combinator.child;
-          continue;
-        }
-
-        combinator ??= _Combinator.descendant;
-
-        String? tag;
-        String? id;
-        List<String>? classes;
-
-        final matches = _specifierRegex.allMatches(part);
-        if (matches.isEmpty) {
-          throw FormatException('Invalid selector: $s');
-        }
-        for (final match in matches) {
-          final specifier = match.group(0)!;
-          if (specifier == '*') {
-            if (tag != null) {
-              throw FormatException('Invalid selector: $s');
-            }
-            tag = '*';
-          } else if (specifier.startsWith('#')) {
-            if (id != null) {
-              throw FormatException('Invalid selector: $s');
-            }
-            id = specifier.substring(1);
-          } else if (specifier.startsWith('.')) {
-            classes ??= [];
-            classes.add(specifier.substring(1));
-          } else {
-            if (tag != null || id != null || classes != null) {
-              throw FormatException('Invalid selector: $s');
-            }
-            tag = specifier;
-          }
-        }
-        if (tag == '*') {
-          tag = null;
-        }
-
-        parts.add((combinator: combinator, tag: tag, id: id, classes: classes));
-        combinator = null;
-      }
-
-      if (parts.isEmpty) {
-        throw FormatException('Invalid selector: $s');
-      }
-
-      selectors.add(DomSelector(parts));
-    }
-    return selectors;
-  }
-
-  bool matches({required String tag, String? id, String? classes}) {
-    if (parts.length != 1) return false;
-    return parts.first.matches(tag: tag, id: id, classes: classes);
-  }
-
-  (List<DomSelector>, bool) consume({required String tag, String? id, String? classes}) {
-    final first = parts.first;
-    final matches = first.matches(tag: tag, id: id, classes: classes);
-
-    if (first.combinator == _Combinator.child) {
-      // The first part doesn't match, so the selector chain is terminated.
-      if (!matches) {
-        return ([], true);
-      }
-    } else {
-      // The first part matches, so we can include the rest of the selector chain as a new selector.
-      if (matches) {
-        return ([DomSelector(parts.skip(1).toList()), this], true);
-      }
-    }
-
-    return ([this], false);
-  }
+  String get query => [
+    if (onlyChildren) '> ',
+    if (tag == null && id == null && classes == null)
+      '*'
+    else ...[
+      if (tag != null) tag,
+      if (id != null) '#$id',
+      if (classes != null) ...classes!.map((c) => '.$c'),
+    ],
+  ].join();
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is DomSelector &&
-        parts.length == other.parts.length &&
-        parts.every((p) => p == other.parts[parts.indexOf(p)]);
+    return other is ApplyTarget &&
+        onlyChildren == other.onlyChildren &&
+        tag == other.tag &&
+        id == other.id &&
+        classes?.length == other.classes?.length &&
+        classes?.every((c) => other.classes?.contains(c) ?? false) == true;
   }
 
   @override
-  int get hashCode => Object.hashAll(parts);
+  int get hashCode => Object.hashAll([onlyChildren, tag, id, classes?.length, ...?classes]);
 }
 
-typedef DomSelectorPart = ({_Combinator combinator, String? tag, String? id, List<String>? classes});
+@protected
+abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
+  DomRenderObjectElement(super.component);
 
-extension on DomSelectorPart {
-  bool matches({required String tag, String? id, String? classes}) {
-    late final classesSet = classes?.split(' ').toSet() ?? const <String>{};
+  InheritedElement? _inheritedDomElement;
 
-    if (this.tag case final expectedTag? when expectedTag != tag) return false;
-    if (this.id case final expectedId? when expectedId != id) return false;
-    if (this.classes case final expectedClasses? when !expectedClasses.every((c) => classesSet.contains(c))) {
-      return false;
+  List<WrapParams>? get inheritedDomParams {
+    if (_inheritedDomElement case final inheritedDomElement?) {
+      final inheritedDomComponent = dependOnInheritedElement(inheritedDomElement) as _InheritedDomComponent;
+      return inheritedDomComponent.params;
     }
+    return null;
+  }
 
-    return true;
+  List<Component> buildOwnChildren();
+
+  @override
+  List<Component> buildChildren() {
+    if (inheritedDomParams case final inheritedDomParams?) {
+      final List<WrapParams> newParams = inheritedDomParams.where((p) => !p.target.onlyChildren).toList();
+
+      // If we either removed all selectors (or none), we can return the children as is.
+      // The inherited element was already removed (or kept) by the [_updateInheritance] method.
+      if (newParams.isEmpty || newParams.length == inheritedDomParams.length) {
+        return buildOwnChildren();
+      }
+
+      return [
+        for (final child in buildOwnChildren()) _InheritedDomComponent(params: newParams, child: child),
+      ];
+    }
+    return buildOwnChildren();
+  }
+
+  @override
+  void _updateInheritance() {
+    super._updateInheritance();
+    if (_inheritedElements case final originalInheritedElements?) {
+      if (originalInheritedElements[_InheritedDomComponent] case final inheritedElement?) {
+        final updatedInheritedElements = HashMap<Type, InheritedElement>.of(originalInheritedElements);
+        _inheritedDomElement = inheritedElement;
+
+        // Removing this here when *some* selectors use child combinators allows us to short-circuit the build logic to
+        // not add a new [_InheritedDomComponent] when either:
+        //   - *all* selectors use child combinators, as then the inherited element is already removed, or
+        //   - *all* selectors use descendant combinators, as then the inherited element stays unchanged.
+        // Only when *some* selectors use descendant combinators and *some* selectors use child combinators do we need
+        // to create a new [_InheritedDomComponent] in the [buildChildren] method.
+        if ((inheritedElement.component as _InheritedDomComponent).params.any((p) => p.target.onlyChildren)) {
+          updatedInheritedElements.remove(_InheritedDomComponent);
+        }
+
+        _inheritedElements = updatedInheritedElements;
+        return;
+      }
+    }
+    _inheritedDomElement = null;
   }
 }
 
-enum _Combinator { descendant, child }
-
-class _DomParams {
-  const _DomParams({
+@protected
+class WrapParams {
+  const WrapParams({
+    required this.target,
     this.id,
     this.classes,
     this.styles,
@@ -305,129 +297,35 @@ class _DomParams {
     this.events,
   });
 
+  final ApplyTarget target;
   final String? id;
-  final String? classes;
-  final Styles? styles;
+  final List<String>? classes;
+  final Map<String, String>? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
-
-  _DomParams merge(_DomParams other) {
-    return _DomParams(
-      id: other.id ?? id,
-      classes: _joinString(classes, other.classes),
-      styles: switch ((styles, other.styles)) {
-        (null, final s) || (final s, null) => s,
-        (final sa?, final sb?) => sa.combine(sb),
-      },
-      attributes: _joinMap(attributes, other.attributes),
-      events: _joinMap(events, other.events),
-    );
-  }
-
-  static String? _joinString(String? a, String? b) {
-    if (a == null) return b;
-    if (b == null) return a;
-    return '$a $b';
-  }
-
-  static Map<K, V>? _joinMap<K, V>(Map<K, V>? a, Map<K, V>? b) {
-    if (a == null || a.isEmpty) return b;
-    if (b == null || b.isEmpty) return a;
-    return {...a, ...b};
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is _DomParams &&
-        other.id == id &&
-        other.classes == classes &&
-        other.styles == styles &&
-        other.attributes == attributes &&
-        other.events == events;
-  }
-
-  @override
-  int get hashCode => Object.hash(id, classes, styles, attributes, events);
 }
 
 class _InheritedDomComponent extends InheritedComponent {
-  const _InheritedDomComponent({required this.paramsBySelector, required super.child, super.key});
+  const _InheritedDomComponent({required this.params, required super.child});
+
+  final List<WrapParams> params;
 
   factory _InheritedDomComponent.merge(
     BuildContext context, {
-    required List<DomSelector> selector,
-    required _DomParams params,
+    required WrapParams params,
     required Component child,
   }) {
     final current = context.dependOnInheritedComponentOfExactType<_InheritedDomComponent>();
     if (current == null) {
-      return _InheritedDomComponent(paramsBySelector: {for (final s in selector) s: params}, child: child);
+      return _InheritedDomComponent(params: [params], child: child);
     }
-    final paramsBySelector = Map<DomSelector, _DomParams>.from(current.paramsBySelector);
-    for (final s in selector) {
-      if (paramsBySelector[s] case final existing?) {
-        paramsBySelector[s] = existing.merge(params);
-      } else {
-        paramsBySelector[s] = params;
-      }
-    }
-    return _InheritedDomComponent(paramsBySelector: paramsBySelector, child: child);
+    return _InheritedDomComponent(params: [...current.params, params], child: child);
   }
-
-  static List<Component> consume(
-    Map<DomSelector, _DomParams> paramsBySelector,
-    DomComponent component,
-    List<Component> children,
-  ) {
-    bool didConsume = false;
-    final Map<DomSelector, _DomParams> newParamsBySelector = {};
-
-    for (final MapEntry(key: selector, value: params) in paramsBySelector.entries) {
-      final (newSelectors, didConsumeSelector) = selector.consume(
-        tag: component.tag,
-        id: component.id,
-        classes: component.classes,
-      );
-
-      didConsume |= didConsumeSelector;
-      for (final newSelector in newSelectors) {
-        newParamsBySelector[newSelector] = params;
-      }
-    }
-
-    if (!didConsume) {
-      return children;
-    }
-
-    return [
-      _InheritedDomComponent(
-        paramsBySelector: newParamsBySelector,
-        child: Component.fragment(children),
-      ),
-    ];
-  }
-
-  static _DomParams? applyTo(DomComponent component, Map<DomSelector, _DomParams> paramsBySelector) {
-    _DomParams? params;
-
-    for (final selector in paramsBySelector.keys) {
-      if (selector.matches(tag: component.tag, id: component.id, classes: component.classes)) {
-        params = params?.merge(paramsBySelector[selector]!) ?? paramsBySelector[selector];
-      }
-    }
-
-    return params;
-  }
-
-  final Map<DomSelector, _DomParams> paramsBySelector;
 
   @override
   bool updateShouldNotify(_InheritedDomComponent oldComponent) {
-    if (oldComponent.paramsBySelector.length != paramsBySelector.length) return true;
-    return oldComponent.paramsBySelector.entries.any(
-      (e) => paramsBySelector[e.key] != e.value,
-    );
+    if (params.length != oldComponent.params.length) return true;
+    return params.indexed.any((e) => oldComponent.params[e.$1] != e.$2);
   }
 }
 
