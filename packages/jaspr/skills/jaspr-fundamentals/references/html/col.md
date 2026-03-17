@@ -4,7 +4,6 @@ Signature of the col component:
 
 ```dart
 const col({
-  /// Specifies the number of consecutive columns the <col> element spans. The value must be a positive integer greater than zero. If not present, its default value is 1.
   int? span,
   String? id,
   String? classes,

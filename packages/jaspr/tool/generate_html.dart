@@ -456,11 +456,6 @@ void writeTagResource(Class clazz, Map<String, dynamic> data, Map<String, dynami
       continue;
     }
     final field = clazz.fields.firstWhere((f) => f.name == param.name);
-    if (!stdFields.contains(param.name)) {
-      for (final doc in field.docs) {
-        signature += '  ${doc.replaceAll('&lt;', '<').replaceAll('&gt;', '>')}\n';
-      }
-    }
     signature += '  ';
     if (param.required) {
       signature += 'required ';

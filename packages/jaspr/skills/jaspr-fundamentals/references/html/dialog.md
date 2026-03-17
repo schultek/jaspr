@@ -4,7 +4,6 @@ Signature of the dialog component:
 
 ```dart
 const dialog(List<Component> children, {
-  /// Indicates that the dialog is active and can be interacted with. When the open attribute is not set, the dialog shouldn't be shown to the user.
   bool open = false,
   String? id,
   String? classes,
