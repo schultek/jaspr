@@ -15,10 +15,10 @@ final class a extends StatelessComponent {
   /// {@macro jaspr.html.a}
   const a(
     this.children, {
-    this.download,
     required this.href,
     this.target,
     this.type,
+    this.download,
     this.referrerPolicy,
     this.onClick,
     this.id,
@@ -28,15 +28,6 @@ final class a extends StatelessComponent {
     this.events,
     super.key,
   });
-
-  /// Causes the browser to treat the linked URL as a download. Can be used with or without a value:
-  ///
-  /// Without a value, the browser will suggest a filename/extension, generated from various sources:
-  /// The Content-Disposition HTTP header
-  /// The final segment in the URL path
-  /// The media type (from the Content-Type header, the start of a data: URL, or Blob.type for a blob: URL)
-  /// Defining a value suggests it as the filename. / and \ characters are converted to underscores (_). Filesystems may forbid other characters in filenames, so browsers will adjust the suggested name if necessary.
-  final String? download;
 
   /// The URL that the hyperlink points to. Links are not restricted to HTTP-based URLs — they can use any URL scheme supported by browsers:
   ///
@@ -52,6 +43,15 @@ final class a extends StatelessComponent {
 
   /// Hints at the linked URL's format with a MIME type. No built-in functionality.
   final String? type;
+
+  /// Causes the browser to treat the linked URL as a download. Can be used with or without a value:
+  ///
+  /// Without a value, the browser will suggest a filename/extension, generated from various sources:
+  /// The Content-Disposition HTTP header
+  /// The final segment in the URL path
+  /// The media type (from the Content-Type header, the start of a data: URL, or Blob.type for a blob: URL)
+  /// Defining a value suggests it as the filename. / and \ characters are converted to underscores (_). Filesystems may forbid other characters in filenames, so browsers will adjust the suggested name if necessary.
+  final String? download;
 
   /// How much of the referrer to send when following the link.
   final ReferrerPolicy? referrerPolicy;
@@ -86,10 +86,10 @@ final class a extends StatelessComponent {
       styles: styles,
       attributes: {
         ...?attributes,
-        'download': ?download,
         'href': href,
         'target': ?target?.value,
         'type': ?type,
+        'download': ?download,
         'referrerpolicy': ?referrerPolicy?.value,
       },
       events: {
@@ -116,6 +116,37 @@ enum Target {
   top('_top');
 
   const Target(this.value);
+
+  final String value;
+}
+
+/// The Referrer-Policy controls how much referrer information (sent with the Referer header) should be included with requests.
+enum ReferrerPolicy {
+  /// The Referer header will not be sent.
+  noReferrer('no-referrer'),
+
+  /// The Referer header will not be sent to origins without TLS (HTTPS).
+  noReferrerWhenDowngrade('no-referrer-when-downgrade'),
+
+  /// The sent referrer will be limited to the origin of the referring page: its scheme, host, and port.
+  origin('origin'),
+
+  /// The referrer sent to other origins will be limited to the scheme, the host, and the port. Navigations on the same origin will still include the path.
+  originWhenCrossOrigin('origin-when-cross-origin'),
+
+  /// A referrer will be sent for same origin, but cross-origin requests will contain no referrer information.
+  sameOrigin('same-origin'),
+
+  /// Only send the origin of the document as the referrer when the protocol security level stays the same (HTTPS→HTTPS), but don't send it to a less secure destination (HTTPS→HTTP).
+  strictOrigin('strict-origin'),
+
+  /// (default): Send a full URL when performing a same-origin request, only send the origin when the protocol security level stays the same (HTTPS→HTTPS), and send no header to a less secure destination (HTTPS→HTTP).
+  strictOriginWhenCrossOrigin('strict-origin-when-cross-origin'),
+
+  /// The referrer will include the origin and the path (but not the fragment, password, or username). This value is unsafe, because it leaks origins and paths from TLS-protected resources to insecure origins.
+  unsafeUrl('unsafe-url');
+
+  const ReferrerPolicy(this.value);
 
   final String value;
 }

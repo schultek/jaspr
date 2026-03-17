@@ -44,10 +44,14 @@ class MyComponent extends StatelessComponent {
 
 Jaspr provides typed components for standard HTML elements (e.g., `div()`, `p()`, `a()`, `button()`). To use these add the `package:jaspr/dom.dart` import. 
 
-Most HTML components take a positional `List<Component> children` parameter, and named `Key? key`, `String? id`, `String? classes`, `Styles? style`, `Map<String, String>? attributes` and `Map<String, void Function(Event)>? events` parameters.
+All HTML components take standard named `Key? key`, `String? id`, `String? classes`, `Styles? style`, `Map<String, String>? attributes` and `Map<String, void Function(Event)>? events` parameters.
+Most HTML components take a positional `List<Component> children` parameter (except for self-closing tags like `img`, `input`, `br`, etc.).
 
 - **Rule 1:** ALWAYS put the `children` list LAST, after all named parameters.
 - **Rule 2:** You MUST prefer available typed parameters (e.g., `href`, `src`, `onClick`) over using the raw `attributes:` or `events:` maps.
+- **Rule 3:** When you are unsure about which typed parameters exist for an HTML component, you **MUST** read the respective reference file provided alongside this skill:
+  - `references/html/<tag>.md` contains the full signature and example usage of the component for the given tag. (e.g. `references/html/div.md` for `div()`, `references/html/button.md` for `button()`, etc.)
+- **Rule 4:** When a respective reference file does not exist for a tag (and therefore the component itself doesn't exist), you **MUST** use the generic `.element(tag: '...', /* other standard params, */ children: [ /* ... */ ])` constructor instead.
 
 **Example Usage:**
 ```dart
@@ -63,41 +67,13 @@ class MyHtmlComponent extends StatelessComponent {
       p(attributes: {'aria-label': 'Example Paragraph'}, [
         .text('Hello World'),
       ]),
+      // E.g. signature as found at 'references/html/a.md'
       a(href: 'https://example.com', [
         .text('Click me'),
       ]),
     ]);
   }
 }
-```
-
-### Finding Typed Parameters
-
-When you are unsure which typed parameters exist for an HTML component, you MUST use the `tooling-daemon` to look up its signature.
-
-Run this command in the terminal: `jaspr tooling-daemon lookup-tag <tag>`
-
-Example output for `jaspr tooling-daemon lookup-tag button`:
-
-```dart
-/// The &lt;button&gt; HTML element is an interactive element activated by a user with a mouse, keyboard, finger, voice command, or other assistive technology. Once activated, it then performs a programmable action, such as submitting a form or opening a dialog.
-const button(
-  List<Component> children, {
-  /// Specifies that the button should have input focus when the page loads. Only one element in a document can have this attribute.
-  bool autofocus = false,
-  /// Prevents the user from interacting with the button: it cannot be pressed or focused.
-  bool disabled = false,
-  /// The default behavior of the button.
-  ButtonType? type, // One of `.submit`, `.reset`, `.button`
-  /// Callback for the 'click' event.
-  VoidCallback? onClick,
-  String? id,
-  String? classes,
-  Styles? styles,
-  Map<String, String>? attributes,
-  Map<String, void Function(Event)>? events,
-  Key? key,
-});
 ```
 
 ## Interactivity and Events

@@ -66,7 +66,7 @@ class HtmlDomain extends Domain {
         } else {
           if (specAttributes?[key] case final Map<String, Object?> attrSpec) {
             final attrName = (attrSpec['name'] ?? key) as String;
-            var attrType = attrSpec['type'];
+            final attrType = attrSpec['type'] as String;
 
             if (attrType == 'string') {
               paramStrings.add('$attrName: ${_escapeString(value)}');
@@ -76,12 +76,11 @@ class HtmlDomain extends Domain {
               paramStrings.add('$attrName: true');
               continue;
             }
-            if (attrType is String && attrType.startsWith('enum:')) {
+            if (attrType.startsWith('enum:')) {
               final enumName = attrType.substring(5);
-              attrType = enumSpecs[enumName];
-            }
-            if (attrType case {'name': final String enumName, 'values': final Map<String, Object?> enumValues}) {
-              final enumValue = enumValues.entries
+              final enumSpec = htmlSpec['enums']![enumName] as Map<String, Object?>;
+
+              final enumValue = (enumSpec['values'] as Map<String, Object?>).entries
                   .where(
                     (e) => ((e.value as Map<String, Object?>?)?['value'] ?? e.key) == value,
                   )
@@ -178,27 +177,13 @@ class HtmlDomain extends Domain {
 
 final elementSpecs = (() {
   final config = <String, Object?>{};
-  for (final group in htmlSpec.values) {
+  for (final group in htmlSpec['tags']!.values) {
     for (final entry in group.entries) {
       final name = entry.key;
-      final data = entry.value;
+      final data = entry.value as Map<String, Object?>;
       final tag = data['tag'] as String? ?? name;
       config[tag] = {...data, 'name': name};
     }
   }
   return config;
-})();
-
-final enumSpecs = (() {
-  final enums = <String, Map<String, Object?>>{};
-  for (final element in elementSpecs.values.cast<Map<String, Object?>>()) {
-    if (element['attributes'] case final Map<String, Object?> attrs) {
-      for (final attr in attrs.values.cast<Map<String, Object?>>()) {
-        if (attr['type'] case <String, Object?>{'name': String _, 'values': final Map<String, Object?> type}) {
-          enums[type['name'] as String] = type;
-        }
-      }
-    }
-  }
-  return enums;
 })();
