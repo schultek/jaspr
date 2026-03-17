@@ -1,6 +1,7 @@
-## Unreleased patch
+## Unreleased minor
 
 - Allow `analyzer` versions 10.x.
+- Added debug-only component tree inspector (Ctrl+Shift+D) for visualizing the live component tree in development builds.
 
 ## 0.22.3
 

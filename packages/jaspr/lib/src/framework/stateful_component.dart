@@ -561,6 +561,12 @@ abstract class State<T extends StatefulComponent> {
   @protected
   Component build(BuildContext context);
 
+  /// Returns a map of state field names to their string representations.
+  ///
+  /// Override in debug builds to expose state fields to the inspector.
+  /// Default returns empty map.
+  Map<String, String> debugDescribeState() => const {};
+
   /// Called when a dependency of this [State] object changes.
   ///
   /// For example, if the previous call to [build] referenced an

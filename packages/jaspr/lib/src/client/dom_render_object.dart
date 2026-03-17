@@ -16,6 +16,9 @@ abstract class DomRenderObject implements RenderObject {
   web.Node get node;
 
   @override
+  bool? debugWasHydrated;
+
+  @override
   DomRenderObject? parent;
 
   DomRenderObject? previousSibling;
@@ -68,12 +71,14 @@ class DomRenderElement extends DomRenderObject
         print('Hydrate html node: $retakeNode');
       }
       node = retakeNode as web.Element;
+      debugWasHydrated = true;
 
       toHydrate = retakeNode.childNodes.toIterable().toList();
       return;
     }
 
     node = _createElement(tag, namespace);
+    debugWasHydrated = false;
     if (kVerboseMode) {
       web.console.log('Create html node: $node'.toJS);
     }
@@ -234,6 +239,7 @@ class DomRenderText extends DomRenderObject implements RenderText {
         print('Hydrate text node: $retakeNode');
       }
       node = retakeNode as web.Text;
+      debugWasHydrated = true;
       if (node.textContent != text) {
         node.textContent = text;
         if (kVerboseMode) {
@@ -244,6 +250,7 @@ class DomRenderText extends DomRenderObject implements RenderText {
     }
 
     node = web.Text(text);
+    debugWasHydrated = false;
     if (kVerboseMode) {
       print('Create text node: $text');
     }

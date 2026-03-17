@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
@@ -28,6 +29,11 @@ mixin ProxyHelper on BaseCommand {
       if (req.url.path == r'$jasprMessageHandler') {
         onMessage?.call(jsonDecode(await req.readAsString()));
         return Response.ok(null);
+      }
+
+      if (req.url.path == r'$jasprProjectInfo') {
+        final info = jsonEncode(_buildProjectInfo());
+        return Response.ok(info, headers: {'content-type': 'application/json'});
       }
 
       // Each proxyHandler will read the body, so we have to duplicate the stream beforehand,
@@ -164,4 +170,44 @@ Handler _sseProxyHandler(http.Client client, String webPort, Logger logger) {
 
     return Response.notFound('');
   };
+}
+
+/// Reads .dart_tool/package_config.json and builds a map of
+/// package name → absolute lib path for all packages.
+// NOTE: Keep in sync with the parallel implementation in
+// packages/jaspr/lib/src/server/server_handler.dart
+Map<String, Object> _buildProjectInfo() {
+  final packages = <String, String>{};
+  final configFile = _findPackageConfig(Directory.current.path);
+  if (configFile != null) {
+    final configDir = p.dirname(configFile.path);
+    final config = jsonDecode(configFile.readAsStringSync()) as Map<String, dynamic>;
+    final pkgList = config['packages'] as List<dynamic>? ?? [];
+    for (final entry in pkgList) {
+      final pkg = entry as Map<String, dynamic>;
+      final name = pkg['name'] as String;
+      final rootUri = pkg['rootUri'] as String;
+      final packageUri = pkg['packageUri'] as String? ?? 'lib/';
+      final String rootDir;
+      if (rootUri.startsWith('file:')) {
+        rootDir = Uri.parse(rootUri).toFilePath();
+      } else {
+        rootDir = p.normalize(p.join(configDir, rootUri));
+      }
+      final libDir = p.normalize(p.join(rootDir, packageUri));
+      packages[name] = libDir;
+    }
+  }
+  return {'packages': packages};
+}
+
+File? _findPackageConfig(String startDir) {
+  var dir = startDir;
+  while (true) {
+    final f = File(p.join(dir, '.dart_tool', 'package_config.json'));
+    if (f.existsSync()) return f;
+    final parent = p.dirname(dir);
+    if (parent == dir) return null;
+    dir = parent;
+  }
 }

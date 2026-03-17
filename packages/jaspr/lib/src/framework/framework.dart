@@ -351,6 +351,20 @@ abstract class Element implements BuildContext {
   // orderly fashion.
   _ElementLifecycle _lifecycleState = _ElementLifecycle.initial;
 
+  /// Debug-only stack trace captured when this element was mounted.
+  ///
+  /// Only populated in debug builds. Returns `null` in release.
+  StackTrace? _debugCreationStack;
+
+  /// Debug-only stack trace captured at element creation time.
+  StackTrace? get debugCreationStack => _debugCreationStack;
+
+  /// Debug-only reference to the element whose build() method created this element.
+  Element? _debugBuildOwnerElement;
+
+  /// The element whose build() method produced the component that created this element.
+  Element? get debugBuildOwnerElement => _debugBuildOwnerElement;
+
   /// Calls the argument for each child.
   ///
   /// There is no guaranteed order in which the children will be visited, though
@@ -638,6 +652,10 @@ abstract class Element implements BuildContext {
   /// method, as in `super.mount(parent)`.
   @mustCallSuper
   void mount(Element? parent, ElementSlot newSlot) {
+    assert(() {
+      _debugCreationStack = StackTrace.current;
+      return true;
+    }());
     assert(_lifecycleState == _ElementLifecycle.initial);
     assert(_component != null);
     assert(_parent == null);
@@ -807,6 +825,10 @@ abstract class Element implements BuildContext {
     newChild.mount(this, newSlot);
     newChild.didMount();
     assert(newChild._lifecycleState == _ElementLifecycle.active);
+    assert(() {
+      newChild._debugBuildOwnerElement = owner._debugCurrentBuildTarget ?? this;
+      return true;
+    }());
     return newChild;
   }
 

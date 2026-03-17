@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
+import '../devtools/inspector.dart';
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../framework/framework.dart';
@@ -60,6 +61,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   void completeInitialFrame() {
     (rootElement!.renderObject as DomRenderObject).finalize();
     super.completeInitialFrame();
+    initInspector(this);
   }
 
   @override

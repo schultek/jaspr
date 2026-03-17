@@ -76,6 +76,18 @@ Handler createHandler(
     cascade = cascade.add(gzipMiddleware(staticHandler));
   }
 
+  if (kDebugMode) {
+    cascade = cascade.add((request) {
+      if (request.url.path == r'$jasprProjectInfo') {
+        return Response.ok(
+          _buildProjectInfoJson(),
+          headers: {'content-type': 'application/json'},
+        );
+      }
+      return Response.notFound('');
+    });
+  }
+
   cascade = cascade.add((request) async {
     var isAllowedPath = false;
     final segment = request.url.pathSegments.lastOrNull ?? '';
@@ -184,3 +196,46 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
 }
 
 // coverage:ignore-end
+
+String? _projectInfoCache;
+
+// NOTE: Keep in sync with the parallel implementation in
+// packages/jaspr_cli/lib/src/helpers/proxy_helper.dart
+String _buildProjectInfoJson() {
+  if (_projectInfoCache != null) return _projectInfoCache!;
+  final packages = <String, String>{};
+  final configFile = _findPackageConfig(Directory.current.path);
+  if (configFile != null) {
+    final configDir = dirname(configFile.path); // .dart_tool directory
+    final config = jsonDecode(configFile.readAsStringSync()) as Map<String, dynamic>;
+    final pkgList = config['packages'] as List<dynamic>? ?? [];
+    for (final entry in pkgList) {
+      final pkg = entry as Map<String, dynamic>;
+      final name = pkg['name'] as String;
+      final rootUri = pkg['rootUri'] as String;
+      final packageUri = pkg['packageUri'] as String? ?? 'lib/';
+      final String rootDir;
+      if (rootUri.startsWith('file:')) {
+        rootDir = Uri.parse(rootUri).toFilePath();
+      } else {
+        rootDir = normalize(join(configDir, rootUri));
+      }
+      final libDir = normalize(join(rootDir, packageUri));
+      packages[name] = libDir;
+    }
+  }
+  _projectInfoCache = jsonEncode({'packages': packages});
+  return _projectInfoCache!;
+}
+
+/// Walks up from [startDir] to find `.dart_tool/package_config.json`.
+File? _findPackageConfig(String startDir) {
+  var dir = startDir;
+  while (true) {
+    final f = File(join(dir, '.dart_tool', 'package_config.json'));
+    if (f.existsSync()) return f;
+    final parent = dirname(dir);
+    if (parent == dir) return null;
+    dir = parent;
+  }
+}

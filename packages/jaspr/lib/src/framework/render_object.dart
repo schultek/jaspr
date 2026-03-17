@@ -4,6 +4,12 @@ abstract class RenderObject {
   RenderObject? get parent;
   web.Node? get node;
 
+  /// Whether this node's DOM was hydrated from server-rendered HTML.
+  ///
+  /// `true` = hydrated from server HTML, `false` = created by client JS,
+  /// `null` = not applicable (e.g. fragments, anchors).
+  bool? debugWasHydrated;
+
   RenderElement createChildRenderElement(String tag);
   RenderText createChildRenderText(String text);
   RenderFragment createChildRenderFragment();
