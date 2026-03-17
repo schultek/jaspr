@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://jaspr.site">Website</a> •
-  <a href="https://docs.jaspr.site/get_started/quick_start">Quickstart</a> •
+  <a href="https://docs.jaspr.site/quick_start">Quickstart</a> •
   <a href="https://docs.jaspr.site">Documentation</a> •
   <a href="https://playground.jaspr.site">Playground</a> •
   <a href="https://github.com/schultek/jaspr/tree/main/examples/">Examples</a> •
@@ -183,5 +183,5 @@ void main() {
 ```
 
 For more examples on how to use the testing package, check out the 
-[documentation](https://docs.jaspr.site/concepts/testing) and the 
+[documentation](https://docs.jaspr.site/dev/testing) and the 
 [tests in the jaspr package](https://github.com/schultek/jaspr/tree/main/packages/jaspr/test).

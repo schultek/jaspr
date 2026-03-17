@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:build_daemon/data/server_log.dart' as s;
 import 'package:io/ansi.dart';
 import 'package:mason/mason.dart' as m;
+import 'package:meta/meta.dart';
 
 typedef Level = m.Level;
 typedef MasonLogger = m.Logger;
@@ -28,23 +29,33 @@ enum Tag {
 enum ProgressState { running, completed }
 
 abstract class Logger {
-  factory Logger(bool verbose) = _Logger;
+  Logger.base({this.verbose = false, this.logger});
+  factory Logger(bool verbose) => _Logger(verbose: verbose);
 
-  MasonLogger? get logger;
-  bool get verbose;
-
-  void complete(bool success);
-  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress});
-}
-
-class _Logger implements Logger {
-  _Logger(this.verbose);
-
-  @override
+  final MasonLogger? logger;
   final bool verbose;
 
-  @override
-  final MasonLogger logger = MasonLogger();
+  void complete(bool success);
+  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
+    message = message.trimRight();
+
+    if (message.contains('\n')) {
+      final lines = message.split('\n');
+      for (final l in lines) {
+        writeLine(l, tag: tag, level: level, progress: progress);
+      }
+      return;
+    }
+
+    writeLine(message, tag: tag, level: level, progress: progress);
+  }
+
+  @protected
+  void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {}
+}
+
+class _Logger extends Logger {
+  _Logger({super.verbose = false}) : super.base(logger: MasonLogger());
 
   m.Progress? _progress;
 
@@ -61,20 +72,8 @@ class _Logger implements Logger {
   }
 
   @override
-  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
+  void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     if (level == Level.verbose && !verbose) {
-      return;
-    }
-
-    message = message.trim();
-    if (message.isEmpty) {
-      return;
-    }
-    if (message.contains('\n')) {
-      final lines = message.split('\n');
-      for (final l in lines) {
-        write(l, tag: tag, level: level, progress: progress);
-      }
       return;
     }
 
@@ -83,7 +82,7 @@ class _Logger implements Logger {
     final String log = '${tag?.format() ?? ''}${level.format(message.trim())}';
 
     if (showAsProgress) {
-      _progress ??= logger.progress(log);
+      _progress ??= logger?.progress(log);
       if (progress == ProgressState.completed) {
         if (level.index <= Level.info.index) {
           _progress!.complete(log);

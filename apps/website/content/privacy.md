@@ -1,3 +1,8 @@
+---
+title: Privacy Policy
+layout: imprint
+---
+
 ### Privacy Policy
 
 Responsible for data processing on this website is:

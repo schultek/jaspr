@@ -35,7 +35,7 @@ Router(
 
 You may want to generate dynamic routes based on some data for your application.
 
-Take for example a typical blog site, where each blog post has its own route, e.g. `/posts/{postId}`, and you want
+Take, for example, a typical blog site, where each blog post has its own route, e.g. `/posts/{postId}`, and you want
 to render these as separate pages when running `jaspr build`. Normally, you could use routes with path parameters for this,
 however for static-site generation, path parameters are not supported, since all routes need to be resolvable when initializing the router.
 
@@ -65,6 +65,17 @@ Since `ServerApp` is only available through the `package:jaspr/server.dart` impo
 server code and not the client.
 
 The method should be called during the initial build of your app, so putting it into `initState()` of your root component is a good choice.
+
+## Content-Driven Sites
+
+If you are building a content-heavy site like a blog, documentation or marketing page, it is recommended to use the `jaspr_content` package.
+
+This package provides a set of tools to load, parse, and render content from markdown files, along with support for frontmatter, templating, and custom components.
+It works great with static-site generation and automatically generates routes for your content.
+
+<Info>
+  Check out the [jaspr_content](/content) documentation for more details.
+</Info>
 
 ## Generating a Sitemap
 

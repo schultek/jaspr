@@ -1,33 +1,33 @@
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/jaspr.dart';
-import 'package:jaspr_router/jaspr_router.dart';
+import 'package:jaspr/server.dart';
+import 'package:jaspr_content/jaspr_content.dart';
 
-import 'components/banner.dart';
-import 'components/markdown_page.dart';
-import 'constants/theme.dart';
-import 'layout/footer.dart';
-import 'layout/header.dart';
-import 'pages/home/home.dart';
+import '../components/banner.dart';
+import '../components/layout/footer.dart';
+import '../components/layout/header.dart';
+import '../constants/theme.dart';
+import '../pages/home/home.dart';
 
-class App extends StatelessComponent {
-  const App({super.key});
+class HomeLayout extends PageLayout {
+  @override
+  Pattern get name => 'home';
 
   @override
-  Component build(BuildContext context) {
-    return Router(
-      routes: [
-        Route(
-          path: '/',
-          builder: (_, _) => .fragment([
-            Banner(),
-            Header(),
-            main_([Home()]),
-            Footer(),
-          ]),
-        ),
-        Route(path: '/imprint', title: 'Imprint', builder: (_, _) => MarkdownPage('lib/content/imprint.md')),
-        Route(path: '/privacy', title: 'Privacy Policy', builder: (_, _) => MarkdownPage('lib/content/privacy.md')),
+  Component buildLayout(Page page, Component child) {
+    return Document(
+      title: 'Jaspr | Dart Web Framework',
+      lang: 'en',
+      head: [link(rel: 'icon', type: 'image/x-icon', href: 'favicon.ico')],
+      styles: [
+        css('html.light .on-dark').styles(display: .none),
+        css('html.dark .on-light').styles(display: .none),
       ],
+      body: .fragment([
+        Banner(),
+        Header(),
+        main_([Home()]),
+        Footer(),
+      ]),
     );
   }
 

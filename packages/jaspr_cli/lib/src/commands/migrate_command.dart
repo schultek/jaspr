@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:analyzer/source/line_info.dart';
 import 'package:file/local.dart';
 import 'package:io/ansi.dart';
-import 'package:pub_updater/pub_updater.dart';
 import 'package:yaml/yaml.dart';
 
 import '../command_runner.dart';
@@ -97,7 +96,7 @@ class MigrateCommand extends BaseCommand {
     var targetJasprVersion = targetVersion;
     if (targetJasprVersion == null) {
       try {
-        targetJasprVersion = await PubUpdater().getLatestVersion(packageName);
+        targetJasprVersion = await updater.getLatestVersion(packageName);
       } catch (error) {
         logger.write('$error', level: Level.error);
         logger.write(

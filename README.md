@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="https://jaspr.site">Website</a> •
-  <a href="https://docs.jaspr.site/get_started/quick_start">Quickstart</a> •
+  <a href="https://docs.jaspr.site/quick_start">Quickstart</a> •
   <a href="https://docs.jaspr.site">Documentation</a> •
   <a href="https://playground.jaspr.site">Playground</a> •
   <a href="https://discord.gg/XGXrGEk4c6">Community & Support</a> •

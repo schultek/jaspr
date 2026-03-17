@@ -1,7 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_content/jaspr_content.dart';
 
-import '../constants/texts.dart';
 import '../constants/theme.dart';
 
 class Banner extends StatelessComponent {
@@ -9,14 +9,23 @@ class Banner extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
+    final banner = context.page.data.site['banner'] as Map<String, Object?>? ?? {};
+    if (banner['enabled'] == false) return .empty();
+
+    final text = (banner['text'] as String).split('{{link}}');
+    final linkText = banner['linkText'] as String? ?? '';
+    final link = banner['link'] as String? ?? '';
+
     return div(
       id: 'site-banner',
       attributes: {'role': 'alert'},
       [
         p([
-          .text(bannerText.$1),
-          a(classes: 'animated-underline', href: bannerLink, target: .blank, [.text(bannerText.$2)]),
-          .text(bannerText.$3),
+          .text(text[0]),
+          if (text.length > 1) ...[
+            a(classes: 'animated-underline', href: link, target: .blank, [.text(linkText)]),
+            .text(text.skip(1).join('')),
+          ],
         ]),
       ],
     );
@@ -30,6 +39,7 @@ class Banner extends StatelessComponent {
         zIndex: .new(10),
         width: 100.percent,
         padding: .all(0.75.rem),
+        boxSizing: .borderBox,
         justifyContent: .center,
         alignItems: .center,
         gap: .column(0.5.rem),

@@ -14,7 +14,7 @@ typedef GithubLoader = GitHubLoader;
 /// Routes are constructed based on the recursive folder structure starting at the root [path].
 /// Index files (index.*) are treated as the page for the containing folder.
 /// Files and folders starting with an underscore (_) are ignored.
-class GitHubLoader extends RouteLoaderBase {
+class GitHubLoader extends RouteLoaderBase<GitHubPageSource> {
   GitHubLoader(
     this.repo, {
     this.ref = 'main',
@@ -60,14 +60,14 @@ class GitHubLoader extends RouteLoaderBase {
   }
 
   @override
-  Future<List<PageSource>> loadPageSources() async {
+  Future<List<GitHubPageSource>> loadPageSources() async {
     var root = path;
     if (root.isNotEmpty && !root.endsWith('/')) {
       root += '/';
     }
 
     final files = await _loadTree();
-    final routes = <PageSource>[];
+    final routes = <GitHubPageSource>[];
     for (final file in files) {
       final fileUrl = file.url;
       if (file.type != 'blob' || fileUrl == null) continue;
@@ -79,7 +79,7 @@ class GitHubLoader extends RouteLoaderBase {
       if (path.isEmpty) continue;
 
       routes.add(
-        _GitHubPageSource(
+        GitHubPageSource(
           path,
           fileUrl,
           this,
@@ -104,8 +104,8 @@ extension type _GitHubTree._(Map<String, Object?> tree) {
   String get sha => tree['sha'] as String;
 }
 
-class _GitHubPageSource extends PageSource {
-  _GitHubPageSource(super.path, this.blobUrl, super.loader, {this.accessToken, super.keepSuffix = false});
+class GitHubPageSource extends PageSource {
+  GitHubPageSource(super.path, this.blobUrl, super.loader, {this.accessToken, super.keepSuffix = false});
 
   final String blobUrl;
   final String? accessToken;

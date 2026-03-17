@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:mason/mason.dart' as m show Logger;
 import 'package:mason/mason.dart' hide Level;
 import 'package:path/path.dart' as p;
-import 'package:pub_updater/pub_updater.dart';
 
 import '../bundles/bundles.dart';
 import '../bundles/scaffold/scaffold_bundle.dart';
@@ -125,14 +124,12 @@ class CreateCommand extends BaseCommand {
       if (useMode.useServer) useBackend ?? 'base',
     };
 
-    final updater = PubUpdater();
-
-    final [jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion] = await Future.wait([
+    final (jasprFlutterEmbedVersion, jasprRouterVersion, jasprLintsVersion, webCompilersVersion) = await (
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_lints'),
       updater.getLatestVersion('build_web_compilers'),
-    ]);
+    ).wait;
 
     final progress = logger.logger!.progress('Generating project...');
     final generator = await MasonGenerator.fromBundle(scaffoldBundle);
@@ -191,21 +188,19 @@ class CreateCommand extends BaseCommand {
       usageException('Template "$template" not found.');
     }
 
-    final updater = PubUpdater();
-
-    final [
+    final (
       jasprFlutterEmbedVersion,
       jasprRouterVersion,
       jasprContentVersion,
       jasprLintsVersion,
       webCompilersVersion,
-    ] = await Future.wait([
+    ) = await (
       updater.getLatestVersion('jaspr_flutter_embed'),
       updater.getLatestVersion('jaspr_router'),
       updater.getLatestVersion('jaspr_content'),
       updater.getLatestVersion('jaspr_lints'),
       updater.getLatestVersion('build_web_compilers'),
-    ]);
+    ).wait;
 
     final progress = logger.logger!.progress('Generating project from template "$template"...');
     final generator = await MasonGenerator.fromBundle(bundle);

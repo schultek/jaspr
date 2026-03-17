@@ -7,6 +7,8 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_riverpod/legacy.dart';
 import 'package:jaspr_test/server_test.dart';
 
+import '../utils.dart';
+
 void main() {
   group('sync', () {
     testServer('writes provider values to output', (tester) async {
@@ -91,6 +93,38 @@ void main() {
       );
 
       expect(providerValue, equals(AsyncValue.data('value')));
+    });
+
+    testServer('uses codec when encoding sync provider value', (tester) async {
+      final p1 = StateProvider((_) => 21);
+
+      tester.pumpComponent(
+        div([
+          ProviderScope(
+            sync: [
+              p1.syncWith('some_number', codec: DoublingCodec()),
+            ],
+            child: p([
+              Builder(
+                builder: (context) {
+                  final v1 = context.read(p1);
+                  return Component.text('One: $v1');
+                },
+              ),
+            ]),
+          ),
+        ]),
+      );
+
+      final doc = await tester.request('/');
+      expect(
+        doc.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html><head></head><body><div><!--\${"some_number":42}--><p>One: 21</p></div></body></html>\n'
+          '',
+        ),
+      );
     });
   });
 }

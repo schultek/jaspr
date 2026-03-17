@@ -78,8 +78,7 @@ class Client extends _i1.ServerpodClientShared {
          connectionTimeout: connectionTimeout,
          onFailedCall: onFailedCall,
          onSucceededCall: onSucceededCall,
-         disconnectStreamsOnLostInternetConnection:
-             disconnectStreamsOnLostInternetConnection,
+         disconnectStreamsOnLostInternetConnection: disconnectStreamsOnLostInternetConnection,
        ) {
     quotes = EndpointQuotes(this);
     modules = Modules(this);

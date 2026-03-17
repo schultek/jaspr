@@ -86,7 +86,10 @@ class CodeBlock extends StatelessComponent {
                 backgroundColor: surfaceLowest,
               )
               .combine(jasprTheme['root']!),
-          css('&.scroll').styles(overflow: .only(x: .scroll)),
+          css('&.scroll').styles(
+            overflow: .only(x: .scroll),
+            raw: {'scrollbar-width': 'none'},
+          ),
         ]),
         css('.lines', [
           css('&').styles(display: .inlineBlock, minWidth: 100.percent),

@@ -35,7 +35,7 @@ class Features extends StatelessComponent {
           icon: 'database',
           title: 'State Management',
           description: 'Use your favorite state management solution, like Riverpod or Provider.',
-          link: 'https://docs.jaspr.site/eco/packages#state-management-packages',
+          link: 'https://docs.jaspr.site/going_further/packages#state-management-packages',
         ),
         LinkCard(
           icon: 'picture-in-picture',
@@ -59,7 +59,7 @@ class Features extends StatelessComponent {
           icon: 'test-tube',
           title: 'Testing',
           description: 'Write tests for your components and pages with Jasprs testing library.',
-          link: 'https://docs.jaspr.site/concepts/testing',
+          link: 'https://docs.jaspr.site/dev/testing',
         ),
       ]),
     ]);

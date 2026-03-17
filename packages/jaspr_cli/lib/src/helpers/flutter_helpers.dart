@@ -42,7 +42,7 @@ mixin FlutterHelper on BaseCommand {
     return flutterProcess;
   }
 
-  Future<void> buildFlutter(bool wasm) async {
+  Future<int> buildFlutter(bool wasm) async {
     await _ensureTarget();
 
     final flutterProcess = await Process.start(
@@ -63,9 +63,11 @@ mixin FlutterHelper on BaseCommand {
 
     final moveTargets = ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'];
 
-    await watchProcess('flutter build', flutterProcess, tag: Tag.flutter);
+    final exitCode = await watchProcess('flutter build', flutterProcess, tag: Tag.flutter);
 
     await copyFiles('./build/flutter', target, moveTargets);
+
+    return exitCode;
   }
 
   Future<void> _ensureTarget() async {

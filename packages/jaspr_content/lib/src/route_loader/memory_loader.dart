@@ -8,14 +8,14 @@ import 'route_loader.dart';
 /// A loader that loads routes from memory.
 ///
 /// Takes a list of [MemoryPage]s and creates routes from them.
-class MemoryLoader extends RouteLoaderBase {
+class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
   MemoryLoader({required List<MemoryPage> pages, super.debugPrint}) : _pages = pages;
 
   final List<MemoryPage> _pages;
 
   @override
-  Future<List<PageSource>> loadPageSources() async {
-    final entities = <PageSource>[];
+  Future<List<MemoryPageSource>> loadPageSources() async {
+    final entities = <MemoryPageSource>[];
     for (final page in _pages) {
       entities.add(MemoryPageSource(page, page.path, this, keepSuffix: page.keepSuffix));
     }
@@ -52,7 +52,9 @@ class MemoryPage {
     this.initialData = const {},
   }) : content = null;
 
-  /// The path to the page.
+  /// The source path of the page, including its suffix, e.g. 'index.html', 'some/path.md'.
+  ///
+  /// The path must always be in posix format, i.e. using forward slashes.
   final String path;
 
   /// Whether to keep the suffix of the page.

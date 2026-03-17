@@ -421,6 +421,12 @@ class DomRenderFragment extends DomRenderObject
 
   @override
   void remove(DomRenderObject child) {
+    if (child == _firstChild) {
+      _firstChild = child.nextSibling;
+    }
+    if (child == _lastChild) {
+      _lastChild = child.previousSibling;
+    }
     if (!isAttached) {
       removeChild(child);
     } else {
@@ -543,17 +549,26 @@ mixin MultiChildDomRenderObject on DomRenderObject {
   void removeChild(DomRenderObject child) {
     if (child case DomRenderFragment(isAttached: true)) {
       child.removeChildren(this);
-      child.parent = null;
-      return;
+    } else {
+      if (kVerboseMode) {
+        print('Remove child ${child.node} of $node');
+      }
+
+      assert(
+        node == child.node.parentNode,
+        'Child node must be a child of this element.',
+      );
+
+      node.removeChild(child.node);
     }
 
-    if (kVerboseMode) {
-      print('Remove child ${child.node} of $node');
-    }
-
-    assert(node == child.node.parentNode, 'Child node must be a child of this element.');
-
-    node.removeChild(child.node);
+    // Unlink the removed child from its siblings.
+    final oldPreviousSibling = child.previousSibling;
+    final oldNextSibling = child.nextSibling;
+    oldPreviousSibling?.nextSibling = oldNextSibling;
+    oldNextSibling?.previousSibling = oldPreviousSibling;
+    child.previousSibling = null;
+    child.nextSibling = null;
     child.parent = null;
   }
 }
@@ -595,10 +610,13 @@ class EventBinding {
   DomEventCallback fn;
   StreamSubscription<web.Event>? _subscription;
 
-  EventBinding(web.Element element, this.type, this.fn)
-    : _subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
-        fn(event);
-      });
+  EventBinding(web.Element element, this.type, this.fn) {
+    _subscription = web.EventStreamProvider<web.Event>(type).forElement(element).listen((event) {
+      // Do not move to a field initializer: we need fn here to refer to the
+      // field and not the constructor parameter.
+      fn(event);
+    });
+  }
 
   void clear() {
     _subscription?.cancel();

@@ -18,7 +18,7 @@ Common use-cases for secondary outputs include:
 
 ## Built-In Outputs
 
-`jaspr_content` provides some common secondary outputs out of the box. You can add them to your site by including them in the `secondaryOutputs` list of your `PageConfig`. As its an advanced feature, its only available through the `ContentApp.custom()` constructor.
+`jaspr_content` provides some common secondary outputs out of the box. You can add them to your site by including them in the `secondaryOutputs` list of your `PageConfig`. As it's an advanced feature, its only available through the `ContentApp.custom()` constructor.
 
 ```dart
 ContentApp.custom(
@@ -67,7 +67,7 @@ ContentApp.custom(
 ```
 
 <Info>
-For `RSSOutput` to work property, you need to set `eagerlyLoadAllPages` to `true`. [Read more about this](/content/concepts/route_loading#eager-loading)
+For `RSSOutput` to work properly, you need to set `eagerlyLoadAllPages` to `true`. [Read more about this](/content/concepts/route_loading#eager-loading)
 </Info>
 
 ---
@@ -84,7 +84,7 @@ For `RSSOutput` to work property, you need to set `eagerlyLoadAllPages` to `true
   RSSOutput(
     // ...
     filter: RSSFilter.custom((Page page) {
-      // Include only posts based on the page url. 
+      // Include only posts based on the page url.
       return page.url.startsWith('/posts');
    }),
   )
@@ -99,7 +99,7 @@ By default, the `RSSItem`s for each page are created based on the page's data (f
 ```xml
 <item>
   <title>{{page.title}}</title>
-  <description>{{page.description}}</title>
+  <description>{{page.description}}</description>
   <pubDate>{{page.publishDate}}</pubDate>
   <author>{{page.author}}</author>
 </item>

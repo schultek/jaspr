@@ -163,11 +163,10 @@ class QuoteUpdateTable extends _i1.UpdateTable<QuoteTable> {
     value,
   );
 
-  _i1.ColumnValue<List<String>, List<String>> likes(List<String> value) =>
-      _i1.ColumnValue(
-        table.likes,
-        value,
-      );
+  _i1.ColumnValue<List<String>, List<String>> likes(List<String> value) => _i1.ColumnValue(
+    table.likes,
+    value,
+  );
 }
 
 class QuoteTable extends _i1.Table<int?> {

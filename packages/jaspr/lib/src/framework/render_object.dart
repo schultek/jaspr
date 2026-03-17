@@ -27,6 +27,16 @@ abstract class RenderText implements RenderObject {
   void update(String text);
 }
 
+abstract class RawableRenderObject implements RenderObject {
+  @override
+  RenderText createChildRenderText(String text, [bool rawHtml = false]);
+}
+
+abstract class RawableRenderText implements RenderText {
+  @override
+  void update(String text, [bool rawHtml = false]);
+}
+
 abstract class RenderFragment implements RenderObject {}
 
 abstract class MultiChildRenderObjectElement = MultiChildElement with RenderObjectElement;

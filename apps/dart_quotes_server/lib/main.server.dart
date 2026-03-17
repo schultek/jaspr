@@ -1,6 +1,7 @@
 import 'package:jaspr/server.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
+import 'package:serverpod_auth_idp_server/providers/google.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 
 import 'main.server.options.dart';

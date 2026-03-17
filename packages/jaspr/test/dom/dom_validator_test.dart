@@ -1,3 +1,6 @@
+@TestOn('vm')
+library;
+
 import 'package:jaspr/src/dom/validator.dart';
 import 'package:test/test.dart';
 

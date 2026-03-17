@@ -8,19 +8,20 @@ import 'package:jaspr/server.dart';
 import 'package:website/components/code_window/code_block.dart' as _code_block;
 import 'package:website/components/code_window/code_window.dart'
     as _code_window;
+import 'package:website/components/layout/footer.dart' as _footer;
+import 'package:website/components/layout/header.dart' as _header;
 import 'package:website/components/banner.dart' as _banner;
 import 'package:website/components/github_button.dart' as _github_button;
 import 'package:website/components/gradient_border.dart' as _gradient_border;
 import 'package:website/components/icon.dart' as _icon;
 import 'package:website/components/link_button.dart' as _link_button;
 import 'package:website/components/logo.dart' as _logo;
-import 'package:website/components/markdown_page.dart' as _markdown_page;
 import 'package:website/components/menu_button.dart' as _menu_button;
 import 'package:website/components/particles.dart' as _particles;
 import 'package:website/components/theme_toggle.dart' as _theme_toggle;
 import 'package:website/constants/theme.dart' as _theme;
-import 'package:website/layout/footer.dart' as _footer;
-import 'package:website/layout/header.dart' as _header;
+import 'package:website/layouts/home_layout.dart' as _home_layout;
+import 'package:website/layouts/imprint_layout.dart' as _imprint_layout;
 import 'package:website/pages/home/0_hero/components/hero_pill.dart'
     as _hero_pill;
 import 'package:website/pages/home/0_hero/components/install_command.dart'
@@ -50,7 +51,6 @@ import 'package:website/pages/home/4_testimonials/testimonials.dart'
 import 'package:website/pages/home/5_community/components/sponsors_list.dart'
     as _sponsors_list;
 import 'package:website/pages/home/5_community/community.dart' as _community;
-import 'package:website/app.dart' as _app;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -91,19 +91,20 @@ ServerOptions get defaultServerOptions => ServerOptions(
   styles: () => [
     ..._code_block.CodeBlock.styles,
     ..._code_window.CodeWindow.styles,
+    ..._footer.Footer.styles,
+    ..._header.HeaderState.styles,
     ..._banner.Banner.styles,
     ..._github_button.GitHubButtonState.styles,
     ..._gradient_border.GradientBorder.styles,
     ..._icon.Icon.styles,
     ..._link_button.LinkButton.styles,
     ..._logo.Logo.styles,
-    ..._markdown_page.MarkdownPage.styles,
     ..._menu_button.MenuButton.styles,
     ..._particles.Particles.styles,
     ..._theme_toggle.ThemeToggleState.styles,
     ..._theme.root,
-    ..._footer.Footer.styles,
-    ..._header.HeaderState.styles,
+    ..._home_layout.HomeLayout.styles,
+    ..._imprint_layout.ImprintLayout.styles,
     ..._hero_pill.HeroPill.styles,
     ..._install_command.InstallCommandState.styles,
     ..._meet_jaspr_button.MeetJasprButtonState.styles,
@@ -122,7 +123,6 @@ ServerOptions get defaultServerOptions => ServerOptions(
     ..._testimonials.Testimonials.styles,
     ..._sponsors_list.SponsorsListState.styles,
     ..._community.Community.styles,
-    ..._app.App.styles,
   ],
 );
 

@@ -1,8 +1,8 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-import '../components/logo.dart';
-import '../constants/theme.dart';
+import '../../constants/theme.dart';
+import '../logo.dart';
 
 class Footer extends StatelessComponent {
   const Footer({super.key});

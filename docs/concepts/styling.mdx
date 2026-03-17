@@ -52,7 +52,7 @@ The `@css` annotation is only supported in **server** and **static** mode.
 Read more about this approach in the documentation for [@css](/api/utils/at_css).
 
 <Success>
-**Tip:** The `jaspr_lints` package provides a convenient lint rule to keep your styles properties organized. Learn more about it [here](/get_started/linting#lint-rules).
+**Tip:** The `jaspr_lints` package provides a convenient lint rule to keep your styles properties organized. Learn more about it [here](/api/linting#lint-rules).
 </Success>
 
 ### Global Stylesheet
@@ -172,7 +172,7 @@ Some common css solutions include:
 
 ### Tailwind
 
-Jaspr has a first-party Tailwind integration. Check it out [here](/eco/tailwind).
+Jaspr has a third-party Tailwind integration. Check it out [here](https://pub.dev/packages/jaspr_tailwind).
 
 ### Bulma
 
@@ -185,7 +185,7 @@ See the [Bulma Example](https://playground.jaspr.site/?sample=bulma) on JasprPad
 
 ### Dart Sass
 
-The easiest way to integrate the Sass preprocessor into your dart project is by using the
+The easiest way to integrate the Sass preprocessor into your Dart project is by using the
 [sass_builder](https://pub.dev/packages/sass_builder) package.
 
 After setting up the package, simply create a `.scss` file:
@@ -204,7 +204,7 @@ After setting up the package, simply create a `.scss` file:
 and include the generated output `.css` file as an [external stylesheet](/concepts/styling#external-stylesheets):
 
 ```dart
-link(rel:"stylesheet", href: "/styles.css")
+link(rel: "stylesheet", href: "/styles.css")
 ```
 
 

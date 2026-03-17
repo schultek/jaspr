@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Allow `analyzer` versions 10.x.
+
 ## 0.6.0
 
 - **Breaking** Removed `custom_lint` dependency and migrated to new `analysis_server_plugin`.

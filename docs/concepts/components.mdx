@@ -1,14 +1,14 @@
 ---
 title: Component System
-description: An overview of Jasprs component system.
+description: An overview of Jaspr's component system.
 ---
 
 ---
 
-**Jaspr** comes with a component system that is very similar to Flutters widgets. This is a core design decision of jaspr, in order to look and feel very familiar to developers coming from Flutter. You might think of it as just replacing the word 'Widget' with 'Component' *(which actually was a small part of jasprs development process 😉)*, while keeping the same structure and behavior.
+**Jaspr** comes with a component system that is very similar to Flutter's widgets. This is a core design decision of jaspr, in order to look and feel very familiar to developers coming from Flutter. You might think of it as just replacing the word 'Widget' with 'Component' *(which actually was a small part of Jaspr's development process 😉)*, while keeping the same structure and behavior.
 
 <Warning>
-The following page and other documentation assumes, that you have already a basic understanding of Flutters widget system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
+The following page and other documentation assumes, that you have already a basic understanding of Flutter's widget system, especially the widget tree and the three base widgets: StatelessWidget, StatefulWidget and InheritedWidget.
 </Warning>
 
 When building an app or website with **Jaspr** you will mostly use these **three** basic components:
@@ -88,7 +88,7 @@ class MyInheritedComponent extends InheritedComponent {
 }
 ```
 
-In every aspect, this component behaves the same as Flutters `InheritedWidget`.
+In every aspect, this component behaves the same as Flutter's `InheritedWidget`.
 
 
 ## Foundation Components
@@ -242,7 +242,7 @@ The above component renders the following HTML:
 
 When pre-rendering your components in **server** and **static** mode, Jaspr will output cleanly formatted html on a best-effort basis. This means it will add newlines and indentations to your html element, while trying to not affect the way the html is rendered.
 
-For example lets look at this simple Jaspr code:
+For example let's look at this simple Jaspr code:
 
 ```dart
 div([

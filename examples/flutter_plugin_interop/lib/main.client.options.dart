@@ -33,10 +33,10 @@ import 'package:shared_preferences_web/shared_preferences_web.dart'
 ClientOptions get defaultClientOptions => ClientOptions(
   initialize: () {
     final Registrar registrar = webPluginRegistrar;
-    _shared_preferences_web.SharedPreferencesPlugin.registerWith(registrar);
-    _firebase_core_web.FirebaseCoreWeb.registerWith(registrar);
-    _firebase_auth_web.FirebaseAuthWeb.registerWith(registrar);
     _cloud_firestore_web.FirebaseFirestoreWeb.registerWith(registrar);
+    _firebase_auth_web.FirebaseAuthWeb.registerWith(registrar);
+    _firebase_core_web.FirebaseCoreWeb.registerWith(registrar);
+    _shared_preferences_web.SharedPreferencesPlugin.registerWith(registrar);
     registrar.registerMessageHandler();
   },
   clients: {'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary)},

@@ -171,7 +171,7 @@ abstract class ConvertComponentAssist extends ResolvedCorrectionProducer {
 
       MethodDeclaration? buildMethod;
       final List<String> members = [];
-      for (final m in node.members) {
+      for (final m in node.body.childEntities) {
         if (m is MethodDeclaration && m.name.lexeme == 'build') {
           buildMethod = m;
         } else if (m is FieldDeclaration) {
@@ -199,10 +199,10 @@ class ConvertToStatefulComponent extends ConvertComponentAssist {
         edit.write('StatefulComponent');
       });
 
-      final splitToken = buildMethod?.beginToken ?? node.rightBracket;
+      final splitToken = buildMethod?.beginToken ?? node.body.endToken;
       final indent = buildMethod != null ? '' : '  ';
       final endIndent = buildMethod != null ? '  ' : '';
-      final name = node.name.lexeme;
+      final name = node.namePart.typeName.lexeme;
 
       builder.addInsertion(splitToken.offset, (edit) {
         edit.write(

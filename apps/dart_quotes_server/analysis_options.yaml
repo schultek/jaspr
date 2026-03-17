@@ -1,5 +1,7 @@
 include: package:jaspr_repo/app.yaml
 
 analyzer:
+  exclude:
+    - "lib/src/generated/**"
   errors:
     directives_ordering: ignore

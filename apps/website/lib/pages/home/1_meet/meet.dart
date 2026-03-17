@@ -1,9 +1,9 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_content/jaspr_content.dart';
 
 import '../../../components/code_window/code_window.dart';
 import '../../../components/link_button.dart';
-import '../../../constants/texts.dart';
 import '../../../constants/theme.dart';
 import 'components/modes_animation.dart';
 
@@ -12,6 +12,8 @@ class Meet extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
+    final versions = context.page.data.site['versions'] as Map<String, Object?>? ?? {};
+
     return section(id: 'meet', [
       div(classes: 'meet-section meet-components', [
         div([
@@ -105,13 +107,13 @@ class Meet extends StatelessComponent {
             sdk: ^3.10.0
 
           dependencies:  
-            jaspr: ^$latestCoreVersion
-            jaspr_content: ^$latestContentVersion
-            jaspr_router: ^$latestRouterVersion
+            jaspr: ^${versions['latestCore']}
+            jaspr_content: ^${versions['latestContent']}
+            jaspr_router: ^${versions['latestRouter']}
             
           dev_dependencies:
-            jaspr_builder: ^$latestCoreVersion
-            jaspr_lints: ^$latestLintsVersion
+            jaspr_builder: ^${versions['latestCore']}
+            jaspr_lints: ^${versions['latestLints']}
 
           jaspr:
             mode: static
@@ -133,7 +135,7 @@ class Meet extends StatelessComponent {
             LinkButton.filled(
               label: 'Explore Modes',
               icon: 'book-open',
-              to: 'https://docs.jaspr.site/get_started/modes',
+              to: 'https://docs.jaspr.site/dev/modes',
             ),
             LinkButton.outlined(
               label: 'See what others have built',

@@ -139,7 +139,7 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   }
 }
 
-class TestRenderObject extends RenderObject {
+class TestRenderObject extends RenderObject implements RawableRenderObject {
   List<TestRenderObject> children = [];
 
   @override
@@ -158,8 +158,8 @@ class TestRenderObject extends RenderObject {
   }
 
   @override
-  TestRenderText createChildRenderText(String text) {
-    return TestRenderText(text)..parent = this;
+  TestRenderText createChildRenderText(String text, [bool rawHtml = false]) {
+    return TestRenderText(text, rawHtml)..parent = this;
   }
 
   @override
@@ -209,11 +209,11 @@ class TestRenderElement extends TestRenderObject implements RenderElement {
   }
 }
 
-class TestRenderText extends TestRenderObject implements RenderText {
-  TestRenderText(this.text);
+class TestRenderText extends TestRenderObject implements RawableRenderText {
+  TestRenderText(this.text, [this.rawHtml = false]);
 
   String text;
-  bool? rawHtml;
+  bool rawHtml;
 
   @override
   void update(String text, [bool rawHtml = false]) {

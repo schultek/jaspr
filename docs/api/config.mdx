@@ -1,0 +1,51 @@
+---
+title: Project Configuration
+description: The configuration options for a Jaspr project.
+---
+
+---
+
+Each Jaspr project is a normal Dart project including a `pubspec.yaml` file and `lib/` directory.
+
+The project-wide Jaspr configuration is specified in `pubspec.yaml` under the `jaspr` option:
+
+```yaml
+name: my_project
+...
+
+jaspr:
+  mode: server
+  port: 8080
+  flutter: plugins
+```
+
+There are currently the following configuration options available:
+
+<Property name="mode" type="Enum" required>
+
+  Sets the [**Rendering Mode**](/dev/modes) for your project. Either `static`, `server` or `client`.
+</Property>
+
+---
+
+<Property name="port" type="int" optional>
+
+  *Only applicable in "static" or "server" mode.*
+
+  Specifies the target port to use when **serving** your project. This is optional and defaults to "8080" if not set. Can be overridden by the `--port` flag with `jaspr serve`.
+</Property>
+
+---
+
+<Property name="flutter" type="Enum" optional>
+
+  Specifies the Flutter support for your project.
+
+  - `embedded`: Enables [Flutter embedding](/going_further/flutter_embedding) support, allowing you to use Flutter widgets inside Jaspr components.
+  - `plugins`: Enables Flutter plugin support, allowing you to use Flutter plugins that provide web support inside your project.
+  - `none` or omitted: No Flutter support.
+
+  Using either `embedded` or `plugins` requires the Flutter SDK to be installed and available in your system PATH, as well as a dependency on `build_web_compilers` with a minimum version constraint of `4.4.6` or higher.
+</Property>
+
+---

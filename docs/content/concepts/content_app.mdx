@@ -5,7 +5,7 @@ description: The ContentApp component is the root component for building a conte
 
 ---
 
-The `ContentApp` component is the root component for building a content-driven site. It controls and sets up the overall content renderin pipeline, from loading the content to rendering it.
+The `ContentApp` component is the root component for building a content-driven site. It controls and sets up the overall content rendering pipeline, from loading the content to rendering it.
 
 It is recommended to use the `ContentApp` component as the root component of your app like this:
 
@@ -33,14 +33,14 @@ With this simple setup, using the default `ContentApp()` constructor, there is a
    For example:
    - a file `content/index.md` will be available at `/`
    - a file `content/guides/routing.md` will be available at `guides/routing/`
-2. The app will parse the markdown content of each file and render it into a Jaspr component, including some basic theming and typographic styles.  
-   - 2.1. If the file contains frontmatter data, it too will be parsed. Data like a 'title' or 'description' will be rendered as html meta tags.
-3. When building in static mode, the app will generate static html files for each markdown file at build time.
+2. The app will parse the markdown content of each file and render it into a Jaspr component, including some basic theming and typographic styles.
+   - 2.1. If the file contains frontmatter data, it too will be parsed. Data like a 'title' or 'description' will be rendered as HTML meta tags.
+3. When building in static mode, the app will generate static HTML files for each markdown file at build time.
 4. During development, the app watches the 'content' directory for changes and updates the routing table and content accordingly.
 
 ## ContentApp()
 
-The default `ContentApp()` constructor is a good starting point for simple content-driven sites. It provides a basic setup for parsing and rendering content from the local filesystem and is easy to setup.
+The default `ContentApp()` constructor is a good starting point for simple content-driven sites. It provides a basic setup for parsing and rendering content from the local filesystem and is easy to set up.
 
 <Card title="Properties" icon="sliders">
   <Property name="directory" type="String">
@@ -74,7 +74,7 @@ The default `ContentApp()` constructor is a good starting point for simple conte
   ---
 
   <Property name="parsers" type="List&lt;PageParser&gt;">
-    A list of [PageParser](/content/concepts/page_parsing) to use for parsing the page content. Each parser may be responsible for a file type like markdown, html, etc.
+    A list of [PageParser](/content/concepts/page_parsing) to use for parsing the page content. Each parser may be responsible for a file type like markdown, HTML, etc.
   </Property>
 
   ---
