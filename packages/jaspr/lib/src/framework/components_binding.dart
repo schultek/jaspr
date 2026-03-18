@@ -42,7 +42,7 @@ mixin ComponentsBinding on AppBinding {
 }
 
 @visibleForTesting
-class GlobalComponentsBinding {
+abstract final class GlobalComponentsBinding {
   static void clearGlobalKeys() {
     ComponentsBinding._globalKeyRegistry.clear();
   }

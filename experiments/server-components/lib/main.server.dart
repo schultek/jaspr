@@ -16,13 +16,8 @@ void main() {
           var time = DateTime.now();
           return div(classes: 'server', [
             p([.text('Server Time: $time')]),
-            Counter(
-              step: time.second,
-              child: p(classes: 'server', [
-                .text('This is a server component, rendered at $time.'),
-                MiniCounter(),
-              ]),
-            ),
+            Counter(step: time.second, child: null),
+            MiniCounter(),
           ]);
         },
       ),

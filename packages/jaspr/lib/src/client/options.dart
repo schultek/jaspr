@@ -71,10 +71,10 @@ final class ClientLoader {
 /// Use the generated `defaultClientOptions` instead.
 typedef ClientBuilder = Component Function(ClientParams params);
 
-class ClientParams {
+final class ClientParams {
   ClientParams(this._params, this.serverComponents);
 
-  final Map<String, dynamic> _params;
+  final Map<String, Object?> _params;
   final Map<String, ServerComponentAnchor> serverComponents;
 
   Component mount(String sId) {
@@ -87,10 +87,16 @@ class ClientParams {
     }
   }
 
+  Component? mountOrNull(String? sId) {
+    if (sId == null) return null;
+    return mount(sId);
+  }
+
   T get<T>(String key) {
-    if (_params[key] is! T) {
-      print('$key is not $T: ${_params[key]}');
+    final value = _params[key];
+    if (value is! T) {
+      throw StateError('$key is not $T: $value');
     }
-    return _params[key] as T;
+    return value;
   }
 }

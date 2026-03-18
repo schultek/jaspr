@@ -436,28 +436,22 @@ class DomRenderFragment extends DomRenderObject
 }
 
 class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject, HydratableDomRenderObject {
-  RootDomRenderObject(this.node, [List<web.Node>? nodes]) {
-    toHydrate = [...nodes ?? node.childNodes.toIterable()];
-    beforeStart = toHydrate.firstOrNull?.previousSibling;
+  RootDomRenderObject(this._node) {
+    toHydrate = [..._node.childNodes.toIterable()];
   }
 
-  factory RootDomRenderObject.between(web.Node start, web.Node end) {
-    final nodes = <web.Node>[];
-    web.Node? curr = start.nextSibling;
-    while (curr != null && curr != end) {
-      nodes.add(curr);
-      curr = curr.nextSibling;
-    }
-    return RootDomRenderObject(start.parentElement!, nodes);
-  }
-
+  web.Element _node;
   @override
-  web.Element node;
-  late final web.Node? beforeStart;
+  web.Element get node => _node;
+
+  void setRootNode(web.Element newNode) {
+    _node = newNode;
+    toHydrate = [...newNode.childNodes.toIterable()];
+  }
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
-    attachChild(child, after, startNode: beforeStart);
+    attachChild(child, after);
   }
 
   @override

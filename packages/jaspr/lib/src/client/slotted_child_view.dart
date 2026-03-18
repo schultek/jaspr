@@ -151,13 +151,9 @@ class SlottedChildViewElement extends MultiChildRenderObjectElement {
 }
 
 class SlottedDomRenderObject extends DomRenderFragment {
-  SlottedDomRenderObject._(
-    DomRenderObject? parent, {
-    this.firstChildNode,
-    this.lastChildNode,
-  }) : super(parent, []);
+  SlottedDomRenderObject._(DomRenderObject parent, {this.firstChildNode, this.lastChildNode}) : super(parent, []);
 
-  factory SlottedDomRenderObject.fromNodes(List<web.Node>? nodes, DomRenderObject? parent) {
+  factory SlottedDomRenderObject.fromNodes(List<web.Node>? nodes, DomRenderObject parent) {
     final nodesToAdd = nodes ?? [if (parent is HydratableDomRenderObject) ...parent.toHydrate];
 
     if (nodesToAdd.isEmpty) {
@@ -175,7 +171,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
         parent.toHydrate.removeRange(startIndex, endIndex + 1);
       }
     }
-    if (_realNodeOf(parent!).contains(firstNode)) {
+    if (_realNodeOf(parent).contains(firstNode)) {
       object.isAttached = true;
     } else {
       for (final node in nodesToAdd) {

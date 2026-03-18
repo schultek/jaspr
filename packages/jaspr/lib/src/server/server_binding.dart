@@ -69,6 +69,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
     final root = rootElement.renderObject as MarkupRenderObject;
 
+    // Not using for each to allow for new adapters to be added during iteration.
     for (var i = 0; i < _adapters.length; i++) {
       final r = _adapters[i].prepare();
       if (r is Future) {
@@ -88,7 +89,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       return override;
     }
 
-    if (request.headers.singleValues['X-Jaspr-Reload'] == 'true' && !standalone) {
+    if (!standalone && request.headers.singleValues['X-Jaspr-Reload'] == 'true') {
       final body = (root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?)
           ?.children
           .findWhere<MarkupRenderElement>((c) => c.tag == 'body')

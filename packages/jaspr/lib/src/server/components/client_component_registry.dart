@@ -32,10 +32,10 @@ class ClientComponentRegistryElement extends ObserverElement {
     }
 
     if (!_didHandleClientScript) {
-      if (binding.options.clientId != null) {
-        (binding).addRenderAdapter(ClientScriptAdapter(binding.options.clientId!));
+      if (binding.options.clientId case final clientId?) {
+        binding.addRenderAdapter(ClientScriptAdapter(clientId));
       } else if (kDebugMode) {
-        (binding).addRenderAdapter(NoClientScriptAdapter());
+        binding.addRenderAdapter(NoClientScriptAdapter());
       }
       _didHandleClientScript = true;
     }

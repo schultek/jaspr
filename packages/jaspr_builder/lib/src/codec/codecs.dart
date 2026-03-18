@@ -148,6 +148,9 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, Stri
     } else if (allowComponent &&
         type.element.name == 'Component' &&
         type.element.library.identifier == 'package:jaspr/src/framework/framework.dart') {
+      if (type.nullabilitySuffix == NullabilitySuffix.question) {
+        return (decoder: 'p.mountOrNull($argument)', cast: 'String?');
+      }
       return (decoder: 'p.mount($argument)', cast: 'String');
     }
     return super.visitInterfaceType(type, argument);

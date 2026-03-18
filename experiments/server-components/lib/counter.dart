@@ -40,12 +40,6 @@ class CounterState extends State<Counter>
         [.text("Increase by ${component.step}")],
       ),
       if (component.child != null) component.child!,
-      button(
-        onClick: () {
-          context.reload();
-        },
-        [.text('Reload Page')],
-      ),
     ]);
   }
 }

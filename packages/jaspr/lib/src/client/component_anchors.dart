@@ -41,8 +41,11 @@ class ClientComponentAnchor extends ComponentAnchor {
       : {};
 
   Future<void> resolve() async {
-    final r = await (Future.value(builder), Future.wait(serverAnchors.values.map((a) => a.resolve()))).wait;
-    builder = r.$1;
+    final (clientBuilder, _) = await (
+      Future.value(builder),
+      serverAnchors.values.map((a) => a.resolve()).wait,
+    ).wait;
+    builder = clientBuilder;
   }
 
   Component build() {
@@ -106,7 +109,7 @@ class ServerComponentAnchor extends ComponentAnchor {
   final List<ClientComponentAnchor> clientAnchors = [];
 
   Future<void> resolve() async {
-    await Future.wait(clientAnchors.map((a) => a.resolve()));
+    await [for (final anchor in clientAnchors) anchor.resolve()].wait;
   }
 
   Component build() {

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
 
-import '../../server/adapters/document_structure_helper.dart';
 import '/dom.dart';
 import '/server.dart';
+import '../../server/adapters/document_structure_helper.dart';
 
 abstract class Document implements Component {
   /// Sets up a basic document structure at the root of your app and renders the main `<html>`, `<head>` and `<body>` tags.
@@ -331,7 +331,7 @@ class AttachAdapter extends RenderAdapter {
 
   @override
   void apply(MarkupRenderObject root) {
-    final (html, head, body) = createDocumentStructure(root);
+    final (:html, :head, :body) = createDocumentStructure(root);
 
     String? keyFor(MarkupRenderObject n) {
       return switch (n) {

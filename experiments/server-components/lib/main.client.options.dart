@@ -30,7 +30,7 @@ ClientOptions get defaultClientOptions => ClientOptions(
     'counter': ClientLoader(
       (p) => _counter.Counter(
         step: p.get<int>('step'),
-        child: p.mount(p.get<String>('child')),
+        child: p.mountOrNull(p.get<String?>('child')),
       ),
       loader: _counter.loadLibrary,
     ),

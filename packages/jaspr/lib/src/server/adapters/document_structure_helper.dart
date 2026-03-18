@@ -1,13 +1,15 @@
 import '../markup_render_object.dart';
 
-(MarkupRenderElement, MarkupRenderElement, MarkupRenderElement) createDocumentStructure(
+({MarkupRenderElement html, MarkupRenderElement head, MarkupRenderElement body}) createDocumentStructure(
   MarkupRenderObject root, [
   bool includeDoctype = false,
 ]) {
   var html = root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?;
   if (html == null) {
     final range = root.children.range();
-    root.children.insertAfter(html = root.createChildRenderElement('html')..children.insertNodeAfter(range));
+    html = root.createChildRenderElement('html');
+    html.children.insertNodeAfter(range);
+    root.children.insertAfter(html);
   }
 
   final headNode = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'head');
@@ -45,5 +47,5 @@ import '../markup_render_object.dart';
     }
   }
 
-  return (html, head, body);
+  return (html: html, head: head, body: body);
 }

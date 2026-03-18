@@ -11,12 +11,13 @@ import '../foundation/binding.dart';
 import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'dom_render_object.dart';
-import 'utils.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
   ClientAppBinding() {
-    initializeEvents();
+    if (kDebugMode) {
+      _debugInitializeEvents();
+    }
   }
 
   @override
@@ -70,13 +71,13 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     web.console.error('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace'.toJS);
   }
 
-  SseClient? _eventsClient;
+  SseClient? _debugEventsClient;
 
-  void initializeEvents() {
-    if (_eventsClient != null) return;
+  void _debugInitializeEvents() {
+    if (_debugEventsClient != null) return;
 
-    _eventsClient = SseClient(r'/$jasprEventsHandler');
-    _eventsClient!.stream.listen(
+    _debugEventsClient = SseClient(r'/$jasprEventsHandler');
+    _debugEventsClient!.stream.listen(
       (event) {
         final data = jsonDecode(event);
         if (data case ['ReloadRequest']) {
@@ -84,11 +85,11 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
         }
       },
       onDone: () {
-        _eventsClient!.close();
-        _eventsClient = null;
+        _debugEventsClient!.close();
+        _debugEventsClient = null;
       },
     );
-    _eventsClient!.sink.add(jsonEncode(['RouteInfo', web.window.location.pathname]));
+    _debugEventsClient!.sink.add(jsonEncode(['RouteInfo', web.window.location.pathname]));
   }
 
   void _reloadPage([String? path]) async {
@@ -114,8 +115,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     final newNode = _attachTarget == 'body' ? body : body.querySelector(_attachTarget)!;
 
     final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;
-    rootRenderObject.node = newNode;
-    rootRenderObject.toHydrate = [...newNode.childNodes.toIterable()];
+    rootRenderObject.setRootNode(newNode);
     rootElement!.owner.performReload(rootElement!);
 
     web.document.body!.replaceWith(body);
