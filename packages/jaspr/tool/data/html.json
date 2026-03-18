@@ -469,6 +469,7 @@
       },
       "input": {
         "doc": "The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.",
+        "usage": "`T` defines the value type for the input element and must align with the 'type' attribute:\n- `bool` for checkbox and radio\n- `num` for number and range\n- `DateTime` (UTC) for date, time, week, month and datetime-local\n- `List<File>` for file\n- `Color` for color\n- `String` for all other types",
         "self_closing": true,
         "type_args": [
           "T"
@@ -1234,6 +1235,9 @@
     "InputType": {
       "doc": "The type for an &lt;input&gt; element.",
       "values": {
+        "text": {
+          "doc": "The default value. A single-line text field. Line-breaks are automatically removed from the input value."
+        },
         "button": {
           "doc": "A push button with no default behavior displaying the value of the value attribute, empty by default."
         },
@@ -1288,9 +1292,6 @@
         },
         "tel": {
           "doc": "A control for entering a telephone number. Displays a telephone keypad in some devices with dynamic keypads."
-        },
-        "text": {
-          "doc": "The default value. A single-line text field. Line-breaks are automatically removed from the input value."
         },
         "time": {
           "doc": "A control for entering a time value with no time zone."

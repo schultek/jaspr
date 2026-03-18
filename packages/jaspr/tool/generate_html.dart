@@ -66,16 +66,22 @@ void main() {
           c.modifier = ClassModifier.final$;
           c.extend = refer('StatelessComponent');
 
+          final docs = (data['doc'] as String).split('\n').map((d) => '/// $d').toList();
+          final usage = data['usage'] as String? ?? '';
+
           final typeArgs = data['type_args'] as List<Object?>? ?? [];
           if (typeArgs.isNotEmpty) {
             c.types.addAll(typeArgs.map((t) => refer(t as String)));
             c.annotations.add(refer('optionalTypeArgs'));
           }
 
-          final docs = (data['doc'] as String).split('\n').map((d) => '/// $d');
           c.docs.addAll([
             '/// {@template jaspr.html.$tag}',
             ...docs,
+            if (usage.isNotEmpty) ...[
+              '///',
+              ...usage.split('\n').map((d) => '/// $d'),
+            ],
             '/// {@endtemplate}',
           ]);
 
@@ -442,7 +448,13 @@ void writeTagResource(Class clazz, Map<String, dynamic> data, Map<String, dynami
   const stdFields = {'id', 'classes', 'styles', 'attributes', 'events', 'key'};
   final hasChildren = constructor.requiredParameters.any((p) => p.name == 'children');
 
-  var signature = 'const ${clazz.name}(';
+  var signature = 'const ${clazz.name}';
+
+  if (clazz.types.isNotEmpty) {
+    signature += '<${clazz.types.map((t) => t.symbol).join(', ')}>';
+  }
+
+  signature += '(';
 
   if (hasChildren) {
     signature += 'List<Component> children, {\n';
@@ -478,7 +490,17 @@ void writeTagResource(Class clazz, Map<String, dynamic> data, Map<String, dynami
 
   signature += '})';
 
-  var example = '${clazz.name}(';
+  var usage = '';
+  if (data['usage'] case final String u) {
+    usage = '$u\n\n';
+  }
+
+  var example = clazz.name;
+  if (clazz.types.isNotEmpty) {
+    example += '<String>';
+  }
+
+  example += '(';
   var hasRequired = false;
 
   for (final param in constructor.optionalParameters) {
@@ -526,6 +548,7 @@ void writeTagResource(Class clazz, Map<String, dynamic> data, Map<String, dynami
     '# ${clazz.name}\n\n'
     'Signature of the ${clazz.name} component:\n\n'
     '```dart\n$signature\n```\n\n'
+    '$usage'
     'Example usage:\n\n'
     '```dart\n$example\n```',
   );

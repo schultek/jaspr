@@ -3,8 +3,8 @@
 Signature of the input component:
 
 ```dart
-const input({
-  InputType? type, // One of `.button`, `.checkbox`, `.color`, `.date`, `.dateTimeLocal`, `.email`, `.file`, `.hidden`, `.image`, `.month`, `.number`, `.password`, `.radio`, `.range`, `.reset`, `.search`, `.submit`, `.tel`, `.text`, `.time`, `.url`, `.week`
+const input<T>({
+  InputType? type, // One of `.text`, `.button`, `.checkbox`, `.color`, `.date`, `.dateTimeLocal`, `.email`, `.file`, `.hidden`, `.image`, `.month`, `.number`, `.password`, `.radio`, `.range`, `.reset`, `.search`, `.submit`, `.tel`, `.time`, `.url`, `.week`
   String? name,
   String? value,
   bool disabled = false,
@@ -21,8 +21,16 @@ const input({
 })
 ```
 
+`T` defines the value type for the input element and must align with the 'type' attribute:
+- `bool` for checkbox and radio
+- `num` for number and range
+- `DateTime` (UTC) for date, time, week, month and datetime-local
+- `List<File>` for file
+- `Color` for color
+- `String` for all other types
+
 Example usage:
 
 ```dart
-input(type: .button)
+input<String>(type: .text)
 ```
