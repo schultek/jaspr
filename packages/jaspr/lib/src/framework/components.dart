@@ -100,25 +100,19 @@ class DomElement extends DomRenderObjectElement {
 
         if (param.styles case final stylesProps?) {
           for (final MapEntry(:key, :value) in stylesProps.entries) {
-            if (!styles.containsKey(key)) {
-              styles[key] = value;
-            }
+            styles[key] ??= value;
           }
         }
 
         if (param.attributes case final attributesMap?) {
           for (final MapEntry(:key, :value) in attributesMap.entries) {
-            if (!attributes.containsKey(key)) {
-              attributes[key] = value;
-            }
+            attributes[key] ??= value;
           }
         }
 
         if (param.events case final eventsMap?) {
           for (final MapEntry(:key, :value) in eventsMap.entries) {
-            if (!events.containsKey(key)) {
-              events[key] = value;
-            }
+            events[key] ??= value;
           }
         }
       }
@@ -164,7 +158,7 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
   Component build(BuildContext context) {
     return _InheritedDomComponent.merge(
       context,
-      params: WrapParams(
+      params: ApplyParams(
         target: target,
         id: id,
         classes: classes?.split(' '),
@@ -179,8 +173,9 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
 
 /// Defines the target for a [Component.apply] component.
 ///
-/// The target can select either a direct child or descendant, and optionally filter by tag, id, and classes.
-class ApplyTarget {
+/// The target can select either a direct child or descendant,
+/// and optionally filter by [tag], [id], and [classes].
+final class ApplyTarget {
   static const ApplyTarget anyChild = ApplyTarget.childWith();
 
   const ApplyTarget.childWith({
@@ -205,25 +200,12 @@ class ApplyTarget {
     if (tag == null && id == null && classes == null)
       '*'
     else ...[
-      if (tag != null) tag,
+      ?tag,
       if (id != null) '#$id',
-      if (classes != null) ...classes!.map((c) => '.$c'),
+      if (classes case final classes?)
+        for (final c in classes) '.$c',
     ],
   ].join();
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is ApplyTarget &&
-        onlyChildren == other.onlyChildren &&
-        tag == other.tag &&
-        id == other.id &&
-        classes?.length == other.classes?.length &&
-        classes?.every((c) => other.classes?.contains(c) ?? false) == true;
-  }
-
-  @override
-  int get hashCode => Object.hashAll([onlyChildren, tag, id, classes?.length, ...?classes]);
 }
 
 @protected
@@ -232,7 +214,7 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
 
   InheritedElement? _inheritedDomElement;
 
-  List<WrapParams>? get inheritedDomParams {
+  List<ApplyParams>? get inheritedDomParams {
     if (_inheritedDomElement case final inheritedDomElement?) {
       final inheritedDomComponent = dependOnInheritedElement(inheritedDomElement) as _InheritedDomComponent;
       return inheritedDomComponent.params;
@@ -245,7 +227,7 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
   @override
   List<Component> buildChildren() {
     if (inheritedDomParams case final inheritedDomParams?) {
-      final List<WrapParams> newParams = inheritedDomParams.where((p) => !p.target.onlyChildren).toList();
+      final List<ApplyParams> newParams = inheritedDomParams.where((p) => !p.target.onlyChildren).toList();
 
       // If we either removed all selectors (or none), we can return the children as is.
       // The inherited element was already removed (or kept) by the [_updateInheritance] method.
@@ -287,8 +269,8 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
 }
 
 @protected
-class WrapParams {
-  const WrapParams({
+class ApplyParams {
+  const ApplyParams({
     required this.target,
     this.id,
     this.classes,
@@ -308,11 +290,11 @@ class WrapParams {
 class _InheritedDomComponent extends InheritedComponent {
   const _InheritedDomComponent({required this.params, required super.child});
 
-  final List<WrapParams> params;
+  final List<ApplyParams> params;
 
   factory _InheritedDomComponent.merge(
     BuildContext context, {
-    required WrapParams params,
+    required ApplyParams params,
     required Component child,
   }) {
     final current = context.dependOnInheritedComponentOfExactType<_InheritedDomComponent>();
@@ -324,8 +306,9 @@ class _InheritedDomComponent extends InheritedComponent {
 
   @override
   bool updateShouldNotify(_InheritedDomComponent oldComponent) {
-    if (params.length != oldComponent.params.length) return true;
-    return params.indexed.any((e) => oldComponent.params[e.$1] != e.$2);
+    if (identical(this, oldComponent)) return false;
+    if (params.isEmpty && oldComponent.params.isEmpty) return false;
+    return true;
   }
 }
 

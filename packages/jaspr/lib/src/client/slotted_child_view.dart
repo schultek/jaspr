@@ -141,7 +141,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     return renderObject;
   }
 
-  final Map<web.HTMLElement, WrapParams?> _appliedParams = {};
+  final Map<web.HTMLElement, ApplyParams?> _appliedParams = {};
   final Map<web.HTMLElement, Map<String, EventBinding>?> _appliedEvents = {};
 
   @override
@@ -232,7 +232,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     }
   }
 
-  void updateElementParams(web.HTMLElement element, WrapParams newParams) {
+  void updateElementParams(web.HTMLElement element, ApplyParams newParams) {
     final appliedParams = _appliedParams[element];
 
     String? appliedId = appliedParams?.id;
@@ -287,7 +287,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
       }
     }
 
-    _appliedParams[element] = WrapParams(
+    _appliedParams[element] = ApplyParams(
       target: newParams.target,
       id: appliedId,
       classes: appliedClasses,
