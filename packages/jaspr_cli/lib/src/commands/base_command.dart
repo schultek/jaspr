@@ -243,8 +243,10 @@ abstract class BaseCommand extends Command<int> {
     while (moveTargets.isNotEmpty) {
       final moveTarget = moveTargets.removeAt(0);
       final file = File('$from/$moveTarget').absolute;
-      final isDir = file.statSync().type == FileSystemEntityType.directory;
-      if (isDir) {
+      final directory = Directory('$from/$moveTarget').absolute;
+      if (file.existsSync()) {
+        moves.add(file.copy(File('$to/$moveTarget').absolute.path));
+      } else if (directory.existsSync()) {
         await Directory('$to/$moveTarget').absolute.create(recursive: true);
 
         final files = Directory('$from/$moveTarget').absolute.list(recursive: true);
@@ -252,8 +254,6 @@ abstract class BaseCommand extends Command<int> {
           final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
           moveTargets.add(path);
         }
-      } else {
-        moves.add(file.copy(File('$to/$moveTarget').absolute.path));
       }
     }
 

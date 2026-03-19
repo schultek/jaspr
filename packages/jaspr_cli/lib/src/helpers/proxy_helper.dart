@@ -24,6 +24,7 @@ mixin ProxyHelper on BaseCommand {
   }) async {
     final client = devProxy?.client ?? http.Client();
     final flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
+    Directory('.dart_tool/jaspr/generated').createSync(recursive: true);
     final generatedHandler = createStaticHandler('.dart_tool/jaspr/generated');
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
     final webdevHandler = devProxy?.handler ?? (req) => Response.notFound(null);

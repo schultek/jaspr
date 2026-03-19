@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
+import 'package:path/path.dart' as p;
 
 import '../commands/base_command.dart';
 import '../logging.dart';
@@ -10,18 +11,18 @@ import '../logging.dart';
 extension CssHelper on BaseCommand {
   Future<int> generateCss() async {
     final projectName = project.requirePubspecYaml['name'] as String;
-    final buildDir = '.dart_tool/build/generated/$projectName/lib/';
+    final buildDir = '.dart_tool/build/generated/$projectName/lib';
 
     bool hasError = false;
 
-    final runnerFiles = Glob('$buildDir/**.styles.dart').list();
+    final runnerFiles = Glob('$buildDir/**.styles.dart').list(root: Directory.current.path);
     await for (final runnerFile in runnerFiles) {
       if (!runnerFile.path.endsWith('.server.styles.dart') && !runnerFile.path.endsWith('.client.styles.dart')) {
         continue;
       }
 
-      final outputFile = runnerFile.path
-          .replaceFirst(buildDir, '')
+      final outputFile = p
+          .relative(runnerFile.path, from: p.join(Directory.current.path, buildDir))
           .replaceFirst('.server.styles.dart', '.css')
           .replaceFirst('.client.styles.dart', '.css');
 
@@ -43,7 +44,7 @@ extension CssHelper on BaseCommand {
 
       final json = jsonDecode(result.stdout.toString());
       if (json case {'css': final String cssValue}) {
-        File('.dart_tool/jaspr/generated/$outputFile')
+        File('.dart_tool/jaspr/generated/$outputFile').absolute
           ..createSync(recursive: true)
           ..writeAsStringSync(cssValue);
         logger.write(
