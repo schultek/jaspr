@@ -11,8 +11,13 @@ import 'src/web/routes/root.dart';
 // configuring Relic (Serverpod's web-server), or need custom setup work.
 
 void main(List<String> args) async {
+  if (_runningPod case final pod?) {
+    // To support hotreload, shutdown the open instance before creating a new one.
+    await pod.shutdown(exitProcess: false);
+  }
+
   // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(args, Protocol(), Endpoints());
+  final pod = _runningPod = Serverpod(args, Protocol(), Endpoints());
 
   // If you are using any future calls, they need to be registered here.
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
@@ -20,8 +25,10 @@ void main(List<String> args) async {
   Jaspr.initializeApp(options: defaultServerOptions);
 
   // Let Jaspr render all routes.
-  pod.webServer.addRoute(RootRoute(), '/*');
+  pod.webServer.addRoute(RootRoute());
 
   // Start the server.
   await pod.start();
 }
+
+Serverpod? _runningPod;

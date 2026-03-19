@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -33,6 +34,9 @@ abstract class Example implements _i1.SerializableModel {
 
   int data;
 
+  /// Returns a shallow copy of this [Example]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
   Example copyWith({
     String? name,
     int? data,
@@ -40,6 +44,7 @@ abstract class Example implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Example',
       'name': name,
       'data': data,
     };
@@ -56,10 +61,13 @@ class _ExampleImpl extends Example {
     required String name,
     required int data,
   }) : super._(
-          name: name,
-          data: data,
-        );
+         name: name,
+         data: data,
+       );
 
+  /// Returns a shallow copy of this [Example]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
   @override
   Example copyWith({
     String? name,

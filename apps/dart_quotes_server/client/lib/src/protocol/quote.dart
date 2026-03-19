@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:dart_quotes_client/src/protocol/protocol.dart' as _i2;
 
 abstract class Quote implements _i1.SerializableModel {
   Quote._({
@@ -23,7 +25,7 @@ abstract class Quote implements _i1.SerializableModel {
     int? id,
     required String quote,
     required String author,
-    required List<int> likes,
+    required List<String> likes,
   }) = _QuoteImpl;
 
   factory Quote.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -31,7 +33,9 @@ abstract class Quote implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       quote: jsonSerialization['quote'] as String,
       author: jsonSerialization['author'] as String,
-      likes: (jsonSerialization['likes'] as List).map((e) => e as int).toList(),
+      likes: _i2.Protocol().deserialize<List<String>>(
+        jsonSerialization['likes'],
+      ),
     );
   }
 
@@ -44,18 +48,22 @@ abstract class Quote implements _i1.SerializableModel {
 
   String author;
 
-  List<int> likes;
+  List<String> likes;
 
+  /// Returns a shallow copy of this [Quote]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
   Quote copyWith({
     int? id,
     String? quote,
     String? author,
-    List<int>? likes,
+    List<String>? likes,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      'id': ?id,
+      '__className__': 'Quote',
+      if (id != null) 'id': id,
       'quote': quote,
       'author': author,
       'likes': likes.toJson(),
@@ -75,7 +83,7 @@ class _QuoteImpl extends Quote {
     int? id,
     required String quote,
     required String author,
-    required List<int> likes,
+    required List<String> likes,
   }) : super._(
          id: id,
          quote: quote,
@@ -83,12 +91,15 @@ class _QuoteImpl extends Quote {
          likes: likes,
        );
 
+  /// Returns a shallow copy of this [Quote]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
   @override
   Quote copyWith({
     Object? id = _Undefined,
     String? quote,
     String? author,
-    List<int>? likes,
+    List<String>? likes,
   }) {
     return Quote(
       id: id is int? ? id : this.id,

@@ -8,14 +8,12 @@
 
 dynamic JSConfetti;
 typedef JSConfettiOrStubbed = dynamic;
-dynamic StreamingConnectionHandler;
-typedef StreamingConnectionHandlerOrStubbed = dynamic;
 dynamic Client;
 typedef ClientOrStubbed = dynamic;
 dynamic QuoteInit;
 typedef QuoteInitOrStubbed = dynamic;
-dynamic signInWithGoogle;
 dynamic FlutterAuthenticationKeyManager;
 typedef FlutterAuthenticationKeyManagerOrStubbed = dynamic;
 dynamic SessionManager;
 typedef SessionManagerOrStubbed = dynamic;
+dynamic signInWithGoogle;

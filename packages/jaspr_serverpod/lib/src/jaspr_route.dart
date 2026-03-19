@@ -1,9 +1,11 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:jaspr/server.dart';
+import 'package:jaspr/server.dart' hide Request, Response, Handler;
 import 'package:serverpod/serverpod.dart';
-import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'package:shelf/shelf.dart' as shelf;
+// ignore: depend_on_referenced_packages
+import 'package:stream_channel/stream_channel.dart';
 
 import '../jaspr_serverpod.dart';
 
@@ -12,32 +14,77 @@ import '../jaspr_serverpod.dart';
 ///
 /// {@category Setup}
 abstract class JasprRoute extends Route {
-  JasprRoute() {
+  JasprRoute() : super(methods: {Method.get, Method.head, Method.post}) {
     handler = serveApp(_handleRenderCall);
   }
 
-  late Handler handler;
+  late shelf.Handler handler;
 
   /// Override this method to build your root [Component] from the current [session] and [request].
-  Future<Component> build(Session session, HttpRequest request);
+  Future<Component> build(Session session, Request request);
 
-  Future<Response> _handleRenderCall(Request request, FutureOr<Response> Function(Component) render) async {
+  Future<shelf.Response> _handleRenderCall(
+    shelf.Request request,
+    FutureOr<shelf.Response> Function(Component) render,
+  ) async {
     final session = request.context['session'] as Session;
-    final req = request.context['request'] as HttpRequest;
+    final req = request.context['request'] as Request;
     final component = await build(session, req);
     return render(InheritedSession(session: session, child: component));
   }
 
   @override
-  Future<bool> handleCall(Session session, HttpRequest request) async {
-    await shelf_io.handleRequest(request, (req) {
-      return handler(req.change(context: {'session': session, 'request': request}));
-    }, poweredByHeader: null);
-    // Needed to flush hijacked requests before returning.
-    await Future(() {});
-    return true;
+  void injectIn(RelicRouter router) {
+    final subRouter = Router<Handler>();
+    subRouter.anyOf(methods, '/**', asHandler);
+    router.attach('/', subRouter);
   }
 
   @override
-  void setHeaders(HttpHeaders headers) {}
+  FutureOr<Result> handleCall(Session session, Request request) async {
+    final hijackCompleter = Completer<void Function(StreamChannel<List<int>>)>.sync();
+    final shelf.Request shelfRequest = shelf.Request(
+      request.method.value,
+      request.url,
+      protocolVersion: request.protocolVersion,
+      headers: request.headers,
+      handlerPath: request.matchedPath.path,
+      body: request.body.read(),
+      encoding: request.encoding,
+      context: {'session': session, 'request': request},
+      onHijack: (callback) => hijackCompleter.complete(callback),
+    );
+    final shelf.Response shelfResponse;
+    try {
+      shelfResponse = await handler(shelfRequest);
+    } on shelf.HijackException catch (error, stackTrace) {
+      // A HijackException should bypass the response-writing logic entirely.
+      if (!shelfRequest.canHijack) {
+        final callback = await hijackCompleter.future;
+        return Hijack(callback);
+      }
+
+      // If the request wasn't hijacked, we shouldn't be seeing this exception.
+      session.log(
+        '[jaspr_serverpod] Got a HijackException, but the request was not hijacked.',
+        level: LogLevel.error,
+        exception: error,
+        stackTrace: stackTrace,
+      );
+      return Response.internalServerError();
+    }
+
+    final response = Response(
+      shelfResponse.statusCode,
+      body: Body.fromDataStream(
+        shelfResponse.read().map(Uint8List.fromList),
+        encoding: shelfResponse.encoding,
+        mimeType: shelfResponse.mimeType != null ? MimeType.parse(shelfResponse.mimeType!) : null,
+        contentLength: shelfResponse.contentLength,
+      ),
+      headers: Headers.fromMap(shelfResponse.headersAll),
+    );
+
+    return response;
+  }
 }

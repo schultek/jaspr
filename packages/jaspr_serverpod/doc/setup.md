@@ -59,8 +59,8 @@ void main(List<String> args) async {
   // If you need other special routes, like authentication redirects, 
   // add them here.
   
-  // Point all paths to the root route.
-  pod.webServer.addRoute(RootRoute(), '/*');
+  // Add your root JasprRoute.
+  pod.webServer.addRoute(RootRoute());
   
   // Remove all other routes like 
   // - `pod.webServer.addRoute(RootRoute(), '...')` 
@@ -79,7 +79,7 @@ Then change your root route inside `lib/src/web/routes/root.dart` to this:
 import 'dart:io';
 
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/server.dart';
+import 'package:jaspr/server.dart' hide Request;
 import 'package:jaspr_serverpod/jaspr_serverpod.dart';
 import 'package:serverpod/serverpod.dart';
 
@@ -87,7 +87,7 @@ import '/components/home.dart';
 
 class RootRoute extends JasprRoute {
   @override
-  Future<Component> build(Session session, HttpRequest request) async {
+  Future<Component> build(Session session, Request request) async {
     return Document(
       title: "Built with Serverpod & Jaspr",
       head: [
@@ -218,7 +218,30 @@ void main() {
 }
 ```
 
+## Server Hotreload
+
+When running `jaspr serve`, the server will be started in debug mode and hotreload will be enabled. This means that you can make changes to your code and the server will automatically re-run the `main()` function.
+
+To support this with Serverpod, you need to keep track of your `Serverpod` instance and call `pod.shutdown(exitProcess: false)` at the start of the `main()` function:
+
+```dart
+Serverpod? _runningPod;
+
+void main(List<String> args) async {
+  if (_runningPod case final pod?) {
+    // Shutdown the open instance before creating a new one.
+    await pod.shutdown(exitProcess: false);
+  }
+
+  final pod = _runningPod = Serverpod(args, ...);
+
+  ...
+}
+```
+
 ---
+
+# Running the Server
 
 You are now set to run your server and render your website using Serverpod and Jaspr. 
 
