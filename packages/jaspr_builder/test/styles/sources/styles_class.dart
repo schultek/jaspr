@@ -13,7 +13,7 @@ const stylesClassSources = {
       @css
       static List<StyleRule> get styles2 => [
         css('.main', [
-          css('&').styles(width: 100.px),
+          css('&').styles(height: 100.px),
         ]),
       ];
     }

@@ -13,7 +13,7 @@ void main() {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'models');
+      reader = TestReaderWriter(rootPackage: 'site');
       await reader.testing.loadIsolateSources();
     });
 

@@ -6,13 +6,13 @@ const stylesGlobalSources = {
         
     @css
     final styles = [
-      css('.main').styles(width: 100.px),
+      css('body').styles(width: 100.vw),
     ];
     
     @css
     List<StyleRule> get styles2 => [
-      css('.main', [
-        css('&').styles(width: 100.px),
+      css('body', [
+        css('&').styles(height: 100.vh),
       ]),
     ];
   ''',

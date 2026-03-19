@@ -89,15 +89,15 @@ class ServerOptionsBuilder implements Builder {
       ///   runApp(...);
       /// }
       /// ```
-      ServerOptions get defaultServerOptions => ServerOptions(
-        ${await buildClientIdEntry(buildStep)}
-        ${buildClientEntries(clients, package)}
-        ${buildStylesIdEntry(stylesMode, buildStep)}
-        ${buildStylesEntries(styles)}
-      );
-      
-      ${buildClientParamGetters(clients)}  
     ''';
+    source += 'ServerOptions get defaultServerOptions => ServerOptions(';
+    source += await buildClientIdEntry(buildStep);
+    source += buildClientEntries(clients, package);
+    source += buildStylesIdEntry(stylesMode, buildStep);
+    source += buildStylesEntries(styles);
+    source += ');\n\n';
+    source += buildClientParamGetters(clients);
+
     source = ImportsWriter().resolve(source);
     await buildStep.writeAsFormattedDart(optionsId, source);
   }

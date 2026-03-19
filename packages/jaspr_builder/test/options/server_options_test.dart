@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 
 import 'sources/server_options.dart';
 import 'sources/server_options_other.dart';
+import 'sources/server_options_standalone.dart';
 
 void main() {
   group('jaspr options builder', () {
@@ -29,6 +30,15 @@ void main() {
         ServerOptionsBuilder(BuilderOptions({})),
         serverOptionsOtherSources,
         outputs: serverOptionsOtherOutputs,
+        readerWriter: reader,
+      );
+    });
+
+    test('generates options with standalone styles', () async {
+      await testBuilder(
+        ServerOptionsBuilder(BuilderOptions({})),
+        serverOptionsStandaloneSources,
+        outputs: serverOptionsStandaloneOutputs,
         readerWriter: reader,
       );
     });
