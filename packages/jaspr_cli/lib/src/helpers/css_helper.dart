@@ -1,0 +1,68 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:glob/glob.dart';
+import 'package:glob/list_local_fs.dart';
+
+import '../commands/base_command.dart';
+import '../logging.dart';
+
+extension CssHelper on BaseCommand {
+  Future<int> generateCss() async {
+    final projectName = project.requirePubspecYaml['name'] as String;
+    final buildDir = '.dart_tool/build/generated/$projectName/lib/';
+
+    bool hasError = false;
+
+    final runnerFiles = Glob('$buildDir/**.styles.dart').list();
+    await for (final runnerFile in runnerFiles) {
+      if (!runnerFile.path.endsWith('.server.styles.dart') && !runnerFile.path.endsWith('.client.styles.dart')) {
+        continue;
+      }
+
+      final outputFile = runnerFile.path
+          .replaceFirst(buildDir, '')
+          .replaceFirst('.server.styles.dart', '.css')
+          .replaceFirst('.client.styles.dart', '.css');
+
+      final result = await Process.run('dart', ['run', runnerFile.path]);
+      if (result.exitCode != 0) {
+        logger.write(
+          'Failed to generate $outputFile, the script exited with code ${result.exitCode}:\n${result.stderr}',
+          tag: Tag.cli,
+          level: Level.error,
+        );
+        logger.write(
+          'Run: `dart run ${runnerFile.path}` to debug this error.',
+          tag: Tag.cli,
+          level: Level.verbose,
+        );
+        hasError = true;
+        continue;
+      }
+
+      final json = jsonDecode(result.stdout.toString());
+      if (json case {'css': final String cssValue}) {
+        File('.dart_tool/jaspr/generated/$outputFile')
+          ..createSync(recursive: true)
+          ..writeAsStringSync(cssValue);
+        logger.write(
+          'Generated $outputFile',
+          tag: Tag.cli,
+        );
+      } else {
+        throw 'Invalid output: ${result.stdout}';
+      }
+    }
+
+    return hasError ? 1 : 0;
+  }
+
+  Future<int> buildCss() async {
+    final exitCode = await generateCss();
+
+    await copyToBuildDir('.dart_tool/jaspr/generated');
+
+    return exitCode;
+  }
+}

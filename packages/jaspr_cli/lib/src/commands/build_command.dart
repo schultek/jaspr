@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http show Client, Response;
 import 'package:path/path.dart' as p;
 
 import '../dev/util.dart';
+import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
@@ -164,6 +165,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       flutterResult = buildFlutter(useWasm);
     } else {
       flutterResult = null;
+    }
+
+    if (!hasBuildError) {
+      hasBuildError = (await buildCss()) != 0;
     }
 
     final serverDefines = getServerDartDefines();

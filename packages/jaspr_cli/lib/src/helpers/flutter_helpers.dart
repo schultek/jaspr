@@ -60,13 +60,12 @@ mixin FlutterHelper on BaseCommand {
       workingDirectory: Directory.current.path,
     );
 
-    final target = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
-
-    final moveTargets = ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'];
-
     final exitCode = await watchProcess('flutter build', flutterProcess, tag: Tag.flutter);
 
-    await copyFiles('./build/flutter', target, moveTargets);
+    await copyToBuildDir(
+      './build/flutter',
+      ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'],
+    );
 
     return exitCode;
   }
@@ -78,30 +77,6 @@ mixin FlutterHelper on BaseCommand {
     }
     await flutterTarget.writeAsString('void main() {}');
   }
-}
-
-Future<void> copyFiles(String from, String to, [List<String> targets = const ['']]) async {
-  final moveTargets = [...targets];
-
-  final moves = <Future<void>>[];
-  while (moveTargets.isNotEmpty) {
-    final moveTarget = moveTargets.removeAt(0);
-    final file = File('$from/$moveTarget').absolute;
-    final stat = file.statSync();
-    if (stat.type case FileSystemEntityType.directory) {
-      await Directory('$to/$moveTarget').absolute.create(recursive: true);
-
-      final files = Directory('$from/$moveTarget').absolute.list(recursive: true);
-      await for (final file in files) {
-        final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
-        moveTargets.add(path);
-      }
-    } else if (stat.type case FileSystemEntityType.file || FileSystemEntityType.link) {
-      moves.add(file.copy(File('$to/$moveTarget').absolute.path));
-    }
-  }
-
-  await moves.wait;
 }
 
 final flutterInfo = (() {

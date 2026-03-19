@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
@@ -8,16 +7,16 @@ import '../styles/styles_bundle_builder.dart';
 import '../styles/styles_module_builder.dart';
 import '../utils.dart';
 
-/// Builds the standalone module file for Jaspr projects.
-class StylesStandaloneModuleBuilder implements Builder {
-  StylesStandaloneModuleBuilder(this.options);
+/// Builds the standalone runner file for Jaspr projects.
+class StylesStandaloneBuilder implements Builder {
+  StylesStandaloneBuilder(this.options);
 
   final BuilderOptions options;
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     try {
-      await generateStandaloneStylesModule(buildStep);
+      await generateStandaloneRunner(buildStep);
     } catch (e, st) {
       print(
         'An unexpected error occurred.\n'
@@ -33,12 +32,12 @@ class StylesStandaloneModuleBuilder implements Builder {
   @override
   Map<String, List<String>> get buildExtensions {
     return {
-      '.client.dart': ['.client.css.json'],
-      '.server.dart': ['.server.css.json'],
+      '.client.dart': ['.client.styles.dart'],
+      '.server.dart': ['.server.styles.dart'],
     };
   }
 
-  Future<void> generateStandaloneStylesModule(BuildStep buildStep) async {
+  Future<void> generateStandaloneRunner(BuildStep buildStep) async {
     final (mode, _, stylesOption) = await buildStep.loadProjectMode();
     if (mode == null) return;
     if (mode == JasprMode.client && !buildStep.inputId.path.endsWith('.client.dart')) {
@@ -67,28 +66,32 @@ class StylesStandaloneModuleBuilder implements Builder {
 
     styles.sortByCompare((s) => s.id.toImportUrl(), comparePaths);
 
-    final module = StylesStandaloneModule(mode: mode, styles: styles);
+    final outputId = buildStep.inputId.changeExtension('.styles.dart');
+    final runnerCode = ImportsWriter().resolve('''
+    import 'dart:io';
+    import 'dart:convert';
+    
+    import 'package:jaspr/src/dom/styles/rules.dart' show StyleRule, StyleRulesRender;
+    [[/]]
 
-    final outputId = buildStep.inputId.changeExtension('.css.json');
-    await buildStep.writeAsString(outputId, jsonEncode(module.serialize()));
+    void main() {
+      final List<StyleRule> styles = [
+        ${buildStylesEntries(styles)}
+      ];
+
+      stdout.write(jsonEncode({
+        'css': styles.render(),
+      }));
+    }
+    ''');
+
+    await buildStep.writeAsFormattedDart(outputId, runnerCode);
   }
-}
 
-class StylesStandaloneModule {
-  final JasprMode mode;
-  final List<StylesModule> styles;
+  String buildStylesEntries(List<StylesModule> styles) {
+    final filteredStyles = styles.where((s) => s.elements.isNotEmpty).toList();
+    if (filteredStyles.isEmpty) return '';
 
-  StylesStandaloneModule({required this.mode, required this.styles});
-
-  factory StylesStandaloneModule.deserialize(Map<String, Object?> map) {
-    return StylesStandaloneModule(
-      mode: JasprMode.values.firstWhere((m) => m.name == map['mode'] as String),
-      styles: (map['styles'] as List<Object?>).map((e) => StylesModule.deserialize(e as Map<String, Object?>)).toList(),
-    );
+    return filteredStyles.map((s) => s.elements.map((e) => '...[[${s.id.toImportUrl()}]].$e,').join('\n')).join('\n');
   }
-
-  Map<String, Object?> serialize() => {
-    'mode': mode.name,
-    'styles': styles.map((m) => m.serialize()).toList(),
-  };
 }
