@@ -15,7 +15,7 @@ class HtmlDomain extends Domain {
 
   final Logger logger;
 
-  Future<String> convertHtml(Map<String, Object?> params) async {
+  Future<String> convertHtml(Map<String, Object?> params, _) async {
     final html = params['html'] as String;
     final query = params['query'] as String?;
     final parsed = parse(html);

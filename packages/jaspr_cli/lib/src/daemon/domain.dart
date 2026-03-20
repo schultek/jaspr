@@ -21,36 +21,39 @@ abstract class Domain {
   @override
   String toString() => name;
 
-  void handleCommand(String command, dynamic id, Map<String, dynamic> args) {
+  void handleCommand(String command, dynamic id, Map<String, dynamic> args, int? clientId) {
     Future<dynamic>.sync(() {
-          if (_handlers.containsKey(command)) return _handlers[command]!(args);
+          if (_handlers.containsKey(command)) return _handlers[command]!(args, clientId);
           throw ArgumentError('command not understood: $name.$command');
         })
         .then<dynamic>((dynamic result) {
           if (result == null) {
-            _send(<String, dynamic>{'id': id});
+            _send(<String, dynamic>{'id': id, 'clientId': ?clientId});
           } else {
-            _send(<String, dynamic>{'id': id, 'result': toJsonable(result)});
+            _send(<String, dynamic>{'id': id, 'clientId': ?clientId, 'result': toJsonable(result)});
           }
         })
         .catchError((dynamic error, dynamic trace) {
           _send(<String, dynamic>{
             'id': id,
+            'clientId': ?clientId,
             'error': toJsonable(error),
             'trace': '$trace',
           });
         });
   }
 
-  void sendEvent(String name, [dynamic args]) {
-    final map = <String, dynamic>{'event': name};
+  void sendEvent(String name, [dynamic args, int? clientId]) {
+    final map = <String, dynamic>{'event': name, 'clientId': ?clientId};
     if (args != null) map['params'] = toJsonable(args);
     _send(map);
   }
 
   void _send(Map<String, dynamic> map) => daemon.send(map);
 
+  void handleClientDisconnect(int clientId) {}
+
   void dispose() {}
 }
 
-typedef CommandHandler = Future<dynamic> Function(Map<String, dynamic> args);
+typedef CommandHandler = Future<dynamic> Function(Map<String, dynamic> args, int? clientId);

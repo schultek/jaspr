@@ -23,23 +23,17 @@ class ScopesDomain extends Domain {
   final Logger logger;
   final Map<String, ScopesContext> _scopes = {};
 
-  Future<void> registerScopes(Map<String, Object?> params) async {
-    final clientId = params['__clientId'] as int?;
-    if (clientId == null) {
-      logger.write('Missing clientId in scopes message.', level: Level.error);
-      return;
-    }
-
-    final clientOnDone = params['__clientOnDone'] as Future<void>?;
-    clientOnDone?.then((_) {
-      _removeClient(clientId);
-    });
-
+  Future<void> registerScopes(Map<String, Object?> params, int? clientId) async {
     final folders = (params['folders'] as List<Object?>).cast<String>();
 
     for (final folder in folders) {
       createScopes(folder, clientId: clientId);
     }
+  }
+
+  @override
+  void handleClientDisconnect(int clientId) {
+    _removeClient(clientId);
   }
 
   Future<void> createScopes(String folder, {int? clientId}) async {
@@ -161,9 +155,7 @@ class ScopesDomain extends Domain {
     final targetClientIds = clientIds ?? _scopes.values.expand((s) => s.dependentClients).toSet();
 
     for (final clientId in targetClientIds) {
-      final output = <String, Object?>{
-        '__clientId': clientId,
-      };
+      final output = <String, Object?>{};
 
       final scopes = _scopes.values.where((s) => s.dependentClients.contains(clientId)).toList();
       final allLibraries = scopes.expand((s) => s.inspectedData.values.expand((libraries) => libraries.keys)).toSet();
@@ -232,7 +224,7 @@ class ScopesDomain extends Domain {
       }
 
       toolingDaemonDebugLog('Emitting scopes result for $clientId');
-      sendEvent('scopes.result', output);
+      sendEvent('scopes.result', output, clientId);
     }
   }
 
@@ -240,9 +232,7 @@ class ScopesDomain extends Domain {
     final targetClientIds = clientIds ?? _scopes.values.expand((s) => s.dependentClients).toSet();
 
     for (final clientId in targetClientIds) {
-      final output = <String, Object?>{
-        '__clientId': clientId,
-      };
+      final output = <String, Object?>{};
 
       for (final scope in _scopes.values) {
         if (scope.dependentClients.contains(clientId)) {
@@ -253,7 +243,7 @@ class ScopesDomain extends Domain {
       }
 
       toolingDaemonDebugLog('Emitting scopes status for $clientId');
-      sendEvent('scopes.status', output);
+      sendEvent('scopes.status', output, clientId);
     }
   }
 

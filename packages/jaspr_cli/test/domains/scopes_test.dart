@@ -53,6 +53,7 @@ void main() {
       messages[0],
       equals({
         'event': 'scopes.status',
+        'clientId': 1,
         'params': {projectPath: true},
       }),
     );
@@ -61,6 +62,7 @@ void main() {
       messages[1],
       equals({
         'event': 'scopes.result',
+        'clientId': 1,
         'params': data,
       }),
     );
@@ -69,6 +71,7 @@ void main() {
       messages[2],
       equals({
         'event': 'scopes.status',
+        'clientId': 1,
         'params': {projectPath: false},
       }),
     );
@@ -110,7 +113,7 @@ class Page extends StatelessComponent {
       });
       await domain.registerScopes({
         'folders': [projectPath],
-      });
+      }, 1);
 
       await expectScopesResult({
         '$projectPath/lib/app.dart': {
@@ -197,7 +200,7 @@ class Page extends StatelessComponent {
       });
       await domain.registerScopes({
         'folders': [projectPath],
-      });
+      }, 1);
 
       await expectScopesResult({
         '$projectPath/lib/app.dart': {
@@ -272,7 +275,7 @@ class App extends StatelessComponent {
       });
       await domain.registerScopes({
         'folders': [projectPath],
-      });
+      }, 1);
 
       await expectScopesResult({
         '$projectPath/lib/app.dart': {

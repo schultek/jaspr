@@ -19,7 +19,7 @@ void main() {
     domain = HtmlDomain(FakeDaemon(), FakeLogger());
   });
 
-  Future<String> convert(String html) => domain.convertHtml({'html': html});
+  Future<String> convert(String html) => domain.convertHtml({'html': html}, null);
 
   group('html domain', () {
     test('converts simple element with text', () async {

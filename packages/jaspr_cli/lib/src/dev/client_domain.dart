@@ -80,7 +80,7 @@ class ClientDomain extends Domain {
     }
   }
 
-  Future<Map<String, Object?>?> _callServiceExtension(Map<String, Object?> args) async {
+  Future<Map<String, Object?>?> _callServiceExtension(Map<String, Object?> args, _) async {
     final appId = getStringArg(args, 'appId', required: true);
     final appState = _clientStates[appId];
     if (appState == null) {
@@ -92,7 +92,7 @@ class ClientDomain extends Domain {
     return response?.json;
   }
 
-  Future<Map<String, Object?>> _restart(Map<String, Object?> args) async {
+  Future<Map<String, Object?>> _restart(Map<String, Object?> args, _) async {
     final appId = getStringArg(args, 'appId', required: true);
     final appState = _clientStates[appId];
     if (appState == null) {
@@ -124,7 +124,7 @@ class ClientDomain extends Domain {
     return {'code': response?.type == 'Success' ? 0 : 1, 'message': response.toString()};
   }
 
-  Future<bool> _stop(Map<String, Object?> args) async {
+  Future<bool> _stop(Map<String, Object?> args, _) async {
     final appId = getStringArg(args, 'appId', required: true);
     final appState = _clientStates[appId];
     if (appState == null) {

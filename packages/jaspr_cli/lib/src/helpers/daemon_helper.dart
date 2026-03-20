@@ -51,27 +51,8 @@ mixin DaemonHelper on BaseCommand {
     }
 
     void handleResponse(Map<String, Object?> command) {
-      if (command['id'] case final String id when id.contains(':')) {
-        final parts = id.split(':');
-        final clientId = int.tryParse(parts[0]);
-        if (clientId != null && channels.containsKey(clientId)) {
-          final originalIdStr = id.substring(parts[0].length + 1);
-          final Object originalId = int.tryParse(originalIdStr) ?? originalIdStr;
-
-          final newCommand = Map<String, Object?>.from(command);
-          newCommand['id'] = originalId;
-
-          sendToClient(channels[clientId]!, newCommand);
-        } else {
-          broadcast(command);
-        }
-      } else if (command['params'] case <String, dynamic>{
-        '__clientId': final int clientId,
-      } when channels.containsKey(clientId)) {
-        sendToClient(channels[clientId]!, {
-          ...command,
-          'params': Map<String, Object?>.from(command['params'] as Map)..remove('__clientId'),
-        });
+      if (command['clientId'] case final int clientId when channels.containsKey(clientId)) {
+        sendToClient(channels[clientId]!, Map.of(command)..remove('clientId'));
       } else {
         broadcast(command);
       }
@@ -108,14 +89,10 @@ mixin DaemonHelper on BaseCommand {
                 data = data.first;
               }
               if (data is Map<String, Object?>) {
-                if (data.containsKey('id')) {
-                  final originalId = data['id'];
-                  data['id'] = '$clientId:$originalId';
-                }
-                final params = (data['params'] ??= <String, Object?>{}) as Map<String, Object?>;
-                params['__clientId'] = clientId;
-                params['__clientOnDone'] = onDone.future;
-                commandStreamController.add(data);
+                commandStreamController.add({
+                  ...data,
+                  'clientId': clientId,
+                });
               }
             } catch (_) {}
           }
@@ -123,6 +100,8 @@ mixin DaemonHelper on BaseCommand {
         onDone: () {
           onDone.complete();
           channels.remove(clientId);
+
+          daemon.handleClientDisconnect(clientId);
 
           onLog?.call('Client disconnected: $clientId (total active ${channels.length})');
         },

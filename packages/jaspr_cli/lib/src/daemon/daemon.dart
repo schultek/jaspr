@@ -64,7 +64,12 @@ class Daemon {
         throw ArgumentError('no domain for method: $method');
       }
 
-      domainValue.handleCommand(name, id, request['params'] as Map<String, dynamic>? ?? {});
+      domainValue.handleCommand(
+        name,
+        id,
+        request['params'] as Map<String, dynamic>? ?? {},
+        request['clientId'] as int?,
+      );
     } catch (error, trace) {
       send(<String, dynamic>{
         'id': id,
@@ -75,6 +80,12 @@ class Daemon {
   }
 
   void send(Map<String, dynamic> map) => _sendCommand(map);
+
+  void handleClientDisconnect(int clientId) {
+    for (final domain in _domainMap.values) {
+      domain.handleClientDisconnect(clientId);
+    }
+  }
 
   void shutdown({Object? error}) {
     _commandSubscription.cancel();

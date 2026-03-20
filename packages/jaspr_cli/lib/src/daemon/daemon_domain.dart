@@ -21,11 +21,11 @@ class DaemonDomain extends Domain {
     );
   }
 
-  Future<String> _version(Map<String, dynamic> args) {
+  Future<String> _version(Map<String, dynamic> args, _) {
     return Future<String>.value(protocolVersion);
   }
 
-  Future<void> _shutdown(Map<String, dynamic> args) {
+  Future<void> _shutdown(Map<String, dynamic> args, _) {
     // Schedule shutdown after we return the result.
     Timer.run(daemon.shutdown);
     return Future<void>.value();
