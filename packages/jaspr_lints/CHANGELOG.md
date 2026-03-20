@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.6.1
 
 - Allow `analyzer` versions 10.x.
 

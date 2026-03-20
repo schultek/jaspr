@@ -297,7 +297,7 @@ void main() {
           request.response.headers.set(
             'jaspr-sitemap-data',
             jsonEncode({
-              'lastmod': '234',
+              'lastmod': '2026-01-01T12:34:56.789Z',
               'changefreq': 'daily',
               'priority': 0.3,
             }),
@@ -308,7 +308,7 @@ void main() {
 
         await proxyConnection.sendFakeRequest(
           r'$jasprMessageHandler',
-          jsonEncode({'route': '/abc', 'lastmod': '123', 'changefreq': 'weekly', 'priority': 0.7}),
+          jsonEncode({'route': '/abc', 'lastmod': '2026-01-02T12:34:56.789Z', 'changefreq': 'weekly', 'priority': 0.7}),
         );
         await proxyConnection.sendFakeRequest(r'$jasprMessageHandler', jsonEncode({'route': '/abc2'}));
 
@@ -340,13 +340,13 @@ void main() {
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
             '  <url>\n'
             '    <loc>https://example.com/abc</loc>\n'
-            '    <lastmod>123</lastmod>\n'
+            '    <lastmod>2026-01-02T12:34:56Z</lastmod>\n'
             '    <changefreq>weekly</changefreq>\n'
             '    <priority>0.7</priority>\n'
             '  </url>\n'
             '  <url>\n'
             '    <loc>https://example.com/abc2</loc>\n'
-            '    <lastmod>234</lastmod>\n'
+            '    <lastmod>2026-01-01T12:34:56Z</lastmod>\n'
             '    <changefreq>daily</changefreq>\n'
             '    <priority>0.3</priority>\n'
             '  </url>\n'

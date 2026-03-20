@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.5.1
 
 - Fixed eager page loading exhausting file descriptors on macOS
   when building sites with a large number of file-sourced pages.
