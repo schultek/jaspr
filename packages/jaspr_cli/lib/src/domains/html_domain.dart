@@ -18,12 +18,25 @@ class HtmlDomain extends Domain {
   Future<String> convertHtml(Map<String, Object?> params, _) async {
     final html = params['html'] as String;
     final query = params['query'] as String?;
-    final parsed = parse(html);
 
-    List<Node> nodes = parsed.nodes;
+    final parser = HtmlParser(html);
+    final Node document;
+    if (html.startsWith('<!DOCTYPE') || html.startsWith('<html') || html.startsWith('<body')) {
+      document = parser.parse();
+    } else {
+      document = parser.parseFragment();
+    }
+
+    List<Node> nodes = document.children;
 
     if (query != null) {
-      nodes = parsed.querySelectorAll(query);
+      nodes = switch (document) {
+        Document() => document.querySelectorAll(query),
+        DocumentFragment() => document.querySelectorAll(query),
+        _ => [],
+      };
+    } else if (html.startsWith('<body')) {
+      nodes = [?(document as Document).body];
     }
 
     if (nodes.length == 1) {
