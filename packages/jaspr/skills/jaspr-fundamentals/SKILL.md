@@ -1,6 +1,8 @@
 ---
 name: jaspr-fundamentals
 description: Use when working in a Jaspr project, on Jaspr components, or other Jaspr-related tasks. Contains fundamentals of writing Jaspr components and using HTML components.
+metadata:
+  minimum_jaspr_version: 0.22.0
 ---
 
 ## Components
@@ -75,6 +77,11 @@ class MyHtmlComponent extends StatelessComponent {
   }
 }
 ```
+
+## Styling Components
+
+Jaspr has built-in support for styling components using CSS-in-Dart. 
+See the [jaspr-styling](../jaspr-styling/SKILL.md) skill for more information.
 
 ## Interactivity and Events
 
@@ -156,7 +163,7 @@ class _MyInputState extends State<MyInput> {
 
   @override
   Component build(BuildContext context) {
-    return input(key: inputKey, []);
+    return input(key: inputKey, type: .text);
   }
 }
 ```
@@ -165,5 +172,6 @@ class _MyInputState extends State<MyInput> {
 
 ## Further Resources
 
-- For information on pre-rendering, async data fetching, hydration, and the @client annotation see the related skill: [jaspr-pre-rendering-and-hydration](../jaspr-pre-rendering-and-hydration/SKILL.md).
+- For information on pre-rendering, async data fetching, hydration, and the `@client` annotation see the related skill: [jaspr-pre-rendering-and-hydration](../jaspr-pre-rendering-and-hydration/SKILL.md).
+- For information on styling components see the related skill: [jaspr-styling](../jaspr-styling/SKILL.md).
 - For information on how to convert HTML to Jaspr code, see the related skill: [jaspr-convert-html](../jaspr-convert-html/SKILL.md).

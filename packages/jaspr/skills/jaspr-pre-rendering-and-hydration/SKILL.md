@@ -1,7 +1,11 @@
 ---
 name: jaspr-pre-rendering-and-hydration
-description: Use when working in a **static** or **server** mode Jaspr project (defined in `pubspec.yaml` under `jaspr: mode: <mode>`). Covers SSR/SSG, async data fetching, the @client annotation, hydration, and handling dual entrypoints (.server.dart vs .client.dart).
+description: Use when working in a **static** or **server** mode Jaspr project. Covers SSR/SSG, async data fetching, the @client annotation, hydration, and handling dual entrypoints (.server.dart vs .client.dart).
+metadata:
+  minimum_jaspr_version: 0.22.0
 ---
+
+This skill is relevant for **static** and **server** mode Jaspr projects. You can check the mode of a Jaspr project in `pubspec.yaml` under `jaspr: mode: <mode>`.
 
 ## Core Rules for Pre-rendering (SSR/SSG)
 
@@ -21,7 +25,7 @@ Jaspr pre-renders components at request/build-time on the server. Interactive br
 When you annotate a component with `@client`, Jaspr renders its initial HTML on the server and "hydrates" it in the browser.
 
 - `ClientApp()` (called in the client entrypoint) automatically looks for and hydrates all `@client` components that were pre-rendered on the server.
-- **Rule:** Only the **uppermost** component of a subtree that needs client interactivity needs to be annotated with `@client`. Do not annotate all child components in that subtree, they will automatically be hydrated as part of the parent.
+- **Rule:** Only the **uppermost** component of a subtree that needs client interactivity needs to be annotated with `@client`. Do not annotate child components in that subtree, they will automatically be hydrated as part of the parent.
 
 ### Passing Data to `@client` Components
 

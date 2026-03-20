@@ -1,6 +1,8 @@
 ---
 name: jaspr-styling
-description: Guide to writing native structural Jaspr CSS. Use this skill when styling components, implementing themes, or using CSS properties.
+description: Write type-safe CSS-in-Dart to style Jaspr components. Use this skill when styling components, implementing themes, or using CSS properties.
+metadata:
+  minimum_jaspr_version: 0.22.0
 ---
 
 ## Rules for Styling
@@ -62,7 +64,7 @@ You can pass `Styles` instances directly to native HTML components. This renders
 class ColorBox extends StatelessComponent {
   final Color boxColor;
 
-  const ColorBox({required this boxColor, super.key});
+  const ColorBox({required this.boxColor, super.key});
 
   @override
   Component build(BuildContext context) {
@@ -99,7 +101,7 @@ List<StyleRule> get globalStyles => [
 
 ---
 
-## 🛠 Resource Strategy: Jaspr Styles Properties
+## Jaspr Styles Properties
 
 To avoid guessing CSS properties and overwhelming context, Jaspr maps CSS properties to strongly-typed Dart classes.
 
@@ -196,7 +198,7 @@ Styles({ // or .styles({
 - **Rule 2:** You MUST use dot-shorthands for all style properties and values where applicable (e.g., `padding: .all(10.px)` instead of `padding: Padding.all(Unit.pixels(10))`, or `justifyContent: .center` instead of `justifyContent: JustifyContent.center`).
 - **Rule 3:** You MUST use `raw` for any properties that are not supported by the `Styles` class.
 
-**IMPORTANT:** When you are unsure about a specific layout mechanism, you **MUST** read the respective reference file provided alongside this skill:
+**IMPORTANT:** Before writing styles in one of the below areas, you **MUST** read the respective reference file provided alongside this skill:
 
 - `references/sizing.md` (Units like `.px`, `.percent`, dimensions, margin, padding, borders, border-radius)
 - `references/color.md` (Colors, HEX, RGB, HSL values)
