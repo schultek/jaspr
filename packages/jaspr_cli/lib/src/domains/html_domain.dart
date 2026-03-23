@@ -10,19 +10,46 @@ import '../logging.dart';
 
 class HtmlDomain extends Domain {
   HtmlDomain(Daemon daemon, this.logger) : super(daemon, 'html') {
-    registerHandler('convert', convertHtml);
+    registerHandler('convert', _convertHtml);
   }
 
   final Logger logger;
 
-  Future<String> convertHtml(Map<String, Object?> params) async {
-    final html = params['html'] as String;
-    final parsed = parseFragment(html);
+  static Future<String> convertHtml(String html, String? query) async {
+    final parser = HtmlParser(html);
+    final Node document;
+    if (html.startsWith('<!DOCTYPE') || html.startsWith('<html') || html.startsWith('<body')) {
+      document = parser.parse();
+    } else {
+      document = parser.parseFragment();
+    }
 
-    return _convertNode(parsed.firstChild, '').trimLeft();
+    List<Node> nodes = document.children;
+
+    if (query != null) {
+      nodes = switch (document) {
+        Document() => document.querySelectorAll(query),
+        DocumentFragment() => document.querySelectorAll(query),
+        _ => [],
+      };
+    } else if (html.startsWith('<body')) {
+      nodes = [?(document as Document).body];
+    }
+
+    if (nodes.length == 1) {
+      return _convertNode(nodes.first, '').trimLeft();
+    }
+
+    return '.fragment([\n${nodes.map((node) => _convertNode(node, '  ')).where((c) => c.trim().isNotEmpty).join(',\n')}\n])';
   }
 
-  String _convertNode(Node? node, String indent) {
+  Future<String> _convertHtml(Map<String, Object?> params) async {
+    final html = params['html'] as String;
+    final query = params['query'] as String?;
+    return convertHtml(html, query);
+  }
+
+  static String _convertNode(Node? node, String indent) {
     if (node == null) {
       return '';
     }
@@ -31,7 +58,7 @@ class HtmlDomain extends Domain {
       if (text.trim().isEmpty) {
         return '';
       }
-      return '${indent}text(${_escapeString(text)})';
+      return '$indent.text(${_escapeString(text)})';
     } else if (node is Element) {
       final tagName = node.localName;
       final attrs = node.attributes;
@@ -157,12 +184,18 @@ class HtmlDomain extends Domain {
       result += ')';
 
       return result;
+    } else if (node is Comment) {
+      final data = node.data?.trimLeft();
+      if (data == null || data.isEmpty) {
+        return '';
+      }
+      return '$indent// $data';
     } else {
       return '';
     }
   }
 
-  String _escapeString(String input) {
+  static String _escapeString(String input) {
     final isMultiLine = input.contains('\n');
     var escaped = input.replaceAll(r'\', r'\\').replaceAll(r'$', r'\$');
     if (isMultiLine) {
