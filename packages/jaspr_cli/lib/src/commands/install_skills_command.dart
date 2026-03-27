@@ -40,7 +40,7 @@ class InstallSkillsCommand extends BaseCommand {
   String get name => 'install-skills';
 
   @override
-  String get category => 'Project';
+  String get category => 'Tooling';
 
   @override
   Future<int> runCommand() async {
