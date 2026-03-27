@@ -60,6 +60,7 @@ melos:
             jaspr_builder,
             jaspr_cli,
             jaspr_content,
+            jaspr_lints,
             jaspr_riverpod,
             jaspr_router,
           ]
@@ -76,6 +77,7 @@ melos:
             jaspr_builder,
             jaspr_cli,
             jaspr_content,
+            jaspr_lints,
             jaspr_riverpod,
             jaspr_router,
           ]
