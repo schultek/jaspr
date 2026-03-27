@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/file_system/file_system.dart';
 import 'package:path/path.dart' as path;
 import 'logging.dart';
 
@@ -53,13 +54,22 @@ class ScopeTree {
     return node;
   }
 
-  void writeScopes(String rootPath) {
-    final file = File(path.join(rootPath, '.dart_tool', 'jaspr', 'scopes.json'));
-    if (!dirty && file.existsSync()) {
-      return;
+  void writeScopes(String rootPath, {ResourceProvider? resourceProvider}) {
+    late final scopesContent = jsonEncode(buildScopes());
+
+    final scopesPath = path.join(rootPath, '.dart_tool', 'jaspr', 'scopes.json');
+    if (resourceProvider != null) {
+      final file = resourceProvider.getFile(scopesPath);
+      if (!dirty && file.exists) return;
+
+      file.writeAsStringSync(scopesContent);
+    } else {
+      final file = io.File(scopesPath);
+      if (!dirty && file.existsSync()) return;
+
+      file.createSync(recursive: true);
+      file.writeAsStringSync(scopesContent);
     }
-    file.createSync(recursive: true);
-    file.writeAsStringSync(jsonEncode(buildScopes()));
     dirty = false;
   }
 

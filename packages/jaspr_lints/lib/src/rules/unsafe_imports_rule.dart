@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
+import 'package:analyzer/file_system/file_system.dart';
 import 'package:yaml/yaml.dart';
 
 import '../utils.dart';
@@ -17,11 +18,13 @@ class UnsafeImportsRule extends AnalysisRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
-  UnsafeImportsRule()
+  UnsafeImportsRule({this.resourceProvider})
     : super(
         name: 'unsafe_imports',
         description: 'Detects unsafe platform imports.',
       );
+
+  final ResourceProvider? resourceProvider;
 
   final ScopeTree scopeTree = ScopeTree();
 
@@ -44,7 +47,7 @@ class UnsafeImportsRule extends AnalysisRule {
     }
 
     if (context.package?.root case final root?) {
-      scopeTree.writeScopes(root.path);
+      scopeTree.writeScopes(root.path, resourceProvider: resourceProvider);
     }
   }
 

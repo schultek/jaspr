@@ -1,17 +1,22 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:html/dom.dart';
+import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 
-import '../domains/html_domain.dart';
+import '../html_spec.dart';
 import '../logging.dart';
 import 'base_command.dart';
 
 class ConvertHtmlCommand extends BaseCommand {
   ConvertHtmlCommand({super.logger}) {
     argParser
+      ..addOption('html', help: 'The HTML to convert, as a json-encoded string.')
       ..addOption('file', abbr: 'f', help: 'The HTML file to convert.')
       ..addOption('url', abbr: 'u', help: 'The URL to fetch HTML from.')
-      ..addOption('query', abbr: 'q', help: 'A CSS selector to narrow down the conversion.');
+      ..addOption('query', abbr: 'q', help: 'A CSS selector to narrow down the conversion.')
+      ..addFlag('json', help: 'Output the result as JSON.');
   }
 
   @override
@@ -25,37 +30,243 @@ class ConvertHtmlCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
+    var html = argResults?.option('html');
     final file = argResults?.option('file');
     final url = argResults?.option('url');
     final query = argResults?.option('query');
+    final json = argResults?.flag('json') ?? false;
 
-    String html;
-    if (file != null && url == null) {
-      final f = File(file);
-      if (!f.existsSync()) {
-        logger.write('File not found: $file', level: Level.error);
-        return 1;
-      }
-      html = f.readAsStringSync();
-    } else if (file == null && url != null) {
-      try {
-        final response = await http.get(Uri.parse(url));
-        if (response.statusCode != 200) {
-          logger.write('Failed to fetch URL: $url (Status: ${response.statusCode})', level: Level.error);
+    if (html == null) {
+      if (file != null && url == null) {
+        final f = File(file);
+        if (!f.existsSync()) {
+          logger.write('File not found: $file', level: Level.error);
           return 1;
         }
-        html = response.body;
-      } catch (e) {
-        logger.write('Error fetching URL: $e', level: Level.error);
+        html = f.readAsStringSync();
+      } else if (file == null && url != null) {
+        try {
+          final response = await http.get(Uri.parse(url));
+          if (response.statusCode != 200) {
+            logger.write('Failed to fetch URL: $url (Status: ${response.statusCode})', level: Level.error);
+            return 1;
+          }
+          html = response.body;
+        } catch (e) {
+          logger.write('Error fetching URL: $e', level: Level.error);
+          return 1;
+        }
+      } else {
+        logger.write('Either --html, --file or --url must be provided.', level: Level.error);
         return 1;
       }
-    } else {
-      logger.write('Either --file or --url must be provided.', level: Level.error);
-      return 1;
     }
 
-    final result = await HtmlDomain.convertHtml(html, query);
-    logger.write(result);
+    final result = convertHtml(html, query);
+    if (json) {
+      logger.write(jsonEncode({'result': result}));
+    } else {
+      logger.write(result);
+    }
     return 0;
   }
+
+  String convertHtml(String html, String? query) {
+    final parser = HtmlParser(html);
+    final Node document;
+    if (html.startsWith('<!DOCTYPE') || html.startsWith('<html') || html.startsWith('<body')) {
+      document = parser.parse();
+    } else {
+      document = parser.parseFragment();
+    }
+
+    List<Node> nodes = document.children;
+
+    if (query != null) {
+      nodes = switch (document) {
+        Document() => document.querySelectorAll(query),
+        DocumentFragment() => document.querySelectorAll(query),
+        _ => [],
+      };
+    } else if (html.startsWith('<body')) {
+      nodes = [?(document as Document).body];
+    }
+
+    if (nodes.length == 1) {
+      return _convertNode(nodes.first, '').trimLeft();
+    }
+
+    return '.fragment([\n${nodes.map((node) => _convertNode(node, '  ')).where((c) => c.trim().isNotEmpty).join(',\n')}\n])';
+  }
+
+  String _convertNode(Node? node, String indent) {
+    if (node == null) {
+      return '';
+    }
+    if (node is Text) {
+      final text = node.text;
+      if (text.trim().isEmpty) {
+        return '';
+      }
+      return '$indent.text(${_escapeString(text)})';
+    } else if (node is Element) {
+      final tagName = node.localName;
+      final attrs = node.attributes;
+      final children = node.nodes;
+
+      final spec = elementSpecs[tagName] as Map<String, Object?>?;
+
+      if (spec == null) {
+        final attrsString = attrs.isEmpty
+            ? ''
+            : ', attributes: {${attrs.entries.map((e) => "'${e.key}': ${_escapeString(e.value)}").join(', ')}}';
+
+        final childrenString = children.isEmpty
+            ? ''
+            : ', children: [\n${children.map((c) => _convertNode(c, '$indent  ')).where((c) => c.trim().isNotEmpty).join(',\n')}\n$indent]';
+
+        return '${indent}Component.element(tag: \'$tagName\'$attrsString$childrenString)';
+      }
+
+      final specAttributes = spec['attributes'] as Map<String, Object?>?;
+
+      String? idString;
+      String? classString;
+      final paramStrings = <String>[];
+      final attrStrings = <String>[];
+
+      for (final MapEntry(:key, :value) in attrs.entries) {
+        if (key == 'class') {
+          classString = value;
+        } else if (key == 'id') {
+          idString = value;
+        } else {
+          if (specAttributes?[key] case final Map<String, Object?> attrSpec) {
+            final attrName = (attrSpec['name'] ?? key) as String;
+            final attrType = attrSpec['type'] as String;
+
+            if (attrType == 'string') {
+              paramStrings.add('$attrName: ${_escapeString(value)}');
+              continue;
+            }
+            if (attrType == 'boolean') {
+              paramStrings.add('$attrName: true');
+              continue;
+            }
+            if (attrType.startsWith('enum:')) {
+              final enumName = attrType.substring(5);
+              final enumSpec = htmlSpec['enums']![enumName] as Map<String, Object?>;
+
+              final enumValue = (enumSpec['values'] as Map<String, Object?>).entries
+                  .where(
+                    (e) => ((e.value as Map<String, Object?>?)?['value'] ?? e.key) == value,
+                  )
+                  .firstOrNull;
+              if (enumValue != null) {
+                paramStrings.add('$attrName: $enumName.${enumValue.key}');
+                continue;
+              }
+            }
+          }
+          attrStrings.add("'$key': ${_escapeString(value)}");
+        }
+      }
+
+      var result = '$indent${spec['name']}(';
+
+      if (idString != null) {
+        result += 'id: ${_escapeString(idString)}, ';
+      }
+
+      if (classString != null) {
+        result += 'classes: ${_escapeString(classString)}, ';
+      }
+
+      if (paramStrings.isNotEmpty) {
+        for (final param in paramStrings) {
+          result += '$param, ';
+        }
+      }
+
+      if (attrStrings.isNotEmpty) {
+        result += 'attributes: {';
+        var isFirst = true;
+        for (final attrString in attrStrings) {
+          if (!isFirst) {
+            result += ', ';
+          }
+          isFirst = false;
+          result += attrString;
+        }
+        result += '}, ';
+      }
+
+      final contentParam = specAttributes?.entries
+          .map((e) => (key: e.key, value: e.value as Map<String, Object?>))
+          .where((e) => e.value['type'] == 'content')
+          .firstOrNull;
+
+      if (contentParam != null && children.isNotEmpty) {
+        final contentParamName = contentParam.value['name'] as String? ?? contentParam.key;
+        result += '$contentParamName: ${_escapeString(node.innerHtml)}';
+      }
+
+      if (contentParam == null && spec['self_closing'] != true) {
+        if (children.isEmpty) {
+          result += '[]';
+        } else {
+          result += '[\n';
+          for (final child in children) {
+            final childHtml = _convertNode(child, '$indent  ');
+            if (childHtml.trim().isEmpty) {
+              continue;
+            }
+            result += '$childHtml,\n';
+          }
+          result += '$indent]';
+        }
+      } else {
+        if (result.endsWith(', ')) {
+          result = result.substring(0, result.length - 2);
+        }
+      }
+
+      result += ')';
+
+      return result;
+    } else if (node is Comment) {
+      final data = node.data?.trimLeft();
+      if (data == null || data.isEmpty) {
+        return '';
+      }
+      return '$indent// $data';
+    } else {
+      return '';
+    }
+  }
+
+  String _escapeString(String input) {
+    final isMultiLine = input.contains('\n');
+    var escaped = input.replaceAll(r'\', r'\\').replaceAll(r'$', r'\$');
+    if (isMultiLine) {
+      escaped = escaped.replaceAll("'''", r"\'\'\'");
+      return "'''$escaped'''";
+    } else {
+      escaped = escaped.replaceAll("'", r"\'");
+      return "'$escaped'";
+    }
+  }
 }
+
+final elementSpecs = (() {
+  final config = <String, Object?>{};
+  for (final group in htmlSpec['tags']!.values) {
+    for (final entry in group.entries) {
+      final name = entry.key;
+      final data = entry.value as Map<String, Object?>;
+      final tag = data['tag'] as String? ?? name;
+      config[tag] = {...data, 'name': name};
+    }
+  }
+  return config;
+})();
