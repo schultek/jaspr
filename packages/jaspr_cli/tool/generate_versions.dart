@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:pub_semver/pub_semver.dart';
-
 void main() async {
   final output = StringBuffer(
     '// ignore_for_file: directives_ordering\n'
