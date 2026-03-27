@@ -2,7 +2,7 @@
 name: jaspr-convert-html
 description: Use when you need to convert / rewrite existing HTML (from a file or url) into Jaspr code.
 metadata:
-  minimum_jaspr_version: 0.22.0
+  jaspr_version: 0.22.4
 ---
 
 ## Rules

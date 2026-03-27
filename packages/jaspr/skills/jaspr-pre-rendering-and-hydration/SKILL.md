@@ -2,7 +2,7 @@
 name: jaspr-pre-rendering-and-hydration
 description: Use when working in a **static** or **server** mode Jaspr project. Covers SSR/SSG, async data fetching, the @client annotation, hydration, and handling dual entrypoints (.server.dart vs .client.dart).
 metadata:
-  minimum_jaspr_version: 0.22.0
+  jaspr_version: 0.22.4
 ---
 
 This skill is relevant for **static** and **server** mode Jaspr projects. You can check the mode of a Jaspr project in `pubspec.yaml` under `jaspr: mode: <mode>`.

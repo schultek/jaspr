@@ -2,7 +2,7 @@
 name: jaspr-fundamentals
 description: Use when working in a Jaspr project, on Jaspr components, or other Jaspr-related tasks. Contains fundamentals of writing Jaspr components and using HTML components.
 metadata:
-  minimum_jaspr_version: 0.22.0
+  jaspr_version: 0.22.4
 ---
 
 ## Components
@@ -175,3 +175,4 @@ class _MyInputState extends State<MyInput> {
 - For information on pre-rendering, async data fetching, hydration, and the `@client` annotation see the related skill: [jaspr-pre-rendering-and-hydration](../jaspr-pre-rendering-and-hydration/SKILL.md).
 - For information on styling components see the related skill: [jaspr-styling](../jaspr-styling/SKILL.md).
 - For information on how to convert HTML to Jaspr code, see the related skill: [jaspr-convert-html](../jaspr-convert-html/SKILL.md).
+- An index of all available documentation can be found at [https://jaspr.site/llms.txt](https://jaspr.site/llms.txt).

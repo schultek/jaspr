@@ -27,9 +27,6 @@ void main() async {
   final versionsFile = File('lib/src/version.dart');
   await versionsFile.writeAsString(output.toString());
 
-  final parsedJasprVersion = Version.parse(jasprVersion);
-  final majorJasprVersion = Version(parsedJasprVersion.major, parsedJasprVersion.minor, 0).toString();
-
   final skillsFiles = Directory('../jaspr/skills').listSync(recursive: true);
   for (final file in skillsFiles) {
     if (file is File && file.path.endsWith('SKILL.md')) {
@@ -37,9 +34,9 @@ void main() async {
       final metadataMatch = RegExp(r'^---(.*?)---', dotAll: true).firstMatch(content);
       if (metadataMatch != null) {
         final metadata = metadataMatch.group(1)!;
-        final versionMatch = RegExp(r'minimum_jaspr_version: (.*)').firstMatch(metadata);
+        final versionMatch = RegExp(r'jaspr_version: (.*)').firstMatch(metadata);
         if (versionMatch != null) {
-          final output = content.replaceFirst(versionMatch.group(0)!, 'minimum_jaspr_version: $majorJasprVersion');
+          final output = content.replaceFirst(versionMatch.group(0)!, 'jaspr_version: $jasprVersion');
           file.writeAsStringSync(output);
         }
       }
