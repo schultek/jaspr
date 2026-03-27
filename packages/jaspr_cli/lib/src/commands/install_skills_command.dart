@@ -84,19 +84,16 @@ class InstallSkillsCommand extends BaseCommand {
       return 1;
     }
 
-    String? selectedAgent;
     String? targetDirName;
 
     final requestedAgent = argResults?['agent'] as String?;
     if (requestedAgent != null) {
-      selectedAgent = requestedAgent;
       targetDirName = _agents[requestedAgent];
     } else {
       for (final entry in _agents.entries) {
         if (Directory(p.join(entry.value, 'skills')).existsSync()) {
-          selectedAgent = entry.key;
           targetDirName = entry.value;
-          logger.write('Auto-detected agent: $selectedAgent (using directory $targetDirName)');
+          logger.write('Using auto-detected skills directory: $targetDirName/skills');
           break;
         }
       }
@@ -147,7 +144,7 @@ class InstallSkillsCommand extends BaseCommand {
     }
 
     if (!didUpdateSkills) {
-      logger.write('All skills are already installed for agent $selectedAgent.');
+      logger.write('All skills are already installed and up to date.');
     }
 
     return 0;
