@@ -57,13 +57,14 @@ class ScopeTree {
   void writeScopes(String rootPath, {ResourceProvider? resourceProvider}) {
     late final scopesContent = jsonEncode(buildScopes());
 
-    final scopesPath = path.join(rootPath, '.dart_tool', 'jaspr', 'scopes.json');
     if (resourceProvider != null) {
+      final scopesPath = resourceProvider.pathContext.join(rootPath, '.dart_tool', 'jaspr', 'scopes.json');
       final file = resourceProvider.getFile(scopesPath);
       if (!dirty && file.exists) return;
 
       file.writeAsStringSync(scopesContent);
     } else {
+      final scopesPath = path.join(rootPath, '.dart_tool', 'jaspr', 'scopes.json');
       final file = io.File(scopesPath);
       if (!dirty && file.existsSync()) return;
 
@@ -118,7 +119,17 @@ class ScopeTree {
       setScopes(node, {}, {});
     }
 
-    final output = <String, Object?>{};
+    int locationIdCounter = 0;
+    final locationIds = <String, String>{};
+    final locations = <String, Object?>{};
+    final scopes = <String, Object?>{};
+
+    String putLocation(NodeLocation location) {
+      final key = '${location.path}:${location.name}';
+      final locationId = locationIds.putIfAbsent(key, () => '${locationIdCounter++}');
+      locations[locationId] = location.toJson();
+      return locationId;
+    }
 
     for (final libraryPath in nodes.keys) {
       final node = nodes[libraryPath]!;
@@ -130,20 +141,19 @@ class ScopeTree {
       final nodeServerScopes = serverScopes[node] ??= {};
       final nodeClientScopes = clientScopes[node] ??= {};
 
-      output[libraryPath] = {
-        'components': node.components.map((e) => e.toJson()).toList(),
+      scopes[libraryPath] = {
+        'components': [for (final location in node.components) putLocation(location)],
         if (nodeServerScopes.isNotEmpty)
-          'serverScopeRoots': [
-            for (final location in nodeServerScopes) location.toJson(),
-          ],
+          'serverScopeRoots': [for (final location in nodeServerScopes) putLocation(location)],
         if (nodeClientScopes.isNotEmpty)
-          'clientScopeRoots': [
-            for (final location in nodeClientScopes) location.toJson(),
-          ],
+          'clientScopeRoots': [for (final location in nodeClientScopes) putLocation(location)],
       };
     }
 
-    return output;
+    return {
+      'locations': locations,
+      'scopes': scopes,
+    };
   }
 }
 
@@ -397,7 +407,7 @@ class NodeLocation {
   NodeLocation(this.path, this.name, this.line, this.character, this.length);
 
   Map<String, Object?> toJson() {
-    return {'path': path, 'name': name, 'line': line, 'character': character, 'length': length};
+    return {'path': path, 'name': name, 'line': line, 'char': character, 'length': length};
   }
 }
 

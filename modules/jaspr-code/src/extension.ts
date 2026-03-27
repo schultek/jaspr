@@ -10,9 +10,7 @@ import { jasprClean, jasprDoctor, jasprServe } from "./commands";
 import {
   findJasprProjectFolders,
 } from "./helpers/project_helper";
-import { JasprToolingDaemon } from "./jaspr/tooling_daemon";
-import { ScopesDomain } from "./jaspr/scopes_domain";
-import { HtmlDomain } from "./jaspr/html_domain";
+import { HtmlPasteProvider } from "./jaspr/html_paste_provider";
 import { dartExtensionApi } from "./api";
 import { ComponentCodeLensProvider } from "./code_lenses/component_code_lens";
 import { ServeCodeLensProvider } from "./code_lenses/serve_code_lens";
@@ -67,17 +65,10 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("jaspr.serve", jasprServe(context))
   );
 
-  const toolingDaemon = new JasprToolingDaemon();
-  context.subscriptions.push(toolingDaemon);
-  await toolingDaemon.start(context);
-
-  const scopesDomain = new ScopesDomain(toolingDaemon);
-  context.subscriptions.push(scopesDomain);
-
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider(
       { language: "dart", scheme: "file" },
-      new ComponentCodeLensProvider(scopesDomain)
+      new ComponentCodeLensProvider()
     )
   );
 
@@ -90,6 +81,6 @@ export async function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  const htmlDomain = new HtmlDomain(toolingDaemon);
-  context.subscriptions.push(htmlDomain);
+  const htmlPasteProvider = new HtmlPasteProvider();
+  context.subscriptions.push(htmlPasteProvider);
 }

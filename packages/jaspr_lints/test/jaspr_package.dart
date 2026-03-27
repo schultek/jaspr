@@ -15,6 +15,7 @@ extension JasprAnalysisRuleTest on AnalysisRuleTest {
         class Component {
           const Component();
           factory Component.element({required String tag}) => Component._();
+          factory Component.text(String text) => Component._();
         }
 
         class div extends Component {
@@ -23,6 +24,16 @@ extension JasprAnalysisRuleTest on AnalysisRuleTest {
         class p extends Component {
           p(List<Component> children, {String? id, String? classes}) : super();
         }
+
+        abstract class StatelessComponent extends Component {
+          const StatelessComponent();
+
+          Component build(BuildContext context);
+        }
+
+        class BuildContext {}
+
+        void runApp(Component app) {}
       ''')
       ..addFile('lib/src/dom/styles/css.dart', r'''
         import 'styles.dart';

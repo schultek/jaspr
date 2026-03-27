@@ -1,7 +1,10 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
+
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:jaspr_lints/src/rules/unsafe_imports_rule.dart';
+import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../jaspr_package.dart';
@@ -11,6 +14,7 @@ void main() {
     defineReflectiveTests(UnsafeImportsServerTest);
     defineReflectiveTests(UnsafeImportsClientTest);
     defineReflectiveTests(UnsafeImportsComponentTest);
+    defineReflectiveTests(ScopesTest);
   });
 }
 
@@ -193,96 +197,102 @@ class UnsafeImportsComponentTest extends UnsafeImportsBaseTest {
   }
 }
 
-/*
+@reflectiveTest
 class ScopesTest extends UnsafeImportsBaseTest {
-  @override
-  String get testFileName => 'main.server.dart';
+  Future<Object?> getScopesFor(Map<String, String> files) async {
+    final entrypoints = <String>[];
+    for (final file in files.entries) {
+      newFile('$testPackageLibPath/${file.key}', file.value);
+      if (file.key.endsWith('.server.dart')) {
+        entrypoints.add(file.key);
+      }
+    }
 
-  void test_scopes_file_is_created() {}
-}
+    for (final entrypoint in entrypoints) {
+      final convertedPath = convertPath('$testPackageLibPath/$entrypoint');
+      await resolveFile(convertedPath);
+    }
 
-test('analyzes simple scopes', () async {
-      projectPath = setUpProject({
-        'main.server.dart': '''
+    final scopesFile = resourceProvider.getFile(convertPath('$testPackageRootPath/.dart_tool/jaspr/scopes.json'));
+    return jsonDecode(scopesFile.readAsStringSync());
+  }
+
+  Future<void> test_simple_scopes() async {
+    final actualScopes = await getScopesFor({
+      'main.server.dart': '''
 import 'package:jaspr/jaspr.dart';
 import 'app.dart';
 
 void main() {
   runApp(App());
 }
-''',
-        'app.dart': '''
+      ''',
+      'app.dart': '''
 import 'package:jaspr/jaspr.dart';
 import 'page.dart';
 
-@client
 class App extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return Page();
   }
 }
-''',
-        'page.dart': '''
+      ''',
+      'page.dart': '''
 import 'package:jaspr/jaspr.dart';
+import 'button.dart';
 
+@client
 class Page extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return text('Hello, World!');
+    return Button();
   }
 }
-''',
-      });
-      await domain.registerScopes({
-        'folders': [projectPath],
-      });
+      ''',
+      'button.dart': '''
+import 'package:jaspr/jaspr.dart';
 
-      await expectScopesResult({
-        '$projectPath/lib/app.dart': {
-          'components': ['App'],
-          'clientScopeRoots': [
-            {
-              'path': '$projectPath/lib/app.dart',
-              'name': 'App',
-              'line': 5,
-              'character': 7,
-            },
-          ],
-          'serverScopeRoots': [
-            {
-              'path': '$projectPath/lib/main.server.dart',
-              'name': 'main',
-              'line': 4,
-              'character': 6,
-            },
-          ],
-        },
-        '$projectPath/lib/page.dart': {
-          'components': ['Page'],
-          'clientScopeRoots': [
-            {
-              'path': '$projectPath/lib/app.dart',
-              'name': 'App',
-              'line': 5,
-              'character': 7,
-            },
-          ],
-          'serverScopeRoots': [
-            {
-              'path': '$projectPath/lib/main.server.dart',
-              'name': 'main',
-              'line': 4,
-              'character': 6,
-            },
-          ],
-        },
-      });
+class Button extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    return text('Click me');
+  }
+}
+      ''',
     });
 
-    test('analyzes multiple server entrypoints', () async {
-      projectPath = setUpProject({
-        'main.server.dart': '''
+    final expectedScopes = {
+      'locations': {
+        '0': {'path': '$testPackageLibPath/app.dart', 'name': 'App', 'line': 4, 'char': 7, 'length': 3},
+        '1': {'path': '$testPackageLibPath/main.server.dart', 'name': 'main', 'line': 4, 'char': 6, 'length': 4},
+        '2': {'path': '$testPackageLibPath/page.dart', 'name': 'Page', 'line': 5, 'char': 7, 'length': 4},
+        '3': {'path': '$testPackageLibPath/button.dart', 'name': 'Button', 'line': 3, 'char': 7, 'length': 6},
+      },
+      'scopes': {
+        '$testPackageLibPath/app.dart': {
+          'components': ['0'],
+          'serverScopeRoots': ['1'],
+        },
+        '$testPackageLibPath/page.dart': {
+          'components': ['2'],
+          'serverScopeRoots': ['1'],
+          'clientScopeRoots': ['2'],
+        },
+        '$testPackageLibPath/button.dart': {
+          'components': ['3'],
+          'serverScopeRoots': ['1'],
+          'clientScopeRoots': ['2'],
+        },
+      },
+    };
+
+    expect(actualScopes, equals(expectedScopes));
+  }
+
+  void test_multi_server_entrypoints() async {
+    final actualScopes = await getScopesFor({
+      'main.server.dart': '''
 import 'package:jaspr/jaspr.dart';
 import 'app.dart';
 
@@ -290,7 +300,7 @@ void main() {
   runApp(App());
 }
 ''',
-        'other.server.dart': '''
+      'other.server.dart': '''
 import 'package:jaspr/jaspr.dart';
 import 'page.dart';
 
@@ -298,7 +308,7 @@ void main() {
   runApp(Page());
 }
 ''',
-        'app.dart': '''
+      'app.dart': '''
 import 'package:jaspr/jaspr.dart';
 import 'page.dart';
 
@@ -310,7 +320,7 @@ class App extends StatelessComponent {
   }
 }
 ''',
-        'page.dart': '''
+      'page.dart': '''
 import 'package:jaspr/jaspr.dart';
 
 class Page extends StatelessComponent {
@@ -320,128 +330,106 @@ class Page extends StatelessComponent {
   }
 }
 ''',
-      });
-      await domain.registerScopes({
-        'folders': [projectPath],
-      });
-
-      await expectScopesResult({
-        '$projectPath/lib/app.dart': {
-          'components': ['App'],
-          'clientScopeRoots': [
-            {
-              'path': '$projectPath/lib/app.dart',
-              'name': 'App',
-              'line': 5,
-              'character': 7,
-            },
-          ],
-          'serverScopeRoots': [
-            {
-              'path': '$projectPath/lib/main.server.dart',
-              'name': 'main',
-              'line': 4,
-              'character': 6,
-            },
-          ],
-        },
-        '$projectPath/lib/page.dart': {
-          'components': ['Page'],
-          'clientScopeRoots': [
-            {
-              'path': '$projectPath/lib/app.dart',
-              'name': 'App',
-              'line': 5,
-              'character': 7,
-            },
-          ],
-          'serverScopeRoots': unorderedEquals([
-            {
-              'path': '$projectPath/lib/main.server.dart',
-              'name': 'main',
-              'line': 4,
-              'character': 6,
-            },
-            {
-              'path': '$projectPath/lib/other.server.dart',
-              'name': 'main',
-              'line': 4,
-              'character': 6,
-            },
-          ]),
-        },
-      });
     });
 
-    test('analyzes unallowed imports', () async {
-      projectPath = setUpProject({
-        'main.server.dart': '''
+    final expectedScopes = {
+      'locations': {
+        '0': {'path': '$testPackageLibPath/app.dart', 'name': 'App', 'line': 5, 'char': 7, 'length': 3},
+        '1': {'path': '$testPackageLibPath/main.server.dart', 'name': 'main', 'line': 4, 'char': 6, 'length': 4},
+        '2': {'path': '$testPackageLibPath/page.dart', 'name': 'Page', 'line': 3, 'char': 7, 'length': 4},
+        '3': {'path': '$testPackageLibPath/other.server.dart', 'name': 'main', 'line': 4, 'char': 6, 'length': 4},
+      },
+      'scopes': {
+        '$testPackageLibPath/app.dart': {
+          'components': ['0'],
+          'serverScopeRoots': ['1'],
+          'clientScopeRoots': ['0'],
+        },
+        '$testPackageLibPath/page.dart': {
+          'components': ['2'],
+          'serverScopeRoots': unorderedEquals(['1', '3']),
+          'clientScopeRoots': ['0'],
+        },
+      },
+    };
+
+    expect(actualScopes, equals(expectedScopes));
+  }
+
+  void test_multi_client_components() async {
+    final actualScopes = await getScopesFor({
+      'main.server.dart': '''
 import 'package:jaspr/jaspr.dart';
-import 'app.dart';
+import 'home.dart';
+import 'about.dart';
 
 void main() {
-  runApp(App());
+  runApp(Home());
+  runApp(About());
 }
 ''',
-        'app.dart': '''
-import 'package:jaspr/server.dart';
-import 'package:web/web.dart';
+      'home.dart': '''
+import 'package:jaspr/jaspr.dart';
+import 'button.dart';
 
 @client
-class App extends StatelessComponent {
+class Home extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return text('Hello, World!');
+    return Button();
   }
 }
 ''',
-      });
-      await domain.registerScopes({
-        'folders': [projectPath],
-      });
+      'about.dart': '''
+import 'package:jaspr/jaspr.dart';
+import 'button.dart';
 
-      await expectScopesResult({
-        '$projectPath/lib/app.dart': {
-          'components': ['App'],
-          'clientScopeRoots': [
-            {
-              'path': '$projectPath/lib/app.dart',
-              'name': 'App',
-              'line': 5,
-              'character': 7,
-            },
-          ],
-          'serverScopeRoots': [
-            {
-              'path': '$projectPath/lib/main.server.dart',
-              'name': 'main',
-              'line': 4,
-              'character': 6,
-            },
-          ],
-          'invalidDependencies': [
-            {
-              'uri': 'package:jaspr/server.dart',
-              'invalidOnClient': {
-                'uri': 'package:jaspr/server.dart',
-                'target': 'package:jaspr/server.dart',
-                'line': 1,
-                'character': 1,
-                'length': 35,
-              },
-            },
-            {
-              'uri': 'package:web/web.dart',
-              'invalidOnServer': {
-                'uri': 'package:web/web.dart',
-                'target': 'package:web/web.dart',
-                'line': 2,
-                'character': 1,
-                'length': 30,
-              },
-            },
-          ],
-        },
-      });
+@client
+class About extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    return Button();
+  }
+}
+''',
+      'button.dart': '''
+import 'package:jaspr/jaspr.dart';
+
+class Button extends StatelessComponent {
+  @override
+  Component build(BuildContext context) {
+    return text('Click me!');
+  }
+}
+''',
     });
-    */
+
+    final expectedScopes = {
+      'locations': {
+        '0': {'path': '$testPackageLibPath/home.dart', 'name': 'Home', 'line': 5, 'char': 7, 'length': 4},
+        '1': {'path': '$testPackageLibPath/main.server.dart', 'name': 'main', 'line': 5, 'char': 6, 'length': 4},
+        '2': {'path': '$testPackageLibPath/about.dart', 'name': 'About', 'line': 5, 'char': 7, 'length': 5},
+        '3': {'path': '$testPackageLibPath/button.dart', 'name': 'Button', 'line': 3, 'char': 7, 'length': 6},
+      },
+      'scopes': {
+        '$testPackageLibPath/home.dart': {
+          'components': ['0'],
+          'serverScopeRoots': ['1'],
+          'clientScopeRoots': ['0'],
+        },
+        '$testPackageLibPath/about.dart': {
+          'components': ['2'],
+          'serverScopeRoots': ['1'],
+          'clientScopeRoots': ['2'],
+        },
+        '$testPackageLibPath/button.dart': {
+          'components': ['3'],
+          'serverScopeRoots': ['1'],
+          'clientScopeRoots': unorderedEquals(['0', '2']),
+        },
+      },
+    };
+
+    expect(actualScopes, equals(expectedScopes));
+  }
+}

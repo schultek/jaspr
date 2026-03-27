@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
-import { JasprToolingDaemon } from "./tooling_daemon";
+import { runJaspr } from "../helpers/process_helper";
+import { cwd } from "process";
 
-export class HtmlDomain
-  implements vscode.DocumentPasteEditProvider, vscode.Disposable
-{
-  private toolingDaemon: JasprToolingDaemon;
+export class HtmlPasteProvider
+  implements vscode.DocumentPasteEditProvider, vscode.Disposable {
   private pasteEditProviderDisposable: vscode.Disposable | undefined;
 
   static readonly kind = vscode.DocumentDropOrPasteEditKind.Empty.append(
@@ -13,15 +12,13 @@ export class HtmlDomain
     "jaspr"
   );
 
-  constructor(toolingDaemon: JasprToolingDaemon) {
-    this.toolingDaemon = toolingDaemon;
-
+  constructor() {
     this.pasteEditProviderDisposable =
       vscode.languages.registerDocumentPasteEditProvider(
         { language: "dart" },
         this,
         {
-          providedPasteEditKinds: [HtmlDomain.kind],
+          providedPasteEditKinds: [HtmlPasteProvider.kind],
           pasteMimeTypes: ["text/plain"],
         }
       );
@@ -34,30 +31,26 @@ export class HtmlDomain
     context: vscode.DocumentPasteEditContext,
     token: vscode.CancellationToken
   ) {
-    if (
-      this.toolingDaemon.jasprVersion === undefined ||
-      this.toolingDaemon.jasprVersion < "0.21.2"
-    ) {
-      return;
-    }
+
 
     const content = await data.get("text/plain")?.asString();
-    if (content?.startsWith("<")) {
+    if (content && /^<[a-z]+(\s+[^>]*)*>/i.test(content)) {
       try {
-        const result = await this.toolingDaemon.sendMessage(
-          "html.convert",
-          { html: content },
-          1000
-        );
-
+        const output = await runJaspr(['convert-html', '--html', JSON.stringify(content), '--json'], cwd());
         if (token.isCancellationRequested) {
           return;
         }
+        const result = output.split('\n').find((line) => line.startsWith('{"result":'));
+        if (!result) {
+          vscode.window.showErrorMessage("Failed to convert HTML to Jaspr: " + output);
+          return;
+        }
+
         return [
           new vscode.DocumentPasteEdit(
-            result,
+            JSON.parse(result)['result'],
             "Convert to Jaspr",
-            HtmlDomain.kind
+            HtmlPasteProvider.kind
           ),
         ];
       } catch (e) {
