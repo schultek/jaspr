@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:jaspr_cli/src/command_runner.dart';
 import 'package:jaspr_cli/src/project.dart';
@@ -362,6 +363,53 @@ void main() {
             'Terminating server...',
           ]),
         );
+
+        expect(await buildResult, equals(0));
+      });
+    });
+
+    test('builds project with standalone css', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerBuildArgs);
+
+        final buildResult = runner.run(['build', '--verbose']);
+
+        await expectLater(io.stdout.queue, emits('Building jaspr for client rendering mode.'));
+
+        final runnerFilePath = '.dart_tool/build/generated/myapp/lib/main.client.styles.dart';
+        io.fs.file('/root/myapp/$runnerFilePath')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('void main() {}');
+
+        final cssContent = 'body { color: red; }';
+
+        when(
+          () => io.process.run(
+            '/fake/bin/dart',
+            any(that: containsAllInOrder(['run', '/root/myapp/$runnerFilePath'])),
+            workingDirectory: '/root/myapp',
+          ),
+        ).thenAnswer((inv) async {
+          return ProcessResult(0, 0, '{"css": "$cssContent"}', '');
+        });
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrder(['[CLI] Generated main.css', 'Completed building project to /build/jaspr.']),
+        );
+
+        final tempOutputPath = '/root/myapp/.dart_tool/jaspr/generated/main.css';
+        final buildOutputPath = '/root/myapp/build/jaspr/main.css';
+
+        expect(io.fs.file(tempOutputPath).existsSync(), isTrue);
+        expect(io.fs.file(tempOutputPath).readAsStringSync(), equals(cssContent));
+        expect(io.fs.file(buildOutputPath).existsSync(), isTrue);
+        expect(io.fs.file(buildOutputPath).readAsStringSync(), equals(cssContent));
 
         expect(await buildResult, equals(0));
       });

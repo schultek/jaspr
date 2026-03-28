@@ -7,11 +7,17 @@ import 'package:path/path.dart' as p;
 
 import '../commands/base_command.dart';
 import '../logging.dart';
+import '../process_runner.dart';
+import '../project.dart';
 
 extension CssHelper on BaseCommand {
   Future<int> generateCss() async {
     final projectName = project.requirePubspecYaml['name'] as String;
     final buildDir = '.dart_tool/build/generated/$projectName/lib';
+
+    if (!Directory(buildDir).absolute.existsSync()) {
+      return 0;
+    }
 
     bool hasError = false;
 
@@ -26,7 +32,10 @@ extension CssHelper on BaseCommand {
           .replaceFirst('.server.styles.dart', '.css')
           .replaceFirst('.client.styles.dart', '.css');
 
-      final result = await Process.run('dart', ['run', runnerFile.path]);
+      final result = await ProcessRunner.instance.run(dartExecutable, [
+        'run',
+        runnerFile.path,
+      ], workingDirectory: Directory.current.path);
       if (result.exitCode != 0) {
         logger.write(
           'Failed to generate $outputFile, the script exited with code ${result.exitCode}:\n${result.stderr}',
@@ -51,8 +60,6 @@ extension CssHelper on BaseCommand {
           'Generated $outputFile',
           tag: Tag.cli,
         );
-      } else {
-        throw 'Invalid output: ${result.stdout}';
       }
     }
 
