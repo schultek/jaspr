@@ -11,11 +11,17 @@ import 'package:yaml/yaml.dart';
 import '../utils.dart';
 import '../utils/scope_tree.dart';
 
-class UnsafeImportsRule extends AnalysisRule {
-  static const LintCode code = LintCode(
+class UnsafeImportsRule extends MultiAnalysisRule {
+  static const LintCode unsafeImportCode = LintCode(
     'unsafe_imports',
     'Unsafe import: {0}',
-    severity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const LintCode unsafeCssCode = LintCode(
+    'unsafe_css',
+    'Unsafe @css usage: {0}',
+    severity: DiagnosticSeverity.WARNING,
   );
 
   UnsafeImportsRule({this.resourceProvider})
@@ -24,12 +30,12 @@ class UnsafeImportsRule extends AnalysisRule {
         description: 'Detects unsafe platform imports.',
       );
 
+  @override
+  List<DiagnosticCode> get diagnosticCodes => [unsafeImportCode, unsafeCssCode];
+
   final ResourceProvider? resourceProvider;
 
   final ScopeTree scopeTree = ScopeTree();
-
-  @override
-  LintCode get diagnosticCode => code;
 
   @override
   void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
@@ -44,6 +50,10 @@ class UnsafeImportsRule extends AnalysisRule {
     if (node.clientScopeLocation != null) {
       _checkPubspecConfig(context);
       registry.addImportDirective(this, ClientScopeImportsVisitor(this, node, allowFlutterLibsInClient));
+    }
+
+    if (node.usesCssAnnotation) {
+      registry.addAnnotation(this, CssImportsVisitor(this, node));
     }
 
     if (context.package?.root case final root?) {
@@ -70,46 +80,26 @@ class UnsafeImportsRule extends AnalysisRule {
   }
 }
 
-abstract class ScopeImportsVisitor extends SimpleAstVisitor<void> {
-  ScopeImportsVisitor(this.rule, this.treeNode, {required this.edgeType});
-
-  final UnsafeImportsRule rule;
-  final ScopeTreeNode treeNode;
-  final EdgeType edgeType;
-
-  @override
-  void visitImportDirective(ImportDirective node) {
-    for (final edge in treeNode.childEdges) {
-      if (allowsEdge(edge) && edge.directive.toSource() == node.toSource()) {
-        if (isUnsafeImport(edge.childNode.library)) {
-          reportUnsafeDirectImport(edge);
-        } else {
-          checkUnsafeTransitiveImports(edge);
-        }
-      }
-    }
-  }
+abstract mixin class ScopeEdgeVisitor {
+  EdgeType get edgeType;
 
   bool allowsEdge(ScopeTreeEdge edge) {
     return edge.type == EdgeType.general || edge.type == edgeType;
   }
 
-  void reportUnsafeDirectImport(ScopeTreeEdge edge) {
-    rule.reportAtNode(
-      edge.directive,
-      arguments: [
-        "'${edge.directive.uri.stringValue}' is not available on the ${edgeType.name}.\n${suggestionFor(edge.childNode.library)}",
-      ],
-    );
-  }
-
-  void checkUnsafeTransitiveImports(ScopeTreeEdge edge) {
+  List<DiagnosticMessage> collectUnsafeImports(
+    ScopeTreeEdge edge, {
+    bool checkRoot = false,
+    bool Function(ScopeTreeNode node)? filterNode,
+  }) {
     final visited = <String>{};
     final messages = <DiagnosticMessage>[];
 
     late void Function(ScopeTreeEdge) recurseEdge;
 
     void recurseEdges(ScopeTreeNode node) {
+      if (filterNode != null && filterNode(node)) return;
+
       for (final childEdge in node.childEdges) {
         if (allowsEdge(childEdge)) {
           recurseEdge(childEdge);
@@ -137,7 +127,50 @@ abstract class ScopeImportsVisitor extends SimpleAstVisitor<void> {
       recurseEdges(childEdge.childNode);
     };
 
-    recurseEdges(edge.childNode);
+    if (checkRoot) {
+      recurseEdge(edge);
+    } else {
+      recurseEdges(edge.childNode);
+    }
+
+    return messages;
+  }
+
+  bool isUnsafeImport(LibraryElement lib);
+  String suggestionFor(LibraryElement lib);
+}
+
+abstract class ScopeImportsVisitor extends SimpleAstVisitor<void> with ScopeEdgeVisitor {
+  ScopeImportsVisitor(this.rule, this.treeNode);
+
+  final UnsafeImportsRule rule;
+  final ScopeTreeNode treeNode;
+
+  @override
+  void visitImportDirective(ImportDirective node) {
+    for (final edge in treeNode.childEdges) {
+      if (allowsEdge(edge) && edge.directive.toSource() == node.toSource()) {
+        if (isUnsafeImport(edge.childNode.library)) {
+          reportUnsafeDirectImport(edge);
+        } else {
+          checkUnsafeTransitiveImports(edge);
+        }
+      }
+    }
+  }
+
+  void reportUnsafeDirectImport(ScopeTreeEdge edge) {
+    rule.reportAtNode(
+      edge.directive,
+      arguments: [
+        "'${edge.directive.uri.stringValue}' is not available on the ${edgeType.name}.\n${suggestionFor(edge.childNode.library)}",
+      ],
+      diagnosticCode: UnsafeImportsRule.unsafeImportCode,
+    );
+  }
+
+  void checkUnsafeTransitiveImports(ScopeTreeEdge edge) {
+    final messages = collectUnsafeImports(edge);
 
     if (messages.isNotEmpty) {
       rule.reportAtNode(
@@ -146,16 +179,15 @@ abstract class ScopeImportsVisitor extends SimpleAstVisitor<void> {
           "'${edge.directive.uri.stringValue}' imports other unsafe libraries which are not available on the ${edgeType.name}. See below for details.",
         ],
         contextMessages: messages,
+        diagnosticCode: UnsafeImportsRule.unsafeImportCode,
       );
     }
   }
-
-  bool isUnsafeImport(LibraryElement lib);
-  String suggestionFor(LibraryElement lib);
 }
 
-class ServerScopeImportsVisitor extends ScopeImportsVisitor {
-  ServerScopeImportsVisitor(super.rule, super.treeNode) : super(edgeType: EdgeType.server);
+abstract mixin class ServerScopeEdgeVisitor implements ScopeEdgeVisitor {
+  @override
+  EdgeType get edgeType => EdgeType.server;
 
   @override
   bool isUnsafeImport(LibraryElement lib) {
@@ -182,11 +214,17 @@ class ServerScopeImportsVisitor extends ScopeImportsVisitor {
   }
 }
 
+class ServerScopeImportsVisitor extends ScopeImportsVisitor with ServerScopeEdgeVisitor {
+  ServerScopeImportsVisitor(super.rule, super.treeNode);
+}
+
 class ClientScopeImportsVisitor extends ScopeImportsVisitor {
-  ClientScopeImportsVisitor(super.rule, super.treeNode, this.allowFlutterLibsInClient)
-    : super(edgeType: EdgeType.client);
+  ClientScopeImportsVisitor(super.rule, super.treeNode, this.allowFlutterLibsInClient);
 
   final bool allowFlutterLibsInClient;
+
+  @override
+  EdgeType get edgeType => EdgeType.client;
 
   @override
   bool isUnsafeImport(LibraryElement lib) {
@@ -205,6 +243,45 @@ class ClientScopeImportsVisitor extends ScopeImportsVisitor {
       return "Try using 'package:jaspr/jaspr.dart' instead.";
     }
     return 'Try moving this out of the client scope or use a conditional import.';
+  }
+}
+
+class CssImportsVisitor extends SimpleAstVisitor<void> with ScopeEdgeVisitor, ServerScopeEdgeVisitor {
+  CssImportsVisitor(this.rule, this.treeNode);
+
+  final UnsafeImportsRule rule;
+  final ScopeTreeNode treeNode;
+
+  @override
+  void visitAnnotation(Annotation node) {
+    if (node case Annotation(
+      name: Identifier(name: 'css'),
+      elementAnnotation: ElementAnnotation(isCssAnnotation: true),
+    )) {
+      final messages = [
+        for (final edge in treeNode.childEdges)
+          ...collectUnsafeImports(
+            edge,
+            checkRoot: true,
+            filterNode: (node) {
+              // Skip nodes that also use @css themself, to avoid double-reporting.
+              if (node.usesCssAnnotation) return true;
+              return false;
+            },
+          ),
+      ];
+
+      if (messages.isNotEmpty) {
+        rule.reportAtNode(
+          node,
+          arguments: [
+            'Importing client-only libraries is not allowed when using @css. See below for details.',
+          ],
+          contextMessages: messages,
+          diagnosticCode: UnsafeImportsRule.unsafeCssCode,
+        );
+      }
+    }
   }
 }
 

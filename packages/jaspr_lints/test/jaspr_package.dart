@@ -11,6 +11,12 @@ extension JasprAnalysisRuleTest on AnalysisRuleTest {
         export 'src/dom/styles/css.dart';
         export 'src/dom/styles/styles.dart';
       ''')
+      ..addFile('lib/server.dart', r'''
+        export 'src/framework/framework.dart';
+      ''')
+      ..addFile('lib/client.dart', r'''
+        export 'src/framework/framework.dart';
+      ''')
       ..addFile('lib/src/framework/framework.dart', r'''
         class Component {
           const Component();

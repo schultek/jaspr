@@ -168,6 +168,7 @@ class ScopeTreeNode {
 
   NodeLocation? serverScopeLocation;
   NodeLocation? clientScopeLocation;
+  bool usesCssAnnotation = false;
 
   final List<NodeLocation> components = [];
 
@@ -209,6 +210,8 @@ class ScopeTreeNode {
     if (path.endsWith('.client.dart')) {
       clientScopeLocation = findMainFunction();
     }
+
+    usesCssAnnotation = findCssAnnotation();
   }
 
   NodeLocation? findMainFunction() {
@@ -223,6 +226,24 @@ class ScopeTreeNode {
       mainLocation?.columnNumber ?? 0,
       4,
     );
+  }
+
+  bool findCssAnnotation() {
+    final annotated = [...library.classes, ...library.topLevelVariables]
+        .expand<Element>(
+          (e) => switch (e) {
+            final ClassElement e when !e.isPrivate => [
+              ...e.fields.where((e) => e.isStatic),
+              ...e.getters.where((e) => e.isStatic),
+            ],
+            final TopLevelVariableElement e when e.isOriginDeclaration => [e],
+            TopLevelVariableElement(:final getter?) when e.isOriginGetterSetter => [getter],
+            _ => [],
+          },
+        )
+        .where((element) => !element.isPrivate)
+        .where((element) => element.metadata.annotations.any((a) => a.isCssAnnotation));
+    return annotated.isNotEmpty;
   }
 
   void analyzeChildren() {
@@ -425,5 +446,11 @@ extension on ClassElement {
           a.element?.name == 'client' &&
           a.element?.library?.identifier == 'package:jaspr/src/foundation/annotations.dart',
     );
+  }
+}
+
+extension CheckElementAnnotation on ElementAnnotation {
+  bool get isCssAnnotation {
+    return element?.name == 'css' && element?.library?.identifier == 'package:jaspr/src/dom/styles/css.dart';
   }
 }
