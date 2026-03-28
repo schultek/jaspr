@@ -1,3 +1,7 @@
+## Unreleased breaking
+
+- Added `unsafe_imports` lint rule to detect unsafe platform-specific imports in components depending on where they are rendered (server or client).
+
 ## 0.6.1
 
 - Allow `analyzer` versions 10.x.
@@ -21,7 +25,7 @@
 
 ## 0.4.0
 
-- Added 'prefer_styles_getter' lint and fix.
+- Added `prefer_styles_getter` lint and fix.
 - Update `analyzer_plugin` to `^0.13.0`.
 
 ## 0.3.1

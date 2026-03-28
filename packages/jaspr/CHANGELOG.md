@@ -1,6 +1,9 @@
 ## Unreleased breaking
 
 - Jaspr can now be installed with `dart install jaspr_cli` instead of `dart pub global activate jaspr_cli`.
+- Added **Agent Skills** for Jaspr, which can be installed with `jaspr install-skills`. 
+- Added `jaspr convert-html` command to automatically convert raw HTML to Jaspr code.
+- **Breaking** Removed `jaspr tooling-daemon` command. The functionality is now provided by the `jaspr_lints` package.
 - Improved logging and stability of the CLI.
 
 ## 0.22.4

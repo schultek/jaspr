@@ -1,4 +1,4 @@
-## 0.4.0
+## 0.4.0-wip
 
 - Jaspr is now installed using `dart install jaspr_cli` instead of `dart pub global activate jaspr_cli`. 
   This requires Dart 3.10 or later.
