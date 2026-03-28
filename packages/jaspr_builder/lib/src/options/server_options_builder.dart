@@ -64,7 +64,6 @@ class ServerOptionsBuilder implements Builder {
     }
 
     clients.sortByCompare((c) => '${c.import}/${c.name}', comparePaths);
-    styles.sortByCompare((s) => s.id.toImportUrl(), comparePaths);
 
     final optionsId = buildStep.inputId.changeExtension('.options.dart');
 
@@ -93,8 +92,12 @@ class ServerOptionsBuilder implements Builder {
     source += 'ServerOptions get defaultServerOptions => ServerOptions(';
     source += await buildClientIdEntry(buildStep);
     source += buildClientEntries(clients, package);
-    source += buildStylesIdEntry(stylesMode, buildStep);
-    source += buildStylesEntries(styles);
+    if (stylesMode == StylesMode.standalone) {
+      final stylesId = buildStep.inputId.path.replaceFirst('lib/', '').replaceFirst('.server.dart', '.css');
+      source += "stylesId: '$stylesId',";
+    } else if (styles.toOutputString() case final stylesOutput when stylesOutput.isNotEmpty) {
+      source += 'styles: () => $stylesOutput,';
+    }
     source += ');\n\n';
     source += buildClientParamGetters(clients);
 
@@ -140,14 +143,5 @@ class ServerOptionsBuilder implements Builder {
     if (stylesOption != StylesMode.standalone) return '';
     final stylesId = buildStep.inputId.path.replaceFirst('lib/', '').replaceFirst('.server.dart', '.css');
     return "stylesId: '$stylesId',";
-  }
-
-  String buildStylesEntries(List<StylesModule> styles) {
-    final filteredStyles = styles.where((s) => s.elements.isNotEmpty).toList();
-    if (filteredStyles.isEmpty) return '';
-
-    return 'styles: () => [${filteredStyles.map((s) {
-      return s.elements.map((e) => '...[[${s.id.toImportUrl()}]].$e,').join('\n');
-    }).join('\n')}],';
   }
 }

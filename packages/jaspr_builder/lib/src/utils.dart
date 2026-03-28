@@ -67,11 +67,18 @@ Map<String, String> compressPaths(List<String> paths) {
   return compressed;
 }
 
-int compareSegments(Iterable<String> a, Iterable<String> b) {
+int compareSegments(Iterable<String> a, Iterable<String> b, {bool withPriority = false}) {
+  if (withPriority) {
+    if (a.length == 1 && b.length > 1) {
+      return -1;
+    } else if (a.length > 1 && b.length == 1) {
+      return 1;
+    }
+  }
   if (a.length > 1 && b.length > 1) {
     final comp = a.first.compareTo(b.first);
     if (comp == 0) {
-      return compareSegments(a.skip(1), b.skip(1));
+      return compareSegments(a.skip(1), b.skip(1), withPriority: withPriority);
     } else {
       return comp;
     }
@@ -86,6 +93,10 @@ int compareSegments(Iterable<String> a, Iterable<String> b) {
 
 int comparePaths(String a, String b) {
   return compareSegments(a.split('/'), b.split('/'));
+}
+
+int comparePathsWithPriority(String a, String b) {
+  return compareSegments(a.split('/'), b.split('/'), withPriority: true);
 }
 
 class ImportEntry {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
+import 'package:collection/collection.dart';
 import 'package:glob/glob.dart';
 
 import '../utils.dart';
@@ -69,5 +70,27 @@ extension StylesFilter on List<StylesModule> {
         return StylesModule(id: s.id, elements: []);
       }
     }).toList();
+  }
+
+  String toOutputString() {
+    final globalStyles = expand(
+      (s) => s.elements.where((e) => !e.contains('.')).map((e) => (s.id, e)),
+    ).sortedByCompare((s) => s.$1.toImportUrl(), comparePathsWithPriority);
+    final componentStyles = expand(
+      (s) => s.elements.where((e) => e.contains('.')).map((e) => (s.id, e)),
+    ).sortedByCompare((s) => s.$1.toImportUrl(), comparePathsWithPriority);
+
+    var styleItems = '';
+    for (final (id, element) in globalStyles) {
+      styleItems += '\n    ...[[${id.toImportUrl()}]].$element,';
+    }
+    for (final (id, element) in componentStyles) {
+      styleItems += '\n    ...[[${id.toImportUrl()}]].$element,';
+    }
+    if (styleItems.isNotEmpty) {
+      styleItems += '\n  ';
+    }
+
+    return '[$styleItems]';
   }
 }

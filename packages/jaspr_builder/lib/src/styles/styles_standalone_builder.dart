@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:build/build.dart';
-import 'package:collection/collection.dart';
 
 import '../styles/styles_bundle_builder.dart';
-import '../styles/styles_module_builder.dart';
 import '../utils.dart';
 
 /// Builds the standalone runner file for Jaspr projects.
@@ -64,8 +62,6 @@ class StylesStandaloneBuilder implements Builder {
       styles = styles.filterBySources(sources, buildStep.inputId);
     }
 
-    styles.sortByCompare((s) => s.id.toImportUrl(), comparePaths);
-
     final outputId = buildStep.inputId.changeExtension('.styles.dart');
     final runnerCode = ImportsWriter().resolve('''
     import 'dart:io';
@@ -75,9 +71,7 @@ class StylesStandaloneBuilder implements Builder {
     [[/]]
 
     void main() {
-      final List<StyleRule> styles = [
-        ${buildStylesEntries(styles)}
-      ];
+      final List<StyleRule> styles = ${styles.toOutputString()};
 
       stdout.write(jsonEncode({
         'css': styles.render(),
@@ -86,12 +80,5 @@ class StylesStandaloneBuilder implements Builder {
     ''');
 
     await buildStep.writeAsFormattedDart(outputId, runnerCode);
-  }
-
-  String buildStylesEntries(List<StylesModule> styles) {
-    final filteredStyles = styles.where((s) => s.elements.isNotEmpty).toList();
-    if (filteredStyles.isEmpty) return '';
-
-    return filteredStyles.map((s) => s.elements.map((e) => '...[[${s.id.toImportUrl()}]].$e,').join('\n')).join('\n');
   }
 }

@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 const stylesClassSources = {
-  'site|lib/styles_class.dart': '''
+  'site|lib/main.dart': '''
     import 'package:jaspr/dom.dart';
+    import 'components/button.dart';
         
-    class Component {
+    class Main {
       @css
       static final styles = [
         css('.main').styles(width: 100.px),
@@ -18,11 +19,25 @@ const stylesClassSources = {
       ];
     }
   ''',
+  'site|lib/components/button.dart': '''
+    import 'package:jaspr/dom.dart';
+        
+    class Button {
+      @css
+      static final styles = [
+        css('button').styles(color: Colors.red),
+      ];
+    }
+  ''',
 };
 
 final stylesClassOutputs = {
-  'site|lib/styles_class.styles.json': jsonEncode({
-    'elements': ['Component.styles', 'Component.styles2'],
-    'id': ['site', 'lib/styles_class.dart'],
+  'site|lib/main.styles.json': jsonEncode({
+    'elements': ['Main.styles', 'Main.styles2'],
+    'id': ['site', 'lib/main.dart'],
+  }),
+  'site|lib/components/button.styles.json': jsonEncode({
+    'elements': ['Button.styles'],
+    'id': ['site', 'lib/components/button.dart'],
   }),
 };
