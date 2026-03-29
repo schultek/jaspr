@@ -8,3 +8,5 @@ pubspec.lock
 
 .test_cov.dart
 coverage/
+
+lib/src/devtools/web/

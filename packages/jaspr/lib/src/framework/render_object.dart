@@ -14,6 +14,9 @@ abstract class RenderObject {
 }
 
 abstract class RenderElement implements RenderObject {
+  @override
+  web.Element? get node;
+
   void update(
     String? id,
     String? classes,
@@ -55,6 +58,13 @@ mixin RenderObjectElement on Element {
   @override
   void didMount() {
     _renderObject ??= createRenderObject();
+    assert(() {
+      final node = _renderObject?.node;
+      if (node != null) {
+        DevToolsService.instance.domRegistry[node] = this;
+      }
+      return true;
+    }());
     super.didMount();
   }
 

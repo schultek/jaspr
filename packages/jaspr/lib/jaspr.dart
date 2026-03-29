@@ -14,6 +14,7 @@ export 'src/foundation/basic_types.dart';
 export 'src/foundation/binding.dart';
 export 'src/foundation/change_notifier.dart';
 export 'src/foundation/constants.dart';
+export 'src/foundation/diagnostics.dart';
 export 'src/foundation/object.dart';
 export 'src/foundation/scheduler.dart';
 export 'src/foundation/sync.dart';

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import '../../dom/validator.dart';
 import '../../foundation/constants.dart';
+import '../../foundation/diagnostics.dart';
 import '../../framework/framework.dart';
 import '../markup_render_object.dart';
 import '../options.dart';
@@ -11,18 +14,28 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   ClientComponentAdapter(this.name, this.data, super.element);
 
   final String name;
-  final String? data;
+  final Map<String, Object?>? data;
 
   @override
   void applyBoundary(ChildListRange range) {
+    late final encoded = const DomValidator().escapeMarkerText(jsonEncode(data));
     final startMarker = MarkupRenderText(
-      '<!--${DomValidator.clientMarkerPrefix}$name${data != null ? ' data=$data' : ''}-->',
+      '<!--${DomValidator.clientMarkerPrefix}$name${data != null ? ' data=$encoded' : ''}-->',
       true,
     );
     final endMarker = MarkupRenderText('<!--/${DomValidator.clientMarkerPrefix}$name-->', true);
 
     range.start.insertNext(ChildNodeData(startMarker));
     range.end.insertPrev(ChildNodeData(endMarker));
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'kind', value: 'client-component'),
+      DiagnosticsProperty(name: 'anchor-name', value: name),
+      if (data != null) DiagnosticsProperty(name: 'data', value: data),
+    ];
   }
 }
 

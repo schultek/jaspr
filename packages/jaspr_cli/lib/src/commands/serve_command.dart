@@ -54,7 +54,7 @@ class ServeCommand extends DevCommand {
   @override
   void handleClientWorkflow(ClientWorkflow workflow) {
     if (launchInChrome) {
-      daemon.registerDomain(ClientDomain(daemon, workflow.devProxy));
+      daemon.registerDomain(ClientDomain(daemon, workflow.devProxy, devTools: controller));
     }
   }
 }

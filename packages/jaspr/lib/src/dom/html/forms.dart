@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.button}
 /// The &lt;button&gt; HTML element is an interactive element activated by a user with a mouse, keyboard, finger, voice command, or other assistive technology. Once activated, it then performs a programmable action, such as submitting a form or opening a dialog.
 /// {@endtemplate}
-final class button extends StatelessComponent {
+final class button extends _HtmlComponent {
   /// {@macro jaspr.html.button}
   const button(
     this.children, {
@@ -75,6 +75,24 @@ final class button extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'button'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'autofocus', value: autofocus),
+      DiagnosticsProperty(name: 'disabled', value: disabled),
+      DiagnosticsProperty(name: 'type', value: type?.value),
+    ];
+  }
 }
 
 /// Defines the default behavior of a button.
@@ -96,7 +114,7 @@ enum ButtonType {
 /// {@template jaspr.html.form}
 /// The &lt;form&gt; HTML element represents a document section containing interactive controls for submitting information.
 /// {@endtemplate}
-final class form extends StatelessComponent {
+final class form extends _HtmlComponent {
   /// {@macro jaspr.html.form}
   const form(
     this.children, {
@@ -177,6 +195,28 @@ final class form extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'form'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'action', value: action),
+      DiagnosticsProperty(name: 'method', value: method?.value),
+      DiagnosticsProperty(name: 'encType', value: encType?.value),
+      DiagnosticsProperty(name: 'autoComplete', value: autoComplete?.value),
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'noValidate', value: noValidate),
+      DiagnosticsProperty(name: 'target', value: target?.value),
+    ];
+  }
 }
 
 /// The HTTP method to submit a form with.
@@ -236,7 +276,7 @@ enum AutoComplete {
 /// - `String` for all other types
 /// {@endtemplate}
 @optionalTypeArgs
-final class input<T> extends StatelessComponent {
+final class input<T> extends _HtmlComponent {
   /// {@macro jaspr.html.input}
   const input({
     this.type,
@@ -316,6 +356,27 @@ final class input<T> extends StatelessComponent {
       },
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'input'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'type', value: type?.value),
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'value', value: value),
+      DiagnosticsProperty(name: 'disabled', value: disabled),
+      DiagnosticsProperty(name: 'checked', value: checked),
+      DiagnosticsProperty(name: 'indeterminate', value: indeterminate),
+    ];
+  }
 }
 
 /// The type for an &lt;input&gt; element.
@@ -394,7 +455,7 @@ enum InputType {
 /// {@template jaspr.html.label}
 /// The &lt;label&gt; HTML element represents a caption for an item in a user interface.
 /// {@endtemplate}
-final class label extends StatelessComponent {
+final class label extends _HtmlComponent {
   /// {@macro jaspr.html.label}
   const label(
     this.children, {
@@ -440,12 +501,28 @@ final class label extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'label'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'htmlFor', value: htmlFor),
+    ];
+  }
 }
 
 /// {@template jaspr.html.datalist}
 /// The &lt;datalist&gt; HTML element contains a set of &lt;option&gt; elements that represent the permissible or recommended options available to choose from within other controls.
 /// {@endtemplate}
-final class datalist extends StatelessComponent {
+final class datalist extends _HtmlComponent {
   /// {@macro jaspr.html.datalist}
   const datalist(
     this.children, {
@@ -487,12 +564,27 @@ final class datalist extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'datalist'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.legend}
 /// The &lt;legend&gt; HTML element represents a caption for the content of its parent &lt;fieldset&gt;.
 /// {@endtemplate}
-final class legend extends StatelessComponent {
+final class legend extends _HtmlComponent {
   /// {@macro jaspr.html.legend}
   const legend(
     this.children, {
@@ -534,12 +626,27 @@ final class legend extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'legend'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.meter}
 /// The &lt;meter&gt; HTML element represents either a scalar value within a known range or a fractional value.
 /// {@endtemplate}
-final class meter extends StatelessComponent {
+final class meter extends _HtmlComponent {
   /// {@macro jaspr.html.meter}
   const meter(
     this.children, {
@@ -613,12 +720,33 @@ final class meter extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'meter'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'value', value: value),
+      DiagnosticsProperty(name: 'min', value: min),
+      DiagnosticsProperty(name: 'max', value: max),
+      DiagnosticsProperty(name: 'low', value: low),
+      DiagnosticsProperty(name: 'high', value: high),
+      DiagnosticsProperty(name: 'optimum', value: optimum),
+    ];
+  }
 }
 
 /// {@template jaspr.html.progress}
 /// The &lt;progress&gt; HTML element displays an indicator showing the completion progress of a task, typically displayed as a progress bar.
 /// {@endtemplate}
-final class progress extends StatelessComponent {
+final class progress extends _HtmlComponent {
   /// {@macro jaspr.html.progress}
   const progress(
     this.children, {
@@ -672,12 +800,29 @@ final class progress extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'progress'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'value', value: value),
+      DiagnosticsProperty(name: 'max', value: max),
+    ];
+  }
 }
 
 /// {@template jaspr.html.optgroup}
 /// The &lt;optgroup&gt; HTML element creates a grouping of options within a &lt;select&gt; element.
 /// {@endtemplate}
-final class optgroup extends StatelessComponent {
+final class optgroup extends _HtmlComponent {
   /// {@macro jaspr.html.optgroup}
   const optgroup(
     this.children, {
@@ -731,12 +876,29 @@ final class optgroup extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'optgroup'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'label', value: label),
+      DiagnosticsProperty(name: 'disabled', value: disabled),
+    ];
+  }
 }
 
 /// {@template jaspr.html.option}
 /// The &lt;option&gt; HTML element is used to define an item contained in a &lt;select&gt;, an &lt;optgroup&gt;, or a &lt;datalist&gt; element. As such, &lt;option&gt; can represent menu items in popups and other lists of items in an HTML document.
 /// {@endtemplate}
-final class option extends StatelessComponent {
+final class option extends _HtmlComponent {
   /// {@macro jaspr.html.option}
   const option(
     this.children, {
@@ -800,12 +962,31 @@ final class option extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'option'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'label', value: label),
+      DiagnosticsProperty(name: 'value', value: value),
+      DiagnosticsProperty(name: 'selected', value: selected),
+      DiagnosticsProperty(name: 'disabled', value: disabled),
+    ];
+  }
 }
 
 /// {@template jaspr.html.select}
 /// The &lt;select&gt; HTML element represents a control that provides a menu of options.
 /// {@endtemplate}
-final class select extends StatelessComponent {
+final class select extends _HtmlComponent {
   /// {@macro jaspr.html.select}
   const select(
     this.children, {
@@ -900,12 +1081,35 @@ final class select extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'select'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'value', value: value),
+      DiagnosticsProperty(name: 'multiple', value: multiple),
+      DiagnosticsProperty(name: 'required', value: required),
+      DiagnosticsProperty(name: 'disabled', value: disabled),
+      DiagnosticsProperty(name: 'autofocus', value: autofocus),
+      DiagnosticsProperty(name: 'autocomplete', value: autocomplete),
+      DiagnosticsProperty(name: 'size', value: size),
+    ];
+  }
 }
 
 /// {@template jaspr.html.fieldset}
 /// The &lt;fieldset&gt; HTML element is used to group several controls as well as labels (&lt;label&gt;) within a web form.
 /// {@endtemplate}
-final class fieldset extends StatelessComponent {
+final class fieldset extends _HtmlComponent {
   /// {@macro jaspr.html.fieldset}
   const fieldset(
     this.children, {
@@ -955,12 +1159,29 @@ final class fieldset extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'fieldset'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'disabled', value: disabled),
+    ];
+  }
 }
 
 /// {@template jaspr.html.textarea}
 /// The &lt;textarea&gt; HTML element represents a multi-line plain-text editing control, useful when you want to allow users to enter a sizeable amount of free-form text, for example a comment on a review or feedback form.
 /// {@endtemplate}
-final class textarea extends StatelessComponent {
+final class textarea extends _HtmlComponent {
   /// {@macro jaspr.html.textarea}
   const textarea(
     this.children, {
@@ -1074,6 +1295,33 @@ final class textarea extends StatelessComponent {
       },
       children: children,
     );
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'textarea'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'autoComplete', value: autoComplete?.value),
+      DiagnosticsProperty(name: 'autofocus', value: autofocus),
+      DiagnosticsProperty(name: 'cols', value: cols),
+      DiagnosticsProperty(name: 'disabled', value: disabled),
+      DiagnosticsProperty(name: 'minLength', value: minLength),
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'placeholder', value: placeholder),
+      DiagnosticsProperty(name: 'readonly', value: readonly),
+      DiagnosticsProperty(name: 'required', value: required),
+      DiagnosticsProperty(name: 'rows', value: rows),
+      DiagnosticsProperty(name: 'spellCheck', value: spellCheck?.value),
+      DiagnosticsProperty(name: 'wrap', value: wrap?.value),
+    ];
   }
 }
 

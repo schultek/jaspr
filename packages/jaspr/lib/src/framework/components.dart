@@ -25,6 +25,18 @@ class DomComponent extends Component {
   final List<Component>? children;
 
   @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: tag),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null) DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null) DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null) DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
+
+  @override
   Element createElement() => DomElement(this);
 }
 
@@ -164,6 +176,13 @@ class Text extends Component {
   const Text._(this.text, {super.key});
 
   final String text;
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'text', value: text),
+    ];
+  }
 
   @override
   Element createElement() => TextElement(this);

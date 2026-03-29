@@ -2,6 +2,7 @@ import 'package:meta/meta.dart' show optionalTypeArgs;
 
 import '../../foundation/basic_types.dart';
 import '../../foundation/constants.dart';
+import '../../foundation/diagnostics.dart';
 import '../../framework/framework.dart';
 import '../events.dart';
 import '../raw_text/raw_text.dart';
@@ -50,3 +51,19 @@ String? _explicitBool(bool? val) => switch (val) {
   false => kIsWeb ? 'false' : null,
   null => null,
 };
+
+abstract class _HtmlComponent extends StatelessComponent {
+  const _HtmlComponent({super.key});
+
+  @override
+  StatelessElement createElement() => _HtmlElement(this);
+}
+
+class _HtmlElement extends StatelessElement {
+  _HtmlElement(_HtmlComponent super.component);
+
+  @override
+  void debugVisitChildren(void Function(Element) visitor) {
+    child?.debugVisitChildren(visitor);
+  }
+}

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../foundation/diagnostics.dart';
 import '../../framework/framework.dart';
 import '../child_nodes.dart';
 import '../markup_render_object.dart';
@@ -7,7 +8,7 @@ import '../server_binding.dart';
 
 export '../child_nodes.dart' show ChildListRange, ChildNodeData;
 
-abstract class ElementBoundaryAdapter extends RenderAdapter {
+abstract class ElementBoundaryAdapter extends RenderAdapter with Diagnosticable {
   ElementBoundaryAdapter(this.element);
 
   final Element element;

@@ -13,9 +13,11 @@ import 'dart:collection';
 import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;
 
+import '../devtools/dev_tools_service.dart';
 import '../dom/styles/styles.dart' show Styles, Padding, Colors, Unit;
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
+import '../foundation/diagnostics.dart';
 import '../foundation/object.dart';
 
 part 'build_context.dart';
@@ -71,7 +73,7 @@ part 'stateless_component.dart';
 ///  * [StatelessComponent], for components that always build the same way given a
 ///    particular configuration and ambient state.
 @immutable
-abstract class Component {
+abstract class Component extends Diagnosticable {
   /// Initializes [key] for subclasses.
   const Component({this.key});
 
@@ -257,7 +259,7 @@ enum _ElementLifecycle { initial, active, inactive, defunct }
 /// in the tree. Over time, the component associated with a given element can
 /// change, for example, if the parent component rebuilds and creates a new component
 /// for this location..
-abstract class Element implements BuildContext {
+abstract class Element extends DiagnosticableTree implements BuildContext {
   /// Creates an element that uses the given component as its configuration.
   ///
   /// Typically called by an override of [Component.createElement].
@@ -365,6 +367,19 @@ abstract class Element implements BuildContext {
   /// Wrapper around [visitChildren] for [BuildContext].
   @override
   void visitChildElements(ElementVisitor visitor) {
+    visitChildren(visitor);
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'type', value: component.runtimeType.toString()),
+      DiagnosticsProperty(name: 'component', properties: component.debugFillProperties()),
+    ];
+  }
+
+  @override
+  void debugVisitChildren(ElementVisitor visitor) {
     visitChildren(visitor);
   }
 

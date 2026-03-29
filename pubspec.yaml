@@ -10,6 +10,7 @@ workspace:
   - packages/jaspr_builder
   - packages/jaspr_cli
   - packages/jaspr_content
+  - packages/jaspr_devtools
   - packages/jaspr_flutter_embed
   - packages/jaspr_lints
   - packages/jaspr_repo
@@ -107,6 +108,10 @@ melos:
       run: |
         cd packages/jaspr_cli
         dart run tool/generate_versions.dart
+    build:devtools:
+      run: |
+        cd packages/jaspr_devtools
+        dart run tool/build_devtools.dart
     activate:cli:
       run: |
         rm -r packages/jaspr_cli/.dart_tool

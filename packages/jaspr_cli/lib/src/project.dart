@@ -296,6 +296,7 @@ class Project {
 const defaultServePort = '8080';
 const serverProxyPort = '5567';
 const flutterProxyPort = '5678';
+const defaultDevToolsPort = '5468';
 
 // The path to the Dart executable in either the Dart or Flutter SDK.
 final dartExecutable = () {

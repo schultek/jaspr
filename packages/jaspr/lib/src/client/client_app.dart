@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:universal_web/web.dart' as web;
 
+import '../foundation/diagnostics.dart';
 import '../framework/framework.dart';
 import 'component_anchors.dart';
 import 'dom_render_object.dart';
@@ -44,7 +45,7 @@ class _ClientAppElement extends BuildableElement {
   @override
   void didMount() {
     final parent = parentRenderObjectElement!.renderObject;
-    final nodes = parent is HydratableDomRenderObject ? parent.toHydrate : <web.Node>[];
+    final nodes = parent is MultiChildDomRenderObject ? parent.toHydrate : <web.Node>[];
     final anchors = extractClientAnchors(getClientByName, nodes: nodes);
 
     for (final anchor in anchors) {
@@ -52,18 +53,21 @@ class _ClientAppElement extends BuildableElement {
         this.anchors.add(anchor);
         slots.add(createSlotForAnchor(anchor));
       } else {
-        anchor
-            .resolve()
-            .then((b) {
-              if (mounted) {
-                this.anchors.add(anchor);
-                slots.add(createSlotForAnchor(anchor));
-                markNeedsBuild();
-              }
-            })
-            .onError((error, stackTrace) {
-              print("Error loading client component '${anchor.name}': $error");
-            });
+        final future = anchor.resolve();
+        binding.addPostFrameCallback(() async {
+          try {
+            await future;
+
+            if (mounted) {
+              this.anchors.add(anchor);
+              slots.add(createSlotForAnchor(anchor));
+
+              markNeedsBuild();
+            }
+          } catch (error) {
+            print("Error loading client component '${anchor.name}': $error");
+          }
+        });
       }
     }
     super.didMount();
@@ -71,9 +75,11 @@ class _ClientAppElement extends BuildableElement {
 
   ChildSlot createSlotForAnchor(ClientComponentAnchor anchor) {
     return _AnchorChildSlot(
+      name: anchor.name,
       start: anchor.startNode,
       end: anchor.endNode,
       child: anchor.build(),
+      params: anchor.params,
     );
   }
 
@@ -90,12 +96,20 @@ class _ClientAppElement extends BuildableElement {
 }
 
 class _AnchorChildSlot extends ChildSlot {
-  _AnchorChildSlot({required this.start, required this.end, required this.child});
+  _AnchorChildSlot({
+    required this.name,
+    required this.start,
+    required this.end,
+    required this.child,
+    required this.params,
+  });
 
+  final String name;
   final web.Node start;
   final web.Node end;
   @override
   final Component child;
+  final Map<String, Object?> params;
 
   @override
   ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
@@ -105,5 +119,14 @@ class _AnchorChildSlot extends ChildSlot {
   @override
   bool canUpdate(ChildSlot oldComponent) {
     return oldComponent is _AnchorChildSlot && oldComponent.start == start && oldComponent.end == end;
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'kind', value: 'client-anchor'),
+      DiagnosticsProperty(name: 'anchor-name', value: name),
+      DiagnosticsProperty(name: 'anchor-params', value: params),
+    ];
   }
 }

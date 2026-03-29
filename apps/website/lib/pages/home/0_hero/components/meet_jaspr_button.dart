@@ -77,6 +77,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
     }
 
     return div(id: 'meet-jaspr-button', [
+      Particles(particles: notifier.particles),
       .wrapElement(
         classes: touchTimer != null ? 'active' : null,
         events: {
@@ -118,7 +119,6 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
             : null,
         child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'custom-jaspr', to: '#meet'),
       ),
-      Particles(particles: notifier.particles),
     ]);
   }
 

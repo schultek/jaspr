@@ -3,8 +3,8 @@ import 'dart:js_interop';
 
 import 'package:universal_web/web.dart' as web;
 
+import '../devtools/dev_tools_service.dart';
 import '../dom/type_checks.dart';
-import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'utils.dart';
 
@@ -41,9 +41,7 @@ abstract class DomRenderObject implements RenderObject {
   void finalize();
 }
 
-class DomRenderElement extends DomRenderObject
-    with MultiChildDomRenderObject, HydratableDomRenderObject
-    implements RenderElement {
+class DomRenderElement extends DomRenderObject with MultiChildDomRenderObject implements RenderElement {
   DomRenderElement(String tag, DomRenderObject parent) {
     this.parent = parent;
     _createNode(tag);
@@ -64,9 +62,12 @@ class DomRenderElement extends DomRenderObject
       return n.isElement && (n as web.Element).tagName.toLowerCase() == tag;
     });
     if (retakeNode != null) {
-      if (kVerboseMode) {
-        print('Hydrate html node: $retakeNode');
-      }
+      assert(() {
+        if (DevToolsService.instance.debugVerboseLoggingActive) {
+          print('Hydrate html node: $retakeNode');
+        }
+        return true;
+      }());
       node = retakeNode as web.Element;
 
       toHydrate = retakeNode.childNodes.toIterable().toList();
@@ -74,9 +75,12 @@ class DomRenderElement extends DomRenderObject
     }
 
     node = _createElement(tag, namespace);
-    if (kVerboseMode) {
-      web.console.log('Create html node: $node'.toJS);
-    }
+    assert(() {
+      if (DevToolsService.instance.debugVerboseLoggingActive) {
+        web.console.log('Create html node: $node'.toJS);
+      }
+      return true;
+    }());
   }
 
   web.Element _createElement(String tag, String? namespace) {
@@ -111,9 +115,12 @@ class DomRenderElement extends DomRenderObject
           if (node.isHtmlSelectElement) {
             final nodeAsSelectElement = node as web.HTMLSelectElement;
             if (nodeAsSelectElement.value != attrValue) {
-              if (kVerboseMode) {
-                print('Set select value: $attrValue');
-              }
+              assert(() {
+                if (DevToolsService.instance.debugVerboseLoggingActive) {
+                  print('Set select value: $attrValue');
+                }
+                return true;
+              }());
               nodeAsSelectElement.value = attrValue;
             }
             continue;
@@ -122,9 +129,12 @@ class DomRenderElement extends DomRenderObject
           if (node.isHtmlInputElement) {
             final nodeAsInputElement = node as web.HTMLInputElement;
             if (nodeAsInputElement.value != attrValue) {
-              if (kVerboseMode) {
-                print('Set input value: $attrValue');
-              }
+              assert(() {
+                if (DevToolsService.instance.debugVerboseLoggingActive) {
+                  print('Set input value: $attrValue');
+                }
+                return true;
+              }());
               nodeAsInputElement.value = attrValue;
             }
             continue;
@@ -135,9 +145,12 @@ class DomRenderElement extends DomRenderObject
             if (nodeAsInputElement.type case 'checkbox' || 'radio') {
               final shouldBeChecked = attrValue == 'true';
               if (nodeAsInputElement.checked != shouldBeChecked) {
-                if (kVerboseMode) {
-                  print('Set input checked: $shouldBeChecked');
-                }
+                assert(() {
+                  if (DevToolsService.instance.debugVerboseLoggingActive) {
+                    print('Set input checked: $shouldBeChecked');
+                  }
+                  return true;
+                }());
                 nodeAsInputElement.checked = shouldBeChecked;
                 if (!shouldBeChecked && node.hasAttribute('checked')) {
                   // Remove the attribute if unchecked to avoid HTML5 validation issues.
@@ -153,9 +166,12 @@ class DomRenderElement extends DomRenderObject
             if (nodeAsInputElement.type == 'checkbox') {
               final shouldBeIndeterminate = attrValue == 'true';
               if (nodeAsInputElement.indeterminate != shouldBeIndeterminate) {
-                if (kVerboseMode) {
-                  print('Set input indeterminate: $shouldBeIndeterminate');
-                }
+                assert(() {
+                  if (DevToolsService.instance.debugVerboseLoggingActive) {
+                    print('Set input indeterminate: $shouldBeIndeterminate');
+                  }
+                  return true;
+                }());
                 nodeAsInputElement.indeterminate = shouldBeIndeterminate;
                 if (!shouldBeIndeterminate && node.hasAttribute('indeterminate')) {
                   // Remove the attribute if unchecked to avoid HTML5 validation issues.
@@ -174,9 +190,12 @@ class DomRenderElement extends DomRenderObject
     final attributesToRemove = originalAttributes.difference({'id', 'class', 'style', ...?attributes?.keys});
     for (final name in attributesToRemove) {
       node.removeAttribute(name);
-      if (kVerboseMode) {
-        print('Removed attribute: $name');
-      }
+      assert(() {
+        if (DevToolsService.instance.debugVerboseLoggingActive) {
+          print('Removed attribute: $name');
+        }
+        return true;
+      }());
     }
 
     if (events != null && events.isNotEmpty) {
@@ -230,32 +249,44 @@ class DomRenderText extends DomRenderObject implements RenderText {
     });
 
     if (retakeNode != null) {
-      if (kVerboseMode) {
-        print('Hydrate text node: $retakeNode');
-      }
+      assert(() {
+        if (DevToolsService.instance.debugVerboseLoggingActive) {
+          print('Hydrate text node: $retakeNode');
+        }
+        return true;
+      }());
       node = retakeNode as web.Text;
       if (node.textContent != text) {
         node.textContent = text;
-        if (kVerboseMode) {
-          print('Update text node: $text');
-        }
+        assert(() {
+          if (DevToolsService.instance.debugVerboseLoggingActive) {
+            print('Update text node: $text');
+          }
+          return true;
+        }());
       }
       return;
     }
 
     node = web.Text(text);
-    if (kVerboseMode) {
-      print('Create text node: $text');
-    }
+    assert(() {
+      if (DevToolsService.instance.debugVerboseLoggingActive) {
+        print('Create text node: $text');
+      }
+      return true;
+    }());
   }
 
   @override
   void update(String text) {
     if (node.textContent != text) {
       node.textContent = text;
-      if (kVerboseMode) {
-        print('Update text node: $text');
-      }
+      assert(() {
+        if (DevToolsService.instance.debugVerboseLoggingActive) {
+          print('Update text node: $text');
+        }
+        return true;
+      }());
     }
   }
 
@@ -280,13 +311,11 @@ class DomRenderText extends DomRenderObject implements RenderText {
   }
 }
 
-class DomRenderFragment extends DomRenderObject
-    with MultiChildDomRenderObject, HydratableDomRenderObject
-    implements RenderFragment {
+class DomRenderFragment extends DomRenderObject with MultiChildDomRenderObject implements RenderFragment {
   DomRenderFragment(DomRenderObject? parent, [List<web.Node>? toHydrate])
     : node = web.document.createDocumentFragment() {
     this.parent = parent;
-    this.toHydrate = toHydrate ?? (parent is HydratableDomRenderObject ? parent.toHydrate : []);
+    this.toHydrate = toHydrate ?? (parent is MultiChildDomRenderObject ? parent.toHydrate : []);
   }
 
   DomRenderFragment.from(this.node, DomRenderObject? parent) {
@@ -304,7 +333,7 @@ class DomRenderFragment extends DomRenderObject
   web.Node? get firstChildNode {
     if (_firstChild case final firstChild?) {
       if (firstChild is DomRenderFragment) {
-        return firstChild.lastChildNode;
+        return firstChild.firstChildNode;
       }
 
       return firstChild.node;
@@ -341,9 +370,12 @@ class DomRenderFragment extends DomRenderObject
     assert(parent == this.parent, 'Cannot move fragment to a different parent.');
     assert(isAttached, 'Cannot move fragment that is not attached to a parent.');
 
-    if (kVerboseMode) {
-      print('Move fragment to $targetNode after $afterNode');
-    }
+    assert(() {
+      if (DevToolsService.instance.debugVerboseLoggingActive) {
+        print('Move fragment to $targetNode after $afterNode');
+      }
+      return true;
+    }());
 
     final originalFirstChildNode = firstChildNode;
     if (originalFirstChildNode == null) {
@@ -381,9 +413,12 @@ class DomRenderFragment extends DomRenderObject
     assert(parent == this.parent, 'Cannot remove fragment from a different parent.');
     assert(isAttached, 'Cannot remove fragment that is not attached to a parent.');
 
-    if (kVerboseMode) {
-      print('Remove fragment $node from ${parent.node}');
-    }
+    assert(() {
+      if (DevToolsService.instance.debugVerboseLoggingActive) {
+        print('Remove fragment $node from ${parent.node}');
+      }
+      return true;
+    }());
 
     if (firstChildNode == null) {
       // If fragment is empty, nothing to remove.
@@ -441,7 +476,7 @@ class DomRenderFragment extends DomRenderObject
   }
 }
 
-class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject, HydratableDomRenderObject {
+class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject {
   RootDomRenderObject(this.node, [List<web.Node>? nodes]) {
     toHydrate = [...nodes ?? node.childNodes.toIterable()];
     beforeStart = toHydrate.firstOrNull?.previousSibling;
@@ -473,6 +508,23 @@ class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject
 }
 
 mixin MultiChildDomRenderObject on DomRenderObject {
+  /// List of nodes that are not hydrated yet.
+  /// These nodes will be removed when the render object is finalized.
+  List<web.Node> toHydrate = [];
+
+  @override
+  web.Node? retakeNode(bool Function(web.Node node) visitNode) {
+    if (toHydrate.isNotEmpty) {
+      for (final e in toHydrate) {
+        if (visitNode(e)) {
+          toHydrate.remove(e);
+          return e;
+        }
+      }
+    }
+    return null;
+  }
+
   web.Node get attachTargetNode {
     if (this case DomRenderFragment(isAttached: true)) {
       return (parent as MultiChildDomRenderObject).attachTargetNode;
@@ -497,6 +549,17 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     return null;
   }
 
+  bool containsNode(web.Node? node) {
+    if (this case final DomRenderFragment fragment) {
+      if (fragment.isAttached) {
+        return (parent as MultiChildDomRenderObject).containsNode(node);
+      } else if (toHydrate.contains(node)) {
+        return true;
+      }
+    }
+    return this.node.contains(node);
+  }
+
   void attachChild(DomRenderObject child, DomRenderObject? after, {web.Node? startNode}) {
     child.parent = this;
 
@@ -514,9 +577,12 @@ mixin MultiChildDomRenderObject on DomRenderObject {
         return;
       }
 
-      if (kVerboseMode) {
-        print('Attach node $childNode to $targetNode after $afterNode ($after)');
-      }
+      assert(() {
+        if (DevToolsService.instance.debugVerboseLoggingActive) {
+          print('Attach node $childNode to $targetNode after $afterNode ($after)');
+        }
+        return true;
+      }());
 
       if (afterNode == null) {
         targetNode.insertBefore(childNode, targetNode.childNodes.item(0));
@@ -550,9 +616,12 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     if (child case DomRenderFragment(isAttached: true)) {
       child.removeChildren(this);
     } else {
-      if (kVerboseMode) {
-        print('Remove child ${child.node} of $node');
-      }
+      assert(() {
+        if (DevToolsService.instance.debugVerboseLoggingActive) {
+          print('Remove child ${child.node} of $node');
+        }
+        return true;
+      }());
 
       assert(
         node == child.node.parentNode,
@@ -571,31 +640,15 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     child.nextSibling = null;
     child.parent = null;
   }
-}
-
-mixin HydratableDomRenderObject on DomRenderObject {
-  /// List of nodes that are not hydrated yet.
-  /// These nodes will be removed when the render object is finalized.
-  List<web.Node> toHydrate = [];
-
-  @override
-  web.Node? retakeNode(bool Function(web.Node node) visitNode) {
-    if (toHydrate.isNotEmpty) {
-      for (final e in toHydrate) {
-        if (visitNode(e)) {
-          toHydrate.remove(e);
-          return e;
-        }
-      }
-    }
-    return null;
-  }
 
   @override
   void finalize() {
-    if (kVerboseMode && toHydrate.isNotEmpty) {
-      print('Clear ${toHydrate.length} nodes not hydrated ($toHydrate)');
-    }
+    assert(() {
+      if (DevToolsService.instance.debugVerboseLoggingActive && toHydrate.isNotEmpty) {
+        print('Clear ${toHydrate.length} nodes not hydrated ($toHydrate)');
+      }
+      return true;
+    }());
     for (final node in toHydrate) {
       node.parentNode!.removeChild(node);
     }
@@ -628,15 +681,21 @@ extension AttributeOperation on web.Element {
   void clearOrSetAttribute(String name, String? value) {
     if (value == null) {
       if (!hasAttribute(name)) return;
-      if (kVerboseMode) {
-        print('Remove attribute: $name');
-      }
+      assert(() {
+        if (DevToolsService.instance.debugVerboseLoggingActive) {
+          print('Remove attribute: $name');
+        }
+        return true;
+      }());
       removeAttribute(name);
     } else {
       if (getAttribute(name) == value) return;
-      if (kVerboseMode) {
-        print('Update attribute: $name - $value');
-      }
+      assert(() {
+        if (DevToolsService.instance.debugVerboseLoggingActive) {
+          print('Update attribute: $name - $value');
+        }
+        return true;
+      }());
       setAttribute(name, value);
     }
   }

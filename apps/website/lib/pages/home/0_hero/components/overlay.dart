@@ -34,6 +34,7 @@ class OverlayState extends State<Overlay> {
   }
 
   void showRandomImage() {
+    if (!mounted) return;
     setState(() {
       imageIndex = (imageIndex + 1) % imageIndexes.length;
     });

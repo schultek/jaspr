@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.table}
 /// The &lt;table&gt; HTML element represents tabular data—that is, information presented in a two-dimensional table comprised of rows and columns of cells containing data.
 /// {@endtemplate}
-final class table extends StatelessComponent {
+final class table extends _HtmlComponent {
   /// {@macro jaspr.html.table}
   const table(
     this.children, {
@@ -51,12 +51,27 @@ final class table extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'table'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.caption}
 /// The &lt;caption&gt; HTML element specifies the caption (or title) of a table, providing the table an accessible description.
 /// {@endtemplate}
-final class caption extends StatelessComponent {
+final class caption extends _HtmlComponent {
   /// {@macro jaspr.html.caption}
   const caption(
     this.children, {
@@ -98,12 +113,27 @@ final class caption extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'caption'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.thead}
 /// The &lt;thead&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the head of a table with information about the table's columns. This is usually in the form of column headers (&lt;th&gt; elements).
 /// {@endtemplate}
-final class thead extends StatelessComponent {
+final class thead extends _HtmlComponent {
   /// {@macro jaspr.html.thead}
   const thead(
     this.children, {
@@ -145,12 +175,27 @@ final class thead extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'thead'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.tbody}
 /// The &lt;tbody&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the body of a table's (main) data.
 /// {@endtemplate}
-final class tbody extends StatelessComponent {
+final class tbody extends _HtmlComponent {
   /// {@macro jaspr.html.tbody}
   const tbody(
     this.children, {
@@ -192,12 +237,27 @@ final class tbody extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'tbody'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.tfoot}
 /// The &lt;tfoot&gt; HTML element encapsulates a set of table rows (&lt;tr&gt; elements), indicating that they comprise the foot of a table with information about the table's columns. This is usually a summary of the columns, e.g., a sum of the given numbers in a column.
 /// {@endtemplate}
-final class tfoot extends StatelessComponent {
+final class tfoot extends _HtmlComponent {
   /// {@macro jaspr.html.tfoot}
   const tfoot(
     this.children, {
@@ -239,12 +299,27 @@ final class tfoot extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'tfoot'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.th}
 /// The &lt;th&gt; HTML element defines a cell as the header of a group of table cells and may be used as a child of the &lt;tr&gt; element. The exact nature of this group is defined by the scope and headers attributes.
 /// {@endtemplate}
-final class th extends StatelessComponent {
+final class th extends _HtmlComponent {
   /// {@macro jaspr.html.th}
   const th(
     this.children, {
@@ -318,12 +393,32 @@ final class th extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'th'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'abbr', value: abbr),
+      DiagnosticsProperty(name: 'colspan', value: colspan),
+      DiagnosticsProperty(name: 'headers', value: headers),
+      DiagnosticsProperty(name: 'rowspan', value: rowspan),
+      DiagnosticsProperty(name: 'scope', value: scope),
+    ];
+  }
 }
 
 /// {@template jaspr.html.tr}
 /// The &lt;tr&gt; HTML element defines a row of cells in a table. The row's cells can then be established using a mix of &lt;td&gt; (data cell) and &lt;th&gt; (header cell) elements.
 /// {@endtemplate}
-final class tr extends StatelessComponent {
+final class tr extends _HtmlComponent {
   /// {@macro jaspr.html.tr}
   const tr(
     this.children, {
@@ -365,12 +460,27 @@ final class tr extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'tr'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.td}
 /// The &lt;td&gt; HTML element defines a cell of a table that contains data and may be used as a child of the &lt;tr&gt; element.
 /// {@endtemplate}
-final class td extends StatelessComponent {
+final class td extends _HtmlComponent {
   /// {@macro jaspr.html.td}
   const td(
     this.children, {
@@ -429,12 +539,30 @@ final class td extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'td'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'colspan', value: colspan),
+      DiagnosticsProperty(name: 'headers', value: headers),
+      DiagnosticsProperty(name: 'rowspan', value: rowspan),
+    ];
+  }
 }
 
 /// {@template jaspr.html.col}
 /// The &lt;col&gt; HTML element defines one or more columns in a column group represented by its parent &lt;colgroup&gt; element. The &lt;col&gt; element is only valid as a child of a &lt;colgroup&gt; element that has no span attribute defined.
 /// {@endtemplate}
-final class col extends StatelessComponent {
+final class col extends _HtmlComponent {
   /// {@macro jaspr.html.col}
   const col({
     this.span,
@@ -475,12 +603,28 @@ final class col extends StatelessComponent {
       events: events,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'col'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'span', value: span),
+    ];
+  }
 }
 
 /// {@template jaspr.html.colgroup}
 /// The &lt;colgroup&gt; HTML element defines a group of columns within a table.
 /// {@endtemplate}
-final class colgroup extends StatelessComponent {
+final class colgroup extends _HtmlComponent {
   /// {@macro jaspr.html.colgroup}
   const colgroup(
     this.children, {
@@ -525,5 +669,21 @@ final class colgroup extends StatelessComponent {
       events: events,
       children: children,
     );
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'colgroup'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'span', value: span),
+    ];
   }
 }

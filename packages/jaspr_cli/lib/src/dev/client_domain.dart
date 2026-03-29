@@ -15,18 +15,21 @@ import 'package:vm_service/vm_service_io.dart';
 
 import '../daemon/daemon.dart';
 import '../daemon/domain.dart';
+import 'devtools_server.dart';
 import 'dev_proxy.dart';
 import 'util.dart';
 
 /// A collection of method and events relevant to the running application.
 class ClientDomain extends Domain {
-  ClientDomain(Daemon daemon, DevProxy devProxy) : super(daemon, 'client') {
+  ClientDomain(Daemon daemon, DevProxy devProxy, {required this.devTools}) : super(daemon, 'client') {
     registerHandler('restart', _restart);
     registerHandler('callServiceExtension', _callServiceExtension);
     registerHandler('stop', _stop);
 
     _handleAppConnections(devProxy);
   }
+
+  final DevToolsController devTools;
 
   bool _isShutdown = false;
   int? _buildProgressEventId;
@@ -208,6 +211,7 @@ class _ClientState {
         'port': debugConnection.port,
         'wsUri': debugConnection.uri,
       });
+      domain.devTools.setClientVmServiceUri(debugConnection.uri);
     } catch (e) {
       // noop
     }

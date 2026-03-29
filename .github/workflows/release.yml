@@ -58,6 +58,7 @@ jobs:
       - name: Update CLI
         run: |
           melos run generate:versions
+          melos run build:devtools
           melos run format || true
 
       - name: Commit Versions

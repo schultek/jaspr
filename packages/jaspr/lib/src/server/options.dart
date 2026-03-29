@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import '../../jaspr.dart';
 import '../dom/styles.dart';
-import '../dom/validator.dart';
 
 /// Main class for initializing the Jaspr framework on the server.
 ///
@@ -53,8 +50,7 @@ final class ClientTarget<T extends Component> {
 
   const ClientTarget(this.name, {this.params});
 
-  String? dataFor(T component) {
-    if (params == null) return null;
-    return const DomValidator().escapeMarkerText(jsonEncode(params!(component)));
+  Map<String, Object?>? dataFor(T component) {
+    return params?.call(component);
   }
 }

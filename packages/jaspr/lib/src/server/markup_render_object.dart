@@ -158,6 +158,9 @@ abstract class MarkupRenderObject extends RenderObject implements RawableRenderO
 class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
   MarkupRenderElement(this.tag);
 
+  @override
+  web.Element? get node => null;
+
   final String tag;
 
   String? id;
