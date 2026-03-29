@@ -14,6 +14,7 @@ import 'package:vm_service/vm_service_io.dart';
 import '../daemon/logger.dart';
 import '../dev/chrome.dart';
 import '../dev/client_workflow.dart';
+import '../dev/devtools_server.dart';
 import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
@@ -24,7 +25,7 @@ import '../process_runner.dart';
 import '../project.dart';
 import 'base_command.dart';
 
-abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
+abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper, DevToolsHelper {
   DevCommand({super.logger}) {
     argParser.addOption(
       'input',
@@ -61,6 +62,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'proxy-port',
       help: 'Specify a port for the proxy server. Defaults to "5567". Change this to run multiple projects.',
     );
+    argParser.addOption(
+      'devtools-port',
+      help: 'Specify a port for the Jaspr DevTools app. Defaults to "5468".',
+    );
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
@@ -91,9 +96,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final mode = argResults!.option('mode')!;
   late final port = argResults!.option('port') ?? project.port ?? defaultServePort;
   late final customProxyPort = argResults!.option('proxy-port') ?? serverProxyPort;
+  late final devToolsPort = argResults!.option('devtools-port') ?? defaultDevToolsPort;
   late final useWasm = argResults!.flag('experimental-wasm');
   late final moduleFormat = argResults!.option('module-format');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
+
   late final skipServer = argResults!.flag('skip-server');
 
   String? vmServiceUri;
@@ -166,6 +173,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.requireMode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
 
+      await startDevToolsServer(int.parse(devToolsPort));
       await _runChrome();
     } else if (skipServer) {
       logger.write(
@@ -177,6 +185,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     } else {
       final started = await _startServer(entryPoint!, proxyPort, workflow);
       if (started) {
+        await startDevToolsServer(int.parse(devToolsPort));
         await _runChrome();
       }
     }
@@ -493,8 +502,17 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         if (mode != 'none' && vmServiceUri == null) {
           final match = RegExp(r'The Dart VM service is listening on (http://[a-zA-Z0-9:/_=\-\.\?]+)').firstMatch(log);
           if (match != null) {
-            vmServiceUri = match.group(1)!;
+            var url = vmServiceUri = match.group(1)!;
             connectToVmService();
+
+            // Optional: convert to ws:// if needed, but devtools typically accepts http and transforms it.
+            if (url.startsWith('http://')) {
+              url = 'ws://${url.substring(7)}';
+            }
+            if (!url.endsWith('/')) {
+              url += '/';
+            }
+            controller.setServerVmServiceUri('${url}ws');
           }
         }
         return false;
@@ -609,7 +627,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     final ddcDefines = {
-      'jaspr.flags.verbose': debug,
       ...dartDefines,
     };
 
@@ -719,6 +736,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       useDwdsWebSocketConnection: !launchInChrome,
       reload: reloadConfig,
       moduleFormat: moduleFormat,
+      devTools: controller,
     );
     if (workflow == null) {
       return null;

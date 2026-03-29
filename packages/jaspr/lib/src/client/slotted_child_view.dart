@@ -61,28 +61,20 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
 
   @override
   void update(ChildSlot newComponent) {
-    assert(
-      newComponent.canUpdate(component as ChildSlot),
-      'ChildSlot cannot be updated with a different slot.',
-    );
+    assert(newComponent.canUpdate(component as ChildSlot), 'ChildSlot cannot be updated with a different slot.');
     super.update(newComponent);
   }
 
   @override
   List<Component> buildChildren() {
-    return [
-      (component as ChildSlot).child,
-    ];
+    return [(component as ChildSlot).child];
   }
 
   @override
   ChildSlotRenderObject createRenderObject() {
     final slot = component as ChildSlot;
     final parent = parentRenderObjectElement!.renderObject as DomRenderObject;
-    assert(
-      parent is SlottedDomRenderObject,
-      'ChildSlot must be used as a direct child of SlottedDomRenderObject.',
-    );
+    assert(parent is SlottedDomRenderObject, 'ChildSlot must be used as a direct child of SlottedDomRenderObject.');
     return slot.createRenderObject(parent as SlottedDomRenderObject);
   }
 
@@ -115,10 +107,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
 
   @override
   void update(SlottedChildView newComponent) {
-    assert(
-      newComponent.nodes == component.nodes,
-      'SlottedChildView cannot be updated with different nodes.',
-    );
+    assert(newComponent.nodes == component.nodes, 'SlottedChildView cannot be updated with different nodes.');
     super.update(newComponent);
   }
 
@@ -335,7 +324,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
   SlottedDomRenderObject._(DomRenderObject parent, {this.firstChildNode, this.lastChildNode}) : super(parent, []);
 
   factory SlottedDomRenderObject.fromNodes(List<web.Node>? nodes, DomRenderObject parent) {
-    final nodesToAdd = nodes ?? [if (parent is HydratableDomRenderObject) ...parent.toHydrate];
+    final nodesToAdd = nodes ?? [if (parent is MultiChildDomRenderObject) ...parent.toHydrate];
 
     if (nodesToAdd.isEmpty) {
       return SlottedDomRenderObject._(parent)..isAttached = true;
@@ -345,7 +334,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
     final lastNode = nodesToAdd.last;
     assert(firstNode.parentNode == lastNode.parentNode, 'All nodes must share the same parent.');
     final object = SlottedDomRenderObject._(parent, firstChildNode: firstNode, lastChildNode: lastNode);
-    if (parent is HydratableDomRenderObject) {
+    if (parent is MultiChildDomRenderObject) {
       final startIndex = parent.toHydrate.indexOf(firstNode);
       final endIndex = parent.toHydrate.indexOf(lastNode);
       if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
@@ -371,10 +360,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
   @override
   void attach(covariant RenderObject child, {covariant RenderObject? after}) {
     if (child is ChildSlotRenderObject) {
-      assert(
-        isAttached ? _realNodeOf(parent!).contains(child.node) : node.contains(child.node),
-        'Cannot attach a child that is not already part of the component fragment.',
-      );
+      assert(containsNode(child.node), 'Cannot attach a child that is not already part of the component fragment.');
       child.parent = this;
       child.finalize();
       return;
@@ -399,7 +385,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
   }
 }
 
-class ChildSlotRenderObject extends DomRenderObject with MultiChildDomRenderObject, HydratableDomRenderObject {
+class ChildSlotRenderObject extends DomRenderObject with MultiChildDomRenderObject {
   ChildSlotRenderObject(this.node, DomRenderObject parent, [List<web.Node>? nodes]) {
     this.parent = parent;
     toHydrate = [...nodes ?? node.childNodes.toIterable()];

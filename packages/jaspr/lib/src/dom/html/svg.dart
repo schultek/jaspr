@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.svg}
 /// The &lt;svg&gt; element is a container that defines a new coordinate system and viewport. It is used as the outermost element of SVG documents, but it can also be used to embed an SVG fragment inside an SVG or HTML document.
 /// {@endtemplate}
-final class svg extends StatelessComponent {
+final class svg extends _HtmlComponent {
   /// {@macro jaspr.html.svg}
   const svg(
     this.children, {
@@ -68,12 +68,30 @@ final class svg extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'svg'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'viewBox', value: viewBox),
+      DiagnosticsProperty(name: 'width', value: width?.value),
+      DiagnosticsProperty(name: 'height', value: height?.value),
+    ];
+  }
 }
 
 /// {@template jaspr.html.rect}
 /// The &lt;rect&gt; element is a basic SVG shape that draws rectangles, defined by their position, width, and height. The rectangles may have their corners rounded.
 /// {@endtemplate}
-final class rect extends StatelessComponent {
+final class rect extends _HtmlComponent {
   /// {@macro jaspr.html.rect}
   const rect(
     this.children, {
@@ -162,12 +180,36 @@ final class rect extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'rect'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'x', value: x),
+      DiagnosticsProperty(name: 'y', value: y),
+      DiagnosticsProperty(name: 'rx', value: rx),
+      DiagnosticsProperty(name: 'ry', value: ry),
+      DiagnosticsProperty(name: 'width', value: width),
+      DiagnosticsProperty(name: 'height', value: height),
+      DiagnosticsProperty(name: 'fill', value: fill?.value),
+      DiagnosticsProperty(name: 'stroke', value: stroke?.value),
+      DiagnosticsProperty(name: 'strokeWidth', value: strokeWidth),
+    ];
+  }
 }
 
 /// {@template jaspr.html.circle}
 /// The &lt;circle&gt; SVG element is an SVG basic shape, used to draw circles based on a center point and a radius.
 /// {@endtemplate}
-final class circle extends StatelessComponent {
+final class circle extends _HtmlComponent {
   /// {@macro jaspr.html.circle}
   const circle(
     this.children, {
@@ -241,12 +283,33 @@ final class circle extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'circle'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'cx', value: cx),
+      DiagnosticsProperty(name: 'cy', value: cy),
+      DiagnosticsProperty(name: 'r', value: r),
+      DiagnosticsProperty(name: 'fill', value: fill?.value),
+      DiagnosticsProperty(name: 'stroke', value: stroke?.value),
+      DiagnosticsProperty(name: 'strokeWidth', value: strokeWidth),
+    ];
+  }
 }
 
 /// {@template jaspr.html.ellipse}
 /// The &lt;ellipse&gt; element is an SVG basic shape, used to create ellipses based on a center coordinate, and both their x and y radius.
 /// {@endtemplate}
-final class ellipse extends StatelessComponent {
+final class ellipse extends _HtmlComponent {
   /// {@macro jaspr.html.ellipse}
   const ellipse(
     this.children, {
@@ -325,12 +388,34 @@ final class ellipse extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'ellipse'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'cx', value: cx),
+      DiagnosticsProperty(name: 'cy', value: cy),
+      DiagnosticsProperty(name: 'rx', value: rx),
+      DiagnosticsProperty(name: 'ry', value: ry),
+      DiagnosticsProperty(name: 'fill', value: fill?.value),
+      DiagnosticsProperty(name: 'stroke', value: stroke?.value),
+      DiagnosticsProperty(name: 'strokeWidth', value: strokeWidth),
+    ];
+  }
 }
 
 /// {@template jaspr.html.line}
 /// The &lt;line&gt; element is an SVG basic shape used to create a line connecting two points.
 /// {@endtemplate}
-final class line extends StatelessComponent {
+final class line extends _HtmlComponent {
   /// {@macro jaspr.html.line}
   const line(
     this.children, {
@@ -409,12 +494,34 @@ final class line extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'line'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'x1', value: x1),
+      DiagnosticsProperty(name: 'y1', value: y1),
+      DiagnosticsProperty(name: 'x2', value: x2),
+      DiagnosticsProperty(name: 'y2', value: y2),
+      DiagnosticsProperty(name: 'fill', value: fill?.value),
+      DiagnosticsProperty(name: 'stroke', value: stroke?.value),
+      DiagnosticsProperty(name: 'strokeWidth', value: strokeWidth),
+    ];
+  }
 }
 
 /// {@template jaspr.html.path}
 /// The &lt;path&gt; SVG element is the generic element to define a shape. All the basic shapes can be created with a path element.
 /// {@endtemplate}
-final class path extends StatelessComponent {
+final class path extends _HtmlComponent {
   /// {@macro jaspr.html.path}
   const path(
     this.children, {
@@ -478,12 +585,31 @@ final class path extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'path'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'd', value: d),
+      DiagnosticsProperty(name: 'fill', value: fill?.value),
+      DiagnosticsProperty(name: 'stroke', value: stroke?.value),
+      DiagnosticsProperty(name: 'strokeWidth', value: strokeWidth),
+    ];
+  }
 }
 
 /// {@template jaspr.html.polygon}
 /// The &lt;polygon&gt; element defines a closed shape consisting of a set of connected straight line segments. The last point is connected to the first point.
 /// {@endtemplate}
-final class polygon extends StatelessComponent {
+final class polygon extends _HtmlComponent {
   /// {@macro jaspr.html.polygon}
   const polygon(
     this.children, {
@@ -547,12 +673,31 @@ final class polygon extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'polygon'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'points', value: points),
+      DiagnosticsProperty(name: 'fill', value: fill?.value),
+      DiagnosticsProperty(name: 'stroke', value: stroke?.value),
+      DiagnosticsProperty(name: 'strokeWidth', value: strokeWidth),
+    ];
+  }
 }
 
 /// {@template jaspr.html.polyline}
 /// The &lt;polyline&gt; SVG element is an SVG basic shape that creates straight lines connecting several points. Typically a polyline is used to create open shapes as the last point doesn't have to be connected to the first point.
 /// {@endtemplate}
-final class polyline extends StatelessComponent {
+final class polyline extends _HtmlComponent {
   /// {@macro jaspr.html.polyline}
   const polyline(
     this.children, {
@@ -615,5 +760,24 @@ final class polyline extends StatelessComponent {
       events: events,
       children: children,
     );
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'polyline'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'points', value: points),
+      DiagnosticsProperty(name: 'fill', value: fill?.value),
+      DiagnosticsProperty(name: 'stroke', value: stroke?.value),
+      DiagnosticsProperty(name: 'strokeWidth', value: strokeWidth),
+    ];
   }
 }

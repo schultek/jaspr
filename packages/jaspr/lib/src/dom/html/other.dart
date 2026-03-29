@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.details}
 /// The &lt;details&gt; HTML element creates a disclosure widget in which information is visible only when the widget is toggled into an "open" state. A summary or label must be provided using the &lt;summary&gt; element.
 /// {@endtemplate}
-final class details extends StatelessComponent {
+final class details extends _HtmlComponent {
   /// {@macro jaspr.html.details}
   const details(
     this.children, {
@@ -55,12 +55,28 @@ final class details extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'details'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'open', value: open),
+    ];
+  }
 }
 
 /// {@template jaspr.html.dialog}
 /// The &lt;dialog&gt; HTML element represents a dialog box or other interactive component, such as a dismissible alert, inspector, or subwindow.
 /// {@endtemplate}
-final class dialog extends StatelessComponent {
+final class dialog extends _HtmlComponent {
   /// {@macro jaspr.html.dialog}
   const dialog(
     this.children, {
@@ -106,12 +122,28 @@ final class dialog extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'dialog'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'open', value: open),
+    ];
+  }
 }
 
 /// {@template jaspr.html.summary}
 /// The &lt;summary&gt; HTML element specifies a summary, caption, or legend for a &lt;details&gt; element's disclosure box. Clicking the &lt;summary&gt; element toggles the state of the parent &lt;details&gt; element open and closed.
 /// {@endtemplate}
-final class summary extends StatelessComponent {
+final class summary extends _HtmlComponent {
   /// {@macro jaspr.html.summary}
   const summary(
     this.children, {
@@ -153,12 +185,27 @@ final class summary extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'summary'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.meta}
 /// The  &lt;meta&gt; HTML element represents metadata that cannot be represented by other HTML meta-related elements, like  &lt;base &gt;,  &lt;link &gt;,  &lt;script &gt;,  &lt;style &gt; or  &lt;title &gt;.
 /// {@endtemplate}
-final class meta extends StatelessComponent {
+final class meta extends _HtmlComponent {
   /// {@macro jaspr.html.meta}
   const meta({
     this.name,
@@ -218,12 +265,31 @@ final class meta extends StatelessComponent {
       events: events,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'meta'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'content', value: content),
+      DiagnosticsProperty(name: 'charset', value: charset),
+      DiagnosticsProperty(name: 'httpEquiv', value: httpEquiv),
+    ];
+  }
 }
 
 /// {@template jaspr.html.link}
 /// The &lt;link&gt; HTML element specifies relationships between the current document and an external resource. This element is most commonly used to link to stylesheets, but is also used to establish site icons (both "favicon" style icons and icons for the home screen and apps on mobile devices) among other things.
 /// {@endtemplate}
-final class link extends StatelessComponent {
+final class link extends _HtmlComponent {
   /// {@macro jaspr.html.link}
   const link({
     required this.href,
@@ -282,12 +348,31 @@ final class link extends StatelessComponent {
       events: events,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'link'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'href', value: href),
+      DiagnosticsProperty(name: 'rel', value: rel),
+      DiagnosticsProperty(name: 'type', value: type),
+      DiagnosticsProperty(name: 'as', value: as),
+    ];
+  }
 }
 
 /// {@template jaspr.html.script}
 /// The &lt;script&gt; HTML element is used to embed executable code or data; this is typically used to embed or refer to JavaScript code. The &lt;script&gt; element can also be used with other languages, such as WebGL's GLSL shader programming language and JSON.
 /// {@endtemplate}
-final class script extends StatelessComponent {
+final class script extends _HtmlComponent {
   /// {@macro jaspr.html.script}
   const script({
     this.src,
@@ -355,5 +440,23 @@ final class script extends StatelessComponent {
       events: events,
       children: [if (content case final content?) RawText(content)],
     );
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'script'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'src', value: src),
+      DiagnosticsProperty(name: 'async', value: async),
+      DiagnosticsProperty(name: 'defer', value: defer),
+    ];
   }
 }

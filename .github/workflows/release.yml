@@ -59,6 +59,7 @@ jobs:
       - name: Update CLI
         run: |
           dart run melos run generate:versions
+          dart run melos run build:devtools
           dart run melos run format || true
 
       - name: Commit Versions

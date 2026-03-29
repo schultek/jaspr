@@ -1,4 +1,5 @@
 import '../../dom/validator.dart';
+import '../../foundation/diagnostics.dart';
 import '../../framework/framework.dart';
 import '../components/client_component_registry.dart';
 import '../markup_render_object.dart';
@@ -59,6 +60,15 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
     range.start.insertNext(ChildNodeData(startMarker));
     range.end.insertPrev(ChildNodeData(endMarker));
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'kind', value: 'client-component'),
+      DiagnosticsProperty(name: 'anchor-name', value: target.name),
+      if (data != null) DiagnosticsProperty(name: 'data', value: data),
+    ];
   }
 
   String? getData() {

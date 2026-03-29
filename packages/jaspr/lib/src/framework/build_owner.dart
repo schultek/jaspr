@@ -72,7 +72,7 @@ class BuildOwner {
     assert(_debugStateLockLevel >= 0);
   }
 
-  Future<void> performInitialBuild(Element element, void Function() completeBuild) async {
+  void performInitialBuild(Element element, void Function() completeBuild) {
     assert(_debugStateLockLevel >= 0);
     assert(!_debugBuilding);
 

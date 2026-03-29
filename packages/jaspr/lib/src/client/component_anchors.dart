@@ -33,7 +33,7 @@ class ClientComponentAnchor extends ComponentAnchor {
   final List<ServerComponentAnchor> serverAnchors = [];
 
   /// The decoded parameters for this client component.
-  Map<String, Object?> get _decodedParameters {
+  Map<String, Object?> get decodedParameters {
     if (data case final rawData?) {
       final unescapedData = const DomValidator().unescapeMarkerText(rawData);
       return jsonDecode(unescapedData) as Map<String, Object?>;
@@ -50,7 +50,7 @@ class ClientComponentAnchor extends ComponentAnchor {
   Component build() {
     assert(builder is ClientBuilder, 'ClientComponentAnchor was not resolved before calling build()');
 
-    final clientParameters = ClientParams(_decodedParameters, serverAnchors);
+    final clientParameters = ClientParams(decodedParameters, serverAnchors);
     final component = (builder as ClientBuilder)(clientParameters);
     return Builder(key: GlobalObjectKey(key), builder: (_) => component);
   }

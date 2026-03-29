@@ -15,6 +15,7 @@ import 'package:vm_service/vm_service_io.dart';
 import '../logging.dart';
 import '../project.dart';
 import 'chrome.dart';
+import 'devtools_server.dart';
 import 'util.dart';
 
 class DevProxy {
@@ -26,6 +27,7 @@ class DevProxy {
   final Dwds dwds;
   final ExpressionCompilerService? ddcService;
   final Logger? logger;
+  final DevToolsController devTools;
 
   final Map<String, ClientConnection> _clientConnections = {};
   final StreamController<Map<String, Object?>> _clientEvents = StreamController();
@@ -39,6 +41,7 @@ class DevProxy {
     required this.dwds,
     this.ddcService,
     this.logger,
+    required this.devTools,
   }) {
     _listenToClientConnections();
     _listenToBuildResults();
@@ -121,6 +124,7 @@ class DevProxy {
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
     String moduleFormat = 'ddc',
     Logger? logger,
+    required DevToolsController devTools,
   }) async {
     const target = 'web';
     final reloadedSources = <Map<String, dynamic>>[];
@@ -254,6 +258,7 @@ class DevProxy {
       dwds: dwds,
       ddcService: ddcService,
       logger: logger,
+      devTools: devTools,
     );
   }
 
@@ -400,6 +405,8 @@ class ClientConnection {
       });
 
       sendEvent('client.debugPort', {'appId': appId, 'port': debugConnection.port, 'wsUri': debugConnection.uri});
+
+      devProxy.devTools.setClientVmServiceUri(debugConnection.uri);
     } catch (_) {
       // noop
     }

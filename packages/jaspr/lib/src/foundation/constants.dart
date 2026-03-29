@@ -20,20 +20,6 @@
 ///  * [kDebugMode], which is true in debug builds.
 const bool kReleaseMode = bool.fromEnvironment('jaspr.flags.release');
 
-/// A constant that is true if the application was run in verbose mode.
-///
-/// More specifically, this is a constant that is true if the application was
-/// compiled in Dart with the '-Djaspr.flags.verbose=true' flag.
-///
-/// Since this is a const value, it can be used to indicate to the compiler that
-/// a particular block of code will not be executed in release mode, and hence
-/// can be removed.
-///
-/// See also:
-///
-///  * [kDebugMode], which is true in debug builds.
-const bool kVerboseMode = bool.fromEnvironment('jaspr.flags.verbose');
-
 /// A constant that is true if the application was compiled in debug mode.
 ///
 /// More specifically, this is a constant that is true if the application was

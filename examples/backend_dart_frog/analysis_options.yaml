@@ -1,15 +1,5 @@
 include: package:jaspr_repo/app.yaml
 
-analyzer:
-  exclude:
-    - build/**
-    - android/**
-    - ios/**
-    - web/**
-    - windows/**
-    - macos/**
-    - linux/**
-
 linter:
   rules:
     file_names: false

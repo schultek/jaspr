@@ -14,6 +14,7 @@ import 'package:dwds/dwds.dart';
 
 import '../logging.dart';
 import 'dev_proxy.dart';
+import 'devtools_server.dart';
 import 'util.dart';
 
 /// Controls the web development workflow.
@@ -30,6 +31,7 @@ class ClientWorkflow {
     bool useDwdsWebSocketConnection = true,
     ReloadConfiguration reload = ReloadConfiguration.none,
     String moduleFormat = 'ddc',
+    required DevToolsController devTools,
   }) async {
     var cancelled = false;
 
@@ -64,6 +66,7 @@ class ClientWorkflow {
           reload: reload,
           moduleFormat: moduleFormat,
           logger: logger,
+          devTools: devTools,
         );
 
         if (cancelled) {

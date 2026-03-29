@@ -64,7 +64,7 @@ void main() {
         final clazz = Class((c) {
           c.name = tag;
           c.modifier = ClassModifier.final$;
-          c.extend = refer('StatelessComponent');
+          c.extend = refer('_HtmlComponent');
 
           final docs = (data['doc'] as String).split('\n').map((d) => '/// $d').toList();
           final usage = data['usage'] as String? ?? '';
@@ -363,6 +363,55 @@ void main() {
               }
 
               content.writeln('  );');
+
+              m.body = Code(content.toString());
+            }),
+          );
+
+          c.methods.add(
+            Method((m) {
+              m.name = 'debugFillProperties';
+              m.annotations.add(refer('override'));
+              m.returns = refer('List<DiagnosticsProperty>');
+
+              final tagValue = data['tag'] ?? tag;
+              final content = StringBuffer();
+
+              content.write(
+                'return [\n'
+                "  DiagnosticsProperty(name: 'tag', value: '$tagValue'),\n"
+                "  if (id != null) DiagnosticsProperty(name: 'id', value: id),\n"
+                "  if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),\n"
+                "  if (attributes != null) DiagnosticsProperty(name: 'attributes', value: attributes),\n"
+                "  if (styles != null) DiagnosticsProperty(name: 'styles', value: styles?.properties),\n"
+                "  if (events != null) DiagnosticsProperty(name: 'events', value: events?.keys.toList()),\n",
+              );
+
+              for (final attr in attrs.keys) {
+                final name = attrs[attr]['name'] ?? attr;
+                final type = attrs[attr]['type'];
+
+                if (type is String && (type.startsWith('event:') || type == 'content')) continue;
+
+                final required = attrs[attr]['required'] == true;
+                final nullCheck = !required && type != 'boolean' ? '?' : '';
+
+                content.write("  DiagnosticsProperty(name: '$name', value: ");
+
+                if (type == 'boolean' || type == 'string' || type == 'int' || type == 'double') {
+                  content.write('$name');
+                } else if (type is String && type.startsWith('enum:')) {
+                  content.write('$name$nullCheck.value');
+                } else if (type is String && type.startsWith('css:')) {
+                  content.write('$name$nullCheck.value');
+                } else if (type is Map<String, dynamic>) {
+                  content.write('$name$nullCheck.value');
+                }
+
+                content.writeln('),');
+              }
+
+              content.writeln('];');
 
               m.body = Code(content.toString());
             }),

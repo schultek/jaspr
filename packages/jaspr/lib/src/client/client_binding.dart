@@ -8,11 +8,14 @@ import 'package:http/http.dart' as http;
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
+import '../devtools/dev_toolbar.dart';
+import '../devtools/dev_tools_service.dart';
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'dom_render_object.dart';
+import 'options.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
@@ -92,6 +95,9 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   @override
   void attachRootComponent(Component app, {String attachTo = 'body'}) {
     _attachTarget = attachTo;
+    if (kDebugMode) {
+      app = Component.fragment([app, JasprDevToolbar()]);
+    }
     super.attachRootComponent(app);
   }
 
@@ -111,6 +117,25 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   void completeInitialFrame() {
     (rootElement!.renderObject as DomRenderObject).finalize();
     super.completeInitialFrame();
+
+    if (kDebugMode) {
+      _sendClientTree();
+    }
+  }
+
+  Future<void> _sendClientTree() async {
+    final devtoolsId = web.document.querySelector('meta[name="jaspr-devtools-id"]')?.getAttribute('content');
+
+    if (Jaspr.options.clients.isNotEmpty) {
+      await Future.wait<void>([
+        for (final client in Jaspr.options.clients.values)
+          if (client.loadedBuilder case final Future<Object?> loader) loader,
+      ]);
+      // Wait for the next frame.
+      await Future(() {});
+    }
+
+    DevToolsService.instance.sendClientTree(devtoolsId, currentUrl, _attachTarget, rootElement!);
   }
 
   @override
@@ -224,7 +249,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
 
     sw.stop();
 
-    if (kVerboseMode) {
+    if (DevToolsService.instance.debugVerboseLoggingActive) {
       print('Page reloaded in ${sw.elapsedMilliseconds}ms');
     }
   }

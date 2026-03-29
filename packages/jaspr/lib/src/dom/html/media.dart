@@ -9,7 +9,7 @@ part of 'html.dart';
 /// {@template jaspr.html.audio}
 /// The &lt;audio&gt; HTML element is used to embed sound content in documents. It may contain one or more audio sources, represented using the src attribute or the &lt;source&gt; element: the browser will choose the most suitable one. It can also be the destination for streamed media, using a MediaStream.
 /// {@endtemplate}
-final class audio extends StatelessComponent {
+final class audio extends _HtmlComponent {
   /// {@macro jaspr.html.audio}
   const audio(
     this.children, {
@@ -88,6 +88,28 @@ final class audio extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'audio'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'autoplay', value: autoplay),
+      DiagnosticsProperty(name: 'controls', value: controls),
+      DiagnosticsProperty(name: 'crossOrigin', value: crossOrigin?.value),
+      DiagnosticsProperty(name: 'loop', value: loop),
+      DiagnosticsProperty(name: 'muted', value: muted),
+      DiagnosticsProperty(name: 'preload', value: preload?.value),
+      DiagnosticsProperty(name: 'src', value: src),
+    ];
+  }
 }
 
 /// Indicates if the fetching of the media must be done using a CORS request. Media data from a CORS request can be reused in the &lt;canvas&gt; element without being marked "tainted". If the crossorigin attribute is not specified, then a non-CORS request is sent (without the Origin request header), and the browser marks the media as tainted and restricts access to its data, preventing its usage in &lt;canvas&gt; elements. If the crossorigin attribute is specified, then a CORS request is sent (with the Origin request header); but if the server does not opt into allowing cross-origin access to the media data by the origin site (by not sending any Access-Control-Allow-Origin response header, or by not including the site's origin in any Access-Control-Allow-Origin response header it does send), then the browser blocks the media from loading, and logs a CORS error to the devtools console.
@@ -123,7 +145,7 @@ enum Preload {
 /// {@template jaspr.html.img}
 /// The &lt;img&gt; HTML element embeds an image into the document.
 /// {@endtemplate}
-final class img extends StatelessComponent {
+final class img extends _HtmlComponent {
   /// {@macro jaspr.html.img}
   const img({
     this.alt,
@@ -197,6 +219,28 @@ final class img extends StatelessComponent {
       events: events,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'img'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'alt', value: alt),
+      DiagnosticsProperty(name: 'crossOrigin', value: crossOrigin?.value),
+      DiagnosticsProperty(name: 'width', value: width),
+      DiagnosticsProperty(name: 'height', value: height),
+      DiagnosticsProperty(name: 'loading', value: loading?.value),
+      DiagnosticsProperty(name: 'src', value: src),
+      DiagnosticsProperty(name: 'referrerPolicy', value: referrerPolicy?.value),
+    ];
+  }
 }
 
 /// Indicates how the browser should load the media. Loading is only deferred when JavaScript is enabled.
@@ -215,7 +259,7 @@ enum MediaLoading {
 /// {@template jaspr.html.video}
 /// The &lt;video&gt; HTML element embeds a media player which supports video playback into the document. You can use &lt;video&gt; for audio content as well, but the &lt;audio&gt; element may provide a more appropriate user experience.
 /// {@endtemplate}
-final class video extends StatelessComponent {
+final class video extends _HtmlComponent {
   /// {@macro jaspr.html.video}
   const video(
     this.children, {
@@ -309,12 +353,37 @@ final class video extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'video'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'autoplay', value: autoplay),
+      DiagnosticsProperty(name: 'controls', value: controls),
+      DiagnosticsProperty(name: 'crossOrigin', value: crossOrigin?.value),
+      DiagnosticsProperty(name: 'loop', value: loop),
+      DiagnosticsProperty(name: 'muted', value: muted),
+      DiagnosticsProperty(name: 'poster', value: poster),
+      DiagnosticsProperty(name: 'preload', value: preload?.value),
+      DiagnosticsProperty(name: 'src', value: src),
+      DiagnosticsProperty(name: 'width', value: width),
+      DiagnosticsProperty(name: 'height', value: height),
+    ];
+  }
 }
 
 /// {@template jaspr.html.embed}
 /// The &lt;embed&gt; HTML element embeds external content at the specified point in the document. This content is provided by an external application or other source of interactive content such as a browser plug-in.
 /// {@endtemplate}
-final class embed extends StatelessComponent {
+final class embed extends _HtmlComponent {
   /// {@macro jaspr.html.embed}
   const embed({
     required this.src,
@@ -373,12 +442,31 @@ final class embed extends StatelessComponent {
       events: events,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'embed'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'src', value: src),
+      DiagnosticsProperty(name: 'type', value: type),
+      DiagnosticsProperty(name: 'width', value: width),
+      DiagnosticsProperty(name: 'height', value: height),
+    ];
+  }
 }
 
 /// {@template jaspr.html.iframe}
 /// The &lt;iframe&gt; HTML element represents a nested browsing context, embedding another HTML page into the current one.
 /// {@endtemplate}
-final class iframe extends StatelessComponent {
+final class iframe extends _HtmlComponent {
   /// {@macro jaspr.html.iframe}
   const iframe(
     this.children, {
@@ -467,12 +555,36 @@ final class iframe extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'iframe'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'src', value: src),
+      DiagnosticsProperty(name: 'allow', value: allow),
+      DiagnosticsProperty(name: 'csp', value: csp),
+      DiagnosticsProperty(name: 'loading', value: loading?.value),
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'sandbox', value: sandbox),
+      DiagnosticsProperty(name: 'referrerPolicy', value: referrerPolicy?.value),
+      DiagnosticsProperty(name: 'width', value: width),
+      DiagnosticsProperty(name: 'height', value: height),
+    ];
+  }
 }
 
 /// {@template jaspr.html.object}
 /// The &lt;object&gt; HTML element represents an external resource, which can be treated as an image, a nested browsing context, or a resource to be handled by a plugin.
 /// {@endtemplate}
-final class object extends StatelessComponent {
+final class object extends _HtmlComponent {
   /// {@macro jaspr.html.object}
   const object(
     this.children, {
@@ -541,12 +653,32 @@ final class object extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'object'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'data', value: data),
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'type', value: type),
+      DiagnosticsProperty(name: 'width', value: width),
+      DiagnosticsProperty(name: 'height', value: height),
+    ];
+  }
 }
 
 /// {@template jaspr.html.source}
 /// The &lt;source&gt; HTML element specifies multiple media resources for the &lt;picture&gt;, the &lt;audio&gt; element, or the &lt;video&gt; element. It is an empty element, meaning that it has no content and does not have a closing tag. It is commonly used to offer the same media content in multiple file formats in order to provide compatibility with a broad range of browsers given their differing support for image file formats and media file formats.
 /// {@endtemplate}
-final class source extends StatelessComponent {
+final class source extends _HtmlComponent {
   /// {@macro jaspr.html.source}
   const source({
     this.src,
@@ -593,12 +725,29 @@ final class source extends StatelessComponent {
       events: events,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'source'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+      DiagnosticsProperty(name: 'src', value: src),
+      DiagnosticsProperty(name: 'type', value: type),
+    ];
+  }
 }
 
 /// {@template jaspr.html.figure}
 /// The &lt;figure&gt; HTML element represents self-contained content, potentially with an optional caption, which is specified using the &lt;figcaption&gt; element. The figure, its caption, and its contents are referenced as a single unit.
 /// {@endtemplate}
-final class figure extends StatelessComponent {
+final class figure extends _HtmlComponent {
   /// {@macro jaspr.html.figure}
   const figure(
     this.children, {
@@ -640,12 +789,27 @@ final class figure extends StatelessComponent {
       children: children,
     );
   }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'figure'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
+  }
 }
 
 /// {@template jaspr.html.figcaption}
 /// The &lt;figcaption&gt; HTML element represents a caption or legend describing the rest of the contents of its parent &lt;figure&gt; element, providing the &lt;figure&gt;> an accessible description.
 /// {@endtemplate}
-final class figcaption extends StatelessComponent {
+final class figcaption extends _HtmlComponent {
   /// {@macro jaspr.html.figcaption}
   const figcaption(
     this.children, {
@@ -686,5 +850,20 @@ final class figcaption extends StatelessComponent {
       events: events,
       children: children,
     );
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'tag', value: 'figcaption'),
+      if (id != null) DiagnosticsProperty(name: 'id', value: id),
+      if (classes != null) DiagnosticsProperty(name: 'classes', value: classes),
+      if (attributes != null)
+        DiagnosticsProperty(name: 'attributes', value: attributes),
+      if (styles != null)
+        DiagnosticsProperty(name: 'styles', value: styles?.properties),
+      if (events != null)
+        DiagnosticsProperty(name: 'events', value: events?.keys.toList()),
+    ];
   }
 }
