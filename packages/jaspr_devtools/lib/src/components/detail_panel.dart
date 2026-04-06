@@ -44,6 +44,8 @@ class DetailPanel extends StatelessComponent {
         if (n.textContent != null) _row('Text', n.textContent!),
         if (n.domAttributes != null && n.domAttributes!.isNotEmpty)
           _section('Attributes', n.domAttributes!),
+        if (n.properties != null && n.properties!.isNotEmpty)
+          _section('Properties', n.properties!),
         if (n.stateFields != null && n.stateFields!.isNotEmpty)
           _section('State Fields', n.stateFields!),
       ],

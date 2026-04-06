@@ -26,6 +26,18 @@ class DomComponent extends Component {
 
   @override
   Element createElement() => DomElement(this);
+
+  @override
+  // ignore: use_null_aware_elements
+  Map<String, String> debugDescribeProperties() => {
+        'tag': tag,
+        if (id != null) 'id': id!,
+        if (classes != null) 'classes': classes!,
+        if (attributes != null)
+          for (final e in attributes!.entries) 'attr:${e.key}': e.value,
+        if (events != null) 'events': '${events!.length} handler(s)',
+        if (styles != null) 'styles': '${styles!.properties.length} rule(s)',
+      };
 }
 
 typedef EventCallback = void Function(web.Event event);
@@ -167,6 +179,11 @@ class Text extends Component {
 
   @override
   Element createElement() => TextElement(this);
+
+  @override
+  Map<String, String> debugDescribeProperties() => {
+        'text': text.length > 50 ? '${text.substring(0, 50)}...' : text,
+      };
 }
 
 class TextElement extends LeafRenderObjectElement {

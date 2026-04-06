@@ -22,6 +22,7 @@ class InspectorNode {
     required this.textContent,
     required this.hasRenderObject,
     required this.children,
+    this.childCount = 0,
     this.sourceLocation,
     this.domId,
     this.domClasses,
@@ -30,6 +31,7 @@ class InspectorNode {
     this.eventCount = 0,
     this.builtBy,
     this.stateFields,
+    this.properties,
     this.wasHydrated,
   });
 
@@ -58,7 +60,16 @@ class InspectorNode {
   final bool hasRenderObject;
 
   /// Direct children of this node in the component tree.
+  ///
+  /// May be empty even when [childCount] > 0 if the tree was snapshotted
+  /// with a depth limit (lazy mode).
   final List<InspectorNode> children;
+
+  /// Total number of direct children, even if [children] is truncated.
+  ///
+  /// When `childCount > children.length`, the DevTools app can request the
+  /// remaining children via the `request_children` protocol message.
+  final int childCount;
 
   /// Source file and line where this component was created (debug only).
   final String? sourceLocation;
@@ -84,6 +95,9 @@ class InspectorNode {
   /// State field names to their string values, from [State.debugDescribeState].
   final Map<String, String>? stateFields;
 
+  /// Component configuration properties, from [Component.debugDescribeProperties].
+  final Map<String, String>? properties;
+
   /// Whether this node's DOM was hydrated from server-rendered HTML.
   ///
   /// `true` = SSR (hydrated), `false` = CSR (client-created), `null` = unknown.
@@ -100,6 +114,7 @@ class InspectorNode {
         'textContent': textContent,
         'hasRenderObject': hasRenderObject,
         'children': children.map((c) => c.toJson()).toList(),
+        'childCount': childCount,
         'sourceLocation': sourceLocation,
         'domId': domId,
         'domClasses': domClasses,
@@ -108,6 +123,7 @@ class InspectorNode {
         'eventCount': eventCount,
         'builtBy': builtBy,
         'stateFields': stateFields,
+        'properties': properties,
         'wasHydrated': wasHydrated,
       };
 
@@ -125,6 +141,7 @@ class InspectorNode {
       children: (json['children'] as List<dynamic>)
           .map((c) => InspectorNode.fromJson((c as Map).cast<String, Object?>()))
           .toList(),
+      childCount: json['childCount'] as int? ?? 0,
       sourceLocation: json['sourceLocation'] as String?,
       domId: json['domId'] as String?,
       domClasses: json['domClasses'] as String?,
@@ -133,6 +150,7 @@ class InspectorNode {
       eventCount: json['eventCount'] as int? ?? 0,
       builtBy: json['builtBy'] as String?,
       stateFields: (json['stateFields'] as Map?)?.cast<String, String>(),
+      properties: (json['properties'] as Map?)?.cast<String, String>(),
       wasHydrated: json['wasHydrated'] as bool?,
     );
   }
@@ -151,8 +169,17 @@ class InspectorNode {
 ///
 /// Recursion stops at [_kMaxSnapshotDepth] to prevent stack overflow on
 /// extremely deep trees.
-InspectorNode snapshotTree(Element root, Map<int, Element> registry, {Map<String, String>? classLocations}) {
-  return _snapshotElement(root, registry, 0, classLocations);
+/// When [maxDepth] is provided, children beyond that depth are omitted
+/// (their [InspectorNode.children] will be empty but [childCount] indicates
+/// how many exist). The DevTools app can request them lazily via
+/// `request_children`.
+InspectorNode snapshotTree(
+  Element root,
+  Map<int, Element> registry, {
+  Map<String, String>? classLocations,
+  int? maxDepth,
+}) {
+  return _snapshotElement(root, registry, 0, classLocations, maxDepth);
 }
 
 InspectorNode _snapshotElement(
@@ -160,6 +187,7 @@ InspectorNode _snapshotElement(
   Map<int, Element> registry,
   int currentDepth,
   Map<String, String>? classLocations,
+  int? maxDepth,
 ) {
   final id = element.hashCode;
   registry[id] = element;
@@ -194,6 +222,11 @@ InspectorNode _snapshotElement(
     if (described.isNotEmpty) stateFields = described;
   }
 
+  // Collect component properties via debugDescribeProperties.
+  Map<String, String>? properties;
+  final described = component.debugDescribeProperties();
+  if (described.isNotEmpty) properties = described;
+
   // Resolve source location: prefer DDC class locations, fall back to stack trace.
   final sourceLocation = classLocations?[componentType] ??
       _parseSourceLocation(element.debugCreationStack);
@@ -213,9 +246,14 @@ InspectorNode _snapshotElement(
   final displayLabel = _buildLabel(componentType, isStateful, domTag, textContent);
 
   final children = <InspectorNode>[];
+  var totalChildCount = 0;
+  final depthExceeded = maxDepth != null && currentDepth >= maxDepth;
   if (currentDepth < _kMaxSnapshotDepth) {
     element.visitChildren((child) {
-      children.add(_snapshotElement(child, registry, currentDepth + 1, classLocations));
+      totalChildCount++;
+      if (!depthExceeded) {
+        children.add(_snapshotElement(child, registry, currentDepth + 1, classLocations, maxDepth));
+      }
     });
   }
 
@@ -229,6 +267,7 @@ InspectorNode _snapshotElement(
     textContent: textContent,
     hasRenderObject: isRenderObject,
     children: children,
+    childCount: totalChildCount,
     sourceLocation: sourceLocation,
     domId: domId,
     domClasses: domClasses,
@@ -237,6 +276,7 @@ InspectorNode _snapshotElement(
     eventCount: eventCount,
     builtBy: builtBy,
     stateFields: stateFields,
+    properties: properties,
     wasHydrated: wasHydrated,
   );
 }

@@ -220,6 +220,17 @@ abstract class Component {
   /// If the components have no key (their key is null), then they are considered a
   /// match if they have the same type, even if their children are completely
   /// different.
+  /// Returns a map of property names to their string representations for
+  /// debugging and inspection.
+  ///
+  /// Override this method in debug builds to expose component configuration
+  /// to the Jaspr DevTools inspector. The default implementation returns an
+  /// empty map.
+  ///
+  /// Only called when DevTools is connected; the method is tree-shaken in
+  /// release builds.
+  Map<String, String> debugDescribeProperties() => const {};
+
   static bool canUpdate(Component oldComponent, Component newComponent) {
     if (oldComponent.runtimeType != newComponent.runtimeType || oldComponent.key != newComponent.key) {
       return false;
