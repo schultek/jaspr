@@ -377,6 +377,148 @@ void main() {
       expect(restored.children.length, equals(tree.children.length));
     });
   });
+
+  group('debugDescribeProperties', () {
+    testComponents('DomComponent exposes tag, id, classes', (tester) async {
+      tester.pumpComponent(div(
+        id: 'app',
+        classes: 'main container',
+        [Component.text('hi')],
+      ));
+
+      final root = tester.binding.rootElement!;
+      final registry = <int, Element>{};
+      final tree = snapshotTree(root, registry);
+
+      final divNode = _findByLabel(tree, '<div>');
+      expect(divNode, isNotNull);
+      expect(divNode!.properties, isNotNull);
+      expect(divNode.properties!['tag'], equals('div'));
+      expect(divNode.properties!['id'], equals('app'));
+      expect(divNode.properties!['classes'], equals('main container'));
+    });
+
+    testComponents('Text component exposes text property', (tester) async {
+      tester.pumpComponent(Component.text('hello world'));
+
+      final root = tester.binding.rootElement!;
+      final registry = <int, Element>{};
+      final tree = snapshotTree(root, registry);
+
+      final textNode = _findByPredicate(tree, (n) => n.textContent != null);
+      expect(textNode, isNotNull);
+      expect(textNode!.properties, isNotNull);
+      expect(textNode.properties!['text'], equals('hello world'));
+    });
+
+    testComponents('StatelessComponent has no properties by default', (tester) async {
+      tester.pumpComponent(_TestStateless());
+
+      final root = tester.binding.rootElement!;
+      final registry = <int, Element>{};
+      final tree = snapshotTree(root, registry);
+
+      final node = _findByPredicate(tree, (n) => n.componentType == '_TestStateless');
+      expect(node, isNotNull);
+      expect(node!.properties, isNull);
+    });
+  });
+
+  group('lazy tree serialization', () {
+    testComponents('maxDepth limits children serialization', (tester) async {
+      tester.pumpComponent(div([span([Component.text('deep')])]));
+
+      final root = tester.binding.rootElement!;
+      final registry = <int, Element>{};
+      final tree = snapshotTree(root, registry, maxDepth: 2);
+
+      // Root at depth 0, first child at depth 1 — those are serialized.
+      // Depth 2+ should have empty children but nonzero childCount.
+      expect(tree.children, isNotEmpty);
+
+      // Find a node at the boundary where children were truncated.
+      final truncated = _findByPredicate(
+        tree,
+        (n) => n.children.isEmpty && n.childCount > 0,
+      );
+      // There should be at least one truncated node.
+      expect(truncated, isNotNull);
+      expect(truncated!.childCount, greaterThan(0));
+    });
+
+    testComponents('without maxDepth serializes full tree', (tester) async {
+      tester.pumpComponent(div([span([Component.text('deep')])]));
+
+      final root = tester.binding.rootElement!;
+      final registry = <int, Element>{};
+      final tree = snapshotTree(root, registry);
+
+      // All nodes should have children.length == childCount.
+      final mismatch = _findByPredicate(
+        tree,
+        (n) => n.children.length != n.childCount,
+      );
+      expect(mismatch, isNull);
+    });
+
+    test('childCount roundtrips through JSON', () {
+      final node = InspectorNode(
+        id: 1,
+        componentType: 'Test',
+        displayLabel: 'Test',
+        depth: 0,
+        isStateful: false,
+        domTag: null,
+        textContent: null,
+        hasRenderObject: false,
+        children: [],
+        childCount: 5,
+      );
+
+      final restored = InspectorNode.fromJson(node.toJson());
+      expect(restored.childCount, equals(5));
+      expect(restored.children, isEmpty);
+    });
+  });
+
+  group('properties roundtrip through JSON', () {
+    test('properties preserved in toJson/fromJson', () {
+      final node = InspectorNode(
+        id: 1,
+        componentType: 'DomComponent',
+        displayLabel: '<div>',
+        depth: 0,
+        isStateful: false,
+        domTag: 'div',
+        textContent: null,
+        hasRenderObject: true,
+        children: [],
+        properties: {'tag': 'div', 'id': 'app'},
+      );
+
+      final restored = InspectorNode.fromJson(node.toJson());
+      expect(restored.properties, isNotNull);
+      expect(restored.properties!['tag'], equals('div'));
+      expect(restored.properties!['id'], equals('app'));
+    });
+
+    test('null properties preserved', () {
+      final node = InspectorNode(
+        id: 1,
+        componentType: 'Test',
+        displayLabel: 'Test',
+        depth: 0,
+        isStateful: false,
+        domTag: null,
+        textContent: null,
+        hasRenderObject: false,
+        children: [],
+      );
+
+      final restored = InspectorNode.fromJson(node.toJson());
+      expect(restored.properties, isNull);
+    });
+  });
 }
 
 /// A minimal stateful component for testing.
