@@ -69,6 +69,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       negatable: false,
       defaultsTo: false,
     );
+    argParser.addOption(
+      'devtools-port',
+      help: 'Specify a port for the DevTools app. Defaults to "8081". Set to "0" to disable.',
+      defaultsTo: '8081',
+    );
     addDartDefineArgs();
   }
 
@@ -85,6 +90,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
   late final skipServer = argResults!.flag('skip-server');
+  late final devToolsPort = argResults!.option('devtools-port') ?? '8081';
 
   bool get launchInChrome;
   bool get autoRun;
@@ -135,6 +141,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       flutterPort: project.flutterMode == FlutterMode.embedded ? flutterPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
     );
+
+    // Start DevTools server if not disabled and not in release mode.
+    if (!release && devToolsPort != '0') {
+      await _startDevToolsServer(devToolsPort, proxyPort);
+    }
 
     if (project.requireMode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
@@ -271,6 +282,90 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         chrome = null;
       }
     });
+  }
+
+  Future<void> _startDevToolsServer(String devToolsPort, String proxyPort) async {
+    // Look for the jaspr_devtools web directory.
+    // Try common locations: workspace root, current dir, and package_config resolution.
+    final candidates = [
+      Directory(p.join(Directory.current.path, 'packages', 'jaspr_devtools', 'web')),
+      // Walk up to find workspace root (look for pubspec.yaml with workspace: key)
+      ..._findDevToolsWebDir(Directory.current.path),
+    ];
+    final devToolsDir = candidates.where((d) => d.existsSync()).firstOrNull;
+    if (devToolsDir == null) {
+      // DevTools package not found — silently skip.
+      // In the future, bundled assets will be used instead.
+      logger.write(
+        'DevTools app not found. Skipping DevTools server.',
+        tag: Tag.cli,
+        level: Level.verbose,
+      );
+      return;
+    }
+
+    try {
+      // Inject the WebSocket relay URL so the DevTools app knows where to connect.
+      final wsUrl = 'ws://localhost:$proxyPort/\$jasprDevTools?role=devtools';
+      final wsScript = '<script>window.\$jasprDevToolsUrl="$wsUrl";</script>';
+
+      final server = await HttpServer.bind(InternetAddress.anyIPv4, int.parse(devToolsPort));
+      server.listen((request) {
+        final path = request.uri.path == '/' ? '/index.html' : request.uri.path;
+        final file = File(p.join(devToolsDir.path, path.substring(1)));
+        if (file.existsSync()) {
+          final ext = p.extension(file.path);
+          final contentType = switch (ext) {
+            '.html' => 'text/html',
+            '.js' => 'application/javascript',
+            '.css' => 'text/css',
+            '.json' => 'application/json',
+            _ => 'application/octet-stream',
+          };
+          if (ext == '.html') {
+            // Inject WebSocket URL into HTML pages.
+            var html = file.readAsStringSync();
+            html = html.replaceFirst('<head>', '<head>$wsScript');
+            request.response
+              ..headers.contentType = ContentType.parse(contentType)
+              ..write(html)
+              ..close();
+          } else {
+            request.response
+              ..headers.contentType = ContentType.parse(contentType)
+              ..add(file.readAsBytesSync())
+              ..close();
+          }
+        } else {
+          request.response
+            ..statusCode = 404
+            ..close();
+        }
+      });
+
+      logger.write('DevTools at http://localhost:$devToolsPort', tag: Tag.cli);
+
+      guardResource(() async {
+        await server.close(force: true);
+      });
+    } catch (e) {
+      logger.write('Failed to start DevTools server on port $devToolsPort: $e', tag: Tag.cli, level: Level.warning);
+    }
+  }
+
+  /// Walks up from [startDir] looking for a workspace root that contains
+  /// `packages/jaspr_devtools/web`.
+  List<Directory> _findDevToolsWebDir(String startDir) {
+    final results = <Directory>[];
+    var dir = startDir;
+    for (var i = 0; i < 10; i++) {
+      final parent = p.dirname(dir);
+      if (parent == dir) break;
+      dir = parent;
+      final candidate = Directory(p.join(dir, 'packages', 'jaspr_devtools', 'web'));
+      if (candidate.existsSync()) results.add(candidate);
+    }
+    return results;
   }
 
   Future<ClientWorkflow?> _runClient(String webPort) async {

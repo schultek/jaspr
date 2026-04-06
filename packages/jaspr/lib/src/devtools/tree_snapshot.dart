@@ -88,6 +88,54 @@ class InspectorNode {
   ///
   /// `true` = SSR (hydrated), `false` = CSR (client-created), `null` = unknown.
   final bool? wasHydrated;
+
+  /// Serializes this node and its children to a JSON-compatible map.
+  Map<String, Object?> toJson() => {
+        'id': id,
+        'componentType': componentType,
+        'displayLabel': displayLabel,
+        'depth': depth,
+        'isStateful': isStateful,
+        'domTag': domTag,
+        'textContent': textContent,
+        'hasRenderObject': hasRenderObject,
+        'children': children.map((c) => c.toJson()).toList(),
+        'sourceLocation': sourceLocation,
+        'domId': domId,
+        'domClasses': domClasses,
+        'domAttributes': domAttributes,
+        'stateType': stateType,
+        'eventCount': eventCount,
+        'builtBy': builtBy,
+        'stateFields': stateFields,
+        'wasHydrated': wasHydrated,
+      };
+
+  /// Deserializes an [InspectorNode] from a JSON map produced by [toJson].
+  factory InspectorNode.fromJson(Map<String, Object?> json) {
+    return InspectorNode(
+      id: json['id'] as int,
+      componentType: json['componentType'] as String,
+      displayLabel: json['displayLabel'] as String,
+      depth: json['depth'] as int,
+      isStateful: json['isStateful'] as bool,
+      domTag: json['domTag'] as String?,
+      textContent: json['textContent'] as String?,
+      hasRenderObject: json['hasRenderObject'] as bool,
+      children: (json['children'] as List<dynamic>)
+          .map((c) => InspectorNode.fromJson((c as Map).cast<String, Object?>()))
+          .toList(),
+      sourceLocation: json['sourceLocation'] as String?,
+      domId: json['domId'] as String?,
+      domClasses: json['domClasses'] as String?,
+      domAttributes: (json['domAttributes'] as Map?)?.cast<String, String>(),
+      stateType: json['stateType'] as String?,
+      eventCount: json['eventCount'] as int? ?? 0,
+      builtBy: json['builtBy'] as String?,
+      stateFields: (json['stateFields'] as Map?)?.cast<String, String>(),
+      wasHydrated: json['wasHydrated'] as bool?,
+    );
+  }
 }
 
 /// Walks the element tree starting from [root] and returns a tree of

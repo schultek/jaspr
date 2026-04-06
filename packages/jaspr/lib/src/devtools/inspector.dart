@@ -5,21 +5,22 @@ import 'package:universal_web/web.dart' as web;
 import '../dom/type_checks.dart';
 import '../foundation/binding.dart';
 import '../foundation/constants.dart';
-import '../framework/framework.dart';
+import 'devtools_service.dart';
+import 'embedded_toolbar.dart';
 import 'inspector_highlight.dart';
-import 'inspector_panel.dart';
-import 'source_resolver.dart';
-import 'tree_snapshot.dart';
 
 /// Singleton instance to make [initInspector] idempotent.
 _JasprInspector? _instance;
 
-/// Initializes the Jaspr component tree inspector.
+/// Initializes the Jaspr DevTools integration.
 ///
-/// When running in debug mode ([kDebugMode] is `true`), this creates an
-/// interactive overlay panel that visualizes the live component tree.
-/// The panel can be toggled with **Ctrl+Shift+D** and automatically refreshes
-/// after every build cycle while visible.
+/// In debug mode ([kDebugMode] is `true`), this creates:
+/// 1. A [DevToolsService] that exposes the component tree over WebSocket to the
+///    standalone DevTools app.
+/// 2. An [EmbeddedToolbar] — a minimal floating toolbar for pick mode and quick
+///    access to the DevTools app.
+///
+/// The toolbar can be toggled with **Ctrl+Shift+D**.
 ///
 /// This is a no-op in release builds — the entire inspector is tree-shaken
 /// because it is gated behind [kDebugMode].
@@ -35,79 +36,59 @@ class _JasprInspector {
     _highlightEl = createHighlightElement();
     _highlight = InspectorHighlight(_highlightEl);
 
-    // Initialize source resolver — synchronously builds class→file map from DDC.
-    _sourceResolver = SourceResolver();
-    // Kick off async line number resolution in the background.
-    _sourceResolver.fetchLineNumbers();
+    _service = DevToolsService(_binding);
+    _service.onHighlightRequested = _onHighlightRequested;
+    _service.onSelectRequested = _onSelectRequested;
 
-    _panel = InspectorPanel(
-      onNodeSelected: _onNodeSelected,
-      onRefresh: _refreshTree,
-      onPickModeChanged: _onPickModeChanged,
-      onVisibilityChanged: () => _schedulePostFrameRefresh(),
-      onInspectInDevTools: _onInspectInDevTools,
+    _toolbar = EmbeddedToolbar(
+      onPickModeToggled: _onPickModeChanged,
+      devToolsUrl: _devToolsAppUrl,
     );
 
-    // Append to document body, guarding against a missing <body>.
+    // Append to document body.
     final body = web.document.body;
     if (body == null) return;
-    final root = _panel.rootElement;
-    root.append(_highlightEl);
-    body.append(root);
+    body.append(_highlightEl);
+    body.append(_toolbar.rootElement);
 
     // Keyboard shortcut: Ctrl+Shift+D
     _keydownHandler = ((web.KeyboardEvent e) {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key == 'D') {
         e.preventDefault();
-        _panel.toggle();
+        _toolbar.toggle();
       }
     }).toJS;
     web.window.addEventListener('keydown', _keydownHandler);
 
-    // Register for auto-refresh after each build cycle.
-    _schedulePostFrameRefresh();
+    // Connect to DevTools relay and start post-frame refresh.
+    _service.connect();
+    _service.schedulePostFrameRefresh();
   }
 
   final AppBinding _binding;
-  late final InspectorPanel _panel;
+  late final DevToolsService _service;
+  late final EmbeddedToolbar _toolbar;
   late final InspectorHighlight _highlight;
   late final web.HTMLDivElement _highlightEl;
   late final JSFunction _keydownHandler;
-  late final SourceResolver _sourceResolver;
-
-  final Map<int, Element> _registry = {};
-
-  /// Cached class → source location map, rebuilt when line numbers become available.
-  Map<String, String>? _classLocationsCache;
-  bool _classLocationsCacheWithLines = false;
-
-  /// Returns a class name → source location map for tree snapshots.
-  Map<String, String>? get _classLocations {
-    final hasLines = _sourceResolver.hasLineNumbers;
-    if (_classLocationsCache == null || (hasLines && !_classLocationsCacheWithLines)) {
-      _classLocationsCache = _sourceResolver.buildClassLocations();
-      _classLocationsCacheWithLines = hasLines;
-    }
-    return _classLocationsCache;
-  }
-
-  // Post-frame scheduling guard.
-  bool _postFrameScheduled = false;
 
   // Pick mode state.
   bool _pickModeActive = false;
-  Map<web.Node, int> _domNodeMap = {};
   JSFunction? _pickMouseoverHandler;
   JSFunction? _pickClickHandler;
   JSFunction? _pickKeydownHandler;
 
-  /// Whether the given DOM node is inside the inspector panel.
-  bool _isInsidePanel(web.Node? target) {
-    return target != null && _panel.rootElement.contains(target);
+  /// The standalone DevTools app URL — derived from the current page origin.
+  /// In the future this will be served by the CLI on a configurable port.
+  String? get _devToolsAppUrl => null; // TODO: Inject from CLI (Phase 4)
+
+  /// Whether the given DOM node is inside the toolbar.
+  bool _isInsideToolbar(web.Node? target) {
+    return target != null && _toolbar.rootElement.contains(target);
   }
 
-  void _onNodeSelected(int nodeId) {
-    final element = _registry[nodeId];
+  void _onHighlightRequested(int nodeId) {
+    final element = _service.registry[nodeId];
     if (element != null) {
       final domNode = findDomNodeForElement(element);
       _highlight.highlight(domNode);
@@ -116,49 +97,9 @@ class _JasprInspector {
     }
   }
 
-  void _onInspectInDevTools(int nodeId) {
-    final element = _registry[nodeId];
-    if (element != null) {
-      final domNode = findDomNodeForElement(element);
-      inspectInBrowserDevTools(domNode);
-    }
-  }
-
-  void _refreshTree() {
-    final root = _binding.rootElement;
-    if (root == null) return;
-
-    _registry.clear();
-    final tree = snapshotTree(root, _registry, classLocations: _classLocations);
-    _panel.renderTree(tree);
-
-    // Rebuild DOM-to-node-ID map for pick mode.
-    _domNodeMap = _buildDomNodeMap();
-  }
-
-  Map<web.Node, int> _buildDomNodeMap() {
-    final map = <web.Node, int>{};
-    for (final entry in _registry.entries) {
-      final domNode = findDomNodeForElement(entry.value);
-      if (domNode != null) map[domNode] = entry.key;
-    }
-    return map;
-  }
-
-  /// Walks up from [target] through parentElement until finding a node in the
-  /// DOM-to-nodeId map.
-  int? _hitTestDomNode(web.Node? target) {
-    var current = target;
-    while (current != null) {
-      final nodeId = _domNodeMap[current];
-      if (nodeId != null) return nodeId;
-      if (current.isElement) {
-        current = (current as web.Element).parentElement;
-      } else {
-        current = current.parentNode;
-      }
-    }
-    return null;
+  void _onSelectRequested(int nodeId) {
+    // Highlight the element on the page when selected from the DevTools app.
+    _onHighlightRequested(nodeId);
   }
 
   void _onPickModeChanged(bool active) {
@@ -175,21 +116,16 @@ class _JasprInspector {
   void _startPickMode() {
     _highlight.setPickMode(true);
 
-    // Ensure we have a fresh DOM node map.
-    if (_domNodeMap.isEmpty) {
-      _domNodeMap = _buildDomNodeMap();
-    }
-
     final body = web.document.body;
     if (body == null) return;
 
     body.style.cursor = 'crosshair';
 
     _pickMouseoverHandler = ((web.MouseEvent e) {
-      if (_isInsidePanel(e.target as web.Node?)) return;
+      if (_isInsideToolbar(e.target as web.Node?)) return;
       final nodeId = _hitTestDomNode(e.target as web.Node?);
       if (nodeId != null) {
-        final element = _registry[nodeId];
+        final element = _service.registry[nodeId];
         if (element != null) {
           final domNode = findDomNodeForElement(element);
           _highlight.highlight(domNode);
@@ -200,22 +136,23 @@ class _JasprInspector {
     }).toJS;
 
     _pickClickHandler = ((web.MouseEvent e) {
-      if (_isInsidePanel(e.target as web.Node?)) return;
+      if (_isInsideToolbar(e.target as web.Node?)) return;
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
       final nodeId = _hitTestDomNode(e.target as web.Node?);
       if (nodeId != null) {
-        _panel.selectAndReveal(nodeId);
-        _onNodeSelected(nodeId);
+        // Notify the DevTools app about the picked element.
+        _service.notifyElementPicked(nodeId);
+        _onHighlightRequested(nodeId);
       }
-      _panel.setPickMode(false);
+      _toolbar.resetPickMode();
       _onPickModeChanged(false);
     }).toJS;
 
     _pickKeydownHandler = ((web.KeyboardEvent e) {
       if (e.key == 'Escape') {
-        _panel.setPickMode(false);
+        _toolbar.resetPickMode();
         _onPickModeChanged(false);
       }
     }).toJS;
@@ -247,15 +184,19 @@ class _JasprInspector {
     _pickKeydownHandler = null;
   }
 
-  void _schedulePostFrameRefresh() {
-    if (_postFrameScheduled) return;
-    _postFrameScheduled = true;
-    _binding.addPostFrameCallback(() {
-      _postFrameScheduled = false;
-      if (_panel.isVisible) {
-        _refreshTree();
-        _schedulePostFrameRefresh();
+  /// Walks up from [target] through parentElement until finding a node in the
+  /// DOM-to-nodeId map.
+  int? _hitTestDomNode(web.Node? target) {
+    var current = target;
+    while (current != null) {
+      final nodeId = _service.domNodeMap[current];
+      if (nodeId != null) return nodeId;
+      if (current.isElement) {
+        current = (current as web.Element).parentElement;
+      } else {
+        current = current.parentNode;
       }
-    });
+    }
+    return null;
   }
 }

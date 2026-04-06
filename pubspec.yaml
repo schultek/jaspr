@@ -9,6 +9,7 @@ workspace:
   - packages/jaspr
   - packages/jaspr_builder
   - packages/jaspr_cli
+  - packages/jaspr_devtools
   - packages/jaspr_content
   - packages/jaspr_flutter_embed
   - packages/jaspr_lints

@@ -269,6 +269,114 @@ void main() {
       expect(node!.sourceLocation, equals('package:test_app/test.dart:42'));
     });
   });
+
+  group('InspectorNode JSON serialization', () {
+    test('roundtrip preserves all fields', () {
+      final node = InspectorNode(
+        id: 42,
+        componentType: 'MyWidget',
+        displayLabel: 'MyWidget [Stateful]',
+        depth: 3,
+        isStateful: true,
+        domTag: null,
+        textContent: null,
+        hasRenderObject: false,
+        children: [
+          InspectorNode(
+            id: 99,
+            componentType: 'DomComponent',
+            displayLabel: '<div>',
+            depth: 4,
+            isStateful: false,
+            domTag: 'div',
+            textContent: null,
+            hasRenderObject: true,
+            children: [],
+            domId: 'main',
+            domClasses: 'app container',
+            domAttributes: {'data-foo': 'bar'},
+            eventCount: 2,
+            wasHydrated: true,
+          ),
+        ],
+        sourceLocation: 'package:test/app.dart',
+        stateType: '_MyWidgetState',
+        builtBy: 'ParentWidget',
+        stateFields: {'counter': '42', 'label': 'test'},
+        wasHydrated: false,
+      );
+
+      final json = node.toJson();
+      final restored = InspectorNode.fromJson(json);
+
+      expect(restored.id, equals(42));
+      expect(restored.componentType, equals('MyWidget'));
+      expect(restored.displayLabel, equals('MyWidget [Stateful]'));
+      expect(restored.depth, equals(3));
+      expect(restored.isStateful, isTrue);
+      expect(restored.domTag, isNull);
+      expect(restored.textContent, isNull);
+      expect(restored.hasRenderObject, isFalse);
+      expect(restored.sourceLocation, equals('package:test/app.dart'));
+      expect(restored.stateType, equals('_MyWidgetState'));
+      expect(restored.builtBy, equals('ParentWidget'));
+      expect(restored.stateFields, equals({'counter': '42', 'label': 'test'}));
+      expect(restored.wasHydrated, isFalse);
+
+      // Verify child
+      expect(restored.children, hasLength(1));
+      final child = restored.children.first;
+      expect(child.id, equals(99));
+      expect(child.domTag, equals('div'));
+      expect(child.domId, equals('main'));
+      expect(child.domClasses, equals('app container'));
+      expect(child.domAttributes, equals({'data-foo': 'bar'}));
+      expect(child.eventCount, equals(2));
+      expect(child.wasHydrated, isTrue);
+      expect(child.hasRenderObject, isTrue);
+    });
+
+    test('roundtrip preserves null optional fields', () {
+      final node = InspectorNode(
+        id: 1,
+        componentType: 'Simple',
+        displayLabel: 'Simple',
+        depth: 0,
+        isStateful: false,
+        domTag: null,
+        textContent: null,
+        hasRenderObject: false,
+        children: [],
+      );
+
+      final restored = InspectorNode.fromJson(node.toJson());
+
+      expect(restored.sourceLocation, isNull);
+      expect(restored.domId, isNull);
+      expect(restored.domClasses, isNull);
+      expect(restored.domAttributes, isNull);
+      expect(restored.stateType, isNull);
+      expect(restored.builtBy, isNull);
+      expect(restored.stateFields, isNull);
+      expect(restored.wasHydrated, isNull);
+      expect(restored.eventCount, equals(0));
+    });
+
+    testComponents('roundtrip from live tree preserves structure', (tester) async {
+      tester.pumpComponent(div([span([]), Component.text('hello')]));
+
+      final root = tester.binding.rootElement!;
+      final registry = <int, Element>{};
+      final tree = snapshotTree(root, registry);
+
+      final json = tree.toJson();
+      final restored = InspectorNode.fromJson(json);
+
+      expect(restored.id, equals(tree.id));
+      expect(restored.componentType, equals(tree.componentType));
+      expect(restored.children.length, equals(tree.children.length));
+    });
+  });
 }
 
 /// A minimal stateful component for testing.

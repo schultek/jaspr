@@ -12,6 +12,12 @@ import '../commands/base_command.dart';
 import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
+  /// Active WebSocket connections from the DevTools UI.
+  final List<WebSocket> _devToolsClients = [];
+
+  /// The single WebSocket connection from the running app.
+  WebSocket? _appSocket;
+
   Future<HttpServer> startProxy(
     String port, {
     required String webPort,
@@ -54,11 +60,13 @@ mixin ProxyHelper on BaseCommand {
           var basePath = req.headers['jaspr_base_path'] ?? '/';
           if (!basePath.endsWith('/')) basePath += '/';
           if (!basePath.startsWith('/')) basePath = '/$basePath';
-          final body = await res.readAsString();
+          var body = await res.readAsString();
           // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<webPort>/$dwdsSseHandler";'
-          return res.change(
-            body: body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort$basePath'),
-          );
+          body = body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort$basePath');
+          // Inject the DevTools WebSocket URL for the client app to connect to.
+          final wsUrl = 'ws://localhost:$port/\$jasprDevTools?role=app';
+          body = 'window.\$jasprDevToolsUrl = "$wsUrl";\n$body';
+          return res.change(body: body);
         }
 
         // Temporary fix for Safari until build_web_compilers is fixed.
@@ -102,7 +110,20 @@ mixin ProxyHelper on BaseCommand {
       }
     });
 
-    final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
+    // Bind the server manually so we can intercept WebSocket upgrades before
+    // shelf processes the request.
+    final handler = cascade.handler;
+    final server = await HttpServer.bind(InternetAddress.anyIPv4, int.parse(port));
+
+    server.listen((HttpRequest request) {
+      // Intercept DevTools WebSocket upgrade requests at the raw HTTP level.
+      if (request.uri.path == r'/$jasprDevTools' && WebSocketTransformer.isUpgradeRequest(request)) {
+        _handleDevToolsWebSocket(request);
+        return;
+      }
+      // Everything else goes through shelf.
+      shelf_io.handleRequest(request, handler);
+    });
 
     guardResource(() async {
       client.close();
@@ -110,6 +131,47 @@ mixin ProxyHelper on BaseCommand {
     });
 
     return server;
+  }
+
+  /// Upgrades an HTTP request to a WebSocket and registers it in the relay.
+  Future<void> _handleDevToolsWebSocket(HttpRequest request) async {
+    try {
+      final socket = await WebSocketTransformer.upgrade(request);
+      final role = request.uri.queryParameters['role'] ?? 'devtools';
+      _registerDevToolsSocket(socket, role);
+    } catch (e) {
+      logger.write('Failed to upgrade DevTools WebSocket: $e', tag: Tag.cli, level: Level.warning);
+    }
+  }
+
+  /// Registers a WebSocket as either the app side or a DevTools client,
+  /// and relays messages between them.
+  void _registerDevToolsSocket(WebSocket socket, String role) {
+    if (role == 'app') {
+      _appSocket = socket;
+      socket.listen(
+        (data) {
+          // Relay app messages to all DevTools clients.
+          for (final client in _devToolsClients) {
+            client.add(data);
+          }
+        },
+        onDone: () {
+          _appSocket = null;
+        },
+      );
+    } else {
+      _devToolsClients.add(socket);
+      socket.listen(
+        (data) {
+          // Relay DevTools messages to the app.
+          _appSocket?.add(data);
+        },
+        onDone: () {
+          _devToolsClients.remove(socket);
+        },
+      );
+    }
   }
 }
 
