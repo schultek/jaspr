@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed running templating multiple times for the same page when reloading or using secondary outputs.
+
 ## 0.5.1
 
 - Fixed eager page loading exhausting file descriptors on macOS
