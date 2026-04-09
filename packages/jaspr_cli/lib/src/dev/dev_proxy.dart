@@ -81,7 +81,6 @@ class DevProxy {
       );
 
       final loadStrategy = BuildRunnerRequireStrategyProvider(
-        assetHandler,
         reload,
         assetReader,
         buildSettings,
