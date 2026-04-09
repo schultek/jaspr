@@ -60,6 +60,13 @@ class ConvertHtmlCommand extends BaseCommand {
         logger.write('Either --html, --file or --url must be provided.', level: Level.error);
         return 1;
       }
+    } else {
+      try {
+        html = jsonDecode(html) as String;
+      } catch (e) {
+        logger.write('Error decoding HTML as JSON: $e', level: Level.error);
+        return 1;
+      }
     }
 
     final result = convertHtml(html, query);
