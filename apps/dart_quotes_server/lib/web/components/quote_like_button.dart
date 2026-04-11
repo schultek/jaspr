@@ -83,7 +83,6 @@ class QuoteLikeButtonState extends State<QuoteLikeButton> {
         if (!sessionManager.isSignedIn) {
           var user = await signInWithGoogle(
             client.modules.auth,
-            debug: true,
             serverClientId: "115506349548-85ujf55vmejrg7idb3vfmbm7ee5lg5uk.apps.googleusercontent.com",
             redirectUri: Uri.parse('http://localhost:8082/googlesignin'),
           );

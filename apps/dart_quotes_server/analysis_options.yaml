@@ -3,3 +3,8 @@ include: package:jaspr_repo/app.yaml
 analyzer:
   errors:
     directives_ordering: ignore
+    deprecated_member_use: ignore
+
+  exclude:
+    - "**/**.imports.dart"
+    - "**/generated/**"

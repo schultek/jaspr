@@ -1,3 +1,13 @@
+## 0.7.0
+
+> **Breaking Changes**: Requires Serverpod 3.0+. For Serverpod 2.x, use jaspr_serverpod 0.6.x.
+
+- Support Serverpod 3.x (tested with 3.0.0 - 3.4.6)
+- Migrate to Relic web server integration
+- **Migration:** Update `JasprRoute.build` to accept `Request` from `package:serverpod/serverpod.dart`
+  (you will need to `hide Request` from the `package:jaspr/server.dart` import)
+  and change route path to `/**` (was `/*`)
+
 ## 0.6.0
 
 - `jaspr` upgraded to `0.22.0`

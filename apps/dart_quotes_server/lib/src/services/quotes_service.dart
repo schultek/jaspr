@@ -14,9 +14,12 @@ class QuotesService {
   }
 
   static Future<Quote?> toggleLikeOnQuote(Session session, int id, bool liked) async {
-    var userInfo = await session.authenticated;
+    final userInfo = session.authenticated;
     if (userInfo == null) return null;
-    var userId = userInfo.userId;
+    // Serverpod 3.0 changed userId to userIdentifier (String).
+    // Parse to int for compatibility with existing likes data model.
+    final userId = int.tryParse(userInfo.userIdentifier);
+    if (userId == null) return null;
 
     var quote = await getQuoteById(session, id);
     if (quote == null) return null;

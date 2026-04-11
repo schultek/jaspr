@@ -3,7 +3,7 @@ publish_to: none
 repository: https://github.com/schultek/jaspr
 
 environment:
-  sdk: '>=3.8.0 <4.0.0'
+  sdk: '>=3.10.0 <4.0.0'
 
 workspace:
   - packages/jaspr
@@ -20,6 +20,7 @@ workspace:
   - apps/dart_quotes
   - apps/dart_quotes_server
   - apps/fluttercon
+  - apps/jaspr_pad
   - apps/website
   - examples/backend_dart_frog
   - examples/backend_serverpod/example_server
@@ -31,6 +32,13 @@ workspace:
 
 dev_dependencies:
   melos: ^7.1.0
+
+# Override to resolve vm_service conflict between relic (serverpod 3.0) and dds (webdev)
+# relic requires vm_service ^15.0.0, dds <5.0.0 requires vm_service ^14.0.0
+# dds 5.1.0 supports vm_service >=14.3.0 <16.0.0, so we override to make them compatible
+dependency_overrides:
+  dds: ^5.1.0
+  vm_service: ^15.0.0
 
 melos:
   command:

@@ -3,6 +3,25 @@
 > This setup guide assumes you have an existing Serverpod project.
 > It will integrate Jaspr in this project for rendering your website.
 
+## Version Compatibility
+
+| jaspr_serverpod | Serverpod |
+|-----------------|-----------|
+| ^0.7.0          | >=3.0.0 <4.0.0 |
+| ^0.6.0          | >=2.3.0 <3.0.0 |
+
+> **Note:** Serverpod 3.0 introduced breaking changes with its new Relic web server.
+> If you're using Serverpod 2.x, use `jaspr_serverpod: ^0.6.0`.
+
+### Tested Versions
+
+jaspr_serverpod 0.7.x has been tested with:
+- Serverpod 3.0.0
+- Serverpod 3.4.6
+
+> **Note:** jaspr_serverpod uses stable Serverpod APIs. If you encounter issues
+> with newer 3.x versions, please [open an issue](https://github.com/schultek/jaspr/issues).
+
 ## Installing
 
 Inside your Serverpod `..._server` package perform the following setup steps:
@@ -60,7 +79,7 @@ void main(List<String> args) async {
   // add them here.
   
   // Point all paths to the root route.
-  pod.webServer.addRoute(RootRoute(), '/*');
+  pod.webServer.addRoute(RootRoute(), '/**');
   
   // Remove all other routes like 
   // - `pod.webServer.addRoute(RootRoute(), '...')` 
@@ -76,8 +95,6 @@ void main(List<String> args) async {
 Then change your root route inside `lib/src/web/routes/root.dart` to this:
 
 ```dart
-import 'dart:io';
-
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_serverpod/jaspr_serverpod.dart';
@@ -87,17 +104,21 @@ import '/components/home.dart';
 
 class RootRoute extends JasprRoute {
   @override
-  Future<Component> build(Session session, HttpRequest request) async {
+  Future<Component> build(Session session, Request request) async {
     return Document(
-      title: "Built with Serverpod & Jaspr",
+      title: 'Built with Serverpod & Jaspr',
       head: [
-        link(rel: "stylesheet", href: "/css/style.css"),
+        link(rel: 'stylesheet', href: '/css/style.css'),
       ],
       body: Home(),
     );
   }
 }
 ```
+
+> **Note:** In Serverpod 3.0+, the `Request` type is from the Relic web server framework,
+> not `dart:io`'s `HttpRequest`. Access headers with `request.headers['name']` instead of
+> `request.headers.value('name')`.
 
 ## Component Setup
 

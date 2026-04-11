@@ -1,10 +1,10 @@
-FROM dart:3.2.5 AS build
+FROM dart:3.10.3 AS build
 
 WORKDIR /app
 COPY . .
 
 RUN dart pub get
-RUN dart compile exe bin/main.dart -o bin/server
+RUN dart compile exe lib/main.server.dart -o bin/server
 
 FROM alpine:latest
 
