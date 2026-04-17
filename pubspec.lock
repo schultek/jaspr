@@ -516,10 +516,10 @@ packages:
     dependency: transitive
     description:
       name: dwds
-      sha256: "7d12e14b8b2929c3d4e09494a33d900f5354da25d0119330d40a81a479d5833a"
+      sha256: "10d22555cbb59c3e0e968da646ff7f0103e4f56698bbc37e45145de34e4bad36"
       url: "https://pub.dev"
     source: hosted
-    version: "27.0.1"
+    version: "27.0.3"
   ed25519_edwards:
     dependency: transitive
     description:
