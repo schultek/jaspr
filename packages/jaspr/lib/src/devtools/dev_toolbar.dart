@@ -91,7 +91,7 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
             e.visitChildElements((e) {
               boundaryElements.add(
                 HighlightedElement(
-                  e,
+                  ElementHighlightTargetDelegate(e),
                   HighlightStyle.boundary,
                   showLabel: showDetails,
                   showProperties: showDetails,
@@ -114,7 +114,13 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
     final element = DevToolsService.instance.selectedElement.value;
     setState(() {
       selectedElement = element != null
-          ? HighlightedElement(element, HighlightStyle.client, showProperties: showPropertyTooltips)
+          ? HighlightedElement(
+              element is Element
+                  ? ElementHighlightTargetDelegate(element)
+                  : ServerElementHighlightTargetDelegate(element as ServerElement),
+              element is Element ? HighlightStyle.client : HighlightStyle.server,
+              showProperties: showPropertyTooltips,
+            )
           : null;
     });
   }
@@ -128,8 +134,12 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
 
     setState(() {
       isInspecting = false;
+      boundaryElements.clear();
     });
-    DevToolsService.instance.selectElement(targetElement);
+
+    if (targetElement case ElementHighlightTargetDelegate(:final element)) {
+      DevToolsService.instance.selectElement(element);
+    }
   }
 
   void _handleMoveEvent(web.Event event) {
@@ -140,10 +150,14 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
     final targetElement = _getHoveredElement(e);
 
     if (targetElement == null) return;
-    if (selectedElement?.element == targetElement) return;
+    if (selectedElement?.target == targetElement) return;
 
     setState(() {
-      selectedElement = HighlightedElement(targetElement, HighlightStyle.client, showProperties: showPropertyTooltips);
+      selectedElement = HighlightedElement(
+        targetElement,
+        targetElement is ServerElementHighlightTargetDelegate ? HighlightStyle.server : HighlightStyle.client,
+        showProperties: showPropertyTooltips,
+      );
     });
   }
 
@@ -156,19 +170,79 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
     });
   }
 
-  Element? _getHoveredElement(web.MouseEvent event) {
-    final targetNodes = web.document.elementsFromPoint(event.clientX, event.clientY).toDart;
-    final targetNode = targetNodes.where((n) => n != glassKey.currentNode).firstOrNull;
+  HighlightTargetDelegate? _getHoveredElement(web.MouseEvent event) {
+    final targetNodes = web.document.elementsFromPoint(event.clientX, event.clientY);
 
-    if (targetNode == null) {
-      return null;
+    final glassIndex = targetNodes.toDart.indexWhere((node) => node == glassKey.currentNode);
+    ({web.Node node, web.DOMRect rect})? target;
+
+    // First select the element that is:
+    //   - not a child of the glass element.
+    //   - the top-most element.
+    //   - the outermose element in case of multiple elements at the same position.
+    for (var i = glassIndex + 1; i < targetNodes.length; i++) {
+      final node = targetNodes[i];
+      final rect = node.getBoundingClientRect();
+
+      if (target == null) {
+        target = (node: node, rect: rect);
+        continue;
+      }
+
+      final position = target.node.compareDocumentPosition(node);
+      final isSameRect =
+          rect.top == target.rect.top &&
+          rect.left == target.rect.left &&
+          rect.width == target.rect.width &&
+          rect.height == target.rect.height;
+
+      if (position == web.Node.DOCUMENT_POSITION_CONTAINED_BY && !isSameRect) {
+        target = (node: node, rect: rect);
+      } else if (position == web.Node.DOCUMENT_POSITION_CONTAINS && isSameRect) {
+        target = (node: node, rect: rect);
+      }
     }
-    Element? element;
-    web.Node? current = targetNode;
+
+    if (target == null) return null;
+
+    HighlightTargetDelegate? targetDelegate;
+
+    // Find the closest existing target delegate.
+    web.Node? current = target.node;
     while (current != null) {
-      element = DevToolsService.instance.domRegistry[current];
-      if (element != null) return element;
+      final element = DevToolsService.instance.domRegistry[current];
+      if (element != null) {
+        targetDelegate = ElementHighlightTargetDelegate(element);
+        break;
+      }
+
+      final node = DevToolsService.instance.serverNodeRegistry[current];
+      if (node != null) {
+        targetDelegate = ServerElementHighlightTargetDelegate(node);
+        break;
+      }
+
       current = current.parentNode;
+    }
+
+    if (targetDelegate != null) {
+      // Walk up the tree to find the outer-most target delegate without considering render targets.
+      // This will prefer a parent StatelessComponent over it's child DomComponent.
+      final visited = [targetDelegate];
+      var current = targetDelegate;
+      var parent = current.parent;
+      while (parent != null) {
+        if (parent.isRenderTarget) {
+          break;
+        }
+        current = parent;
+        parent = current.parent;
+        if (current.isHighlightTarget) {
+          visited.add(current);
+        }
+      }
+
+      return visited.last;
     }
 
     return null;
@@ -323,14 +397,14 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
                 [InspectIcon()],
               ),
               button(
-                attributes: {'title': 'Inspect Layout'},
+                attributes: {'title': 'Scan @client Components'},
                 classes: isInspectingLayout ? 'active' : null,
                 events: {
                   'click': (e) {
                     toggleInspectLayoutMode();
                   },
                 },
-                [InspectLayoutIcon()],
+                [ScanClientComponentsIcon()],
               ),
               button(
                 attributes: {'title': 'Open DevTools'},

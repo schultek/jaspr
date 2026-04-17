@@ -1,20 +1,23 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
+import '../../foundation/diagnostics.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 import 'document_structure_helper.dart';
 
 class DebugInfoAdapter extends RenderAdapter {
   DebugInfoAdapter() {
-    uniqueId = _createId();
+    renderId = _createId();
   }
 
-  late String uniqueId;
+  late String renderId;
+  DiagnosticsNode? tree;
 
   @override
   FutureOr<void> prepare() {
-    uniqueId = _createId();
+    renderId = _createId();
   }
 
   @override
@@ -23,8 +26,11 @@ class DebugInfoAdapter extends RenderAdapter {
 
     head.children.insertAfter(
       head.createChildRenderElement('meta')..update(null, null, null, {
-        'name': 'jaspr-devtools-id',
-        'content': uniqueId,
+        'name': 'jaspr-debug-data',
+        'content': jsonEncode({
+          'renderId': renderId,
+          'serverTree': tree?.toJsonMap(),
+        }),
       }, null),
     );
   }

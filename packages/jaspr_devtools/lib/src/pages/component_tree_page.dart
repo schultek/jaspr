@@ -56,7 +56,29 @@ class ComponentTreePageState extends State<ComponentTreePage> {
       selectedUrl = urls.isNotEmpty ? urls.first : null;
     }
 
+    if (selectedUrl != null && treeService.selectedElementId != null) {
+      final root = treeService.getTree(selectedUrl!, mode: mode);
+      final node = _findNodeById(root, treeService.selectedElementId!);
+      if (node != null) {
+        selectedNode = node;
+      }
+    }
+
     setState(() {});
+  }
+
+  DiagnosticsNode? _findNodeById(DiagnosticsNode? root, String id) {
+    if (root == null) return null;
+    if (root.properties?.any((p) => p.name == 'id' && p.value?.toString() == id) ?? false) {
+      return root;
+    }
+    if (root.children != null) {
+      for (final child in root.children!) {
+        final found = _findNodeById(child, id);
+        if (found != null) return found;
+      }
+    }
+    return null;
   }
 
   @override
@@ -105,7 +127,13 @@ class ComponentTreePageState extends State<ComponentTreePage> {
               key: ValueKey(mode),
               root: root,
               selected: selectedNode,
-              onSelected: (node) => setState(() => selectedNode = node),
+              onSelected: (node) {
+                final id = node.properties?.where((p) => p.name == 'id').firstOrNull?.value?.toString();
+                if (id != null) {
+                  treeService.service.setSelection(id);
+                }
+                setState(() => selectedNode = node);
+              },
             ),
           ]),
         ]),

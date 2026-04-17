@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:js_interop';
 
 import 'package:jaspr/jaspr.dart';
 import 'package:vm_service/vm_service.dart';
-import 'package:web/web.dart' as web;
 
 import '../models/tree_state.dart';
 import 'dev_tools_service.dart';
@@ -20,6 +18,8 @@ class ComponentTreeService with ChangeNotifier {
 
   final Map<String, TreeState> _trees = {};
 
+  String? selectedElementId;
+
   List<String> get allUrls => _trees.keys.toList();
 
   void removeTree(String url) {
@@ -29,7 +29,6 @@ class ComponentTreeService with ChangeNotifier {
 
   DiagnosticsNode? getTree(String url, {TreeMode mode = TreeMode.combined}) {
     final tree = _trees[url];
-    print('getTree $url $mode $tree');
     if (tree == null) return null;
     return switch (mode) {
       TreeMode.client => tree.clientTree?.tree,
@@ -68,28 +67,26 @@ class ComponentTreeService with ChangeNotifier {
       return serverTree?.tree ?? DiagnosticsNode(name: 'root');
     }
 
-    DiagnosticsNode makeCombinedNode(DiagnosticsNode serverNode) {
+    List<DiagnosticsNode> makeCombinedNode(DiagnosticsNode serverNode) {
       if (serverNode.properties?.get('kind')?.value == 'client-component') {
         final anchorName = serverNode.properties?.get('anchor-name')?.value.toString();
         if (clientAnchors[anchorName] case final clientNode?) {
-          return DiagnosticsNode(
-            name: 'ClientComponent',
-            properties: serverNode.properties,
-            children: [clientNode],
-          );
+          return clientNode.children ?? [];
         }
       }
       if (serverNode.children case final children?) {
-        return DiagnosticsNode(
-          name: serverNode.name,
-          properties: serverNode.properties,
-          children: children.map(makeCombinedNode).toList(),
-        );
+        return [
+          DiagnosticsNode(
+            name: serverNode.name,
+            properties: serverNode.properties,
+            children: children.expand(makeCombinedNode).toList(),
+          ),
+        ];
       }
-      return serverNode;
+      return [serverNode];
     }
 
-    return makeCombinedNode(serverTree?.tree ?? DiagnosticsNode(name: 'root'));
+    return makeCombinedNode(serverTree?.tree ?? DiagnosticsNode(name: 'root')).first;
   }
 
   void onServiceUpdated() {
@@ -113,19 +110,21 @@ class ComponentTreeService with ChangeNotifier {
                 tree.id = id;
                 tree.serverTree = null;
               }
+              final node = _tagTree(DiagnosticsNode.fromJsonMap(treeJson), 'client');
               tree.clientTree = ClientTree(
                 attachTarget: attachTarget ?? '',
-                tree: DiagnosticsNode.fromJsonMap(treeJson),
+                tree: node,
               );
               tree.timestamp = event.timestamp ?? 0;
             } else {
+              final node = _tagTree(DiagnosticsNode.fromJsonMap(treeJson), 'client');
               _trees[url] = TreeState(
                 url: url,
                 id: id,
                 timestamp: event.timestamp ?? 0,
                 clientTree: ClientTree(
                   attachTarget: attachTarget ?? '',
-                  tree: DiagnosticsNode.fromJsonMap(treeJson),
+                  tree: node,
                 ),
               );
             }
@@ -151,17 +150,19 @@ class ComponentTreeService with ChangeNotifier {
                 tree.id = id;
                 tree.clientTree = null;
               }
+              final node = _tagTree(DiagnosticsNode.fromJsonMap(treeJson), 'server');
               tree.serverTree = ServerTree(
-                tree: DiagnosticsNode.fromJsonMap(treeJson),
+                tree: node,
               );
               tree.timestamp = event.timestamp ?? 0;
             } else {
+              final node = _tagTree(DiagnosticsNode.fromJsonMap(treeJson), 'server');
               _trees[url] = TreeState(
                 url: url,
                 id: id,
                 timestamp: event.timestamp ?? 0,
                 serverTree: ServerTree(
-                  tree: DiagnosticsNode.fromJsonMap(treeJson),
+                  tree: node,
                 ),
               );
             }
@@ -171,6 +172,19 @@ class ComponentTreeService with ChangeNotifier {
         }
       });
     }
+  }
+
+  DiagnosticsNode _tagTree(DiagnosticsNode node, String environment) {
+    var props = node.properties?.toList() ?? <DiagnosticsProperty>[];
+    if (!props.any((p) => p.name == 'environment')) {
+      props.add(DiagnosticsProperty(name: 'environment', value: environment));
+    }
+
+    return DiagnosticsNode(
+      name: node.name,
+      properties: props,
+      children: node.children?.map((c) => _tagTree(c, environment)).toList(),
+    );
   }
 
   @override

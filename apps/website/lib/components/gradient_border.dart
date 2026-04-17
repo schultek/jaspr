@@ -57,6 +57,7 @@ class GradientBorder extends StatelessComponent {
       css('.gradient-border', [
         css('&').styles(
           position: .absolute(top: (-1).px, left: (-1).px, right: (-1).px, bottom: (-1).px),
+          pointerEvents: .none,
         ),
         css('svg').styles(overflow: .visible),
       ]),

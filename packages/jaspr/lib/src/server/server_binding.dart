@@ -88,21 +88,22 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       }
     }
 
+    if (kDebugMode) {
+      DevToolsService.instance.sendServerTree(
+        debugInfoAdapter!.renderId,
+        currentUrl,
+        rootElement,
+        _adaptersToDiagnosticableMap(_adapters),
+        (tree) => debugInfoAdapter!.tree = tree,
+      );
+    }
+
     for (final adapter in _adapters.reversed) {
       adapter.apply(root);
     }
 
     if (!standalone) {
       createDocumentStructure(root, true);
-    }
-
-    if (kDebugMode) {
-      DevToolsService.instance.sendServerTree(
-        debugInfoAdapter!.uniqueId,
-        currentUrl,
-        rootElement,
-        _adaptersToDiagnosticableMap(_adapters),
-      );
     }
 
     if (_responseBodyOverride case final override?) {

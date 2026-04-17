@@ -59,10 +59,7 @@ mixin RenderObjectElement on Element {
   void didMount() {
     _renderObject ??= createRenderObject();
     assert(() {
-      final node = _renderObject?.node;
-      if (node != null) {
-        DevToolsService.instance.domRegistry[node] = this;
-      }
+      DevToolsService.instance.registerRenderObject(this);
       return true;
     }());
     super.didMount();
