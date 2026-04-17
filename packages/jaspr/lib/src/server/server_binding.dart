@@ -66,12 +66,12 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     }
 
     final root = rootElement.renderObject as MarkupRenderObject;
-    final debugRenderId = kDebugMode ? DebugInfoAdapter.createId() : null;
+    final debugAdapter = kDebugMode ? DebugInfoAdapter() : null;
 
     final adapters = [
       ..._adapters.reversed,
       GlobalStylesAdapter(this),
-      if (debugRenderId != null) DebugInfoAdapter(debugRenderId),
+      ?debugAdapter,
       if (!standalone) DocumentAdapter(),
     ];
 
@@ -82,17 +82,18 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       }
     }
 
-    for (final adapter in adapters) {
-      adapter.apply(root);
-    }
-
-    if (kDebugMode) {
+    if (debugAdapter != null) {
       DevToolsService.instance.sendServerTree(
-        debugRenderId,
+        debugAdapter.renderId,
         currentUrl,
         rootElement,
         _adaptersToDiagnosticableMap(adapters),
+        (tree) => debugAdapter.tree = tree,
       );
+    }
+
+    for (final adapter in adapters) {
+      adapter.apply(root);
     }
 
     if (_responseBodyOverride case final override?) {

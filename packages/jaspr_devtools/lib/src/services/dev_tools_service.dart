@@ -108,6 +108,24 @@ class JasprDevToolsService with ChangeNotifier {
     _serverUri = null;
   }
 
+  Future<void> setSelection(String id) async {
+    final service = clientVmService;
+    if (service == null) return;
+
+    try {
+      final vm = await service.getVM();
+      final isolateId = vm.isolates?.first.id;
+
+      await service.callServiceExtension(
+        'ext.jaspr.inspector.setSelection',
+        isolateId: isolateId,
+        args: {'id': id},
+      );
+    } catch (e) {
+      print('Failed to set selection: $e');
+    }
+  }
+
   @override
   void dispose() {
     _disposeVmServices();

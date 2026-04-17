@@ -61,9 +61,4 @@ abstract class _HtmlComponent extends StatelessComponent {
 
 class _HtmlElement extends StatelessElement {
   _HtmlElement(_HtmlComponent super.component);
-
-  @override
-  void debugVisitChildren(void Function(Element) visitor) {
-    child?.debugVisitChildren(visitor);
-  }
 }

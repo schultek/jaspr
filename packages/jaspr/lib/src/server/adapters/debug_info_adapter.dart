@@ -1,15 +1,18 @@
+import 'dart:convert';
 import 'dart:math';
 
+import '../../foundation/diagnostics.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 import 'document_adapter.dart';
 
 class DebugInfoAdapter extends RenderAdapter with DocumentStructureMixin {
-  DebugInfoAdapter(this.uniqueId);
+  DebugInfoAdapter();
 
   static String createId() => Random().nextInt(0xffffffff).toRadixString(16);
 
-  final String uniqueId;
+  final String renderId = createId();
+  DiagnosticsNode? tree;
 
   @override
   void apply(MarkupRenderObject root) {
@@ -17,8 +20,11 @@ class DebugInfoAdapter extends RenderAdapter with DocumentStructureMixin {
 
     head.children.insertAfter(
       head.createChildRenderElement('meta')..update(null, null, null, {
-        'name': 'jaspr-devtools-id',
-        'content': uniqueId,
+        'name': 'jaspr-debug-data',
+        'content': jsonEncode({
+          'renderId': renderId,
+          'serverTree': tree?.toJsonMap(),
+        }),
       }, null),
     );
   }

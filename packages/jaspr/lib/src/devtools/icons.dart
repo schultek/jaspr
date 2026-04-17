@@ -27,8 +27,8 @@ class InspectIcon extends StatelessComponent {
   }
 }
 
-class InspectLayoutIcon extends StatelessComponent {
-  const InspectLayoutIcon({super.key});
+class ScanClientComponentsIcon extends StatelessComponent {
+  const ScanClientComponentsIcon({super.key});
 
   @override
   Component build(BuildContext context) {
@@ -44,13 +44,13 @@ class InspectLayoutIcon extends StatelessComponent {
         'stroke-linejoin': 'round',
       },
       [
-        path(
-          d:
-              'M 10 17 H 5 a 2 2 0 0 1 -2 -2 V 5 a 2 2 0 0 1 2 -2 h 10 a 2 2 0 0 1 2 2 v 5 '
-              'M 3 8 h 14 M 8 8 v 9 '
-              'M 12 12 a .32 .32 0 0 1 .42 -.42 l 10.4 4.22 a .32 .32 0 0 1 -.04 .62 l -3.98 1.03 a 1.3 1.3 0 0 0 -.93 .93 l -1.03 3.98 a .32 .32 0 0 1 -.62 .04 z',
-          [],
-        ),
+        path(d: 'M4 8v-2a2 2 0 0 1 2 -2h2', []),
+        path(d: 'M4 16v2a2 2 0 0 0 2 2h2', []),
+        path(d: 'M16 4h2a2 2 0 0 1 2 2v2', []),
+        path(d: 'M16 20h2a2 2 0 0 0 2 -2v-2', []),
+        path(d: 'M11 12h6', []),
+        path(d: 'M8 8h5', []),
+        path(d: 'M9 16h5', []),
       ],
     );
   }
@@ -73,35 +73,26 @@ class OpenDevToolsIcon extends StatelessComponent {
         'stroke-linejoin': 'round',
       },
       [
-        // Wrench (background layer)
         path(
-          d: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
-          [],
-        ),
-
-        // Screwdriver Eraser Outline (creates the gap in the Wrench)
-        path(
-          d: 'm11 12.586-2.293-2.293-1.414 1.414L3 7.414V3h4.414l4.293 4.293 1.414-1.414L15.414 8.17l-3.414 3.414Z',
-          attributes: {'stroke': '#050505', 'stroke-width': '6'},
+          d: 'M4 8h8',
           [],
         ),
         path(
-          d: 'm14.6 15 5.5 5.5a2.12 2.12 0 0 1-3 3l-5.5-5.5Z',
-          attributes: {'stroke': '#050505', 'stroke-width': '6'},
+          d: 'M20 11.5v6.5a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h6.5',
           [],
         ),
-
-        // Screwdriver Main (foreground layer)
         path(
-          d: 'm11 12.586-2.293-2.293-1.414 1.414L3 7.414V3h4.414l4.293 4.293 1.414-1.414L15.414 8.17l-3.414 3.414Z',
+          d: 'M8 4v4',
           [],
         ),
-        path(d: 'm14.6 15 5.5 5.5a2.12 2.12 0 0 1-3 3l-5.5-5.5Z', []),
         path(
-          d: 'M21.2 16.2c.4-.4.8-1 .8-1.7s-.4-1.3-.8-1.7a2.38 2.38 0 0 0-1.7-.8c-.7 0-1.3.4-1.7.8L16.4 14l3.6 3.6 1.2-1.4Z',
+          d: 'M16 8l5 -5',
           [],
         ),
-        path(d: 'm3 3 4.4 4.4', []),
+        path(
+          d: 'M21 7.5v-4.5h-4.5',
+          [],
+        ),
       ],
     );
   }

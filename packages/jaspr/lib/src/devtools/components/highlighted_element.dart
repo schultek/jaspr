@@ -5,12 +5,13 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../../client.dart';
 import '../../../dom.dart';
+import '../dev_tools_service.dart';
 import 'element_properties.dart';
 
 enum HighlightStyle { client, server, boundary }
 
 class HighlightedElement extends StatefulComponent {
-  final Element element;
+  final HighlightTargetDelegate target;
   final HighlightStyle style;
   final bool showLabel;
   final bool showProperties;
@@ -18,13 +19,13 @@ class HighlightedElement extends StatefulComponent {
   final List<DiagnosticsProperty>? properties;
 
   HighlightedElement(
-    this.element,
+    this.target,
     this.style, {
     this.showLabel = true,
     this.showProperties = true,
     this.showOnHover = false,
     this.properties,
-  }) : super(key: ValueKey((element, style)));
+  }) : super(key: ValueKey((target, style)));
 
   @override
   State<HighlightedElement> createState() => _HighlightedElementState();
@@ -38,6 +39,7 @@ class HighlightedElement extends StatefulComponent {
         border: Border.all(color: Color.variable('--highlight-color'), width: 2.px),
       ),
       css('&.client').styles(raw: {'--highlight-color': '#3b82f6'}),
+      css('&.server').styles(raw: {'--highlight-color': '#ff9f1b'}),
       css('&.boundary').styles(
         border: Border.all(color: Color.variable('--highlight-color'), width: 1.px, style: BorderStyle.dashed),
         raw: {'--highlight-color': '#ec4899', '--label-offset': '1'},
@@ -96,12 +98,150 @@ class HighlightedElement extends StatefulComponent {
   ];
 }
 
+abstract class HighlightTargetDelegate {
+  HighlightTargetDelegate? get parent;
+
+  bool get isRenderTarget;
+
+  bool get isHighlightTarget;
+
+  List<web.Element> getElementsToHighlight();
+
+  String get label;
+
+  List<DiagnosticsProperty> get properties;
+}
+
+class ElementHighlightTargetDelegate extends HighlightTargetDelegate {
+  final Element element;
+
+  ElementHighlightTargetDelegate(this.element);
+
+  @override
+  String get label {
+    if (element.component case DomComponent(:final tag)) {
+      return '<$tag>';
+    }
+    return element.component.runtimeType.toString();
+  }
+
+  @override
+  List<DiagnosticsProperty> get properties => element.component.debugFillProperties();
+
+  @override
+  HighlightTargetDelegate? get parent {
+    if (element.parent case final parent?) {
+      return ElementHighlightTargetDelegate(parent);
+    }
+    return null;
+  }
+
+  @override
+  bool get isRenderTarget => element is RenderObjectElement;
+
+  @override
+  bool get isHighlightTarget => !(element.component is DomComponent && element is InheritedElement);
+
+  @override
+  List<web.Element> getElementsToHighlight() {
+    if (element case RenderObjectElement(:final renderObject)) {
+      return _getElementsToHighlight(renderObject);
+    }
+
+    final renderObject = element.slot.target?.renderObject;
+    if (renderObject == null) return [];
+
+    return _getElementsToHighlight(renderObject);
+  }
+
+  List<web.Element> _getElementsToHighlight(RenderObject renderObject) {
+    if (renderObject is RenderElement) {
+      return [?renderObject.node];
+    } else if (renderObject is DomRenderFragment) {
+      final elements = <web.Element>[];
+
+      var currentNode = renderObject.firstChildNode;
+      while (currentNode != null) {
+        if (currentNode.isA<web.Element>()) {
+          elements.add(currentNode as web.Element);
+        }
+        if (currentNode == renderObject.lastChildNode) break;
+        currentNode = currentNode.nextSibling;
+      }
+
+      return elements;
+    } else if (renderObject.parent case final parent?) {
+      return _getElementsToHighlight(parent);
+    }
+
+    return [];
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) || (other is ElementHighlightTargetDelegate && other.element == element);
+  }
+
+  @override
+  int get hashCode => element.hashCode;
+}
+
+class ServerElementHighlightTargetDelegate extends HighlightTargetDelegate {
+  final ServerElement element;
+
+  ServerElementHighlightTargetDelegate(this.element);
+
+  @override
+  String get label {
+    return element.properties?.where((prop) => prop.name == 'type').firstOrNull?.value.toString() ?? element.name;
+  }
+
+  @override
+  List<DiagnosticsProperty> get properties =>
+      element.properties?.where((prop) => prop.name == 'component').firstOrNull?.properties ?? [];
+
+  @override
+  HighlightTargetDelegate? get parent {
+    if (element.parent case final parent?) {
+      return ServerElementHighlightTargetDelegate(parent);
+    }
+    return null;
+  }
+
+  @override
+  bool get isRenderTarget =>
+      element.name == 'DomElement' || element.name == '_FragmentElement' || element.name == 'TextElement';
+
+  @override
+  bool get isHighlightTarget => true;
+
+  @override
+  List<web.Element> getElementsToHighlight() {
+    List<web.Element> visitChild(ServerElement child) {
+      if (child.node case final node?) {
+        return [node];
+      }
+      if (child.children.isEmpty) return [];
+      return child.children.expand(visitChild).nonNulls.toList();
+    }
+
+    return visitChild(element);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) || (other is ServerElementHighlightTargetDelegate && other.element == element);
+  }
+
+  @override
+  int get hashCode => element.hashCode;
+}
+
 class _HighlightedElementState extends State<HighlightedElement> {
   final highlightKey = GlobalNodeKey<web.HTMLElement>();
   final tooltipKey = GlobalNodeKey<web.HTMLElement>();
 
   web.DOMRect? rect;
-  late Element targetElement;
   String tooltipLocation = 'top';
 
   bool get showTooltip => component.showProperties && properties.isNotEmpty;
@@ -110,8 +250,7 @@ class _HighlightedElementState extends State<HighlightedElement> {
   void initState() {
     super.initState();
 
-    rect = _getElementBoundingRect(component.element);
-    targetElement = _findTargetElement();
+    rect = _getDelegateBoundingRect(component.target);
     context.binding.addPostFrameCallback(() {
       setState(() {
         tooltipLocation = _getTooltipLocation();
@@ -145,34 +284,13 @@ class _HighlightedElementState extends State<HighlightedElement> {
   }
 
   void maybeUpdate() {
-    final newRect = _getElementBoundingRect(component.element);
+    final newRect = _getDelegateBoundingRect(component.target);
     if (!_rectEquals(rect, newRect)) {
       setState(() {
         rect = newRect;
-        targetElement = _findTargetElement();
         tooltipLocation = _getTooltipLocation();
       });
     }
-  }
-
-  Element _findTargetElement() {
-    final visited = [component.element];
-    var current = component.element;
-    var parent = current.parent;
-    while (parent != null) {
-      if (parent is RenderObjectElement) {
-        final parentRect = _getRenderObjectBoundingRect(parent.renderObject);
-        if (!_rectEquals(parentRect, rect)) {
-          break;
-        }
-      }
-      current = parent;
-      parent = current.parent;
-      if (!(current.component is DomComponent && current is InheritedElement)) {
-        visited.add(current);
-      }
-    }
-    return visited.last;
   }
 
   String _getTooltipLocation() {
@@ -186,19 +304,10 @@ class _HighlightedElementState extends State<HighlightedElement> {
     return 'inset';
   }
 
-  String get label {
-    return labelFor(targetElement);
-  }
+  String get label => component.target.label;
 
   List<DiagnosticsProperty> get properties {
-    return component.properties ?? targetElement.component.debugFillProperties();
-  }
-
-  String labelFor(Element element) {
-    if (element.component case DomComponent(:final tag)) {
-      return '<$tag>';
-    }
-    return element.component.runtimeType.toString();
+    return component.properties ?? component.target.properties;
   }
 
   bool _rectEquals(web.DOMRect? a, web.DOMRect? b) {
@@ -207,50 +316,33 @@ class _HighlightedElementState extends State<HighlightedElement> {
     return a.top == b.top && a.left == b.left && a.width == b.width && a.height == b.height;
   }
 
-  static web.DOMRect? _getElementBoundingRect(Element element) {
-    final renderObject = element.slot.target?.renderObject;
-    if (renderObject == null) return null;
+  static web.DOMRect? _getDelegateBoundingRect(HighlightTargetDelegate delegate) {
+    final elements = delegate.getElementsToHighlight();
+    if (elements.isEmpty) return null;
+    if (elements.length == 1) return elements.first.getBoundingClientRect();
 
-    return _getRenderObjectBoundingRect(renderObject);
-  }
+    final childRects = <web.DOMRect>[
+      for (final element in elements) element.getBoundingClientRect(),
+    ];
 
-  static web.DOMRect? _getRenderObjectBoundingRect(RenderObject renderObject) {
-    if (renderObject is RenderElement) {
-      return renderObject.node?.getBoundingClientRect();
-    } else if (renderObject is DomRenderFragment) {
-      final childRects = <web.DOMRect>[];
+    var minX = double.infinity;
+    var minY = double.infinity;
+    var maxX = double.negativeInfinity;
+    var maxY = double.negativeInfinity;
 
-      var currentNode = renderObject.firstChildNode;
-      while (currentNode != null) {
-        if (currentNode.isA<web.Element>()) {
-          childRects.add((currentNode as web.Element).getBoundingClientRect());
-        }
-        if (currentNode == renderObject.lastChildNode) break;
-        currentNode = currentNode.nextSibling;
-      }
-
-      var minX = double.infinity;
-      var minY = double.infinity;
-      var maxX = double.negativeInfinity;
-      var maxY = double.negativeInfinity;
-
-      for (final rect in childRects) {
-        minX = minX < rect.left ? minX : rect.left;
-        minY = minY < rect.top ? minY : rect.top;
-        maxX = maxX > rect.right ? maxX : rect.right;
-        maxY = maxY > rect.bottom ? maxY : rect.bottom;
-      }
-
-      minX = max(minX, 0);
-      minY = max(minY, 0);
-      maxX = min(maxX, web.window.innerWidth.toDouble());
-      maxY = min(maxY, web.window.innerHeight.toDouble());
-
-      return web.DOMRect(minX, minY, maxX - minX, maxY - minY);
-    } else if (renderObject.parent case final parent?) {
-      return _getRenderObjectBoundingRect(parent);
+    for (final rect in childRects) {
+      minX = minX < rect.left ? minX : rect.left;
+      minY = minY < rect.top ? minY : rect.top;
+      maxX = maxX > rect.right ? maxX : rect.right;
+      maxY = maxY > rect.bottom ? maxY : rect.bottom;
     }
-    return null;
+
+    minX = max(minX, 0);
+    minY = max(minY, 0);
+    maxX = min(maxX, web.window.innerWidth.toDouble());
+    maxY = min(maxY, web.window.innerHeight.toDouble());
+
+    return web.DOMRect(minX, minY, maxX - minX, maxY - minY);
   }
 
   @override
@@ -260,7 +352,7 @@ class _HighlightedElementState extends State<HighlightedElement> {
 
     return div(
       key: highlightKey,
-      classes: 'jaspr-dev-toolbar-highlight ${component.style.name} ${component.showProperties ? '' : 'no-tint'}',
+      classes: 'jaspr-dev-toolbar-highlight ${component.style.name} ${component.showLabel ? '' : 'no-tint'}',
       styles: Styles(
         position: Position.fixed(left: rect.left.px, top: rect.top.px),
         width: rect.width.px,

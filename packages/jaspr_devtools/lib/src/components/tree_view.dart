@@ -91,9 +91,16 @@ class TreeItemState extends State<TreeItem> {
       _ => type ?? component.node.name,
     };
 
+    final environment = component.node.properties?.where((p) => p.name == 'environment').firstOrNull?.value?.toString();
+    final envClass = environment == 'client'
+        ? 'client'
+        : environment == 'server'
+        ? 'server'
+        : '';
+
     return div(classes: 'tree-item-container', [
       div(
-        classes: 'tree-item ${isSelected ? 'selected' : ''}',
+        classes: 'tree-item ${isSelected ? 'selected' : ''} $envClass',
         events: {
           'click': (e) {
             e.stopPropagation();
@@ -130,7 +137,7 @@ class TreeItemState extends State<TreeItem> {
                 selected: component.selected,
                 onSelected: component.onSelected,
                 depth: component.depth + 1,
-                depthLimit: (showMore ? maxDepthLimit : component.depthLimit) - 1,
+                depthLimit: (showMore ? maxDepthLimit : component.depthLimit) - (component.node.children?.length ?? 1),
               ),
           ])
         else
@@ -190,6 +197,8 @@ class TreeItemState extends State<TreeItem> {
     css('.spacer').styles(width: 16.px),
     css('.tag-open, .tag-close').styles(color: ThemeColors.onSurfaceVariant),
     css('.name').styles(color: ThemeColors.primary, fontWeight: FontWeight.bold),
+    css('.tree-item.client .name').styles(color: Color('#3b82f6')),
+    css('.tree-item.server .name').styles(color: Color('#ff9f1b')),
     css('.depth-limit').styles(
       color: ThemeColors.onSurfaceVariant,
       cursor: .pointer,

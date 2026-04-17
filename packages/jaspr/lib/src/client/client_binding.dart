@@ -40,6 +40,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   void attachRootComponent(Component app, {String attachTo = 'body'}) {
     _attachTarget = attachTo;
     if (kDebugMode) {
+      DevToolsService.instance.attachDebugDataToDocument();
       app = Component.fragment([app, JasprDevToolbar()]);
     }
     super.attachRootComponent(app);
@@ -68,8 +69,6 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   Future<void> _sendClientTree() async {
-    final devtoolsId = web.document.querySelector('meta[name="jaspr-devtools-id"]')?.getAttribute('content');
-
     if (Jaspr.options.clients.isNotEmpty) {
       await Future.wait<void>([
         for (final client in Jaspr.options.clients.values)
@@ -79,12 +78,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       await Future(() {});
     }
 
-    DevToolsService.instance.sendClientTree(
-      devtoolsId,
-      currentUrl,
-      _attachTarget,
-      rootElement!,
-    );
+    DevToolsService.instance.sendClientTree(currentUrl, _attachTarget, rootElement!);
   }
 
   @override
