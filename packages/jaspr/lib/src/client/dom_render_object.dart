@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:js_interop';
 
+import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../devtools/dev_tools_service.dart';
@@ -409,9 +409,11 @@ class DomRenderFragment extends DomRenderObject with MultiChildDomRenderObject i
     );
   }
 
-  void removeChildren(DomRenderObject parent) {
-    assert(parent == this.parent, 'Cannot remove fragment from a different parent.');
-    assert(isAttached, 'Cannot remove fragment that is not attached to a parent.');
+  void unattach() {
+    assert(this.parent != null, 'Cannot unattach fragment that is not attached to a parent.');
+    assert(isAttached, 'Cannot unattach fragment that is not attached to a parent.');
+
+    final parent = this.parent!;
 
     assert(() {
       if (DevToolsService.instance.debugVerboseLoggingActive) {
@@ -614,7 +616,7 @@ mixin MultiChildDomRenderObject on DomRenderObject {
 
   void removeChild(DomRenderObject child) {
     if (child case DomRenderFragment(isAttached: true)) {
-      child.removeChildren(this);
+      child.unattach();
     } else {
       assert(() {
         if (DevToolsService.instance.debugVerboseLoggingActive) {
