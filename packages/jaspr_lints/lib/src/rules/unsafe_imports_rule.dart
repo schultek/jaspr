@@ -11,16 +11,10 @@ import 'package:yaml/yaml.dart';
 import '../utils.dart';
 import '../utils/scope_tree.dart';
 
-class UnsafeImportsRule extends MultiAnalysisRule {
+class UnsafeImportsRule extends AnalysisRule {
   static const LintCode unsafeImportCode = LintCode(
     'unsafe_imports',
-    'Unsafe import: {0}',
-    severity: DiagnosticSeverity.WARNING,
-  );
-
-  static const LintCode unsafeCssCode = LintCode(
-    'unsafe_css',
-    'Unsafe @css usage: {0}',
+    '{0}',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -31,7 +25,7 @@ class UnsafeImportsRule extends MultiAnalysisRule {
       );
 
   @override
-  List<DiagnosticCode> get diagnosticCodes => [unsafeImportCode, unsafeCssCode];
+  DiagnosticCode get diagnosticCode => unsafeImportCode;
 
   final ResourceProvider? resourceProvider;
 
@@ -53,7 +47,10 @@ class UnsafeImportsRule extends MultiAnalysisRule {
     }
 
     if (node.usesCssAnnotation) {
-      registry.addAnnotation(this, CssImportsVisitor(this, node));
+      _checkPubspecConfig(context);
+      if (node.usesGlobalCssAnnotation || isClientMode) {
+        registry.addAnnotation(this, CssImportsVisitor(this, node));
+      }
     }
 
     if (context.package?.root case final root?) {
@@ -63,6 +60,7 @@ class UnsafeImportsRule extends MultiAnalysisRule {
 
   int pubspecDigest = 0;
   bool allowFlutterLibsInClient = false;
+  bool isClientMode = false;
   void _checkPubspecConfig(RuleContext context) {
     final session = context.libraryElement?.session;
     if (session == null) return;
@@ -76,6 +74,12 @@ class UnsafeImportsRule extends MultiAnalysisRule {
       allowFlutterLibsInClient = true;
     } else {
       allowFlutterLibsInClient = false;
+    }
+
+    if (pubspec case {'jaspr': {'mode': 'client'}}) {
+      isClientMode = true;
+    } else {
+      isClientMode = false;
     }
   }
 }
@@ -163,9 +167,8 @@ abstract class ScopeImportsVisitor extends SimpleAstVisitor<void> with ScopeEdge
     rule.reportAtNode(
       edge.directive,
       arguments: [
-        "'${edge.directive.uri.stringValue}' is not available on the ${edgeType.name}.\n${suggestionFor(edge.childNode.library)}",
+        "Unsafe import: '${edge.directive.uri.stringValue}' is not available on the ${edgeType.name}.\n${suggestionFor(edge.childNode.library)}",
       ],
-      diagnosticCode: UnsafeImportsRule.unsafeImportCode,
     );
   }
 
@@ -176,10 +179,9 @@ abstract class ScopeImportsVisitor extends SimpleAstVisitor<void> with ScopeEdge
       rule.reportAtNode(
         edge.directive,
         arguments: [
-          "'${edge.directive.uri.stringValue}' imports other unsafe libraries which are not available on the ${edgeType.name}. See below for details.",
+          "Unsafe import: '${edge.directive.uri.stringValue}' imports other unsafe libraries which are not available on the ${edgeType.name}. See below for details.",
         ],
         contextMessages: messages,
-        diagnosticCode: UnsafeImportsRule.unsafeImportCode,
       );
     }
   }
@@ -275,10 +277,9 @@ class CssImportsVisitor extends SimpleAstVisitor<void> with ScopeEdgeVisitor, Se
         rule.reportAtNode(
           node,
           arguments: [
-            'Importing client-only libraries is not allowed when using @css. See below for details.',
+            'Unsafe @css usage: Importing client-only libraries is not allowed when using @css. See below for details.',
           ],
           contextMessages: messages,
-          diagnosticCode: UnsafeImportsRule.unsafeCssCode,
         );
       }
     }

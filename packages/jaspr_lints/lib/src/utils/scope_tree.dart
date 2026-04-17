@@ -169,6 +169,7 @@ class ScopeTreeNode {
   NodeLocation? serverScopeLocation;
   NodeLocation? clientScopeLocation;
   bool usesCssAnnotation = false;
+  bool usesGlobalCssAnnotation = false;
 
   final List<NodeLocation> components = [];
 
@@ -211,7 +212,9 @@ class ScopeTreeNode {
       clientScopeLocation = findMainFunction();
     }
 
-    usesCssAnnotation = findCssAnnotation();
+    final (usesCssAnnotation, usesGlobalCssAnnotation) = findCssAnnotation();
+    this.usesCssAnnotation = usesCssAnnotation;
+    this.usesGlobalCssAnnotation = usesGlobalCssAnnotation;
   }
 
   NodeLocation? findMainFunction() {
@@ -228,14 +231,21 @@ class ScopeTreeNode {
     );
   }
 
-  bool findCssAnnotation() {
-    final annotated = [...library.classes, ...library.topLevelVariables]
+  (bool, bool) findCssAnnotation() {
+    final annotatedFields = library.classes
+        .where((e) => !e.isPrivate)
+        .expand<Element>(
+          (e) => [
+            ...e.fields.where((e) => e.isStatic),
+            ...e.getters.where((e) => e.isStatic),
+          ],
+        )
+        .where((element) => !element.isPrivate)
+        .where((element) => element.metadata.annotations.any((a) => a.isCssAnnotation));
+
+    final annotatedGlobals = library.topLevelVariables
         .expand<Element>(
           (e) => switch (e) {
-            final ClassElement e when !e.isPrivate => [
-              ...e.fields.where((e) => e.isStatic),
-              ...e.getters.where((e) => e.isStatic),
-            ],
             final TopLevelVariableElement e when e.isOriginDeclaration => [e],
             TopLevelVariableElement(:final getter?) when e.isOriginGetterSetter => [getter],
             _ => [],
@@ -243,7 +253,8 @@ class ScopeTreeNode {
         )
         .where((element) => !element.isPrivate)
         .where((element) => element.metadata.annotations.any((a) => a.isCssAnnotation));
-    return annotated.isNotEmpty;
+
+    return (annotatedFields.isNotEmpty || annotatedGlobals.isNotEmpty, annotatedGlobals.isNotEmpty);
   }
 
   void analyzeChildren() {
