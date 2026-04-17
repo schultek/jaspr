@@ -14,17 +14,25 @@ void main() {
     defineReflectiveTests(UnsafeImportsServerTest);
     defineReflectiveTests(UnsafeImportsClientTest);
     defineReflectiveTests(UnsafeImportsComponentTest);
-    defineReflectiveTests(UnsafeImportsStylesTest);
+    defineReflectiveTests(UnsafeImportsStylesClientTest);
+    defineReflectiveTests(UnsafeImportsStylesServerTest);
     defineReflectiveTests(ScopesTest);
   });
 }
 
 abstract class UnsafeImportsBaseTest extends AnalysisRuleTest {
+  String get mode => 'server';
+
   @override
   void setUp() {
     rule = UnsafeImportsRule(resourceProvider: resourceProvider);
+
     setUpJasprPackage();
     super.setUp();
+    final pubspecFile = getFile(testPackagePubspecPath);
+    if (pubspecFile.exists) {
+      pubspecFile.writeAsStringSync('${pubspecFile.readAsStringSync()}\n\njaspr:\n  mode: $mode');
+    }
   }
 }
 
@@ -199,9 +207,62 @@ class UnsafeImportsComponentTest extends UnsafeImportsBaseTest {
 }
 
 @reflectiveTest
-class UnsafeImportsStylesTest extends UnsafeImportsBaseTest {
+class UnsafeImportsStylesServerTest extends UnsafeImportsBaseTest {
   @override
   String get testFileName => 'component.dart';
+
+  void test_class_styles_import_client_ignored() async {
+    await assertNoDiagnostics(
+      '// ignore_for_file: unused_import\n'
+      "import 'package:jaspr/jaspr.dart';\n"
+      "import 'package:jaspr/dom.dart';\n"
+      "import 'package:jaspr/client.dart';\n"
+      "import 'dart:js_interop';\n\n"
+      'class MyComponent extends Component {\n'
+      '  @css\n'
+      '  static List<StyleRule> get styles => [];\n'
+      '}',
+    );
+  }
+
+  void test_global_styles_import_client_fails() async {
+    final message =
+        'Unsafe @css usage: Importing client-only libraries is not allowed when using @css. See below for details.';
+    final contextMessageText =
+        "Unsafe import 'package:jaspr/client.dart'. Try using 'package:jaspr/jaspr.dart' instead.";
+    final contextMessageText2 =
+        "Unsafe import 'dart:js_interop'. Try using 'package:universal_web/js_interop.dart' instead.";
+
+    await assertDiagnostics(
+      '// ignore_for_file: unused_import\n'
+      "import 'package:jaspr/jaspr.dart';\n"
+      "import 'package:jaspr/dom.dart';\n"
+      "import 'package:jaspr/client.dart';\n"
+      "import 'dart:js_interop';\n\n"
+      '@css\n'
+      'List<StyleRule> get styles => [];',
+      [
+        lint(
+          165,
+          4,
+          messageContainsAll: [message],
+          contextMessages: [
+            contextMessage(testFile, 109, 27, textContains: [contextMessageText]),
+            contextMessage(testFile, 145, 17, textContains: [contextMessageText2]),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+@reflectiveTest
+class UnsafeImportsStylesClientTest extends UnsafeImportsBaseTest {
+  @override
+  String get testFileName => 'component.dart';
+
+  @override
+  String get mode => 'client';
 
   void test_styles_import_client_fails() async {
     final message =
@@ -225,7 +286,6 @@ class UnsafeImportsStylesTest extends UnsafeImportsBaseTest {
         lint(
           205,
           4,
-          name: 'unsafe_css',
           messageContainsAll: [message],
           contextMessages: [
             contextMessage(testFile, 109, 27, textContains: [contextMessageText]),
@@ -260,7 +320,6 @@ class UnsafeImportsStylesTest extends UnsafeImportsBaseTest {
         lint(
           160,
           4,
-          name: 'unsafe_css',
           messageContainsAll: [message],
           contextMessages: [
             contextMessage(aFile, 7, 27, textContains: [contextMessageText]),
