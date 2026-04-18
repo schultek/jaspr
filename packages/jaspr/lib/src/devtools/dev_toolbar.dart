@@ -8,6 +8,8 @@ import 'components/element_properties.dart';
 import 'components/highlighted_element.dart';
 import 'dev_tools_service.dart';
 import 'icons.dart';
+import 'models/highlight_target.dart';
+import 'models/tree_element.dart';
 
 enum Attachment { top, bottom, left, right }
 
@@ -91,7 +93,7 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
             e.visitChildElements((e) {
               boundaryElements.add(
                 HighlightedElement(
-                  ElementHighlightTargetDelegate(e),
+                  LocalHighlightTarget(LocalElement(e)),
                   HighlightStyle.boundary,
                   showLabel: showDetails,
                   showProperties: showDetails,
@@ -115,10 +117,11 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
     setState(() {
       selectedElement = element != null
           ? HighlightedElement(
-              element is Element
-                  ? ElementHighlightTargetDelegate(element)
-                  : ServerElementHighlightTargetDelegate(element as ServerElement),
-              element is Element ? HighlightStyle.client : HighlightStyle.server,
+              switch (element) {
+                final LocalElement e => LocalHighlightTarget(e),
+                final RemoteElement e => RemoteHighlightTarget(e),
+              },
+              element is LocalElement ? HighlightStyle.client : HighlightStyle.server,
               showProperties: showPropertyTooltips,
             )
           : null;
@@ -128,18 +131,16 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
   void _handleClickEvent(web.Event event) {
     if (!isInspecting) return;
     final e = event as web.MouseEvent;
-    final targetElement = _getHoveredElement(e);
+    final target = _getHighlightTargetFromEvent(e);
 
-    if (targetElement == null) return;
+    if (target == null) return;
 
     setState(() {
       isInspecting = false;
       boundaryElements.clear();
     });
 
-    if (targetElement case ElementHighlightTargetDelegate(:final element)) {
-      DevToolsService.instance.selectElement(element);
-    }
+    DevToolsService.instance.selectElement(target.element, context.binding.currentUrl);
   }
 
   void _handleMoveEvent(web.Event event) {
@@ -147,15 +148,15 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
     if (isDragging) return;
 
     final e = event as web.MouseEvent;
-    final targetElement = _getHoveredElement(e);
+    final target = _getHighlightTargetFromEvent(e);
 
-    if (targetElement == null) return;
-    if (selectedElement?.target == targetElement) return;
+    if (target == null) return;
+    if (selectedElement?.target == target) return;
 
     setState(() {
       selectedElement = HighlightedElement(
-        targetElement,
-        targetElement is ServerElementHighlightTargetDelegate ? HighlightStyle.server : HighlightStyle.client,
+        target,
+        target is RemoteHighlightTarget ? HighlightStyle.server : HighlightStyle.client,
         showProperties: showPropertyTooltips,
       );
     });
@@ -170,66 +171,66 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
     });
   }
 
-  HighlightTargetDelegate? _getHoveredElement(web.MouseEvent event) {
-    final targetNodes = web.document.elementsFromPoint(event.clientX, event.clientY);
+  HighlightTarget? _getHighlightTargetFromEvent(web.MouseEvent event) {
+    final hoveredNodes = web.document.elementsFromPoint(event.clientX, event.clientY);
 
-    final glassIndex = targetNodes.toDart.indexWhere((node) => node == glassKey.currentNode);
-    ({web.Node node, web.DOMRect rect})? target;
+    final glassIndex = hoveredNodes.toDart.indexWhere((node) => node == glassKey.currentNode);
+    ({web.Node node, web.DOMRect rect})? selection;
 
     // First select the element that is:
     //   - not a child of the glass element.
     //   - the top-most element.
     //   - the outermose element in case of multiple elements at the same position.
-    for (var i = glassIndex + 1; i < targetNodes.length; i++) {
-      final node = targetNodes[i];
+    for (var i = glassIndex + 1; i < hoveredNodes.length; i++) {
+      final node = hoveredNodes[i];
       final rect = node.getBoundingClientRect();
 
-      if (target == null) {
-        target = (node: node, rect: rect);
+      if (selection == null) {
+        selection = (node: node, rect: rect);
         continue;
       }
 
-      final position = target.node.compareDocumentPosition(node);
+      final position = selection.node.compareDocumentPosition(node);
       final isSameRect =
-          rect.top == target.rect.top &&
-          rect.left == target.rect.left &&
-          rect.width == target.rect.width &&
-          rect.height == target.rect.height;
+          rect.top == selection.rect.top &&
+          rect.left == selection.rect.left &&
+          rect.width == selection.rect.width &&
+          rect.height == selection.rect.height;
 
       if (position == web.Node.DOCUMENT_POSITION_CONTAINED_BY && !isSameRect) {
-        target = (node: node, rect: rect);
+        selection = (node: node, rect: rect);
       } else if (position == web.Node.DOCUMENT_POSITION_CONTAINS && isSameRect) {
-        target = (node: node, rect: rect);
+        selection = (node: node, rect: rect);
       }
     }
 
-    if (target == null) return null;
+    if (selection == null) return null;
 
-    HighlightTargetDelegate? targetDelegate;
+    HighlightTarget? target;
 
-    // Find the closest existing target delegate.
-    web.Node? current = target.node;
+    // Find the closest existing highlight target.
+    web.Node? current = selection.node;
     while (current != null) {
-      final element = DevToolsService.instance.domRegistry[current];
+      final element = LocalElement.nodeRegistry[current];
       if (element != null) {
-        targetDelegate = ElementHighlightTargetDelegate(element);
+        target = LocalHighlightTarget(LocalElement(element));
         break;
       }
 
-      final node = DevToolsService.instance.serverNodeRegistry[current];
+      final node = RemoteElement.nodeRegistry[current];
       if (node != null) {
-        targetDelegate = ServerElementHighlightTargetDelegate(node);
+        target = RemoteHighlightTarget(node);
         break;
       }
 
       current = current.parentNode;
     }
 
-    if (targetDelegate != null) {
-      // Walk up the tree to find the outer-most target delegate without considering render targets.
+    if (target != null) {
+      // Walk up the tree to find the outer-most highlight target without considering render targets.
       // This will prefer a parent StatelessComponent over it's child DomComponent.
-      final visited = [targetDelegate];
-      var current = targetDelegate;
+      final visited = [target];
+      var current = target;
       var parent = current.parent;
       while (parent != null) {
         if (parent.isRenderTarget) {
@@ -237,7 +238,7 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
         }
         current = parent;
         parent = current.parent;
-        if (current.isHighlightTarget) {
+        if (current.allowHighlighting) {
           visited.add(current);
         }
       }
@@ -410,7 +411,7 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
                 attributes: {'title': 'Open DevTools'},
                 events: {
                   'click': (e) {
-                    web.window.open('http://localhost:5468', '_blank');
+                    web.window.open('http://localhost:5468', '_blank', 'popup=true');
                   },
                 },
                 [OpenDevToolsIcon()],

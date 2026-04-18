@@ -11,22 +11,19 @@ class MainLayout extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return div(classes: 'layout', [
-      header(classes: 'header', [
-        span(classes: 'logo', [.text('Jaspr DevTools')]),
-      ]),
       div(classes: 'body', [
-        aside(classes: 'siderail', [
-          nav([
-            ul([
-              li([
-                a(href: '/', classes: 'nav-item active', [
-                  i(classes: 'icon icon-components', []),
-                  span([.text('TREE')]),
-                ]),
-              ]),
-            ]),
-          ]),
-        ]),
+        // aside(classes: 'siderail', [
+        //   nav([
+        //     ul([
+        //       li([
+        //         a(href: '/', classes: 'nav-item active', [
+        //           i(classes: 'icon icon-components', []),
+        //           span([.text('TREE')]),
+        //         ]),
+        //       ]),
+        //     ]),
+        //   ]),
+        // ]),
         main_(classes: 'content', [child]),
       ]),
     ]);
@@ -37,69 +34,69 @@ class MainLayout extends StatelessComponent {
     css('.layout', [
       css('&').styles(
         display: .flex,
-        flexDirection: .column,
         height: 100.vh,
-        backgroundColor: ThemeColors.background,
-        color: ThemeColors.onSurface,
         overflow: .hidden,
+        flexDirection: .column,
+        color: ThemeColors.onSurface,
+        backgroundColor: ThemeColors.background,
       ),
       css('.header', [
         css('&').styles(
-          height: 48.px,
           display: .flex,
-          alignItems: .center,
+          height: 48.px,
           padding: .symmetric(horizontal: ThemeSpacing.s4),
-          backgroundColor: ThemeColors.surfaceContainerHigh,
+          alignItems: .center,
           flex: .shrink(0),
+          backgroundColor: ThemeColors.surfaceContainerHigh,
         ),
         css('.logo').styles(
+          color: ThemeColors.primary,
           fontFamily: .list([FontFamily('Space Grotesk'), FontFamilies.sansSerif]),
           fontSize: 1.rem,
           fontWeight: FontWeight.bold,
-          letterSpacing: 0.05.rem,
           textTransform: .upperCase,
-          color: ThemeColors.primary,
+          letterSpacing: 0.05.rem,
         ),
       ]),
       css('.body', [
         css('&').styles(
           display: .flex,
-          flex: Flex(grow: 1, shrink: 1, basis: .auto),
           overflow: .hidden,
+          flex: Flex(grow: 1, shrink: 1, basis: .auto),
         ),
         css('.siderail', [
           css('&').styles(
-            width: 64.px,
-            backgroundColor: ThemeColors.surfaceContainerLow,
             display: .flex,
+            width: 64.px,
+            padding: .symmetric(vertical: ThemeSpacing.s4),
             flexDirection: .column,
             alignItems: .center,
-            padding: .symmetric(vertical: ThemeSpacing.s4),
             flex: .shrink(0),
+            backgroundColor: ThemeColors.surfaceContainerLow,
           ),
-          css('nav, ul').styles(margin: .zero, padding: .zero, listStyle: .none, width: .percent(100)),
+          css('nav, ul').styles(width: .percent(100), padding: .zero, margin: .zero, listStyle: .none),
           css('.nav-item', [
             css('&').styles(
               display: .flex,
+              padding: .symmetric(vertical: ThemeSpacing.s3),
+              transition: .new('all', duration: 200.ms),
               flexDirection: .column,
               alignItems: .center,
-              padding: .symmetric(vertical: ThemeSpacing.s3),
-              color: ThemeColors.onSurfaceVariant,
-              textDecoration: .none,
-              fontSize: 0.65.rem,
               gap: .all(ThemeSpacing.s1),
-              transition: .new('all', duration: 200.ms),
+              color: ThemeColors.onSurfaceVariant,
+              fontSize: 0.65.rem,
+              textDecoration: .none,
             ),
             css('&:hover').styles(
-              backgroundColor: ThemeColors.surfaceContainerHighest,
               color: ThemeColors.primary,
+              backgroundColor: ThemeColors.surfaceContainerHighest,
             ),
             css('&.active').styles(
-              color: ThemeColors.primary,
-              backgroundColor: ThemeColors.surfaceContainer,
               border: Border.only(
                 left: BorderSide(width: 2.px, color: ThemeColors.primary),
               ),
+              color: ThemeColors.primary,
+              backgroundColor: ThemeColors.surfaceContainer,
             ),
           ]),
           css('.icon', [
@@ -123,11 +120,11 @@ class MainLayout extends StatelessComponent {
         ]),
         css('.content', [
           css('&').styles(
-            flex: Flex(grow: 1, shrink: 1, basis: .auto),
-            position: .relative(),
             display: .flex,
-            flexDirection: .column,
+            position: .relative(),
             overflow: .hidden,
+            flexDirection: .column,
+            flex: Flex(grow: 1, shrink: 1, basis: .auto),
           ),
         ]),
       ]),

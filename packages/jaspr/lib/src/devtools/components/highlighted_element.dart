@@ -5,13 +5,13 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../../client.dart';
 import '../../../dom.dart';
-import '../dev_tools_service.dart';
+import '../models/highlight_target.dart';
 import 'element_properties.dart';
 
 enum HighlightStyle { client, server, boundary }
 
 class HighlightedElement extends StatefulComponent {
-  final HighlightTargetDelegate target;
+  final HighlightTarget target;
   final HighlightStyle style;
   final bool showLabel;
   final bool showProperties;
@@ -98,145 +98,6 @@ class HighlightedElement extends StatefulComponent {
   ];
 }
 
-abstract class HighlightTargetDelegate {
-  HighlightTargetDelegate? get parent;
-
-  bool get isRenderTarget;
-
-  bool get isHighlightTarget;
-
-  List<web.Element> getElementsToHighlight();
-
-  String get label;
-
-  List<DiagnosticsProperty> get properties;
-}
-
-class ElementHighlightTargetDelegate extends HighlightTargetDelegate {
-  final Element element;
-
-  ElementHighlightTargetDelegate(this.element);
-
-  @override
-  String get label {
-    if (element.component case DomComponent(:final tag)) {
-      return '<$tag>';
-    }
-    return element.component.runtimeType.toString();
-  }
-
-  @override
-  List<DiagnosticsProperty> get properties => element.component.debugFillProperties();
-
-  @override
-  HighlightTargetDelegate? get parent {
-    if (element.parent case final parent?) {
-      return ElementHighlightTargetDelegate(parent);
-    }
-    return null;
-  }
-
-  @override
-  bool get isRenderTarget => element is RenderObjectElement;
-
-  @override
-  bool get isHighlightTarget => !(element.component is DomComponent && element is InheritedElement);
-
-  @override
-  List<web.Element> getElementsToHighlight() {
-    if (element case RenderObjectElement(:final renderObject)) {
-      return _getElementsToHighlight(renderObject);
-    }
-
-    final renderObject = element.slot.target?.renderObject;
-    if (renderObject == null) return [];
-
-    return _getElementsToHighlight(renderObject);
-  }
-
-  List<web.Element> _getElementsToHighlight(RenderObject renderObject) {
-    if (renderObject is RenderElement) {
-      return [?renderObject.node];
-    } else if (renderObject is DomRenderFragment) {
-      final elements = <web.Element>[];
-
-      var currentNode = renderObject.firstChildNode;
-      while (currentNode != null) {
-        if (currentNode.isA<web.Element>()) {
-          elements.add(currentNode as web.Element);
-        }
-        if (currentNode == renderObject.lastChildNode) break;
-        currentNode = currentNode.nextSibling;
-      }
-
-      return elements;
-    } else if (renderObject.parent case final parent?) {
-      return _getElementsToHighlight(parent);
-    }
-
-    return [];
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) || (other is ElementHighlightTargetDelegate && other.element == element);
-  }
-
-  @override
-  int get hashCode => element.hashCode;
-}
-
-class ServerElementHighlightTargetDelegate extends HighlightTargetDelegate {
-  final ServerElement element;
-
-  ServerElementHighlightTargetDelegate(this.element);
-
-  @override
-  String get label {
-    return element.properties?.where((prop) => prop.name == 'type').firstOrNull?.value.toString() ?? element.name;
-  }
-
-  @override
-  List<DiagnosticsProperty> get properties =>
-      element.properties?.where((prop) => prop.name == 'component').firstOrNull?.properties ?? [];
-
-  @override
-  HighlightTargetDelegate? get parent {
-    if (element.parent case final parent?) {
-      return ServerElementHighlightTargetDelegate(parent);
-    }
-    return null;
-  }
-
-  @override
-  bool get isRenderTarget =>
-      element.name == 'DomElement' || element.name == '_FragmentElement' || element.name == 'TextElement';
-
-  @override
-  bool get isHighlightTarget => true;
-
-  @override
-  List<web.Element> getElementsToHighlight() {
-    List<web.Element> visitChild(ServerElement child) {
-      if (child.node case final node?) {
-        return [node];
-      }
-      if (child.children.isEmpty) return [];
-      return child.children.expand(visitChild).nonNulls.toList();
-    }
-
-    return visitChild(element);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) || (other is ServerElementHighlightTargetDelegate && other.element == element);
-  }
-
-  @override
-  int get hashCode => element.hashCode;
-}
-
 class _HighlightedElementState extends State<HighlightedElement> {
   final highlightKey = GlobalNodeKey<web.HTMLElement>();
   final tooltipKey = GlobalNodeKey<web.HTMLElement>();
@@ -250,7 +111,7 @@ class _HighlightedElementState extends State<HighlightedElement> {
   void initState() {
     super.initState();
 
-    rect = _getDelegateBoundingRect(component.target);
+    rect = _getTargetBoundingRect(component.target);
     context.binding.addPostFrameCallback(() {
       setState(() {
         tooltipLocation = _getTooltipLocation();
@@ -284,7 +145,7 @@ class _HighlightedElementState extends State<HighlightedElement> {
   }
 
   void maybeUpdate() {
-    final newRect = _getDelegateBoundingRect(component.target);
+    final newRect = _getTargetBoundingRect(component.target);
     if (!_rectEquals(rect, newRect)) {
       setState(() {
         rect = newRect;
@@ -316,8 +177,8 @@ class _HighlightedElementState extends State<HighlightedElement> {
     return a.top == b.top && a.left == b.left && a.width == b.width && a.height == b.height;
   }
 
-  static web.DOMRect? _getDelegateBoundingRect(HighlightTargetDelegate delegate) {
-    final elements = delegate.getElementsToHighlight();
+  static web.DOMRect? _getTargetBoundingRect(HighlightTarget target) {
+    final elements = target.getElementsToHighlight();
     if (elements.isEmpty) return null;
     if (elements.length == 1) return elements.first.getBoundingClientRect();
 

@@ -2,6 +2,12 @@
 
 This document details the architecture of the Jaspr DevTools ecosystem, covering integration, serving, and communication for inspecting server-rendered and client-hydrated component trees.
 
+## Dev
+
+Run devtools: jaspr serve --port=5050 --proxy-port=5051 --devtools-port=5052 -v
+
+Run app: JASPR_DEVTOOLS_PROXY=5050 jaspr serve --launch-in-chrome -v
+
 ---
 
 ## System Context

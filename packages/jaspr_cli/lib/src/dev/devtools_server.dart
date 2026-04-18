@@ -11,9 +11,10 @@ import 'package:sse/server/sse_handler.dart';
 
 import '../commands/base_command.dart';
 import '../logging.dart';
+import '../project.dart';
 
 mixin DevToolsHelper on BaseCommand {
-  DevToolsController controller = DevToolsController();
+  late final DevToolsController controller = DevToolsController(project.requireMode);
 
   Future<HttpServer?> startDevToolsServer(int port) async {
     try {
@@ -64,6 +65,9 @@ mixin DevToolsHelper on BaseCommand {
 }
 
 class DevToolsController {
+  DevToolsController(this.mode);
+
+  JasprMode mode;
   String? serverVmServiceUri;
   String? clientVmServiceUri;
 
@@ -73,6 +77,7 @@ class DevToolsController {
   Map<String, String?> get info => {
     'serverVmServiceUri': serverVmServiceUri,
     'clientVmServiceUri': clientVmServiceUri,
+    'mode': mode.name,
   };
 
   void setServerVmServiceUri(String uri) {
