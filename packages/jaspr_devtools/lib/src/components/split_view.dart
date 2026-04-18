@@ -69,34 +69,34 @@ class SplitViewState extends State<SplitView> {
     css('.split-view', [
       css('&').styles(
         display: .flex,
-        flex: Flex(grow: 1, shrink: 1, basis: .auto),
         overflow: .hidden,
+        flex: Flex(grow: 1, shrink: 1, basis: .auto),
       ),
       css('.first').styles(
-        flex: Flex(grow: 1, shrink: 1, basis: .auto),
-        overflow: .hidden,
         display: .flex,
+        overflow: .hidden,
         flexDirection: .column,
+        flex: Flex(grow: 1, shrink: 1, basis: .auto),
       ),
       css('.second').styles(
-        flex: Flex(shrink: 0),
-        overflow: .auto,
-        backgroundColor: ThemeColors.surfaceContainerLowest,
         display: .flex,
+        overflow: .auto,
         flexDirection: .column,
+        flex: Flex(shrink: 0),
+        backgroundColor: ThemeColors.surfaceContainerLowest,
       ),
       css('.divider', [
         css('&').styles(
+          zIndex: ZIndex(10),
           width: 4.px,
-          backgroundColor: ThemeColors.surfaceContainerLow,
           cursor: .colResize,
           transition: .new('all', duration: 200.ms),
           flex: Flex(shrink: 0),
-          zIndex: ZIndex(10),
+          backgroundColor: ThemeColors.surfaceContainerLow,
         ),
         css('&:hover, &.resizing').styles(
-          backgroundColor: ThemeColors.primary,
           width: 4.px,
+          backgroundColor: ThemeColors.primary,
         ),
       ]),
     ]),

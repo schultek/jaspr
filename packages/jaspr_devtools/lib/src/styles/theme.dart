@@ -31,6 +31,8 @@ abstract class ThemeSpacing {
   static final s4 = 0.8.rem;
   static final s6 = 1.2.rem;
   static final s8 = 1.6.rem;
+
+  static final r1 = 4.px;
 }
 
 final _defaultFont = FontFamily.list([
@@ -58,34 +60,34 @@ final _defaultCodeFont = FontFamily.list([
 
 abstract class ThemeTypography {
   static final bodySm = Styles(
-    fontSize: 0.75.rem,
     color: ThemeColors.onSurface,
     fontFamily: _defaultFont,
+    fontSize: 0.75.rem,
   );
 
   static final bodyMd = Styles(
-    fontSize: 0.875.rem,
     color: ThemeColors.onSurface,
     fontFamily: _defaultFont,
+    fontSize: 0.875.rem,
   );
 
   static final labelSm = Styles(
-    fontSize: 0.75.rem,
     color: ThemeColors.onSurfaceVariant,
     fontFamily: _defaultFont,
+    fontSize: 0.75.rem,
   );
 
   static final code = Styles(
-    fontSize: 0.875.rem,
     color: ThemeColors.onSurface,
     fontFamily: _defaultCodeFont,
+    fontSize: 0.875.rem,
   );
 
   static final headline = Styles(
-    fontSize: 1.25.rem,
-    fontWeight: FontWeight.bold,
     color: ThemeColors.onSurface,
     fontFamily: _defaultFont,
+    fontSize: 1.25.rem,
+    fontWeight: FontWeight.bold,
   );
 }
 
@@ -110,8 +112,8 @@ List<StyleRule> get resetStyles => [
   css('body').styles(margin: Margin.zero, lineHeight: Unit.inherit, raw: {'-webkit-font-smoothing': 'antialiased'}),
   css('hr').styles(
     height: Unit.zero,
-    color: Color.inherit,
     border: Border.only(top: BorderSide(width: 1.px)),
+    color: Color.inherit,
   ),
   css('a').styles(color: Color.inherit, textDecoration: TextDecoration.inherit),
   css('b, strong').styles(fontWeight: FontWeight.bolder),
@@ -120,27 +122,27 @@ List<StyleRule> get resetStyles => [
   ).styles(fontSize: 1.em, raw: {'font-feature-settings': 'normal', 'font-variation-settings': 'normal'}),
   css('small').styles(fontSize: 80.percent),
   css('sub, sup').styles(
+    position: Position.relative(),
     fontSize: 75.percent,
     lineHeight: Unit.zero,
-    position: Position.relative(),
     raw: {'vertical-align': 'baseline'},
   ),
   css('sub').styles(position: Position.relative(bottom: (-0.25).em)),
   css('sup').styles(position: Position.relative(top: (-0.5).em)),
   css('table').styles(
-    textIndent: Unit.zero,
     border: Border.all(color: Color.inherit),
+    textIndent: Unit.zero,
     raw: {'border-collapse': 'collapse'},
   ),
   css('button, input, optgroup, select, textarea').styles(
+    padding: Padding.zero,
+    margin: Margin.zero,
+    color: Color.inherit,
     fontFamily: FontFamily.inherit,
     fontSize: 100.percent,
     fontWeight: FontWeight.inherit,
-    lineHeight: Unit.inherit,
     letterSpacing: Unit.inherit,
-    color: Color.inherit,
-    margin: Margin.zero,
-    padding: Padding.zero,
+    lineHeight: Unit.inherit,
     raw: {'font-feature-settings': 'inherit', 'font-variation-settings': 'inherit'},
   ),
   css('button, select').styles(textTransform: TextTransform.none),
@@ -158,7 +160,7 @@ List<StyleRule> get resetStyles => [
   css('blockquote, dd, dl, figure, h1, h2, h3, h4, h5, h6, hr, p, pre').styles(margin: Margin.zero),
   css('fieldset').styles(margin: Margin.zero),
   css('fieldset, legend').styles(padding: Padding.zero),
-  css('menu, ol, ul').styles(listStyle: ListStyle.none, margin: Margin.zero, padding: Padding.zero),
+  css('menu, ol, ul').styles(padding: Padding.zero, margin: Margin.zero, listStyle: ListStyle.none),
   css('dialog').styles(padding: Padding.zero),
   css('textarea').styles(raw: {'resize': 'vertical'}),
   css('input::placeholder, textarea::placeholder').styles(opacity: 1, color: Color('#9ca3af')),
@@ -167,5 +169,5 @@ List<StyleRule> get resetStyles => [
   css(
     'audio, canvas, embed, iframe, img, object, svg, video',
   ).styles(display: Display.block, raw: {'vertical-align': 'middle'}),
-  css('img, video').styles(maxWidth: 100.percent, height: Unit.auto),
+  css('img, video').styles(height: Unit.auto, maxWidth: 100.percent),
 ];
