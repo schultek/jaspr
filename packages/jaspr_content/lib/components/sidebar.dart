@@ -73,9 +73,9 @@ class Sidebar extends StatelessComponent {
     css('.sidebar', [
       css('&').styles(
         position: Position.relative(),
+        padding: Padding.only(left: 0.5.rem, bottom: 1.25.rem, top: 0.75.rem),
         fontSize: 0.875.rem,
         lineHeight: 1.25.rem,
-        padding: Padding.only(left: 0.5.rem, bottom: 1.25.rem, top: 0.75.rem),
       ),
       css.media(MediaQuery.all(minWidth: 1024.px), [css('&').styles(padding: Padding.only(top: Unit.zero))]),
       css('.sidebar-close', [
@@ -89,23 +89,23 @@ class Sidebar extends StatelessComponent {
           padding: Padding.only(top: 1.5.rem, right: 0.75.rem),
         ),
         css('h3').styles(
-          fontWeight: FontWeight.w600,
-          fontSize: 14.px,
           padding: Padding.only(left: 0.75.rem),
           margin: Margin.only(bottom: 1.rem, top: Unit.zero),
+          fontSize: 14.px,
+          fontWeight: FontWeight.w600,
         ),
-        css('ul').styles(listStyle: ListStyle.none, margin: Margin.zero, padding: Padding.zero),
+        css('ul').styles(padding: Padding.zero, margin: Margin.zero, listStyle: ListStyle.none),
         css('li', [
           css('div', [
             css('&').styles(
-              opacity: 0.75,
-              margin: Margin.only(bottom: 1.px),
-              whiteSpace: WhiteSpace.noWrap,
-              overflow: Overflow.hidden,
-              textOverflow: TextOverflow.ellipsis,
-              radius: BorderRadius.circular(.375.rem),
               display: Display.flex,
+              margin: Margin.only(bottom: 1.px),
+              radius: BorderRadius.circular(.375.rem),
+              opacity: 0.75,
+              overflow: Overflow.hidden,
               transition: Transition('all', duration: 150.ms, curve: Curve.easeInOut),
+              textOverflow: TextOverflow.ellipsis,
+              whiteSpace: WhiteSpace.noWrap,
             ),
             css('&:hover').styles(opacity: 1, backgroundColor: Color('#0000000d')),
             css('&.active').styles(
@@ -116,8 +116,8 @@ class Sidebar extends StatelessComponent {
             ),
           ]),
           css('a').styles(
-            padding: Padding.only(left: 12.px, top: .5.rem, bottom: .5.rem),
             display: Display.inlineFlex,
+            padding: Padding.only(left: 12.px, top: .5.rem, bottom: .5.rem),
             flex: Flex(grow: 1),
           ),
         ]),

@@ -24,7 +24,7 @@ class InstallCommandState extends State<InstallCommand> {
       classes: 'install-jaspr',
       events: events(
         onClick: () {
-          window.navigator.clipboard.writeText('dart pub global activate jaspr_cli');
+          window.navigator.clipboard.writeText('dart install jaspr_cli');
           setState(() {
             copied = true;
           });
@@ -38,7 +38,7 @@ class InstallCommandState extends State<InstallCommand> {
       [
         span([
           Icon('terminal'),
-          code([.text('dart pub global activate jaspr_cli')]),
+          code([.text('dart install jaspr_cli')]),
           button(
             styles: copied ? Styles(color: Colors.forestGreen) : null,
             attributes: {'aria-label': 'Copy'},

@@ -63,7 +63,6 @@ Handler createHandler(
   SetupHandler handle, {
   http.Client? client,
   Handler? fileHandler,
-  List<Pattern>? allowedRenderPaths,
 }) {
   client ??= http.Client();
   final staticHandler = fileHandler ?? staticFileHandler(client);

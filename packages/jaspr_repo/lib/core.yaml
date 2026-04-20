@@ -1,0 +1,9 @@
+include: package.yaml
+
+plugins:
+  jaspr_lints:
+    path: ../jaspr_lints
+    diagnostics:
+      sort_children_last: true
+      prefer_html_components: false
+      styles_ordering: true

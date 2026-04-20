@@ -119,9 +119,13 @@ class Page {
   Future<Component> render() async {
     parseFrontmatter();
     await loadData();
+
+    Future<void>? templatingFuture;
+
     return AsyncBuilder(
       builder: (context) async {
-        await renderTemplate(context.pages);
+        // Cache the templating future so that it is only run once.
+        await (templatingFuture ??= renderTemplate(context.pages));
 
         if (kGenerateMode) {
           if (data.page['sitemap'] case final sitemap?) {
@@ -288,9 +292,9 @@ extension PageHandlersExtension on Page {
   /// Renders the page content using the configured template engine.
   ///
   /// Modifies the page content.
-  FutureOr<void> renderTemplate(List<Page> pages) {
+  Future<void> renderTemplate(List<Page> pages) async {
     if (config.templateEngine != null) {
-      return config.templateEngine!.render(this, pages);
+      await config.templateEngine!.render(this, pages);
     }
   }
 

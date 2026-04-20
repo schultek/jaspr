@@ -39,9 +39,15 @@ class UpdateCommand extends BaseCommand {
     }
 
     logger.write('Updating jaspr_cli to $latestVersion...', progress: ProgressState.running);
+
     late final ProcessResult result;
     try {
-      result = await updater.update(packageName: packageName, versionConstraint: latestVersion);
+      // If the cli is installed as aot snapshot, we need to use 'dart install' instead of 'dart pub global activate'.
+      if (Platform.resolvedExecutable.endsWith('/jaspr')) {
+        result = await Process.run('dart', ['install', packageName, latestVersion]);
+      } else {
+        result = await updater.update(packageName: packageName, versionConstraint: latestVersion);
+      }
     } catch (error) {
       logger.complete(false);
       logger.write('$error', level: Level.error);

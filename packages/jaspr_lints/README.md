@@ -16,8 +16,7 @@ plugins:
       styles_ordering: true
 ```
 
-After running `dart pub get` you now see additional Jaspr lints 
-when invoking code assist on a component function like `div()` or `p()` files.
+After running `dart pub get` you now get additional lints and code assists in your IDE or when running `dart analyze`.
 
 ## Lints
 
@@ -25,6 +24,7 @@ when invoking code assist on a component function like `div()` or `p()` files.
 - Sort children last in HTML components. **(Fix available)**
 - Sort styles properties. **(Fix available)**
 - Prefer styles getter over (final) variable. **(Fix available)**
+- Avoid unsafe platform-specific imports.
 
 ## Code Assists:
 

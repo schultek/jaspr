@@ -46,7 +46,7 @@ Detailed guides on Jaspr's specific features and development workflows.
     - Use `@client` annotation to mark components for client-side hydration.
     - Accessing DOM and Browser APIs (`package:universal_web`).
 - [Static Site Generation](https://docs.jaspr.site/dev/static_sites): Generating static sites with `static` mode. Generating dynamic routes and sitemaps.
-- [Deploying](https://docs.jaspr.site/dev/deploying): How to deploy Jaspr apps to different providers (Firebase, GitHub Pages, Docker, Globe).
+- [Deploying](https://docs.jaspr.site/dev/deploying): How to deploy Jaspr apps to different providers (Firebase, GitHub Pages, Docker).
 - [Testing](https://docs.jaspr.site/dev/testing): Testing Jaspr components using `jaspr_test`.
     - `testComponents`: Unit testing.
     - `testClient`: Browser testing.

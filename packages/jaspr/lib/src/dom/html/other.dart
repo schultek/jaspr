@@ -290,9 +290,9 @@ final class link extends StatelessComponent {
 final class script extends StatelessComponent {
   /// {@macro jaspr.html.script}
   const script({
+    this.src,
     this.async = false,
     this.defer = false,
-    this.src,
     this.content,
     this.id,
     this.classes,
@@ -301,6 +301,9 @@ final class script extends StatelessComponent {
     this.events,
     super.key,
   });
+
+  /// This attribute specifies the URI of an external script; this can be used as an alternative to embedding a script directly within a document.
+  final String? src;
 
   /// For classic scripts, if the async attribute is present, then the classic script will be fetched in parallel to parsing and evaluated as soon as it is available.
   ///
@@ -317,9 +320,6 @@ final class script extends StatelessComponent {
   ///
   /// This attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse. async has a similar effect in this case.
   final bool defer;
-
-  /// This attribute specifies the URI of an external script; this can be used as an alternative to embedding a script directly within a document.
-  final String? src;
 
   /// The content of the script element, if it is not an external script.
   final String? content;
@@ -348,9 +348,9 @@ final class script extends StatelessComponent {
       styles: styles,
       attributes: {
         ...?attributes,
+        'src': ?src,
         if (async) 'async': '',
         if (defer) 'defer': '',
-        'src': ?src,
       },
       events: events,
       children: [if (content case final content?) RawText(content)],

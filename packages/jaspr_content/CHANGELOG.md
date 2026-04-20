@@ -1,4 +1,13 @@
-## Unreleased minor
+## 0.5.2
+
+- Fixed running templating multiple times for the same page when reloading or using secondary outputs.
+
+## 0.5.1
+
+- Fixed eager page loading exhausting file descriptors on macOS
+  when building sites with a large number of file-sourced pages.
+
+## 0.5.0
 
 - New `AssetManager` class for handling content assets. Assets like images, videos, etc. can be co-located with the content and referenced by their relative path from a page.
   - Asset paths are resolved across Markdown files, page data and components using `context.resolveAsset('some/asset.png')`.

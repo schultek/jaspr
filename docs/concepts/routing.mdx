@@ -42,7 +42,7 @@ When creating a new Jaspr project, you can choose between two routing setups:
 - **multi-page** (server-side) routing or
 - **single-page** (client-side) routing.
 
-This defined how navigating between routes will behave. With **multi-page routing** a "real" page load is performed when
+This defines how navigating between routes will behave. With **multi-page routing** a "real" page load is performed when
 navigating to a new route (aka. the browser requests the new page using its url from the server). With **single-page routing**
 the routing happens purely on the client without any request to the server.
 
@@ -72,7 +72,7 @@ To set up routing for either strategy is really straight forward:
 
   To navigate to a different page, use the [Link](/api/components/link) component, which wraps the `<a>` html element.
 
-  When using multi-page routing and the `Router` component is only rendered on the server, you cannot use `Router.of(context).push('/path)'`
+  When using multi-page routing and the `Router` component is only rendered on the server, you cannot use `Router.of(context).push('/path')`
   for navigating on the client as it would fail to locate the `Router` in the client-side component tree.
 
 - For single-page routing place the `Router` in the client-rendered section of the component tree, i.e. below any [@client](/api/utils/at_client) components.

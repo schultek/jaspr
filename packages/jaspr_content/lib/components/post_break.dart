@@ -25,14 +25,14 @@ class PostBreak extends StatelessComponent with CustomComponentBase {
   static List<StyleRule> get styles => [
     css('.postbreak', [
       css('&').styles(
-        margin: Margin.only(top: 3.rem, bottom: 3.rem),
         display: Display.flex,
+        margin: Margin.only(top: 3.rem, bottom: 3.rem),
         justifyContent: JustifyContent.center,
         gap: Gap.column(1.25.rem),
       ),
       css(
         'span',
-      ).styles(width: 4.px, height: 4.px, backgroundColor: ContentColors.headings, radius: BorderRadius.circular(4.px)),
+      ).styles(width: 4.px, height: 4.px, radius: BorderRadius.circular(4.px), backgroundColor: ContentColors.headings),
     ]),
   ];
 }

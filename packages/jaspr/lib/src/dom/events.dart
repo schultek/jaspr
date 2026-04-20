@@ -1,7 +1,7 @@
 import 'package:universal_web/web.dart' as web;
 
+import '/dom.dart';
 import '/jaspr.dart';
-import 'html/html.dart';
 import 'type_checks.dart';
 
 /// Helper function to provide typed event handlers to the `events` property of html components.
@@ -18,12 +18,13 @@ Map<String, EventCallback> events<V>({
   ///
   /// When providing a generic type for [V], it must be according to the target element:
   ///
-  /// - `bool?` for checkbox or radio input elements
-  /// - `num?` for number input elements
-  /// - `DateTime` for date input elements
-  /// - `List<File>?` for file input elements
+  /// - `bool` for checkbox or radio input elements
+  /// - `num` for number and range input elements
+  /// - `DateTime` (UTC) for date, time, week, month and datetime-local input elements
+  /// - `List<File>` for file input elements
+  /// - `Color` for color input elements
+  /// - `String` for all other input elements and textarea elements
   /// - `List<String>` for select elements
-  /// - `String` for text input and textarea elements
   /// - `Null` for all other elements
   ValueChanged<V>? onInput,
 
@@ -31,12 +32,13 @@ Map<String, EventCallback> events<V>({
   ///
   /// When providing a generic type for [V], it must be according to the target element:
   ///
-  /// - `bool?` for checkbox or radio input elements
-  /// - `num?` for number input elements
-  /// - `DateTime` for date input elements
-  /// - `List<File>?` for file input elements
+  /// - `bool` for checkbox or radio input elements
+  /// - `num` for number and range input elements
+  /// - `DateTime` (UTC) for date, time, week, month and datetime-local input elements
+  /// - `List<File>` for file input elements
+  /// - `Color` for color input elements
+  /// - `String` for all other input elements and textarea elements
   /// - `List<String>` for select elements
-  /// - `String` for text input and textarea elements
   /// - `Null` for all other elements
   ValueChanged<V>? onChange,
 }) => {
@@ -57,12 +59,24 @@ void Function(web.Event) _callWithValue<V>(String event, void Function(V) fn) {
     final value = switch (target) {
       web.HTMLInputElement() when target.isHtmlInputElement => () {
         final targetType = target.type;
-        final type = InputType.values.where((v) => v.name == targetType).firstOrNull;
+        final type = InputType.values.where((v) => v.value == targetType).firstOrNull;
         return switch (type) {
           InputType.checkbox || InputType.radio => target.checked,
-          InputType.number => target.valueAsNumber,
-          InputType.date || InputType.dateTimeLocal => target.valueAsDate,
-          InputType.file => target.files,
+          InputType.number || InputType.range => target.valueAsNumber,
+          InputType.date ||
+          InputType.time ||
+          InputType.week ||
+          InputType.dateTimeLocal => DateTime.fromMillisecondsSinceEpoch(target.valueAsNumber.toInt(), isUtc: true),
+          InputType.month => DateTime.utc(1970, target.valueAsNumber.toInt() + 1),
+          InputType.file =>
+            target.files != null
+                ? List<web.File>.generate(
+                    target.files!.length,
+                    (index) => target.files!.item(index)!,
+                    growable: false,
+                  )
+                : const <web.File>[],
+          InputType.color => Color(target.value),
           _ => target.value,
         };
       }(),

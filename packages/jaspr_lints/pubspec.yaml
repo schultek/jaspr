@@ -1,6 +1,6 @@
 name: jaspr_lints
 description: A collection of lints and assists for jaspr projects.
-version: 0.6.0
+version: 0.7.0
 homepage: https://jaspr.site
 repository: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
@@ -20,7 +20,12 @@ resolution: workspace
 
 dependencies:
   analysis_server_plugin: ^0.3.0
-  analyzer: ">=8.0.0 <10.0.0"
+  analyzer: ^10.0.0
   analyzer_plugin: any
   path: ^1.9.0
   yaml: ^3.1.2
+
+dev_dependencies:
+  analyzer_testing: ^0.1.9
+  test: ^1.29.0
+  test_reflective_loader: ^0.4.0

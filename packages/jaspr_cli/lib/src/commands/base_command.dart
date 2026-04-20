@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as p;
 import 'package:pub_updater/pub_updater.dart';
 
 import '../helpers/analytics.dart';
@@ -176,7 +177,7 @@ abstract class BaseCommand extends Command<int> {
   Future<int> watchProcess(
     String name,
     Process process, {
-    required Tag tag,
+    Tag? tag,
     String? progress,
     bool Function(String)? hide,
     bool Function()? onFail,
@@ -232,6 +233,31 @@ abstract class BaseCommand extends Command<int> {
     logger.complete(true);
 
     return exitCode;
+  }
+
+  Future<void> copyToBuildDir(String from, [List<String> targets = const ['']]) async {
+    final to = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
+    final moveTargets = [...targets];
+
+    final moves = <Future<void>>[];
+    while (moveTargets.isNotEmpty) {
+      final moveTarget = moveTargets.removeAt(0);
+      final file = File('$from/$moveTarget').absolute;
+      final directory = Directory('$from/$moveTarget').absolute;
+      if (file.existsSync()) {
+        moves.add(file.copy(File('$to/$moveTarget').absolute.path));
+      } else if (directory.existsSync()) {
+        await Directory('$to/$moveTarget').absolute.create(recursive: true);
+
+        final files = Directory('$from/$moveTarget').absolute.list(recursive: true);
+        await for (final file in files) {
+          final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
+          moveTargets.add(path);
+        }
+      }
+    }
+
+    await moves.wait;
   }
 }
 

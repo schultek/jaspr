@@ -39,10 +39,10 @@ final class SidebarToggleButton extends StatelessComponent {
   List<StyleRule> get _styles => [
     css('.sidebar-toggle-button').styles(
       display: Display.none,
-      justifyContent: JustifyContent.center,
-      alignItems: AlignItems.center,
       width: 2.rem,
       height: 2.rem,
+      justifyContent: JustifyContent.center,
+      alignItems: AlignItems.center,
     ),
     css.media(MediaQuery.all(maxWidth: 1024.px), [
       css('[data-has-sidebar] .sidebar-toggle-button').styles(display: Display.flex),

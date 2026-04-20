@@ -41,10 +41,10 @@ class About extends StatelessComponent {
         ]),
       ]),
     ]);
-  }{{#server}}
+  }
 
   @css
   static List<StyleRule> get styles => [
     css('ol').styles(maxWidth: 500.px),
-  ];{{/server}}
+  ];
 }

@@ -1,22 +1,46 @@
-import { lspToRange } from "../helpers/object_helper";
 import * as vs from "vscode";
-import { ScopeResults, ScopesDomain, ScopeTarget } from "../jaspr/scopes_domain";
-import { dartExtensionApi } from "../api";
 import { PublicOutline } from "dart-code/src/extension/api/interfaces";
 
+export type ScopeResults = {
+  locations: Record<string, ScopeLocation>;
+  scopes: Record<string, ScopeLibraryResult>;
+}
+
+export type ScopeLibraryResult = {
+  components: string[];
+  clientScopeRoots?: string[];
+  serverScopeRoots?: string[];
+};
+
+export type ScopeLocation = {
+  path: string;
+  name: string;
+  line: number;
+  char: number;
+  length: number;
+};
+
+
 export class ComponentCodeLensProvider implements vs.CodeLensProvider, vs.Disposable {
-  private scopesDomain: ScopesDomain;
+  private watcher: vs.FileSystemWatcher;
 
   private _onDidChangeCodeLenses: vs.EventEmitter<void> = new vs.EventEmitter<void>();
   public readonly onDidChangeCodeLenses: vs.Event<void> = this._onDidChangeCodeLenses.event;
 
   private hintCommand: vs.Disposable;
-  private scopeResults: ScopeResults = {};
+  private scopeResults: Record<string, ScopeResults> = {};
 
-  constructor(scopesDomain: ScopesDomain) {
-    this.scopesDomain = scopesDomain;
-    this.scopesDomain.onDidChangeScopes((results: ScopeResults) => {
-      this.scopeResults = results;
+  constructor() {
+
+    this.watcher = vs.workspace.createFileSystemWatcher("**/.dart_tool/jaspr/scopes.json");
+
+    this.watcher.onDidChange(async (uri) => {
+      await this.loadScopes(uri);
+      this._onDidChangeCodeLenses.fire();
+    });
+
+    this.watcher.onDidCreate(async (uri) => {
+      await this.loadScopes(uri);
       this._onDidChangeCodeLenses.fire();
     });
 
@@ -43,70 +67,68 @@ export class ComponentCodeLensProvider implements vs.CodeLensProvider, vs.Dispos
     );
   }
 
-  public async provideCodeLenses(
+  private async loadScopes(uri: vs.Uri) {
+    const content = await vs.workspace.fs.readFile(uri);
+    this.scopeResults[uri.fsPath] = JSON.parse(content.toString());
+  }
+
+  public provideCodeLenses(
     document: vs.TextDocument,
     token: vs.CancellationToken
-  ): Promise<vs.CodeLens[] | undefined> {
-    const outline = await dartExtensionApi.workspace.getOutline(
-      document,
-      token
-    );
-    if (!outline?.children?.length) {
-      return;
-    }
-
+  ): vs.CodeLens[] | undefined {
     const results: vs.CodeLens[] = [];
 
-    const serverRoots: ScopeTarget[] = [];
-    const clientRoots: ScopeTarget[] = [];
-    const components: PublicOutline[] = [];
+    let scopeResults: ScopeResults | null = null;
+    let item: ScopeLibraryResult | null = null;
+    for (const key in this.scopeResults) {
+      scopeResults = this.scopeResults[key];
+      item = scopeResults.scopes[document.uri.fsPath];
 
-    const item = this.scopeResults[document.uri.fsPath];
-    if (!item) {
+      if (item) break;
+    }
+
+    if (!scopeResults || !item) {
       return;
     }
 
-    for (let child of outline.children) {
-      const component = item.components?.find((c) => c === child.element.name);
-      if (!component) {
-        continue;
-      }
+    const mapIdsToLocations = (ids?: string[]): vs.Location[] => {
+      if (!ids) return [];
+      return ids.map((id) => scopeResults.locations[id]).map(this.scopeLocationToLocation);
+    };
 
-      serverRoots.push(...(item.serverScopeRoots ?? []));
-      clientRoots.push(...(item.clientScopeRoots ?? []));
-      components.push(child);
-    }
+    const serverRootLocations = mapIdsToLocations(item.serverScopeRoots);
+    const clientRootLocations = mapIdsToLocations(item.clientScopeRoots);
 
-    for (let component of components) {
-      if (serverRoots.length > 0) {
+    const showScopeHint = (serverRootLocations.length > 0 || clientRootLocations.length > 0) && vs.workspace
+      .getConfiguration("jaspr.scopes", document)
+      .get("showHint", true);
+
+    for (let componentId of item.components) {
+
+      const location = scopeResults.locations[componentId];
+      const range = this.scopeLocationToRange(location);
+
+      if (serverRootLocations.length > 0) {
         results.push(
-          this.createCodeLens(
-            document,
-            component,
-            "Server Scope",
-            serverRoots.map(targetToLocation)
-          )
+          new vs.CodeLens(range, {
+            arguments: [document.uri, range.start, serverRootLocations, "peek"],
+            command: "editor.action.peekLocations",
+            title: "Server Scope",
+          })
         );
       }
 
-      if (clientRoots.length > 0) {
+      if (clientRootLocations.length > 0) {
         results.push(
-          this.createCodeLens(
-            document,
-            component,
-            "Client Scope",
-            clientRoots.map(targetToLocation)
-          )
+          new vs.CodeLens(range, {
+            arguments: [document.uri, range.start, clientRootLocations, "peek"],
+            command: "editor.action.peekLocations",
+            title: "Client Scope",
+          })
         );
       }
 
-      if (
-        (serverRoots.length > 0 || clientRoots.length > 0) &&
-        vs.workspace
-          .getConfiguration("jaspr.scopes", document)
-          .get("showHint", true)
-      ) {
-        var range = lspToRange(component.codeRange);
+      if (showScopeHint) {
         results.push(
           new vs.CodeLens(range, {
             command: "jaspr.action.showScopeHint",
@@ -119,29 +141,23 @@ export class ComponentCodeLensProvider implements vs.CodeLensProvider, vs.Dispos
     return results;
   }
 
-  private createCodeLens(
-    document: vs.TextDocument,
-    element: any,
-    name: string,
-    targets: vs.Location[]
-  ): vs.CodeLens {
-    var range = lspToRange(element.codeRange);
-    return new vs.CodeLens(range, {
-      arguments: [document.uri, range.start, targets, "peek"],
-      command: "editor.action.peekLocations",
-      title: name,
-    });
+  private scopeLocationToLocation(location: ScopeLocation): vs.Location {
+    return new vs.Location(
+      vs.Uri.file(location.path),
+      new vs.Position(location.line - 1, location.char)
+    );
+  }
+
+  private scopeLocationToRange(location: ScopeLocation): vs.Range {
+    return new vs.Range(
+      new vs.Position(location.line - 1, location.char),
+      new vs.Position(location.line - 1, location.char + location.length)
+    );
   }
 
   public dispose(): any {
     this._onDidChangeCodeLenses.dispose();
+    this.watcher.dispose();
     this.hintCommand.dispose();
   }
-}
-
-function targetToLocation(target: ScopeTarget): vs.Location {
-  return new vs.Location(
-    vs.Uri.file(target.path),
-    new vs.Position(target.line - 1, target.character)
-  );
 }

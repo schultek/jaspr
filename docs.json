@@ -476,6 +476,10 @@
       "group": "Releases",
       "pages": [
         {
+          "title": "0.23.0",
+          "href": "/releases/v/0.23.0"
+        },
+        {
           "title": "0.22.0",
           "href": "/releases/v/0.22.0"
         },

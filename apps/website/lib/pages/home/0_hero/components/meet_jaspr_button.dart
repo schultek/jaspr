@@ -52,11 +52,20 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
 
   @override
   Component build(BuildContext context) {
-    final children = <Component>[];
     if (notifier.done) {
-      if (showOverlay) {
-        children.add(LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'));
-        children.add(
+      return div(id: 'meet-jaspr-button', [
+        .wrapElement(
+          events: {
+            'click': (event) {
+              event.preventDefault();
+              setState(() {
+                showOverlay = true;
+              });
+            },
+          },
+          child: LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'),
+        ),
+        if (showOverlay)
           Overlay(
             onClose: () {
               setState(() {
@@ -64,73 +73,53 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
               });
             },
           ),
-        );
-      } else {
-        children.add(
-          .wrapElement(
-            events: {
-              'click': (event) {
-                event.preventDefault();
-                setState(() {
-                  showOverlay = true;
-                });
-              },
-            },
-            child: LinkButton.outlined(label: 'Meet Jasper', icon: 'jasper', to: '#meet'),
-          ),
-        );
-      }
-
-      return .fragment(children);
+      ]);
     }
 
-    children.add(
-      div(id: 'meet-jaspr-button', [
-        .wrapElement(
-          classes: touchTimer != null ? 'active' : null,
-          events: {
-            'mousemove': (event) {
-              var e = event as web.MouseEvent;
-              var movement = (e.movementX.abs() + e.movementY.abs()) / 10;
-              notifier.add(movement);
-            },
-            'touchstart': (event) {
-              event.preventDefault();
-              touchTimer = Timer(Duration(seconds: 1), () {
-                touchTimer = Timer.periodic(Duration(milliseconds: 50), (_) {
-                  notifier.add(2, linear: true);
-                });
-              });
-              setState(() {});
-            },
-            'touchend': (event) {
-              touchTimer?.cancel();
-              setState(() {
-                touchTimer = null;
-              });
-              if (notifier.progressAfterCliff == 0) {
-                scrollToMeet();
-              }
-            },
-            'click': (event) {
-              event.preventDefault();
-              scrollToMeet();
-            },
+    return div(id: 'meet-jaspr-button', [
+      .wrapElement(
+        classes: touchTimer != null ? 'active' : null,
+        events: {
+          'mousemove': (event) {
+            var e = event as web.MouseEvent;
+            var movement = (e.movementX.abs() + e.movementY.abs()) / 10;
+            notifier.add(movement);
           },
-          styles: notifier.progressAfterCliff > 0
-              ? Styles(
-                  raw: {
-                    'background':
-                        'linear-gradient(to right, ${primaryFaded.value} ${notifier.progressAfterCliff - 1}%, ${surface.value} ${notifier.progressAfterCliff}%)',
-                  },
-                )
-              : null,
-          child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'custom-jaspr', to: '#meet'),
-        ),
-        Particles(particles: notifier.particles),
-      ]),
-    );
-    return .fragment(children);
+          'touchstart': (event) {
+            event.preventDefault();
+            touchTimer = Timer(Duration(seconds: 1), () {
+              touchTimer = Timer.periodic(Duration(milliseconds: 50), (_) {
+                notifier.add(2, linear: true);
+              });
+            });
+            setState(() {});
+          },
+          'touchend': (event) {
+            touchTimer?.cancel();
+            setState(() {
+              touchTimer = null;
+            });
+            if (notifier.progressAfterCliff == 0) {
+              scrollToMeet();
+            }
+          },
+          'click': (event) {
+            event.preventDefault();
+            scrollToMeet();
+          },
+        },
+        styles: notifier.progressAfterCliff > 0
+            ? Styles(
+                raw: {
+                  'background':
+                      'linear-gradient(to right, ${primaryFaded.value} ${notifier.progressAfterCliff - 1}%, ${surface.value} ${notifier.progressAfterCliff}%)',
+                },
+              )
+            : null,
+        child: LinkButton.outlined(label: 'Meet Jaspr', icon: 'custom-jaspr', to: '#meet'),
+      ),
+      Particles(particles: notifier.particles),
+    ]);
   }
 
   @css

@@ -15,7 +15,7 @@ To include components in your content, you can use the html-like `<Component>` s
 <Info>This draws attention to useful page information.</Info>
 ```
 
-The inner content of a component can contain normal markdown or even other components, which will be rendered as its children. Additionally, components can also take attributes to further customize their behavior: 
+The inner content of a component can contain normal markdown or even other components, which will be rendered as its children. Additionally, components can also take attributes to further customize their behavior:
 
 ```markdown
 <Tabs>
@@ -34,7 +34,7 @@ To make a custom component available for use in your content, add it to the `com
 
 ```dart
 ContentApp(
-  ...
+  // ...
   components: [
     Callout(),
     Tabs(),
@@ -55,7 +55,7 @@ class Card extends StatelessComponent {
   final String? title;
   final Component child;
 
-  ...
+  // ...
 }
 ```
 
@@ -63,7 +63,7 @@ To make this available as a custom `<Card>` component in your content, add the f
 
 ```dart
 ContentApp(
-  ...
+  // ...
   components: [
     CustomComponent(
       pattern: 'Card',
@@ -103,14 +103,14 @@ The `CustomComponent` constructor takes the following parameters:
 
 <Property name="builder" type="Component Function(...)" required>
   A builder function that builds the Jaspr component.
-  
+
   It receives the following parameters:
-  
+
   <Card>
     <Property name="name" type="String">
-      The component name matched by `pattern`. 
+      The component name matched by `pattern`.
     </Property>
-    
+
     ---
 
     <Property name="attributes" type="Map<String, String>">
@@ -120,10 +120,10 @@ The `CustomComponent` constructor takes the following parameters:
     ---
 
     <Property name="child" type="Component?">
-      The inner content of the component. 
+      The inner content of the component.
       This is `null` when using the self-closing `<Component />` syntax.
     </Property>
-    
+
    </Card>
 </Property>
 
@@ -138,7 +138,7 @@ class CustomCard implements CustomComponent {
 
   @override
   Component? create(Node node, NodesBuilder builder) {
-    ...
+    // ...
   }
 }
 ```
@@ -162,7 +162,7 @@ Component? create(Node node, NodesBuilder builder) {
 ```
 
 <Info>
-You can also use this in combination with custom markdown syntaxes. Checkout the [Markdown Parsing](/content/concepts/page_parsing#markdown) docs for more info.
+You can also use this in combination with custom markdown syntaxes. Check out the [Markdown Parsing](/content/concepts/page_parsing#markdown) docs for more info.
 </Info>
 
 ## Theming Custom Components
@@ -171,12 +171,11 @@ For general styling, you can use the standard `@css` annotation to define CSS st
 
 ```dart
 class CustomCard implements CustomComponent {
-
-  ... // other implementation
+  // Other implementation...
 
   @css
   static List<StyleRule> get styles => [
-    ... // your styles here
+    // Your styles here...
   ];
 }
 ```
@@ -187,7 +186,7 @@ If your component requires more advanced theming options, you can also provide a
   @override
   ThemeExtension? get theme => CustomCardTheme();
 
-...
+// ...
 
 class CustomCardTheme extends ThemeExtension<CustomCardTheme> {
   const CustomCardTheme({
@@ -215,15 +214,15 @@ class CustomCardTheme extends ThemeExtension<CustomCardTheme> {
 ```
 
 
-The theme extension can define a set of variables that will be injected into the `ContentTheme` CSS for use in your component styles. 
+The theme extension can define a set of variables that will be injected into the `ContentTheme` CSS for use in your component styles.
 Use these variables in your component styles like this:
 
 ```dart
   @css
   static List<StyleRule> get styles => [
-    css('.custom-card', [
+    css('.custom-card').styles(
       backgroundColor: Color.variable('--custom-card-bg'),
-    ]),
+    ),
   ];
 ```
 
@@ -231,7 +230,7 @@ The user of your component can then customize the component's look by providing 
 
 ```dart
 ContentTheme(
-  ...
+  // ...
   extensions: [
     CustomCardTheme(
       backgroundColor: ThemeColors.blue.$50,

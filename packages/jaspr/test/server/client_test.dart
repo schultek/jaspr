@@ -8,7 +8,7 @@ import 'package:jaspr_test/server_test.dart';
 class App1 extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return div([], attributes: {'data-app': '1'});
+    return div(attributes: {'data-app': '1'}, []);
   }
 }
 
@@ -20,7 +20,7 @@ class App2 extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return div([], attributes: {'data-app': '2'});
+    return div(attributes: {'data-app': '2'}, []);
   }
 }
 
@@ -46,7 +46,7 @@ class _App3State extends State<App3> with SyncStateMixin<App3, Map<String, Objec
 
   @override
   Component build(BuildContext context) {
-    return div([], attributes: {'data-app': '3'});
+    return div(attributes: {'data-app': '3'}, []);
   }
 }
 

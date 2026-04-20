@@ -5,15 +5,15 @@ on:
       - main
       - next
     paths:
-      - '.github/workflows/cli.yml'
-      - 'packages/jaspr_cli/**'
+      - ".github/workflows/cli.yml"
+      - "packages/jaspr_cli/**"
   push:
     branches:
       - main
       - next
     paths:
-      - '.github/workflows/cli.yml'
-      - 'packages/jaspr_cli/**'
+      - ".github/workflows/cli.yml"
+      - "packages/jaspr_cli/**"
 
 name: CLI Pipeline
 
@@ -36,7 +36,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
         with:
-          submodules: 'true'
+          submodules: "true"
 
       - uses: subosito/flutter-action@v2
         with:
@@ -50,11 +50,6 @@ jobs:
           jaspr --disable-analytics
 
       - name: Run cli test
-        run: melos run coverage:cli
+        run: melos run test:cli:integration
         env:
           VARIANT: ${{matrix.VARIANT}}
-
-      - name: Upload Coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: coverage/*_lcov.info

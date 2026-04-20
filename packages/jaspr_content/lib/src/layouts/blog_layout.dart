@@ -102,18 +102,18 @@ class BlogLayout extends PageLayoutBase {
         ]),
         css('main', [
           css('&').styles(
+            maxWidth: Unit.expression('75ch'),
             padding: Padding.only(top: 2.rem, left: 1.rem, right: 1.rem, bottom: 4.rem),
             margin: Margin.symmetric(horizontal: Unit.auto),
-            maxWidth: Unit.expression('75ch'),
           ),
           css('.content-container', [
             css('.post-header', [
               css('&').styles(margin: Margin.only(bottom: 2.rem)),
-              css('h1').styles(fontSize: 2.75.rem, lineHeight: 3.25.rem, color: ContentColors.headings),
+              css('h1').styles(color: ContentColors.headings, fontSize: 2.75.rem, lineHeight: 3.25.rem),
               css('.post-info', [
                 css('&').styles(
-                  margin: Margin.only(top: 2.rem),
                   display: Display.flex,
+                  margin: Margin.only(top: 2.rem),
                   alignItems: AlignItems.center,
                   gap: Gap.column(1.rem),
                 ),
@@ -123,23 +123,23 @@ class BlogLayout extends PageLayoutBase {
                     '&',
                   ).styles(display: Display.flex, flexDirection: FlexDirection.column, color: ContentColors.text),
                   css(':first-child').styles(fontSize: 1.125.rem),
-                  css(':last-child').styles(fontSize: 1.rem, opacity: 0.85),
+                  css(':last-child').styles(opacity: 0.85, fontSize: 1.rem),
                 ]),
               ]),
             ]),
             css('.post-tags', [
               css('&').styles(
                 display: Display.flex,
+                margin: Margin.only(top: 2.rem, bottom: 0.5.rem),
                 flexDirection: FlexDirection.row,
                 flexWrap: FlexWrap.wrap,
                 gap: Gap.all(0.5.rem),
-                margin: Margin.only(top: 2.rem, bottom: 0.5.rem),
               ),
               css('span').styles(
                 padding: Padding.symmetric(horizontal: 0.75.rem, vertical: 0.25.rem),
                 radius: BorderRadius.circular(10.rem),
-                backgroundColor: ContentColors.hr,
                 fontSize: 0.875.rem,
+                backgroundColor: ContentColors.hr,
               ),
             ]),
           ]),
