@@ -1,0 +1,17 @@
+name: functions_template
+description: An app using Firebase Functions for Dart
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  firebase_functions:
+    git: https://github.com/firebase/firebase-functions-dart
+  functionstest:
+    path: ../
+  jaspr: ^0.23.0
+
+dev_dependencies:
+  build_runner: ^2.4.0
