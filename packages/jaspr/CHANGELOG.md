@@ -1,6 +1,7 @@
 ## Unreleased breaking
 
 - Added **Server Components** to allow for more fine-grained control over the server-side rendered component trees.
+- **Breaking**: Renamed `Component.wrapElement()` to `Component.apply()` and added `ApplyTarget target` parameter used to target specific elements instead of only direct children.
 - **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
 - Added stateful server-side reload feature.
 
