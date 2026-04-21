@@ -28,6 +28,8 @@ class ClientWorkflow {
     void Function(FutureOr<void> Function()) guard, {
     bool enableDebugging = false,
     ReloadConfiguration reload = ReloadConfiguration.none,
+    String moduleFormat = 'amd',
+    bool webHotReload = false,
   }) async {
     var cancelled = false;
 
@@ -53,6 +55,8 @@ class ClientWorkflow {
           client.buildResults,
           enableDebugging: enableDebugging,
           reload: reload,
+          moduleFormat: moduleFormat,
+          webHotReload: webHotReload,
         );
 
         if (cancelled) {

@@ -57,6 +57,18 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
+    argParser.addOption(
+      'module-format',
+      help: 'The module format to use.',
+      allowed: ['ddc', 'amd'],
+      defaultsTo: 'amd',
+    );
+    argParser.addFlag(
+      'web-hot-reload',
+      help: 'Enable web hot reload.',
+      negatable: true,
+      defaultsTo: false,
+    );
     argParser.addFlag(
       'managed-build-options',
       help:
@@ -284,15 +296,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
 
-    final configuration = Configuration(
-      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
-      debug: launchInChrome,
-      debugExtension: launchInChrome,
-      launchInChrome: launchInChrome,
-      autoRun: autoRun,
-      moduleFormat: 'ddc',
-      webHotReload: false,
-    );
+    final moduleFormat = argResults!.option('module-format') ?? 'ddc';
+    final webHotReload = argResults!.flag('web-hot-reload');
 
     logger.write('Starting web compilers...', tag: Tag.cli, progress: ProgressState.running);
 
@@ -324,7 +329,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       for (final e in dartDefines.entries) '-D${e.key}=${e.value}',
     ];
 
-    final usesDdcLibraryBundles = configuration.moduleFormat == 'ddc' || configuration.canaryFeatures;
+    final usesDdcLibraryBundles = moduleFormat == 'ddc';
 
     List<String> additionalFlutterBuildArgs() {
       final sdkKernelPath = p.url.join(
@@ -372,7 +377,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ],
 
         // Add Web Hot Reload defines.
-        if (configuration.webHotReload) ...[
+        if (webHotReload) ...[
           '--define=build_web_compilers:sdk_js=web-hot-reload=true',
           '--define=build_web_compilers:entrypoint=web-hot-reload=true',
           '--define=build_web_compilers:entrypoint_marker=web-hot-reload=true',
@@ -394,6 +399,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       guardResource,
       enableDebugging: launchInChrome,
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+      moduleFormat: moduleFormat,
+      webHotReload: webHotReload,
     );
     if (workflow == null) {
       return null;

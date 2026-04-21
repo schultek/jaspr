@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:build_daemon/data/build_status.dart' as daemon;
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/dwds.dart';
+import 'package:dwds/src/loaders/build_runner_strategy_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
@@ -43,6 +44,8 @@ class DevProxy {
     bool enableDebugging = false,
     bool enableInjectedClient = true,
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
+    String moduleFormat = 'amd',
+    bool webHotReload = false,
   }) async {
     const target = 'web';
     var pipeline = const Pipeline();
@@ -78,17 +81,24 @@ class DevProxy {
 
       final buildSettings = BuildSettings(
         //appEntrypoint: Uri.parse('org-dartlang-app:///$target/main.dart'),
-        canaryFeatures: false,
+        canaryFeatures: moduleFormat == 'ddc' || webHotReload,
         isFlutterApp: false,
         experiments: [],
       );
 
-      final loadStrategy = BuildRunnerRequireStrategyProvider(
-        reload,
-        assetReader,
-        buildSettings,
-        packageConfigPath: findPackageConfigFilePath(),
-      ).strategy;
+      final loadStrategy = moduleFormat == 'ddc'
+          ? BuildRunnerDdcLibraryBundleStrategyProvider(
+              reload,
+              assetReader,
+              buildSettings,
+              packageConfigPath: findPackageConfigFilePath(),
+            ).strategy
+          : BuildRunnerRequireStrategyProvider(
+              reload,
+              assetReader,
+              buildSettings,
+              packageConfigPath: findPackageConfigFilePath(),
+            ).strategy;
 
       if (enableDebugging) {
         ddcService = ExpressionCompilerService(
