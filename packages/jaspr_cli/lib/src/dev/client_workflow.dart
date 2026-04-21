@@ -44,7 +44,9 @@ class ClientWorkflow {
           return null;
         }
 
-        client.registerBuildTarget(DefaultBuildTarget((b) => b..target = 'web'));
+        client.registerBuildTarget(DefaultBuildTarget((b) => b
+          ..target = 'web'
+          ..reportChangedAssets = true));
 
         logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
         client.startBuild();

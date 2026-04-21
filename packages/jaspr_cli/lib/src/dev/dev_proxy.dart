@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:build_daemon/data/build_status.dart' as daemon;
@@ -48,10 +49,24 @@ class DevProxy {
     bool webHotReload = false,
   }) async {
     const target = 'web';
+    final reloadedSources = <Map<String, dynamic>>[];
     var pipeline = const Pipeline();
 
     // Only provide relevant build results
     final filteredBuildResults = buildResults.asyncMap<BuildResult>((results) {
+      if (moduleFormat == 'ddc') {
+        reloadedSources.clear();
+        results.changedAssets?.forEach((uri) {
+          if (uri.path.endsWith('.ddc.js')) {
+            final reloadedSource = {
+              'src': ddcUriToSourceUrl('', target, uri),
+              'module': ddcUriToLibraryId(uri),
+              'libraries': [ddcUriToLibraryId(uri)],
+            };
+            reloadedSources.add(reloadedSource);
+          }
+        });
+      }
       final result = results.results.firstWhere((result) => result.target == target);
       switch (result.status) {
         case daemon.BuildStatus.started:
@@ -86,12 +101,15 @@ class DevProxy {
         experiments: [],
       );
 
+      final reloadedSourcesUri = Uri.parse('/reloaded_sources.json');
+
       final loadStrategy = moduleFormat == 'ddc'
           ? BuildRunnerDdcLibraryBundleStrategyProvider(
               reload,
               assetReader,
               buildSettings,
               packageConfigPath: findPackageConfigFilePath(),
+              reloadedSourcesUri: reloadedSourcesUri,
             ).strategy
           : BuildRunnerRequireStrategyProvider(
               reload,
@@ -137,6 +155,14 @@ class DevProxy {
       );
       pipeline = pipeline.addMiddleware(dwds.middleware);
       cascade = cascade.add(dwds.handler);
+      if (moduleFormat == 'ddc') {
+        cascade = cascade.add((Request req) async {
+          if (req.url.path == 'reloaded_sources.json') {
+            return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
+          }
+          return Response.notFound('');
+        });
+      }
       cascade = cascade.add(assetHandler);
     } else {
       cascade = cascade.add(assetHandler);
@@ -194,4 +220,31 @@ class JasprSdkConfigurationProvider extends SdkConfigurationProvider {
       ),
     );
   }
+}
+
+String ddcUriToSourceUrl(String basePath, String target, Uri uri) {
+  String jsPath;
+  if (uri.isScheme('asset')) {
+    var pathParts = uri.pathSegments.skip(1);
+    if (pathParts.first == target) {
+      pathParts = pathParts.skip(1);
+    }
+    jsPath = pathParts.join('/');
+  } else if (uri.isScheme('package')) {
+    jsPath = 'packages/${uri.path}';
+  } else {
+    jsPath = uri.path;
+  }
+  return '$basePath/$jsPath';
+}
+
+String ddcUriToLibraryId(Uri uri) {
+  final jsPath = uri.isScheme('package')
+      ? 'package:${uri.path}'
+      : 'org-dartlang-app:///${uri.path}';
+  final prefix = jsPath.substring(
+    0,
+    jsPath.length - '.ddc.js'.length,
+  );
+  return '$prefix.dart';
 }

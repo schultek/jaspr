@@ -80,7 +80,9 @@ Handler createHandler(
     var isAllowedPath = false;
     final segment = request.url.pathSegments.lastOrNull ?? '';
     if (!segment.contains('.')) {
-      isAllowedPath = true;
+      isAllowedPath = !request.url.path.contains('dwds') &&
+                      !request.url.path.startsWith(r'$') &&
+                      request.url.path != 'null';
     } else {
       final suffix = segment.split('.').last;
       if (Jaspr.allowedPathSuffixes.contains(suffix)) {
