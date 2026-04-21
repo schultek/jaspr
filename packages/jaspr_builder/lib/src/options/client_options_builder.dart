@@ -38,14 +38,14 @@ class ClientOptionsBuilder implements Builder {
   };
 
   Future<void> generateClientOptions(BuildStep buildStep) async {
-    final (_, flutter) = await buildStep.loadProjectMode(options, buildStep);
+    final (_, flutter, _) = await buildStep.loadProjectMode();
 
     final serverId = AssetId(
       buildStep.inputId.package,
       buildStep.inputId.path.replaceFirst('.client.dart', '.server.dart'),
     );
 
-    final shouldInitializePlugins = flutter == 'embedded' || flutter == 'plugins';
+    final shouldInitializePlugins = flutter == FlutterMode.embedded || flutter == FlutterMode.plugins;
 
     var (clients, sources, plugins) = await (
       buildStep.loadClients(),

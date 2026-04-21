@@ -6,15 +6,16 @@ import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
 import '../dev/chrome.dart';
 import '../dev/client_workflow.dart';
+import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
+import '../process_runner.dart';
 import '../project.dart';
 import 'base_command.dart';
 
@@ -41,7 +42,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'port',
       abbr: 'p',
-      help: 'Specify a port to run the dev server on. Defaults to {jaspr.port} from pubspec.yaml or "8080".',
+      help:
+          'Specify a port to run the dev server on. '
+          'Defaults to {jaspr.port} from pubspec.yaml or "$defaultServePort".',
     );
     argParser.addOption(
       'web-port',
@@ -79,15 +82,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final debug = argResults!.flag('debug');
   late final release = argResults!.flag('release');
   late final mode = argResults!.option('mode')!;
-  late final port = argResults!.option('port') ?? project.port ?? '8080';
-  late final webPort = argResults!.option('web-port') ?? '5467';
-  late final customProxyPort = argResults!.option('proxy-port');
+  late final port = argResults!.option('port') ?? project.port ?? defaultServePort;
+  late final customProxyPort = argResults!.option('proxy-port') ?? serverProxyPort;
   late final useWasm = argResults!.flag('experimental-wasm');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
   late final skipServer = argResults!.flag('skip-server');
 
   bool get launchInChrome;
-  bool get autoRun;
 
   void handleClientWorkflow(ClientWorkflow workflow) {}
 
@@ -96,9 +97,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     ensureInProject();
 
     logger.write('Running jaspr in ${project.requireMode.name} rendering mode.');
-
-    final proxyPort = project.requireMode == JasprMode.client ? port : (customProxyPort ?? '5567');
-    final flutterPort = '5678';
 
     final entryPoint = await getServerEntryPoint(input);
 
@@ -109,7 +107,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       );
     }
 
-    final workflow = await _runClient(webPort);
+    final proxyPort = project.requireMode == JasprMode.client ? port : customProxyPort;
+
+    final workflow = await _runClient(proxyPort);
     if (workflow == null) {
       await stop();
       return 1;
@@ -118,11 +118,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     handleClientWorkflow(workflow);
 
     if (project.flutterMode == FlutterMode.embedded) {
-      final flutterProcess = await serveFlutter(flutterPort, useWasm);
+      final flutterProcess = await serveFlutter(useWasm);
 
-      workflow.serverManager.servers.first.buildResults.where((event) => event.status == BuildStatus.succeeded).listen((
-        event,
-      ) {
+      workflow.devProxy.buildResults.where((event) => event.status == BuildStatus.succeeded).listen((event) {
         // trigger reload
         flutterProcess.stdin.writeln('r');
       });
@@ -130,9 +128,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     await startProxy(
       proxyPort,
-      webPort: webPort,
+      devProxy: workflow.devProxy,
       serverPort: port,
-      flutterPort: project.flutterMode == FlutterMode.embedded ? flutterPort : null,
+      flutterPort: project.flutterMode == FlutterMode.embedded ? flutterProxyPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
     );
 
@@ -140,25 +138,23 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
 
       await _runChrome();
-
-      await workflow.done;
-      return 0;
-    }
-
-    if (skipServer) {
+    } else if (skipServer) {
       logger.write(
         'Skipping server as per --skip-server flag.\n'
         'Make sure to set the JASPR_PROXY_PORT=$proxyPort environment variable when starting the server manually.',
         tag: Tag.cli,
         level: Level.warning,
       );
-      await workflow.done;
-      return 0;
+    } else {
+      final started = await _startServer(entryPoint!, proxyPort, workflow);
+      if (started) {
+        await _runChrome();
+      }
     }
-    return await _runServer(entryPoint!, proxyPort, workflow);
+    return await workflow.done;
   }
 
-  Future<int> _runServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
+  Future<bool> _startServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
     logger.write('Starting server...', tag: Tag.cli, progress: ProgressState.running);
 
     final useHotReload = entryPoint.startsWith('lib/') && !release;
@@ -199,8 +195,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     args.addAll(argResults!.rest);
-    final process = await Process.start(
-      Platform.executable,
+    final process = await ProcessRunner.instance.start(
+      dartExecutable,
       args,
       environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
       workingDirectory: Directory.current.absolute.path,
@@ -224,34 +220,42 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     );
 
     var serverClosed = false;
-    serverFuture.whenComplete(() {
+    serverFuture.then((code) {
+      workflow.shutDown(code);
       serverClosed = true;
     });
 
     // Wait until server is reachable.
     var n = 0;
+    final sw = Stopwatch()..start();
+
     while (true) {
-      await Future<void>.delayed(Duration(seconds: 2));
+      await Future<void>.delayed(Duration(milliseconds: 1000 + (n * 100)));
       try {
-        await http.head(Uri.parse('http://localhost:$port'));
+        final socket = await Socket.connect('localhost', int.parse(port));
+        socket.close();
+        sw.stop();
         break;
       } on SocketException catch (_) {}
 
-      if (serverClosed) return serverFuture;
+      if (serverClosed) {
+        sw.stop();
+        return false;
+      }
 
       n++;
-      if (n > 10) {
+      if (n >= 10) {
+        sw.stop();
         logger.write(
-          'Server at http://localhost:$port not reachable after ${n * 2} seconds. Please check the server logs for errors.',
+          'Server at http://localhost:$port not reachable after ${sw.elapsed.inSeconds} seconds. Please check the server logs for errors.',
           tag: Tag.cli,
-          level: Level.error,
+          level: Level.warning,
         );
-        return 1;
+        return false;
       }
     }
 
-    await _runChrome();
-    return serverFuture;
+    return true;
   }
 
   Future<void> _runChrome() async {
@@ -273,14 +277,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     });
   }
 
-  Future<ClientWorkflow?> _runClient(String webPort) async {
+  Future<ClientWorkflow?> _runClient(String proxyPort) async {
     if (useWasm) {
       project.checkWasmSupport();
     }
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
-
-    print("MEMES $mode");
 
     final configuration = Configuration(
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
@@ -288,9 +290,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       debugExtension: launchInChrome,
       launchInChrome: launchInChrome,
       autoRun: autoRun,
-      // moduleFormat: 'ddc',
-      // webHotReload: false,
+      moduleFormat: 'ddc',
+      webHotReload: false,
     );
+
+    logger.write('Starting web compilers...', tag: Tag.cli, progress: ProgressState.running);
 
     final compiler = useWasm
         ? 'dart2wasm'
@@ -359,14 +363,14 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         '--define=build_web_compilers:ddc=generate-full-dill=true',
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
 
-        // Add the DDC Library Bundle defines.
+        // Add DDC Library Bundle defines.
         if (usesDdcLibraryBundles) ...[
         '--define=build_web_compilers:ddc=ddc-library-bundle=true',
         '--define=build_web_compilers:sdk_js=ddc-library-bundle=true',
         '--define=build_web_compilers:entrypoint=ddc-library-bundle=true',
         '--define=build_web_compilers:entrypoint_marker=ddc-library-bundle=true'],
 
-        // Add the Web Hot Reload defines
+        // Add Web Hot Reload defines.
         if (configuration.webHotReload) ...[
           '--define=build_web_compilers:sdk_js=web-hot-reload=true',
           '--define=build_web_compilers:entrypoint=web-hot-reload=true',
@@ -382,13 +386,20 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       ],
     ];
 
-    final workflow = await ClientWorkflow.start(configuration, buildArgs, webPort, logger, guardResource);
+    final workflow = await ClientWorkflow.start(
+      proxyPort,
+      buildArgs,
+      logger,
+      guardResource,
+      enableDebugging: launchInChrome,
+      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+    );
     if (workflow == null) {
       return null;
     }
 
     guardResource(() async {
-      logger.write('Terminating web compiler...');
+      logger.write('Terminating web compilers...');
       await workflow.shutDown();
     });
 
@@ -404,13 +415,14 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     });
 
-    workflow.serverManager.servers.first.buildResults.listen((event) {
+    workflow.devProxy.buildResults.listen((event) {
       if (event.status == BuildStatus.succeeded) {
         if (!buildCompleter.isCompleted) {
           buildCompleter.complete();
         } else {
           logger.write('Rebuilt web assets.', tag: Tag.cli, progress: ProgressState.completed);
         }
+        _runBuildCallback();
       } else if (event.status == BuildStatus.failed) {
         logger.write(
           'Failed building web assets. There is probably more output above.',
@@ -425,6 +437,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         if (buildCompleter.isCompleted) {
           logger.write('Rebuilding web assets...', tag: Tag.cli, progress: ProgressState.running);
         } else {
+          logger.write('Web compilers started.', tag: Tag.cli, progress: ProgressState.completed);
           logger.write('Building web assets...', tag: Tag.cli, progress: ProgressState.running);
         }
       }
@@ -461,6 +474,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     return workflow;
+  }
+
+  void _runBuildCallback() {
+    generateCss();
   }
 }
 

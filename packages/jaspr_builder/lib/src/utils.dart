@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
@@ -66,11 +67,18 @@ Map<String, String> compressPaths(List<String> paths) {
   return compressed;
 }
 
-int compareSegments(Iterable<String> a, Iterable<String> b) {
+int compareSegments(Iterable<String> a, Iterable<String> b, {bool withPriority = false}) {
+  if (withPriority) {
+    if (a.length == 1 && b.length > 1) {
+      return -1;
+    } else if (a.length > 1 && b.length == 1) {
+      return 1;
+    }
+  }
   if (a.length > 1 && b.length > 1) {
     final comp = a.first.compareTo(b.first);
     if (comp == 0) {
-      return compareSegments(a.skip(1), b.skip(1));
+      return compareSegments(a.skip(1), b.skip(1), withPriority: withPriority);
     } else {
       return comp;
     }
@@ -85,6 +93,10 @@ int compareSegments(Iterable<String> a, Iterable<String> b) {
 
 int comparePaths(String a, String b) {
   return compareSegments(a.split('/'), b.split('/'));
+}
+
+int comparePathsWithPriority(String a, String b) {
+  return compareSegments(a.split('/'), b.split('/'), withPriority: true);
 }
 
 class ImportEntry {
@@ -255,12 +267,38 @@ extension LoadBundle on BuildStep {
     }).toSet();
   }
 
-  Future<(String?, String?)> loadProjectMode(BuilderOptions options, BuildStep buildStep) async {
+  Future<(JasprMode?, FlutterMode?, StylesMode?)> loadProjectMode() async {
     final pubspecYaml = await readAsString(AssetId(inputId.package, 'pubspec.yaml'));
     final jasprConfig = (yaml.loadYaml(pubspecYaml) as Map<Object?, Object?>?)?['jaspr'] as Map<Object?, Object?>?;
     final mode = jasprConfig?['mode'] as String?;
     final flutter = jasprConfig?['flutter'] as String?;
+    final styles = jasprConfig?['styles'] as String?;
 
-    return (mode, flutter);
+    if (mode == null) {
+      stderr.writeln('[WARNING] No jaspr.mode specified in pubspec.yaml.');
+    }
+    final jasprMode = JasprMode.values.where((m) => m.name == mode).firstOrNull;
+    if (mode != null && jasprMode == null) {
+      stderr.writeln('[WARNING] Invalid jaspr.mode option "$mode" used in pubspec.yaml.');
+    }
+    final flutterMode = FlutterMode.values.where((m) => m.name == flutter).firstOrNull;
+    if (flutter != null && flutterMode == null) {
+      stderr.writeln('[WARNING] Invalid jaspr.flutter option "$flutter" used in pubspec.yaml.');
+    }
+    final stylesMode = StylesMode.values.where((s) => s.name == styles).firstOrNull;
+    if (styles != null && stylesMode == null) {
+      stderr.writeln('[WARNING] Invalid jaspr.styles option "$styles" used in pubspec.yaml.');
+    }
+    if (jasprMode == JasprMode.client && stylesMode == StylesMode.standalone) {
+      stderr.writeln('[WARNING] jaspr.styles option "$styles" is not supported in client mode.');
+    }
+
+    return (jasprMode, flutterMode, stylesMode);
   }
 }
+
+enum JasprMode { static, server, client }
+
+enum FlutterMode { embedded, plugins, none }
+
+enum StylesMode { standalone, inline }

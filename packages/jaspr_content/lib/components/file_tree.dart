@@ -109,13 +109,13 @@ class FileTree extends CustomComponent {
       css('&').styles(
         display: Display.block,
         padding: Padding.all(1.rem),
-        fontSize: 0.8125.rem,
-        backgroundColor: Color.variable(FileTreeTheme._backgroundVariable),
         color: Color.variable(FileTreeTheme._textVariable),
+        fontSize: 0.8125.rem,
         lineHeight: 1.375.rem,
+        backgroundColor: Color.variable(FileTreeTheme._backgroundVariable),
       ),
       css('ul').styles(
-        listStyle: ListStyle.none,
+        padding: Padding.only(left: .125.rem),
         margin: Margin.only(left: .5.rem),
         border: Border.only(
           left: BorderSide.solid(
@@ -123,7 +123,7 @@ class FileTree extends CustomComponent {
             color: Color.variable(FileTreeTheme._iconVariable),
           ),
         ),
-        padding: Padding.only(left: .125.rem),
+        listStyle: ListStyle.none,
       ),
       css('> ul').styles(
         padding: Padding.zero,
@@ -140,9 +140,9 @@ class FileTree extends CustomComponent {
         ),
         css('svg').styles(
           display: Display.inline,
-          margin: Margin.only(left: .25.rem, right: .375.rem),
           width: .875.rem,
           height: .875.rem,
+          margin: Margin.only(left: .25.rem, right: .375.rem),
           color: Color.variable(FileTreeTheme._iconVariable),
           raw: {
             'vertical-align': 'middle',

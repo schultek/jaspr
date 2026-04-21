@@ -18,7 +18,7 @@ void main() {
 
       test('combines typed styles', () {
         final styles = const Styles.combine([
-          Styles(fontSize: Unit.pixels(12), fontFamily: FontFamily('Roboto')),
+          Styles(fontFamily: FontFamily('Roboto'), fontSize: Unit.pixels(12)),
           Styles(fontSize: Unit.pixels(14)),
         ]);
 

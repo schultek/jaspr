@@ -24,6 +24,7 @@ After running `dart pub get` you now get additional lints and code assists in yo
 - Sort children last in HTML components. **(Fix available)**
 - Sort styles properties. **(Fix available)**
 - Prefer styles getter over (final) variable. **(Fix available)**
+- Avoid unsafe platform-specific imports.
 
 ## Code Assists:
 

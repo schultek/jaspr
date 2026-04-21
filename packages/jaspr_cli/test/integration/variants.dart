@@ -79,12 +79,12 @@ extension on RenderingMode {
       ('lib/main.client.dart', fileExists),
       ('lib/main.client.options.dart', isNot(fileExists)),
       ('web/index.html', fileExists),
-      ('web/styles.css', fileExists),
     },
   };
   Set<String> get resources => {};
   Set<(String, Matcher)> get outputs => {
     ('main.client.dart.js', fileExists),
+    if (this == RenderingMode.client) ('main.css', fileExists),
   };
 }
 

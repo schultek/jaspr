@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
@@ -7,8 +5,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_visitor.dart';
 import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer/source/source_range.dart';
-import 'package:path/path.dart' as path;
-import 'package:yaml/yaml.dart';
 
 export 'package:analysis_server_plugin/edit/dart/dart_fix_kind_priority.dart';
 export 'package:analyzer/error/error.dart';
@@ -102,19 +98,6 @@ extension Indent on String {
     }
     return lines.join('\n');
   }
-}
-
-YamlMap? readJasprConfig(String filePath) {
-  final segments = path.split(filePath);
-  while (segments.length > 1) {
-    final pubspecFile = File(path.joinAll([...segments, 'pubspec.yaml']));
-    if (pubspecFile.existsSync()) {
-      final pubspecData = loadYaml(pubspecFile.readAsStringSync()) as YamlMap;
-      return pubspecData['jaspr'] as YamlMap?;
-    }
-    segments.removeLast();
-  }
-  return null;
 }
 
 extension AstSourceRange on AstNode {

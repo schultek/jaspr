@@ -1,6 +1,12 @@
+## 0.7.0
+
+- Added `unsafe_imports` lint rule to detect unsafe platform-specific imports in components depending on where they are rendered (server or client).
+- Component scopes are now calculated by this package, instead of the `jaspr tooling-daemon` command.
+
 ## 0.6.1
 
 - Allow `analyzer` versions 10.x.
+- Enabled `addStyles` and `convertToNestedStyles` assists in client mode projects. 
 
 ## 0.6.0
 
@@ -21,7 +27,7 @@
 
 ## 0.4.0
 
-- Added 'prefer_styles_getter' lint and fix.
+- Added `prefer_styles_getter` lint and fix.
 - Update `analyzer_plugin` to `^0.13.0`.
 
 ## 0.3.1

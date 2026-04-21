@@ -1,3 +1,7 @@
+## 0.4.5
+
+- `jaspr` upgraded to `0.23.0`
+
 ## 0.4.4
 
 - Fix `.syncWith` incorrectly applying codec when decoding values.

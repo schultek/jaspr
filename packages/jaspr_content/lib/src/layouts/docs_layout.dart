@@ -95,9 +95,9 @@ class DocsLayout extends PageLayoutBase {
           css('&').styles(
             position: Position.absolute(),
             zIndex: ZIndex(9),
-            backgroundColor: ContentColors.background,
             opacity: 0,
             pointerEvents: PointerEvents.none,
+            backgroundColor: ContentColors.background,
             raw: {'inset': '0'},
           ),
           css('&:has(+ .sidebar-container.open)').styles(opacity: 0.5, pointerEvents: PointerEvents.auto),
@@ -108,8 +108,8 @@ class DocsLayout extends PageLayoutBase {
             zIndex: ZIndex(10),
             width: 17.rem,
             overflow: Overflow.only(y: Overflow.auto),
-            transform: Transform.translate(x: (-100).percent),
             transition: Transition('transform', duration: 150.ms, curve: Curve.easeInOut),
+            transform: Transform.translate(x: (-100).percent),
           ),
           css.media(MediaQuery.all(minWidth: 768.px), [css('&').styles(margin: Margin.only(left: (-1.25).rem))]),
           css.media(MediaQuery.all(minWidth: 1024.px), [
@@ -120,11 +120,11 @@ class DocsLayout extends PageLayoutBase {
           ]),
           css.media(MediaQuery.all(maxWidth: 1023.px), [
             css('&').styles(
-              backgroundColor: ContentColors.background,
               position: Position.fixed(top: Unit.zero),
               border: Border.only(
                 right: BorderSide(width: 1.px, color: Color('#0000000d')),
               ),
+              backgroundColor: ContentColors.background,
             ),
           ]),
           css('&.open').styles(transform: Transform.translate(x: Unit.zero)),
@@ -137,17 +137,17 @@ class DocsLayout extends PageLayoutBase {
           css.media(MediaQuery.all(minWidth: 1024.px), [css('&').styles(padding: Padding.only(left: 17.rem))]),
           css('> div', [
             css('&').styles(
-              padding: Padding.only(top: 2.rem, left: 1.rem, right: 1.rem),
               display: Display.flex,
+              padding: Padding.only(top: 2.rem, left: 1.rem, right: 1.rem),
               justifyContent: JustifyContent.center,
             ),
             css.media(MediaQuery.all(minWidth: 1024.px), [css('&').styles(padding: Padding.only(left: 4.rem))]),
             css('.content-container', [
               css('&').styles(
-                flex: Flex(grow: 1, shrink: 1, basis: 0.percent),
                 minWidth: Unit.zero,
                 maxWidth: 80.rem,
                 padding: Padding.only(right: Unit.zero),
+                flex: Flex(grow: 1, shrink: 1, basis: 0.percent),
               ),
               css.media(MediaQuery.all(minWidth: 1280.px), [css('&').styles(padding: Padding.only(right: 3.rem))]),
               css('.content-header', [
@@ -157,9 +157,9 @@ class DocsLayout extends PageLayoutBase {
                 ),
                 css('h1').styles(fontSize: 2.rem, lineHeight: 2.25.rem),
                 css('p').styles(
+                  margin: Margin.only(top: .75.rem),
                   fontSize: 1.25.rem,
                   lineHeight: 1.25.rem,
-                  margin: Margin.only(top: .75.rem),
                 ),
                 css('img').styles(
                   margin: Margin.only(top: 1.rem),
@@ -173,11 +173,11 @@ class DocsLayout extends PageLayoutBase {
               css.media(MediaQuery.all(minWidth: 1280.px), [css('&').styles(display: Display.block)]),
               css('> div', [css('&').styles(position: Position.sticky(top: 6.rem))]),
               css('h3').styles(
-                opacity: 0.75,
-                fontWeight: FontWeight.w600,
-                fontSize: .875.rem,
-                lineHeight: 1.25.rem,
                 margin: Margin.only(bottom: .5.rem),
+                opacity: 0.75,
+                fontSize: .875.rem,
+                fontWeight: FontWeight.w600,
+                lineHeight: 1.25.rem,
               ),
               css('ul').styles(margin: Margin.only(top: 1.rem)),
               css('li').styles(

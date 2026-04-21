@@ -9,12 +9,13 @@ import 'package:pub_updater/pub_updater.dart';
 
 import 'commands/build_command.dart';
 import 'commands/clean_command.dart';
+import 'commands/convert_html_command.dart';
 import 'commands/create_command.dart';
 import 'commands/daemon_command.dart';
 import 'commands/doctor_command.dart';
+import 'commands/install_skills_command.dart';
 import 'commands/migrate_command.dart';
 import 'commands/serve_command.dart';
-import 'commands/tooling_daemon_command.dart';
 import 'commands/update_command.dart';
 import 'helpers/analytics.dart';
 import 'utils.dart';
@@ -28,23 +29,28 @@ const executableName = 'jaspr';
 
 /// A [CommandRunner] for the Jaspr CLI.
 class JasprCommandRunner extends CompletionCommandRunner<int> {
-  JasprCommandRunner() : super(executableName, 'jaspr - A modern web framework for building websites in Dart.') {
+  JasprCommandRunner([this.enableAutoInstall = true])
+    : super(executableName, 'jaspr - A modern web framework for building websites in Dart.') {
     argParser.addFlag('version', abbr: 'v', negatable: false, help: 'Print the current version info.');
     argParser.addFlag('enable-analytics', negatable: false, help: 'Enable anonymous analytics.');
     argParser.addFlag('disable-analytics', negatable: false, help: 'Disable anonymous analytics.');
     addCommand(CreateCommand());
     addCommand(ServeCommand());
+    addCommand(DaemonCommand());
     addCommand(BuildCommand());
     addCommand(CleanCommand());
     addCommand(UpdateCommand());
     addCommand(DoctorCommand());
     addCommand(MigrateCommand());
-    addCommand(DaemonCommand());
-    addCommand(ToolingDaemonCommand());
+    addCommand(InstallSkillsCommand());
+    addCommand(ConvertHtmlCommand());
   }
 
   final Logger _logger = Logger();
   final _updater = PubUpdater(null, getPubDevBaseUrl());
+
+  @override
+  final bool enableAutoInstall;
 
   @override
   Future<int?> run(Iterable<String> args) async {

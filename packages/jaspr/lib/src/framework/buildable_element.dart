@@ -56,9 +56,9 @@ abstract class BuildableElement extends Element {
         tag: 'div',
         styles: const Styles(
           padding: Padding.all(Unit.em(2)),
-          backgroundColor: Colors.red,
           color: Colors.yellow,
           fontSize: Unit.rem(1),
+          backgroundColor: Colors.red,
         ),
         children: [Component.text('Error on building component: $e')],
       );

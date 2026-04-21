@@ -1,0 +1,83 @@
+---
+title: Version 0.23.0
+description: Release notes and breaking changes.
+---
+
+---
+
+## Agent Skills for Jaspr
+
+Jaspr now ships with a set of agent skills to improve the experience of using Jaspr with AI code generation tools.
+
+These skills can be installed by running `jaspr install-skills` in your project directory. The install location depends on the AI tool you are using and can be configured via the `--agent` flag.
+
+For example to install the skills for Antigravity, use `jaspr install-skills --agent=antigravity`.
+
+Use `jaspr install-skills -h` to get the list of all available agents.
+
+When **updating Jaspr** you also should update the installed skills by running `jaspr install-skills` again. The cli will automatically detect if the installed skills are outdated, or when new skills are available.
+
+---
+
+The following skills are available:
+
+| Skill | Description |
+| --- | --- |
+| jaspr-fundamentals | Jaspr fundamentals, Up-to-date syntax for writing components. |
+| jaspr-pre-rendering-and-hydration | Pre-rendering and hydration, @client components, entrypoints. |
+| jaspr-styling | Styling in Jaspr, @css, Styles API. |
+| jaspr-convert-html | Automatically converting HTML to Jaspr. |
+| jaspr-js-interop | JS interop in Jaspr and Dart. |
+
+## CLI Improvements
+
+The Jaspr CLI is now installable with `dart install jaspr_cli`.
+
+This will install the CLI as an **AOT executable** and is faster than the previous version installed via `dart pub global activate`.
+
+<Info>
+When installing the CLI with `dart install jaspr_cli`, make sure to remove any previous global activation of `jaspr_cli`. You can do this by running `dart pub global deactivate jaspr_cli`.
+</Info>
+
+---
+
+Added a new `jaspr convert-html` command to automatically convert raw HTML to clean and idiomatic Jaspr code.
+
+This is used by the new `jaspr-convert-html` agent skill, but can also be used manually by providing a file path or URL to the command.
+
+- From a local file: `jaspr convert-html --file some/path/to/file.html`
+- From a URL: `jaspr convert-html --url https://example.com`
+
+If you only need a portion of the HTML, you can use the `--query` option with a CSS selector to target specific elements rather than converting the whole file and deleting pieces manually.
+
+```bash
+jaspr convert-html --file some/path/to/file.html --query "#my-id"
+```
+*This will only convert and output the element with the id `my-id`.*
+
+## Standalone CSS Generation
+
+Jaspr now supports generating a standalone `.css` file for your styles declared with `@css`.
+
+To enable this feature, add the following option to your `pubspec.yaml`:
+
+```yaml
+jaspr:
+  styles: standalone
+```
+
+By default, all styles declared with `@css` are inlined in the pre-rendered HTML. When standalone mode is enabled, all styles are extracted to a separate `.css` file and linked in the pre-rendered HTML. This can improve the initial load time of your website, since the browser can more efficiently cache the css file.
+
+Additionally, `@css` is now **also supported in client mode** projects, where standalone mode is enabled by default.
+
+## Unsafe Imports Lint Rule
+
+A new lint rule `unsafe_imports` has been added to `jaspr_lints`. It will detect and warn about unsafe platform-specific imports in components depending on where they are rendered (server or client).
+
+For example, if a component imports e.g. `dart:io` or `package:jaspr/server.dart` but is rendered on the client, it will be flagged as unsafe. Similarly, if a component imports e.g. `dart:js_interop` or `package:jaspr/client.dart` but is rendered on the server, it will be flagged as unsafe.
+
+This will help you to avoid compilation errors due to wrong imports, which before were quite hard to debug.
+
+<Info>
+To further improve your experience, consider using the **Jaspr VSCode Extension**, which will give you in-editor hints for each component on where they are rendered (server, client, or both).
+</Info>

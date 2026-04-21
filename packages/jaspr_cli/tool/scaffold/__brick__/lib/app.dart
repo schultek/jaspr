@@ -67,11 +67,11 @@ class App extends StatelessComponent {
       const Home(),
       const About(),{{/routing}}
     ]);
-  }{{#server}}
+  }
 
-  // Defines the css styles for elements of this component.
+  // Defines the CSS styles for this component.
   //
-  // By using the @css annotation, these will be rendered automatically to css inside the <head> of your page.
+  // By using the @css annotation, these will be rendered automatically to CSS and included in your page.
   // Must be a variable or getter of type [List<StyleRule>].
   @css
   static List<StyleRule> get styles => [
@@ -91,5 +91,5 @@ class App extends StatelessComponent {
         flex: Flex(grow: 1{{^routing}}, shrink: 0, basis: 400.px{{/routing}}),
       ),
     ]),
-  ];{{/server}}
+  ];
 }

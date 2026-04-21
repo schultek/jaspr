@@ -1,3 +1,11 @@
+## 0.4.0
+
+- Jaspr is now installed using `dart install jaspr_cli` instead of `dart pub global activate jaspr_cli`. 
+  This requires Dart 3.10 or later.
+- The extension now expects the `jaspr` command to be available on the system PATH.
+- Removed custom reporting of unsafe imports diagnostics. This is now part of the `jaspr_lints` package.
+- Component scopes now require `jaspr_lints` to be setup as an analyzer plugin for the current project.
+
 ## 0.3.1
 
 - Fix issue where the entry file was not opened after project creation.

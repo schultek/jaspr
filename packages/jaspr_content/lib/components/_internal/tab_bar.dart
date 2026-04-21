@@ -22,18 +22,18 @@ class TabBar extends StatefulComponent {
     css('.tab-bar', [
       css('&').styles(
         display: Display.flex,
-        alignItems: AlignItems.center,
-        gap: Gap.column(1.25.rem),
         border: Border.only(
           bottom: BorderSide(width: 1.px, color: ContentColors.hr),
         ),
+        alignItems: AlignItems.center,
+        gap: Gap.column(1.25.rem),
       ),
       css('button').styles(
         padding: Padding.symmetric(vertical: 0.75.rem),
-        fontWeight: FontWeight.w700,
         border: Border.only(
           bottom: BorderSide(width: 2.px, color: Colors.transparent),
         ),
+        fontWeight: FontWeight.w700,
       ),
       css('button:hover').styles(raw: {'border-bottom-color': ContentColors.hr.value}),
       css(

@@ -47,9 +47,9 @@ class DevexBox extends StatelessComponent {
           textAlign: .start,
         ),
         css('a').styles(
+          color: textBlack,
           fontWeight: .bold,
           textDecoration: .new(line: .underline),
-          color: textBlack,
         ),
       ]),
     ]),

@@ -65,7 +65,7 @@ class ThemeToggleState extends State<ThemeToggle> {
   }
 
   @css
-  static final List<StyleRule> styles = [
+  static List<StyleRule> get styles => [
     css('.theme-toggle', [
       css('&').styles(
         display: Display.flex,

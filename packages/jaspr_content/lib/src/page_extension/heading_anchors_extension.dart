@@ -75,10 +75,10 @@ class HeadingAnchorsExtension implements PageExtension {
         gap: Gap.column(0.5.rem),
       ),
       css('> a').styles(
-        textDecoration: TextDecoration.none,
         opacity: 0,
-        fontSize: 0.8.em,
         transition: Transition('opacity', duration: 300.ms),
+        fontSize: 0.8.em,
+        textDecoration: TextDecoration.none,
       ),
       css('&:hover > a').styles(opacity: 0.8),
       css('& > a:hover').styles(opacity: 1),

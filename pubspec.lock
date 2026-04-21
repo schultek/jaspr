@@ -57,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.14.1"
+  analyzer_testing:
+    dependency: transitive
+    description:
+      name: analyzer_testing
+      sha256: "0ec2c743b6dbe9fddb4853574b1d9ede046cab6013e84d044aa291d018518c9d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.9"
   ansi_styles:
     dependency: transitive
     description:
@@ -157,10 +165,10 @@ packages:
     dependency: transitive
     description:
       name: build_daemon
-      sha256: "8e928697a82be082206edb0b9c99c5a4ad6bc31c9e9b8b2f291ae65cd4a25daa"
+      sha256: bf05f6e12cfea92d3c09308d7bcdab1906cd8a179b023269eed00c071004b957
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.4"
+    version: "4.1.1"
   build_modules:
     dependency: transitive
     description:
@@ -456,6 +464,14 @@ packages:
       relative: true
     source: path
     version: "0.0.0"
+  dart_service_protocol_shared:
+    dependency: transitive
+    description:
+      name: dart_service_protocol_shared
+      sha256: "1737875c176d7e3d87bb3a359182828b542fe20a0b34198b8d31a81af5c7a76d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   dart_style:
     dependency: transitive
     description:
@@ -468,10 +484,10 @@ packages:
     dependency: transitive
     description:
       name: dds
-      sha256: c90723eb1f1402429c57f717550ce5af80288d74a27c45ccbe754a0e3e038f95
+      sha256: "06d09ee8b4a0b58e721fd3780aa53a80eeec0e14479899b74be39e4bd522c5ff"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.7"
+    version: "5.1.0"
   dds_service_extensions:
     dependency: transitive
     description:
@@ -484,26 +500,26 @@ packages:
     dependency: transitive
     description:
       name: devtools_shared
-      sha256: "72369878105eccd563547afbad97407a2431b96bd4c04a1d6da75cb068437f50"
+      sha256: "275e48a8a145fa09c7ae433a96fd433c01cc079d39b40acf5ba883236ae2c887"
       url: "https://pub.dev"
     source: hosted
-    version: "10.0.2"
+    version: "12.0.0"
   dtd:
     dependency: transitive
     description:
       name: dtd
-      sha256: "14a0360d898ded87c3d99591fc386b8a6ea5d432927bee709b22130cd25b993a"
+      sha256: "09ddb228b3d1478a093556357692a4c203ff4f9d5f8cda05dfdca0ff3fb7c5d3"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.1"
+    version: "4.0.0"
   dwds:
     dependency: transitive
     description:
       name: dwds
-      sha256: "1c192079b0e62ae1be032340a2ed073d678ab3d5ca7ded7954d1aa2d4643df02"
+      sha256: "10d22555cbb59c3e0e968da646ff7f0103e4f56698bbc37e45145de34e4bad36"
       url: "https://pub.dev"
     source: hosted
-    version: "24.3.5"
+    version: "27.0.3"
   ed25519_edwards:
     dependency: transitive
     description:
@@ -1123,10 +1139,10 @@ packages:
     dependency: transitive
     description:
       name: matcher
-      sha256: dc0b7dc7651697ea4ff3e69ef44b0407ea32c487a39fff6a4004fa585e901861
+      sha256: "12956d0ad8390bbcc63ca2e1469c0619946ccb52809807067a7020d57e647aa6"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.19"
+    version: "0.12.18"
   material_color_utilities:
     dependency: transitive
     description:
@@ -1155,10 +1171,10 @@ packages:
     dependency: transitive
     description:
       name: mime
-      sha256: "801fd0b26f14a4a58ccb09d5892c3fbdeff209594300a542492cf13fba9d247a"
+      sha256: "41a20518f0cb1256669420fdba0cd90d21561e560ac240f26ef8322e45bb7ed6"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "2.0.0"
   mocktail:
     dependency: transitive
     description:
@@ -1712,10 +1728,10 @@ packages:
     dependency: transitive
     description:
       name: sse
-      sha256: fcc97470240bb37377f298e2bd816f09fd7216c07928641c0560719f50603643
+      sha256: a9a804dbde8bfd369da3b4aa241d44d63a6486a97388c54ec166073d88c52302
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.8"
+    version: "4.2.0"
   stack_trace:
     dependency: transitive
     description:
@@ -1800,26 +1816,34 @@ packages:
     dependency: transitive
     description:
       name: test
-      sha256: "280d6d890011ca966ad08df7e8a4ddfab0fb3aa49f96ed6de56e3521347a9ae7"
+      sha256: "54c516bbb7cee2754d327ad4fca637f78abfc3cbcc5ace83b3eda117e42cd71a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.30.0"
+    version: "1.29.0"
   test_api:
     dependency: transitive
     description:
       name: test_api
-      sha256: "8161c84903fd860b26bfdefb7963b3f0b68fee7adea0f59ef805ecca346f0c7a"
+      sha256: "93167629bfc610f71560ab9312acdda4959de4df6fac7492c89ff0d3886f6636"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.10"
+    version: "0.7.9"
   test_core:
     dependency: transitive
     description:
       name: test_core
-      sha256: "0381bd1585d1a924763c308100f2138205252fb90c9d4eeaf28489ee65ccde51"
+      sha256: "394f07d21f0f2255ec9e3989f21e54d3c7dc0e6e9dbce160e5a9c1a6be0e2943"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.16"
+    version: "0.6.15"
+  test_reflective_loader:
+    dependency: transitive
+    description:
+      name: test_reflective_loader
+      sha256: d828d5ca15179aaac2aaf8f510cf0a52ec28e0031681b044ec5e581a4b8002e7
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   timezone:
     dependency: transitive
     description:
@@ -1880,10 +1904,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: "0968250880a6c5fe7edc067ed0a13d4bae1577fe2771dcf3010d52c4a9d3ca14"
+      sha256: ddfa8d30d89985b96407efce8acbdd124701f96741f2d981ca860662f1c0dc02
       url: "https://pub.dev"
     source: hosted
-    version: "14.3.1"
+    version: "15.0.0"
   vm_service_interface:
     dependency: transitive
     description:
@@ -1924,14 +1948,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
-  webdev:
-    dependency: transitive
-    description:
-      name: webdev
-      sha256: efcb8230c9d40c75118b57e10e59936c40f02f232b27fdfae91a9f00ca470d9d
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.7.1"
   webkit_inspection_protocol:
     dependency: transitive
     description:
@@ -1989,5 +2005,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.10.3 <3.12.0-z"
+  dart: ">=3.11.0 <3.12.0-z"
   flutter: ">=3.38.4"
