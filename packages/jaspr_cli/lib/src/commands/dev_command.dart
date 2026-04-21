@@ -365,10 +365,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
         // Add DDC Library Bundle defines.
         if (usesDdcLibraryBundles) ...[
-        '--define=build_web_compilers:ddc=ddc-library-bundle=true',
-        '--define=build_web_compilers:sdk_js=ddc-library-bundle=true',
-        '--define=build_web_compilers:entrypoint=ddc-library-bundle=true',
-        '--define=build_web_compilers:entrypoint_marker=ddc-library-bundle=true'],
+          '--define=build_web_compilers:ddc=ddc-library-bundle=true',
+          '--define=build_web_compilers:sdk_js=ddc-library-bundle=true',
+          '--define=build_web_compilers:entrypoint=ddc-library-bundle=true',
+          '--define=build_web_compilers:entrypoint_marker=ddc-library-bundle=true',
+        ],
 
         // Add Web Hot Reload defines.
         if (configuration.webHotReload) ...[
