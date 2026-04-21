@@ -55,3 +55,9 @@ dependencies:
 
 dev_dependencies:
   test: ^1.22.0
+
+dependency_overrides:
+  webdev:
+    path: /Users/markzipan/Projects/webdev/webdev
+  dwds:
+    path: /Users/markzipan/Projects/webdev/dwds

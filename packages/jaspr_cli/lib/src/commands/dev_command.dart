@@ -280,12 +280,16 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
 
+    print("MEMES $mode");
+
     final configuration = Configuration(
       reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
       debug: launchInChrome,
       debugExtension: launchInChrome,
       launchInChrome: launchInChrome,
       autoRun: autoRun,
+      // moduleFormat: 'ddc',
+      // webHotReload: false,
     );
 
     final compiler = useWasm
@@ -316,16 +320,19 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       for (final e in dartDefines.entries) '-D${e.key}=${e.value}',
     ];
 
+    final usesDdcLibraryBundles = configuration.moduleFormat == 'ddc' || configuration.canaryFeatures;
+
     List<String> additionalFlutterBuildArgs() {
       final sdkKernelPath = p.url.join(
         'kernel',
         flutterVersion.compareTo('3.32.0') >= 0 ? 'ddc_outline.dill' : 'ddc_outline_sound.dill',
       );
       final librariesPath = p.join(webSdkDir, 'libraries.json');
+      final ddcSdkPrefix = usesDdcLibraryBundles ? 'ddcLibraryBundle-canvaskit' : 'amd-canvaskit';
       final sdkJsPath = p.join(
         webSdkDir,
         'kernel',
-        flutterVersion.compareTo('3.32.0') >= 0 ? 'amd-canvaskit' : 'amd-canvaskit-sound',
+        flutterVersion.compareTo('3.32.0') >= 0 ? ddcSdkPrefix : '$ddcSdkPrefix-sound',
       );
       return [
         '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
@@ -351,6 +358,22 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:ddc=generate-full-dill=true',
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
+
+        // Add the DDC Library Bundle defines.
+        if (usesDdcLibraryBundles) ...[
+        '--define=build_web_compilers:ddc=ddc-library-bundle=true',
+        '--define=build_web_compilers:sdk_js=ddc-library-bundle=true',
+        '--define=build_web_compilers:entrypoint=ddc-library-bundle=true',
+        '--define=build_web_compilers:entrypoint_marker=ddc-library-bundle=true'],
+
+        // Add the Web Hot Reload defines
+        if (configuration.webHotReload) ...[
+          '--define=build_web_compilers:sdk_js=web-hot-reload=true',
+          '--define=build_web_compilers:entrypoint=web-hot-reload=true',
+          '--define=build_web_compilers:entrypoint_marker=web-hot-reload=true',
+          '--define=build_web_compilers:ddc=web-hot-reload=true',
+          '--define=build_web_compilers:ddc_modules=web-hot-reload=true',
+        ],
         switch (compiler) {
           'dartdevc' => '--define=build_web_compilers:ddc=environment=${jsonEncode(ddcDefines)}',
           _ => '--define=build_web_compilers:entrypoint=${compiler}_args=${jsonEncode(dart2jsDefines)}',
