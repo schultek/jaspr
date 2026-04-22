@@ -121,7 +121,25 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
 Handler createProxyHandler(http.Client? client) {
   final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: client);
   // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
-  return (req) => handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
+  return (req) async {
+    try {
+      return await handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
+    } on http.ClientException {
+      if (req.url.path == 'reloaded_sources.json' || req.requestedUri.path == '/reloaded_sources.json') {
+        // Hack: retry a few times if the proxy is unavailable during a reload.
+        for (var i = 0; i < 10; i++) {
+          await Future.delayed(Duration(milliseconds: 200));
+          try {
+            return await handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
+          } on http.ClientException {
+            // Continue retrying.
+          }
+        }
+        return Response.ok('[]', headers: {'content-type': 'application/json'});
+      }
+      rethrow;
+    }
+  };
 }
 
 // coverage:ignore-start

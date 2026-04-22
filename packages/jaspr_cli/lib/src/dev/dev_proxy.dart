@@ -153,16 +153,21 @@ class DevProxy {
         buildResults: filteredBuildResults,
         chromeConnection: () async => (await Chrome.connectedInstance).chrome.chromeConnection,
       );
-      pipeline = pipeline.addMiddleware(dwds.middleware);
-      cascade = cascade.add(dwds.handler);
+      
       if (moduleFormat == 'ddc') {
-        cascade = cascade.add((Request req) async {
-          if (req.url.path == 'reloaded_sources.json') {
-            return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
-          }
-          return Response.notFound('');
+        pipeline = pipeline.addMiddleware((Handler innerHandler) {
+          return (Request req) async {
+            if (req.url.path == 'reloaded_sources.json' || req.requestedUri.path == '/reloaded_sources.json') {
+              return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
+            }
+            return innerHandler(req);
+          };
         });
       }
+      
+      pipeline = pipeline.addMiddleware(dwds.middleware);
+      
+      cascade = cascade.add(dwds.handler);
       cascade = cascade.add(assetHandler);
     } else {
       cascade = cascade.add(assetHandler);
