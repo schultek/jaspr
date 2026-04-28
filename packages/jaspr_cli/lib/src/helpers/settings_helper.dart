@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart_data_home/dart_data_home.dart';
 import 'package:path/path.dart' as path;
 
-const String _settingsDirectoryName = '.jaspr';
 const String _settingsFileName = 'jaspr.json';
 
 T? getSetting<T>(String key) {
@@ -41,20 +41,7 @@ void _writeSettings() {
 
 final File? settingsFile = () {
   final settingsDir = getSettingsDirectory();
-  if (settingsDir == null) {
-    // Some systems don't support user home directories.
-    return null;
-  }
-
-  if (!settingsDir.existsSync()) {
-    try {
-      settingsDir.createSync();
-    } catch (e) {
-      // If we can't create the directory for the analytics settings, fail
-      // gracefully by returning null.
-      return null;
-    }
-  }
+  if (settingsDir == null) return null;
 
   final settingsFile = File('${settingsDir.path}${path.separator}$_settingsFileName').absolute;
   if (!settingsFile.existsSync()) {
@@ -65,25 +52,58 @@ final File? settingsFile = () {
   return settingsFile;
 }();
 
-/// The directory used to store the settings file.
-///
-/// Typically, the directory is `~/.dart/`.
-///
-/// This can return `null` under some conditions, including when
-/// the user's home directory does not exist.
 Directory? getSettingsDirectory() {
-  final dir = homeDir;
-  if (dir == null) {
-    return null;
+  final settingsDir = Directory(dataHome);
+  if (!settingsDir.existsSync()) {
+    try {
+      _moveToNewSettingsDir(settingsDir);
+    } catch (e) {
+      stdout.writeln('Error moving settings directory: $e');
+      if (!settingsDir.existsSync()) {
+        return null;
+      }
+    }
   }
-  return Directory(path.join(dir.path, _settingsDirectoryName)).absolute;
+
+  return settingsDir;
 }
 
-/// Return the user's home directory for the current platform.
-Directory? get homeDir {
+/// The directory used to store the settings file.
+///
+/// The directory follows OS defaults and lives under the Dart data home.
+final String dataHome = getDartDataHome('jaspr');
+
+void _moveToNewSettingsDir(Directory newDir) {
+  newDir.createSync();
+
   final envKey = Platform.operatingSystem == 'windows' ? 'APPDATA' : 'HOME';
   final home = Platform.environment[envKey] ?? '.';
 
-  final dir = Directory(home).absolute;
-  return dir.existsSync() ? dir : null;
+  final homeDir = Directory(home).absolute;
+  if (!homeDir.existsSync()) return;
+
+  final legacyDir = Directory(path.join(homeDir.path, '.jaspr')).absolute;
+  if (!legacyDir.existsSync()) return;
+
+  stdout.writeln('Moving Jaspr settings directory to "${newDir.path}" (was "${legacyDir.path}")');
+
+  for (final file in legacyDir.listSync(recursive: true)) {
+    final copyTo = path.join(newDir.path, path.relative(file.path, from: legacyDir.path));
+
+    try {
+      if (file is Directory) {
+        Directory(copyTo).createSync(recursive: true);
+      } else if (file is File) {
+        File(file.path).copySync(copyTo);
+      } else if (file is Link) {
+        Link(copyTo).createSync(file.targetSync(), recursive: true);
+      }
+    } catch (e) {
+      if (!file.path.contains('/chrome_user_data/')) {
+        rethrow;
+      }
+    }
+  }
+
+  legacyDir.deleteSync(recursive: true);
 }

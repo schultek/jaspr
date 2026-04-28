@@ -1,6 +1,14 @@
 ## Unreleased patch
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.
+- Jaspr now uses OS-specific directories for its settings and cache, better respecting platform conventions. 
+  - The old directory at '~/.jaspr/' is automatically migrated to the new locations on first run.
+  - The new directory location is:
+     - when `DART_DATA_HOME` environment variable is set: `$DART_DATA_HOME/jaspr`
+     - on **Windows**: `%LOCALAPPDATA%\Dart\jaspr`
+     - on **Mac OS**: `$HOME/Library/Application Support/Dart/jaspr`
+     - on **Linux**: `$XDG_STATE_HOME/Dart/jaspr` if `$XDG_STATE_HOME` is defined, and `$HOME/.local/state/Dart/jaspr` otherwise.
+- The cli completion files are no longer auto-installed when the `JASPR_NO_COMPLETION` environment variable is set.
 
 ## 0.23.0
 
