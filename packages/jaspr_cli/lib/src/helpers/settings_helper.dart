@@ -55,13 +55,9 @@ final File? settingsFile = () {
 Directory? getSettingsDirectory() {
   final settingsDir = Directory(dataHome);
   if (!settingsDir.existsSync()) {
-    try {
-      _moveToNewSettingsDir(settingsDir);
-    } catch (e) {
-      stdout.writeln('Error moving settings directory: $e');
-      if (!settingsDir.existsSync()) {
-        return null;
-      }
+    final success = _moveToNewSettingsDir(settingsDir);
+    if (!success) {
+      return null;
     }
   }
 
@@ -73,37 +69,47 @@ Directory? getSettingsDirectory() {
 /// The directory follows OS defaults and lives under the Dart data home.
 final String dataHome = getDartDataHome('jaspr');
 
-void _moveToNewSettingsDir(Directory newDir) {
-  newDir.createSync();
+bool _moveToNewSettingsDir(Directory newDir) {
+  try {
+    newDir.createSync();
+  } catch (_) {
+    return false;
+  }
 
   final envKey = Platform.operatingSystem == 'windows' ? 'APPDATA' : 'HOME';
   final home = Platform.environment[envKey] ?? '.';
 
   final homeDir = Directory(home).absolute;
-  if (!homeDir.existsSync()) return;
+  if (!homeDir.existsSync()) return true;
 
   final legacyDir = Directory(path.join(homeDir.path, '.jaspr')).absolute;
-  if (!legacyDir.existsSync()) return;
+  if (!legacyDir.existsSync()) return true;
 
   stdout.writeln('Moving Jaspr settings directory to "${newDir.path}" (was "${legacyDir.path}")');
 
-  for (final file in legacyDir.listSync(recursive: true)) {
-    final copyTo = path.join(newDir.path, path.relative(file.path, from: legacyDir.path));
+  try {
+    for (final file in legacyDir.listSync(recursive: true)) {
+      final copyTo = path.join(newDir.path, path.relative(file.path, from: legacyDir.path));
 
-    try {
-      if (file is Directory) {
-        Directory(copyTo).createSync(recursive: true);
-      } else if (file is File) {
-        File(file.path).copySync(copyTo);
-      } else if (file is Link) {
-        Link(copyTo).createSync(file.targetSync(), recursive: true);
-      }
-    } catch (e) {
-      if (!file.path.contains('/chrome_user_data/')) {
-        rethrow;
+      try {
+        if (file is Directory) {
+          Directory(copyTo).createSync(recursive: true);
+        } else if (file is File) {
+          File(file.path).copySync(copyTo);
+        } else if (file is Link) {
+          Link(copyTo).createSync(file.targetSync(), recursive: true);
+        }
+      } catch (e) {
+        if (!file.path.contains('/chrome_user_data/')) {
+          rethrow;
+        }
       }
     }
+
+    legacyDir.deleteSync(recursive: true);
+  } catch (e) {
+    stdout.writeln('Error moving settings directory: $e');
   }
 
-  legacyDir.deleteSync(recursive: true);
+  return true;
 }
