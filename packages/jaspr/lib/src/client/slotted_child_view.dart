@@ -141,8 +141,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     return renderObject;
   }
 
-  final Map<web.HTMLElement, ApplyParams?> _appliedParams = {};
-  final Map<web.HTMLElement, Map<String, EventBinding>?> _appliedEvents = {};
+  final Map<web.HTMLElement, _AppliedParams> _appliedParams = {};
 
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
@@ -200,32 +199,32 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   void resetElementParams(web.HTMLElement element) {
-    final appliedParams = _appliedParams[element];
-    if (appliedParams == null) return;
+    final params = _appliedParams[element];
+    if (params == null) return;
 
-    if (appliedParams.id != null && element.id == appliedParams.id) {
+    if (params.id != null && element.id == params.id) {
       element.id = '';
     }
 
-    if (appliedParams.classes case final appliedClasses?) {
+    if (params.classes case final appliedClasses?) {
       for (final c in appliedClasses) {
         element.classList.remove(c);
       }
     }
 
-    if (appliedParams.styles case final appliedStyles?) {
+    if (params.styles case final appliedStyles?) {
       for (final e in appliedStyles.entries) {
         element.style.removeProperty(e.key);
       }
     }
 
-    if (appliedParams.attributes case final appliedAttributes?) {
+    if (params.attributes case final appliedAttributes?) {
       for (final e in appliedAttributes.entries) {
         element.removeAttribute(e.key);
       }
     }
 
-    if (_appliedEvents[element] case final appliedEvents?) {
+    if (params.eventBindings case final appliedEvents?) {
       for (final e in appliedEvents.entries) {
         e.value.clear();
       }
@@ -233,13 +232,13 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   void updateElementParams(web.HTMLElement element, ApplyParams newParams) {
-    final appliedParams = _appliedParams[element];
+    final params = _appliedParams[element];
 
-    String? appliedId = appliedParams?.id;
-    List<String>? appliedClasses = appliedParams?.classes;
-    Map<String, String>? appliedStyles = appliedParams?.styles;
-    Map<String, String>? appliedAttributes = appliedParams?.attributes;
-    Map<String, EventBinding>? appliedEvents = _appliedEvents[element];
+    String? appliedId = params?.id;
+    List<String>? appliedClasses = params?.classes;
+    Map<String, String>? appliedStyles = params?.styles;
+    Map<String, String>? appliedAttributes = params?.attributes;
+    Map<String, EventBinding>? appliedEvents = params?.eventBindings;
 
     if (newParams.id case final newId?) {
       if (element.id.isEmpty) {
@@ -287,14 +286,14 @@ class SlottedChildViewElement extends DomRenderObjectElement {
       }
     }
 
-    _appliedParams[element] = ApplyParams(
+    _appliedParams[element] = _AppliedParams(
       target: newParams.target,
       id: appliedId,
       classes: appliedClasses,
       styles: appliedStyles,
       attributes: appliedAttributes,
+      events: appliedEvents,
     );
-    _appliedEvents[element] = appliedEvents;
   }
 
   @override
@@ -313,6 +312,19 @@ class SlottedChildViewElement extends DomRenderObjectElement {
 
     e.visitChildren(_clearEventListeners);
   }
+}
+
+class _AppliedParams extends ApplyParams {
+  _AppliedParams({
+    required super.target,
+    super.id,
+    super.classes,
+    super.styles,
+    super.attributes,
+    Map<String, EventBinding>? events,
+  }) : eventBindings = events;
+
+  final Map<String, EventBinding>? eventBindings;
 }
 
 class SlottedDomRenderObject extends DomRenderFragment {
