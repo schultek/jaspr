@@ -100,9 +100,10 @@ bool _moveToNewSettingsDir(Directory newDir) {
           Link(copyTo).createSync(file.targetSync(), recursive: true);
         }
       } catch (e) {
-        if (!file.path.contains('/chrome_user_data/')) {
-          rethrow;
+        if (path.split(file.path).contains('chrome_user_data')) {
+          continue;
         }
+        rethrow;
       }
     }
 
