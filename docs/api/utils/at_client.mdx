@@ -5,16 +5,12 @@ description: With the @client annotation you can automatically hydrate selected 
 
 ---
 
-A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle,
-this is like 'resuming' the rendering for a component and picking up where the server-side rendering has left off.
+A component annotated with `@client` will be automatically hydrated on the client after it has been pre-rendered. In principle, this is like 'resuming' the rendering for a component and picking up where the server-side rendering has left off.
 
-A `@client` component acts as a 'boundary' between server and client. Components in the tree above will be rendered **only on
-the server**, while components in the tree below will be rendered **both on the server and client**.
+A `@client` component acts as a 'boundary' between server and client. Components in the tree above will be rendered **only on the server**, while components in the tree below will be rendered **both on the server and client**.
 
 <Info>
-It is generally recommended to keep a 'mental note' about which components are only rendered on the server, and which are
-also rendered on the client. This distinction may become important later when you develop your website and want to import some
-server-specific or client-specific library or package. Then you need to make sure that your component compiles for all environments
+It is generally recommended to keep a 'mental note' about which components are only rendered on the server, and which are also rendered on the client. This distinction may become important later when you develop your website and want to import some server-specific or client-specific library or package. Then you need to make sure that your component compiles for all environments
 it will be rendered in.
 </Info>
 
@@ -44,107 +40,34 @@ class App extends StatelessComponent {
 Only one `@client` component per file is allowed.
 </Info>
 
-You can use `@client` components normally as any other component. You can also have multiple components annotated with
-`@client` to have separate interactive parts on the client. However, nesting client components is currently not possible.
+You can use `@client` components normally as any other component. 
 
-### Initializing Client Logic
+To have separate interactive parts of your site, simply annotate multiple components with `@client`. Only the outermost `@client` component of a nested sub-tree will be hydrated on the client, while nested client components will be safely ignored.
 
-When using `@client` components there is no default `main()` function on the client where you would normally
-run any client-side initialization logic. Instead, you can make your `@client` component stateful and use the `initState()`
-method for calling your initialization logic:
-
-```dart
-@override
-void initState() {
-    super.initState();
-    // Optionally skip the initialization logic on the server.
-    if (kIsWeb) {
-      // Your initialization logic, e.g. for setting up service locators, plugins or other global state.
-    }
-}
-```
+All `@client` components are mounted on the client as direct children of the `ClientApp` component, usually created inside `main.client.dart` entrypoint (See [Client Entrypoint](/dev/client#client-entrypoint)).
 
 ### Sharing State
 
-When you use multiple `@client` components, each one will be mounted on the client in a separate component tree as the root.
-Therefore if you want to share state across different `@client` components on the client, you cannot use any tree-based
-state solutions like `InheritedComponent`s. Instead, you can create a global state container outside of the tree and inject
-it for each `@client` component:
+To share state between multiple `@client` components, simply wrap the root `ClientApp` component in your `main.client.dart` with your preferred state provider, such as an `InheritedComponent` or `jaspr_riverpod`'s `ProviderScope`.
 
-<Info>
-The following is just an example for an implementation using `ChangeNotifier` and `InheritedComponent`.
-You can also use other implementations for the container and the tree injection.
-</Info>
+```dart title=lib/main.client.dart
+import 'package:jaspr/jaspr.dart';
 
-```dart
-// Some class that holds the shared state. Can be a ChangeNotifier or some other state primitive.
-class StateContainer extends ChangeNotifier {
-  // Your state
-  State myState;
-}
-
-// Global state container to be injected into each tree.
-final _container = StateContainer();
-
-class InheritedStateContainer extends InheritedComponent {
-  const InheritedStateContainer({required this.container, super.child, super.key});
-
-  final StateContainer container;
-}
-
-@client
-class MyClientComponent extends StatelessComponent {
-
-  @override
-  Component build(context) {
-    // Inject the shared container at the root of each client component tree.
-    return InheritedStateContainer(
-      container: _container,
-      child: /* ... */,
-    );
-  }
-}
-```
-
----
-
-Many state-management solutions also have some support for this. The same concept using `jaspr_riverpod` would look like this:
-
-```dart
-final container = ProviderContainer();
-
-@client
-class MyClientComponent extends StatelessComponent {
-
-  @override
-  Component build(context) {
-    // Use the shared container for the provider scope.
-    return UncontrolledProviderScope(
-      container: container,
-      child: /* ... */,
-    );
-  }
-}
-```
-
-<Info>
-  If you need to use features like `overrides` or `sync` that are only available on `ProviderScope` and not on `UncontrolledProviderScope`, it is possible to set them up like this:
-
-  ```dart
-  UncontrolledProviderScope(
-    container: container,
-    child: ProviderScope(
-      sync: [],
-      overrides: [],
-      child: ...
+void main() {
+  runApp(
+    MyInheritedComponent(
+      state: myState,
+      child: ClientApp()
     ),
-  )
-  ```
-</Info>
+  );
+}
+```
 
 ### Passing Data
 
-As any other component, `@client` components can have parameters, *with certain limitations*. Parameters are automatically serialized on the server and de-serialized on the client when hydrating the component. Therefore, using `@client` components with parameters are a **great way to pass data from the server to the client**. For this to work, the following requirements apply:
+As any other component, `@client` components can have parameters *(with certain limitations)*. 
+
+Parameters are automatically serialized on the server and de-serialized on the client when hydrating the component. Therefore, using `@client` components with parameters are a **great way to pass data from the server to the client**. For this to work, the following requirements apply:
 
 #### 1. All parameters must be **initializing field** parameters (`this.<fieldname>`):
 
@@ -185,17 +108,16 @@ The following happens when you use a `@client` component:
 
 *during build:*
 
-1. The component (along with some framework bits) is compiled to a separate js entrypoint.
+1. The component (along with some framework bits) is compiled as part of the main js bundle.
 
 *on the server:*
 
 2. The component is built and pre-rendered normally.
 3. Jaspr adds a html marker (`<!--$<name> data=<serialized-parameters>-->`) around your components output.
-4. Jaspr adds the components js target as a `<script>` tag to the documents `<head>`.
 
 *on the client:*
 
-5. The browser loads the pre-rendered html and compiled js scripts.
-6. The used component is located based on the html marker.
-7. The parameters are deserialized and the component is mounted to the target element.
+4. The browser loads the pre-rendered html and compiled js scripts.
+5. The used component is located based on the html marker.
+6. The parameters are deserialized and the component is mounted to the target element.
 

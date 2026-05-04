@@ -32,6 +32,9 @@ workspace:
 dev_dependencies:
   melos: ^7.1.0
 
+dependency_overrides:
+  cli_util: 0.5.0 # Until melos upgrades to this version
+
 melos:
   command:
     bootstrap:

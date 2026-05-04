@@ -62,9 +62,10 @@ class UnsafeImportsRule extends AnalysisRule {
   bool allowFlutterLibsInClient = false;
   bool isClientMode = false;
   void _checkPubspecConfig(RuleContext context) {
-    final session = context.libraryElement?.session;
-    if (session == null) return;
-    final pubspecFile = session.analysisContext.contextRoot.root.getChildAssumingFile('pubspec.yaml');
+    final packageRoot = context.package?.root;
+    if (packageRoot == null) return;
+
+    final pubspecFile = packageRoot.getChildAssumingFile('pubspec.yaml');
     final digest = pubspecFile.lengthSync ^ pubspecFile.modificationStamp;
     if (digest == pubspecDigest) return;
     pubspecDigest = digest;

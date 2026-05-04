@@ -1,3 +1,7 @@
+## 0.7.1
+
+- Fixed stack overflow error when analyzing cyclic dependencies.
+
 ## 0.7.0
 
 - Added `unsafe_imports` lint rule to detect unsafe platform-specific imports in components depending on where they are rendered (server or client).
