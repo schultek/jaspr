@@ -105,7 +105,7 @@ mixin RenderObjectElement on Element {
 
   @override
   void detachRenderObject() {
-    final parent = _parentRenderObjectElement?.renderObject;
+    final parent = renderObject.parent;
     if (parent != null) {
       parent.remove(renderObject);
       assert(renderObject.parent == null);
@@ -116,6 +116,15 @@ mixin RenderObjectElement on Element {
   @override
   void updateSlot(ElementSlot newSlot) {
     super.updateSlot(newSlot);
-    attachRenderObject();
+    if (!owner._isReload) {
+      attachRenderObject();
+    }
+  }
+
+  @override
+  void onReload() {
+    _renderObject = createRenderObject();
+    _attached = false;
+    super.onReload();
   }
 }

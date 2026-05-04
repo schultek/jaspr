@@ -7,10 +7,10 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../jaspr.dart';
-import 'adapters/client_component_adapter.dart';
-import 'adapters/document_adapter.dart';
+import 'adapters/document_structure_helper.dart';
 import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
+import 'components/client_component_registry.dart';
 import 'markup_render_object.dart';
 import 'options.dart';
 import 'render_functions.dart';
@@ -19,7 +19,9 @@ typedef FileLoader = Future<String?> Function(String);
 
 /// Global component binding for the server.
 class ServerAppBinding extends AppBinding with ComponentsBinding {
-  ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile;
+  ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile {
+    addRenderAdapter(GlobalStylesAdapter());
+  }
 
   final RequestLike request;
   final FileLoader _fileLoader;
@@ -66,21 +68,35 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     }
 
     final root = rootElement.renderObject as MarkupRenderObject;
-    final adapters = [..._adapters.reversed, GlobalStylesAdapter(this), if (!standalone) DocumentAdapter()];
 
-    for (final adapter in adapters.reversed) {
-      final r = adapter.prepare();
+    // Not using for each to allow for new adapters to be added during iteration.
+    for (var i = 0; i < _adapters.length; i++) {
+      final r = _adapters[i].prepare();
       if (r is Future) {
         await r;
       }
     }
 
-    for (final adapter in adapters) {
+    for (final adapter in _adapters.reversed) {
       adapter.apply(root);
+    }
+
+    if (!standalone) {
+      createDocumentStructure(root, true);
     }
 
     if (_responseBodyOverride case final override?) {
       return override;
+    }
+
+    if (!standalone && request.headers.singleValues['X-Jaspr-Reload'] == 'true') {
+      final body = (root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?)
+          ?.children
+          .findWhere<MarkupRenderElement>((c) => c.tag == 'body')
+          ?.node;
+      if (body != null) {
+        return utf8.encode(body.renderToHtml());
+      }
     }
 
     return utf8.encode(root.renderToHtml());
@@ -118,7 +134,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   void addRenderAdapter(RenderAdapter adapter) {
     if (_adapters.contains(adapter)) return;
-    _adapters.add(adapter);
+    _adapters.add(adapter..binding = this);
   }
 
   ServerOptions get options => _options!;
@@ -138,6 +154,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 }
 
 abstract class RenderAdapter {
+  late ServerAppBinding binding;
   FutureOr<void> prepare() {}
   void apply(MarkupRenderObject root) {}
 }

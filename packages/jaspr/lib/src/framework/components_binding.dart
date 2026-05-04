@@ -41,6 +41,13 @@ mixin ComponentsBinding on AppBinding {
   }
 }
 
+@visibleForTesting
+abstract final class GlobalComponentsBinding {
+  static void clearGlobalKeys() {
+    ComponentsBinding._globalKeyRegistry.clear();
+  }
+}
+
 class _Root extends Component {
   _Root({required this.child, required this.rootRenderObject});
 

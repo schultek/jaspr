@@ -110,7 +110,7 @@ void main() {
       Jaspr.initializeApp(
         options: ClientOptions(
           clients: {
-            'app': ClientLoader((params) => p([Component.text('Hello ${params['name']}')])),
+            'app': ClientLoader((params) => p([Component.text('Hello ${params.get<String>('name')}')])),
           },
         ),
       );

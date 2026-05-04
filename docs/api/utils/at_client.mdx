@@ -114,11 +114,10 @@ The following happens when you use a `@client` component:
 
 2. The component is built and pre-rendered normally.
 3. Jaspr adds a html marker (`<!--$<name> data=<serialized-parameters>-->`) around your components output.
-4. Jaspr adds the components js target as a `<script>` tag to the documents `<head>`.
 
 *on the client:*
 
-5. The browser loads the pre-rendered html and compiled js scripts.
-6. The used component is located based on the html marker.
-7. The parameters are deserialized and the component is mounted to the target element.
+4. The browser loads the pre-rendered html and compiled js scripts.
+5. The used component is located based on the html marker.
+6. The parameters are deserialized and the component is mounted to the target element.
 
