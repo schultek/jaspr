@@ -6,7 +6,6 @@ import 'package:collection/collection.dart';
 import '../client/client_bundle_builder.dart';
 import '../client/client_module_builder.dart';
 import '../styles/styles_bundle_builder.dart';
-import '../styles/styles_module_builder.dart';
 import '../utils.dart';
 
 /// Builds the server options file for jaspr projects.
@@ -50,7 +49,7 @@ class ServerOptionsBuilder implements Builder {
 
     var (clients, styles, sources) = await (
       buildStep.loadClients(),
-      stylesMode == StylesMode.standalone ? Future.value(<StylesModule>[]) : buildStep.loadStyles(),
+      buildStep.loadStyles(),
       rootPath != null
           ? buildStep.loadTransitiveSourcesFor(AssetId(buildStep.inputId.package, rootPath))
           : buildStep.loadTransitiveSources(),
@@ -92,11 +91,14 @@ class ServerOptionsBuilder implements Builder {
     source += 'ServerOptions get defaultServerOptions => ServerOptions(';
     source += await buildClientIdEntry(buildStep);
     source += buildClientEntries(clients, package);
-    if (stylesMode == StylesMode.standalone) {
-      final stylesId = buildStep.inputId.path.replaceFirst('lib/', '').replaceFirst('.server.dart', '.css');
-      source += "stylesId: '$stylesId',";
-    } else if (styles.toOutputString() case final stylesOutput when stylesOutput.isNotEmpty) {
-      source += 'styles: () => $stylesOutput,';
+    if (styles.isNotEmpty) {
+      if (stylesMode == StylesMode.standalone) {
+        final stylesId = buildStep.inputId.path.replaceFirst('lib/', '').replaceFirst('.server.dart', '.css');
+        source += "stylesId: '$stylesId',";
+      } else {
+        final stylesOutput = styles.toOutputString();
+        source += 'styles: () => $stylesOutput,';
+      }
     }
     source += ');\n\n';
     source += buildClientParamGetters(clients);

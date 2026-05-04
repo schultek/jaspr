@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.
+- No longer generates empty css files in standalone mode when no `@css` declarations are used.
 - Jaspr now uses OS-specific directories for its settings and cache, better respecting platform conventions. 
   - The old directory at '~/.jaspr/' is automatically migrated to the new locations on first run.
   - The new directory location is:

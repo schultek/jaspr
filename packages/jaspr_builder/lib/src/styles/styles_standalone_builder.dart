@@ -62,6 +62,10 @@ class StylesStandaloneBuilder implements Builder {
       styles = styles.filterBySources(sources, buildStep.inputId);
     }
 
+    if (styles.isEmpty) {
+      return;
+    }
+
     final outputId = buildStep.inputId.changeExtension('.styles.dart');
     final runnerCode = ImportsWriter().resolve('''
     import 'dart:io';

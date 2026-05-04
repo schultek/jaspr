@@ -289,7 +289,7 @@ extension LoadBundle on BuildStep {
     if (styles != null && stylesMode == null) {
       stderr.writeln('[WARNING] Invalid jaspr.styles option "$styles" used in pubspec.yaml.');
     }
-    if (jasprMode == JasprMode.client && stylesMode == StylesMode.standalone) {
+    if (jasprMode == JasprMode.client && stylesMode != StylesMode.standalone) {
       stderr.writeln('[WARNING] jaspr.styles option "$styles" is not supported in client mode.');
     }
 
