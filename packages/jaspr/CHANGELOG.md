@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.23.1
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.
 - No longer generates empty css files in standalone mode when no `@css` declarations are used.

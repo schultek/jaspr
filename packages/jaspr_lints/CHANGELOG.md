@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.7.1
 
 - Fixed stack overflow error when analyzing cyclic dependencies.
 
