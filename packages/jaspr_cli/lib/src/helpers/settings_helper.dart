@@ -52,10 +52,10 @@ final File? settingsFile = () {
   return settingsFile;
 }();
 
-Directory? getSettingsDirectory() {
-  final settingsDir = Directory(dataHome);
+Directory? getSettingsDirectory({Map<String, String>? environment}) {
+  final settingsDir = Directory(getDartDataHome('jaspr', environment: environment));
   if (!settingsDir.existsSync()) {
-    final success = _moveToNewSettingsDir(settingsDir);
+    final success = _moveToNewSettingsDir(settingsDir, environment: environment);
     if (!success) {
       return null;
     }
@@ -64,12 +64,7 @@ Directory? getSettingsDirectory() {
   return settingsDir;
 }
 
-/// The directory used to store the settings file.
-///
-/// The directory follows OS defaults and lives under the Dart data home.
-final String dataHome = getDartDataHome('jaspr');
-
-bool _moveToNewSettingsDir(Directory newDir) {
+bool _moveToNewSettingsDir(Directory newDir, {Map<String, String>? environment}) {
   try {
     newDir.createSync();
   } catch (_) {
@@ -77,7 +72,8 @@ bool _moveToNewSettingsDir(Directory newDir) {
   }
 
   final envKey = Platform.operatingSystem == 'windows' ? 'APPDATA' : 'HOME';
-  final home = Platform.environment[envKey] ?? '.';
+  final env = environment ?? Platform.environment;
+  final home = env[envKey] ?? '.';
 
   final homeDir = Directory(home).absolute;
   if (!homeDir.existsSync()) return true;
