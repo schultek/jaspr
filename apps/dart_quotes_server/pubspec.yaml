@@ -27,4 +27,5 @@ dev_dependencies:
 
 jaspr:
   mode: server
+  flutter: plugins
   port: 8082

@@ -29,8 +29,9 @@ dependencies:
   browser_launcher: ^1.1.2
   build_daemon: ^4.1.0
   cli_completion: ^0.5.0
-  cli_util: ^0.4.0
+  cli_util: ^0.5.0
   collection: ^1.17.1
+  dart_data_home: ^0.1.0
   dwds: ^27.0.3
   file: ^7.0.1
   glob: ^2.1.3

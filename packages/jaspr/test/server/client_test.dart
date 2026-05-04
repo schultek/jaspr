@@ -78,7 +78,7 @@ class _App4State extends State<App4> with SyncStateMixin<App4, Map<String, Objec
 
   @override
   Component build(BuildContext context) {
-    return div([], attributes: {'data-app': '4'});
+    return div(attributes: {'data-app': '4'}, []);
   }
 }
 

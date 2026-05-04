@@ -276,11 +276,11 @@ class ScopeTreeNode {
       child.parentEdges.add(edge);
     }
 
+    dirty = false;
+
     for (final edge in childEdges) {
       edge.childNode.analyzeChildren();
     }
-
-    dirty = false;
   }
 
   List<({LibraryElement lib, UriBasedDirective dir, Configuration? config, EdgeType type})> resolveDependencies(
