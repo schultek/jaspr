@@ -80,9 +80,8 @@ Handler createHandler(
     var isAllowedPath = false;
     final segment = request.url.pathSegments.lastOrNull ?? '';
     if (!segment.contains('.')) {
-      isAllowedPath = !request.url.path.contains('dwds') &&
-                      !request.url.path.startsWith(r'$') &&
-                      request.url.path != 'null';
+      isAllowedPath =
+          !request.url.path.contains('dwds') && !request.url.path.startsWith(r'$') && request.url.path != 'null';
     } else {
       final suffix = segment.split('.').last;
       if (Jaspr.allowedPathSuffixes.contains(suffix)) {
@@ -128,7 +127,7 @@ Handler createProxyHandler(http.Client? client) {
       if (req.url.path == 'reloaded_sources.json' || req.requestedUri.path == '/reloaded_sources.json') {
         // Hack: retry a few times if the proxy is unavailable during a reload.
         for (var i = 0; i < 10; i++) {
-          await Future.delayed(Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
           try {
             return await handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
           } on http.ClientException {

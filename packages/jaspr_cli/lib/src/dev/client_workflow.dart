@@ -29,7 +29,6 @@ class ClientWorkflow {
     bool enableDebugging = false,
     ReloadConfiguration reload = ReloadConfiguration.none,
     String moduleFormat = 'amd',
-    bool webHotReload = false,
   }) async {
     var cancelled = false;
 
@@ -44,9 +43,13 @@ class ClientWorkflow {
           return null;
         }
 
-        client.registerBuildTarget(DefaultBuildTarget((b) => b
-          ..target = 'web'
-          ..reportChangedAssets = true));
+        client.registerBuildTarget(
+          DefaultBuildTarget(
+            (b) => b
+              ..target = 'web'
+              ..reportChangedAssets = true,
+          ),
+        );
 
         logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
         client.startBuild();
@@ -58,7 +61,6 @@ class ClientWorkflow {
           enableDebugging: enableDebugging,
           reload: reload,
           moduleFormat: moduleFormat,
-          webHotReload: webHotReload,
         );
 
         if (cancelled) {

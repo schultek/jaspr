@@ -46,7 +46,6 @@ class DevProxy {
     bool enableInjectedClient = true,
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
     String moduleFormat = 'amd',
-    bool webHotReload = false,
   }) async {
     const target = 'web';
     final reloadedSources = <Map<String, dynamic>>[];
@@ -96,7 +95,7 @@ class DevProxy {
 
       final buildSettings = BuildSettings(
         //appEntrypoint: Uri.parse('org-dartlang-app:///$target/main.dart'),
-        canaryFeatures: moduleFormat == 'ddc' || webHotReload,
+        canaryFeatures: moduleFormat == 'ddc' || reload == ReloadConfiguration.hotReload,
         isFlutterApp: false,
         experiments: [],
       );
@@ -153,7 +152,7 @@ class DevProxy {
         buildResults: filteredBuildResults,
         chromeConnection: () async => (await Chrome.connectedInstance).chrome.chromeConnection,
       );
-      
+
       if (moduleFormat == 'ddc') {
         pipeline = pipeline.addMiddleware((Handler innerHandler) {
           return (Request req) async {
@@ -164,9 +163,9 @@ class DevProxy {
           };
         });
       }
-      
+
       pipeline = pipeline.addMiddleware(dwds.middleware);
-      
+
       cascade = cascade.add(dwds.handler);
       cascade = cascade.add(assetHandler);
     } else {
@@ -244,9 +243,7 @@ String ddcUriToSourceUrl(String basePath, String target, Uri uri) {
 }
 
 String ddcUriToLibraryId(Uri uri) {
-  final jsPath = uri.isScheme('package')
-      ? 'package:${uri.path}'
-      : 'org-dartlang-app:///${uri.path}';
+  final jsPath = uri.isScheme('package') ? 'package:${uri.path}' : 'org-dartlang-app:///${uri.path}';
   final prefix = jsPath.substring(
     0,
     jsPath.length - '.ddc.js'.length,

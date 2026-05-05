@@ -32,12 +32,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'mode',
       abbr: 'm',
       help: 'Sets the reload/refresh mode.',
-      allowed: ['reload', 'refresh'],
+      allowed: ['reload', 'restart', 'refresh'],
       allowedHelp: {
-        'reload': 'Reloads js modules without server reload (loses current state)',
+        'reload': 'Hot-reloads both client and server apps',
+        'restart': 'Restarts the client app (loses current state)',
         'refresh': 'Performs a full page refresh and server reload',
       },
-      defaultsTo: 'reload',
+      defaultsTo: 'restart',
     );
     argParser.addOption(
       'port',
@@ -57,18 +58,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
-    argParser.addOption(
-      'module-format',
-      help: 'The module format to use.',
-      allowed: ['ddc', 'amd'],
-      defaultsTo: 'amd',
-    );
-    argParser.addFlag(
-      'web-hot-reload',
-      help: 'Enable web hot reload.',
-      negatable: true,
-      defaultsTo: false,
-    );
+    argParser.addOption('module-format', help: 'The module format to use.', allowed: ['ddc', 'amd']);
     argParser.addFlag(
       'managed-build-options',
       help:
@@ -97,6 +87,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final port = argResults!.option('port') ?? project.port ?? defaultServePort;
   late final customProxyPort = argResults!.option('proxy-port') ?? serverProxyPort;
   late final useWasm = argResults!.flag('experimental-wasm');
+  late final moduleFormat = argResults!.option('module-format');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
   late final skipServer = argResults!.flag('skip-server');
 
@@ -296,11 +287,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
 
-    final moduleFormat = argResults!.option('module-format') ?? 'ddc';
-    final webHotReload = argResults!.flag('web-hot-reload');
-
-    logger.write('Starting web compilers...', tag: Tag.cli, progress: ProgressState.running);
-
     final compiler = useWasm
         ? 'dart2wasm'
         : release
@@ -329,6 +315,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       for (final e in dartDefines.entries) '-D${e.key}=${e.value}',
     ];
 
+    final reloadConfig = switch (mode) {
+      'reload' => ReloadConfiguration.hotReload,
+      'refresh' => ReloadConfiguration.liveReload,
+      'restart' || _ => ReloadConfiguration.hotRestart,
+    };
+    final moduleFormat = this.moduleFormat ?? (reloadConfig == ReloadConfiguration.hotReload ? 'ddc' : 'amd');
     final usesDdcLibraryBundles = moduleFormat == 'ddc';
 
     List<String> additionalFlutterBuildArgs() {
@@ -362,6 +354,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     final buildArgs = [
+      // Enable build_runner debugging
+      // '--force-jit',
+      // '--dart-jit-vm-arg=--observe',
+      // '--dart-jit-vm-arg=--pause-isolates-on-start',
       if (release) '--release',
       '--delete-conflicting-outputs',
       if (managedBuildOptions) ...[
@@ -377,7 +373,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ],
 
         // Add Web Hot Reload defines.
-        if (webHotReload) ...[
+        if (reloadConfig == ReloadConfiguration.hotReload) ...[
           '--define=build_web_compilers:sdk_js=web-hot-reload=true',
           '--define=build_web_compilers:entrypoint=web-hot-reload=true',
           '--define=build_web_compilers:entrypoint_marker=web-hot-reload=true',
@@ -398,9 +394,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       logger,
       guardResource,
       enableDebugging: launchInChrome,
-      reload: mode == 'reload' ? ReloadConfiguration.hotRestart : ReloadConfiguration.liveReload,
+      reload: reloadConfig,
       moduleFormat: moduleFormat,
-      webHotReload: webHotReload,
     );
     if (workflow == null) {
       return null;
