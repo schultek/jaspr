@@ -12,7 +12,7 @@ import 'base_command.dart';
 const _agents = {
   'antigravity': '.agents',
   'cursor': '.cursor',
-  'claude-code': '.claude-code',
+  'claude-code': '.claude',
   'cline': '.cline',
   'codex': '.agents',
   'copilot': '.github',

@@ -31,20 +31,7 @@ Future<Chrome?> startChrome(int port, Logger logger) async {
 
 final Directory? chromeUserDir = () {
   final settingsDir = getSettingsDirectory();
-  if (settingsDir == null) {
-    // Some systems don't support user home directories.
-    return null;
-  }
-
-  if (!settingsDir.existsSync()) {
-    try {
-      settingsDir.createSync();
-    } catch (e) {
-      // If we can't create the directory for the analytics settings, fail
-      // gracefully by returning null.
-      return null;
-    }
-  }
+  if (settingsDir == null) return null;
 
   final chromeUserDir = Directory('${settingsDir.path}${path.separator}chrome_user_data').absolute;
   if (!chromeUserDir.existsSync()) {
