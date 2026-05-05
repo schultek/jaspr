@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http/retry.dart' as retry;
 import 'package:path/path.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_gzip/shelf_gzip.dart';
@@ -80,8 +81,12 @@ Handler createHandler(
     var isAllowedPath = false;
     final segment = request.url.pathSegments.lastOrNull ?? '';
     if (!segment.contains('.')) {
-      isAllowedPath =
-          !request.url.path.contains('dwds') && !request.url.path.startsWith(r'$') && request.url.path != 'null';
+      if (kDebugMode) {
+        isAllowedPath =
+            !request.url.path.contains('dwds') && !request.url.path.startsWith(r'$') && request.url.path != 'null';
+      } else {
+        isAllowedPath = true;
+      }
     } else {
       final suffix = segment.split('.').last;
       if (Jaspr.allowedPathSuffixes.contains(suffix)) {
@@ -118,25 +123,14 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
 }
 
 Handler createProxyHandler(http.Client? client) {
-  final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: client);
-  // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
+  final c = retry.RetryClient(client ?? http.Client(), whenError: (e, _) => e is http.ClientException);
+  final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: c);
   return (req) async {
     try {
+      // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
       return await handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
     } on http.ClientException {
-      if (req.url.path == 'reloaded_sources.json' || req.requestedUri.path == '/reloaded_sources.json') {
-        // Hack: retry a few times if the proxy is unavailable during a reload.
-        for (var i = 0; i < 10; i++) {
-          await Future<void>.delayed(const Duration(milliseconds: 200));
-          try {
-            return await handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
-          } on http.ClientException {
-            // Continue retrying.
-          }
-        }
-        return Response.ok('[]', headers: {'content-type': 'application/json'});
-      }
-      rethrow;
+      return Response(503, headers: {'Retry-After': '1'});
     }
   };
 }

@@ -38,7 +38,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         'restart': 'Restarts the client app (loses current state)',
         'refresh': 'Performs a full page refresh and server reload',
       },
-      defaultsTo: 'restart',
+      defaultsTo: 'reload',
     );
     argParser.addOption(
       'port',
