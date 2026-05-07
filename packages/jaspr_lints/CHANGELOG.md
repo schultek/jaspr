@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Update `unsafe_imports` rule to properly handle standalone style mode.
+
 ## 0.7.2
 
 - Support `analyzer` `^12.1.0`.

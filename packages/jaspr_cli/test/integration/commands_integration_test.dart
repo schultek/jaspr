@@ -75,7 +75,12 @@ void main() {
   });
 }
 
-Future<void> bootstrap(TestVariant variant, Directory dir) async {
+Future<void> bootstrap(
+  TestVariant variant,
+  Directory dir, {
+  bool standaloneStyles = false,
+  Map<String, dynamic>? packageOverrides,
+}) async {
   final jasprDir = (Process.runSync('git', ['rev-parse', '--show-toplevel'], runInShell: true).stdout as String).trim();
 
   final overrides = File(p.join(dir.path, 'myapp', 'pubspec_overrides.yaml'));
@@ -83,6 +88,7 @@ Future<void> bootstrap(TestVariant variant, Directory dir) async {
   overrides.writeAsString(
     jsonEncode({
       'dependency_overrides': {
+        ...?packageOverrides,
         'jaspr': {'path': p.join(jasprDir, 'packages', 'jaspr')},
         'jaspr_builder': {'path': p.join(jasprDir, 'packages', 'jaspr_builder')},
         'jaspr_lints': {'path': p.join(jasprDir, 'packages', 'jaspr_lints')},
@@ -90,6 +96,14 @@ Future<void> bootstrap(TestVariant variant, Directory dir) async {
       },
     }),
   );
+
+  if (standaloneStyles) {
+    final pubspec = File(p.join(dir.path, 'myapp', 'pubspec.yaml'));
+    final jasprOptions = 'jaspr:\n  mode: ${variant.mode.name}';
+    pubspec.writeAsStringSync(
+      pubspec.readAsStringSync().replaceFirst(jasprOptions, '$jasprOptions\n  styles: standalone'),
+    );
+  }
 
   await run('dart pub get', dir: Directory(p.join(dir.path, 'myapp')));
 }

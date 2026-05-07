@@ -61,7 +61,9 @@ There are currently the following configuration options available:
   It is optional and defaults to `inline` for **static** and **server** mode and `standalone` for **client** mode.
 
   <Warning>
-    When using `standalone`, all libraries containing `@css` definitions are executed during the build process using the Dart VM. Importing web-only libraries like `dart:js_interop` or `package:web` will lead to build errors. See [Using Platform Libraries](/dev/server#using-platform-libraries) for ways to avoid this.
+    When using `inline`, all libraries containing `@css` definitions are executed during the pre-rendering process on the server. Therefore, importing web-only libraries like `dart:js_interop` or `package:web` will lead to compilation errors. See [Using Platform Libraries](/dev/server#using-platform-libraries) for ways to avoid this.
+
+    When using `standalone`, the CSS is generated during the serve/build step in a custom VM environment that also supports importing web-only libraries. During development, styles are automatically hot-reloaded when the source files are changed.
   </Warning>
 </Property>
 
