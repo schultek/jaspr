@@ -60,11 +60,27 @@ class DevProxy {
         if (buildResult.status == BuildStatus.succeeded) {
           for (final clientConnection in _clientConnections.values) {
             await clientConnection.performHotReload();
+
+            for (var callback in _postReloadCallbacks) {
+              callback();
+            }
           }
         }
       }
     }
   }
+
+  List<Function> _postReloadCallbacks = [];
+
+  void registerPostReloadCallback(Function callback) {
+    _postReloadCallbacks.add(callback);
+  }
+
+  void unregisterPostReloadCallback(Function callback) {
+    _postReloadCallbacks.remove(callback);
+  }
+
+  List<ClientConnection> getClientConnections() => _clientConnections.values.toList();
 
   ClientConnection? getClientConnection(String? appId) {
     if (appId == null) return null;
