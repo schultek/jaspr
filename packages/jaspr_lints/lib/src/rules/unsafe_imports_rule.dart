@@ -48,7 +48,7 @@ class UnsafeImportsRule extends AnalysisRule {
 
     if (node.usesCssAnnotation) {
       _checkPubspecConfig(context);
-      if (node.usesGlobalCssAnnotation || isClientMode) {
+      if (!usesStylesStandaloneMode && node.usesGlobalCssAnnotation) {
         registry.addAnnotation(this, CssImportsVisitor(this, node));
       }
     }
@@ -61,6 +61,8 @@ class UnsafeImportsRule extends AnalysisRule {
   int pubspecDigest = 0;
   bool allowFlutterLibsInClient = false;
   bool isClientMode = false;
+  bool usesStylesStandaloneMode = false;
+
   void _checkPubspecConfig(RuleContext context) {
     final packageRoot = context.package?.root;
     if (packageRoot == null) return;
@@ -81,6 +83,12 @@ class UnsafeImportsRule extends AnalysisRule {
       isClientMode = true;
     } else {
       isClientMode = false;
+    }
+
+    if (pubspec case {'jaspr': {'styles': 'standalone'}}) {
+      usesStylesStandaloneMode = true;
+    } else {
+      usesStylesStandaloneMode = isClientMode;
     }
   }
 }
@@ -278,7 +286,7 @@ class CssImportsVisitor extends SimpleAstVisitor<void> with ScopeEdgeVisitor, Se
         rule.reportAtNode(
           node,
           arguments: [
-            'Unsafe @css usage: Importing client-only libraries is not allowed when using @css. See below for details.',
+            'Unsafe @css usage: Importing client-only libraries is not allowed when using @css. Switch to standalone mode for styles or fix these imports. See below for details.',
           ],
           contextMessages: messages,
         );

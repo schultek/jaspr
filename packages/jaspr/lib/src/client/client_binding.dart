@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:universal_web/js_interop.dart';
@@ -19,6 +20,51 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       registerExtension('ext.jaspr.reassemble', (method, parameters) async {
         // ignore: invalid_use_of_protected_member
         rootElement?.visitChildren((element) => element.reassemble());
+        return ServiceExtensionResponse.result('{}');
+      });
+      registerExtension('ext.jaspr.reload_stylesheets', (method, parameters) async {
+        final urls = (jsonDecode(parameters['urls']!) as List).cast<String>();
+
+        void reloadStylesheet(web.Element oldLink, String url, {int retries = 5}) {
+          final newLink = web.document.createElement('link') as web.HTMLLinkElement;
+          newLink.rel = 'stylesheet';
+          newLink.href = '$url?v=${DateTime.now().millisecondsSinceEpoch}';
+
+          StreamSubscription<void>? loadSub;
+          StreamSubscription<void>? errorSub;
+
+          void cleanup() {
+            loadSub?.cancel();
+            errorSub?.cancel();
+          }
+
+          loadSub = web.EventStreamProvider<web.Event>('load').forElement(newLink).listen((_) {
+            cleanup();
+            oldLink.remove();
+          });
+
+          errorSub = web.EventStreamProvider<web.Event>('error').forElement(newLink).listen((_) {
+            cleanup();
+            newLink.remove();
+            if (retries > 0) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                reloadStylesheet(oldLink, url, retries: retries - 1);
+              });
+            } else {
+              print('Failed to reload stylesheet $url after 5 retries.');
+            }
+          });
+
+          oldLink.parentNode?.insertBefore(newLink, oldLink.nextSibling);
+        }
+
+        // Reload all stylesheet <link> tags.
+        for (final url in urls) {
+          final link = web.document.querySelector('link[rel="stylesheet"][href^="$url"]');
+          if (link != null) {
+            reloadStylesheet(link, url);
+          }
+        }
         return ServiceExtensionResponse.result('{}');
       });
       return true;
