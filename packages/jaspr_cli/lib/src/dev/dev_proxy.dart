@@ -1,14 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:build_daemon/data/build_status.dart' as daemon;
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/dwds.dart';
-import 'package:dwds/src/loaders/build_runner_strategy_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
+import 'package:vm_service/vm_service.dart' as vm;
+import 'package:vm_service/vm_service_io.dart';
 
 import '../project.dart';
 import 'chrome.dart';
@@ -19,23 +21,39 @@ class DevProxy {
   final Handler handler;
   final Stream<BuildResult> buildResults;
 
-  /// Can be null if client.js injection is disabled.
-  final Dwds? dwds;
+  final Dwds dwds;
   final ExpressionCompilerService? ddcService;
+
+  final _clientConnections = <String, ClientConnection>{};
+  final _clientEvents = StreamController<Map<String, dynamic>>();
+  Stream<Map<String, dynamic>> get clientEvents => _clientEvents.stream;
 
   DevProxy._(
     this.client,
     this.handler,
-    this.buildResults,
-    bool autoRun, {
-    this.dwds,
+    this.buildResults, {
+    required this.dwds,
     this.ddcService,
   }) {
-    if (autoRun) {
-      dwds?.connectedApps.listen((connection) {
-        connection.runMain();
-      });
+    _listenToClientConnections();
+  }
+
+  Future<void> _listenToClientConnections() async {
+    await for (final appConnection in dwds.connectedApps) {
+      final appId = appConnection.request.appId;
+
+      if (_clientConnections.containsKey(appId)) {
+        appConnection.runMain();
+        continue;
+      }
+
+      _clientConnections[appId] = ClientConnection(appConnection, dwds, this)..start();
     }
+  }
+
+  ClientConnection? getClientConnection(String? appId) {
+    if (appId == null) return null;
+    return _clientConnections[appId];
   }
 
   static Future<DevProxy> start(
@@ -43,7 +61,7 @@ class DevProxy {
     int proxyPort,
     Stream<daemon.BuildResults> buildResults, {
     bool enableDebugging = false,
-    bool enableInjectedClient = true,
+    bool useDwdsWebSocketConnection = true,
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
     String moduleFormat = 'amd',
   }) async {
@@ -87,96 +105,93 @@ class DevProxy {
 
     Dwds? dwds;
     ExpressionCompilerService? ddcService;
-    if (enableInjectedClient) {
-      final assetReader = ProxyServerAssetReader(
-        daemonPort,
-        root: target,
+
+    final assetReader = ProxyServerAssetReader(
+      daemonPort,
+      root: target,
+    );
+
+    final buildSettings = BuildSettings(
+      //appEntrypoint: Uri.parse('org-dartlang-app:///$target/main.dart'),
+      canaryFeatures: moduleFormat == 'ddc' || reload == ReloadConfiguration.hotReload,
+      isFlutterApp: false,
+      experiments: [],
+    );
+
+    final reloadedSourcesUri = Uri.parse('/reloaded_sources.json');
+
+    final loadStrategy = moduleFormat == 'ddc'
+        ? BuildRunnerDdcLibraryBundleStrategyProvider(
+            reload,
+            assetReader,
+            buildSettings,
+            packageConfigPath: findPackageConfigFilePath(),
+            reloadedSourcesUri: reloadedSourcesUri,
+          ).strategy
+        : BuildRunnerRequireStrategyProvider(
+            reload,
+            assetReader,
+            buildSettings,
+            packageConfigPath: findPackageConfigFilePath(),
+          ).strategy;
+
+    if (enableDebugging) {
+      ddcService = ExpressionCompilerService(
+        'localhost',
+        proxyPort,
+        verbose: false,
+        sdkConfigurationProvider: const JasprSdkConfigurationProvider(),
       );
-
-      final buildSettings = BuildSettings(
-        //appEntrypoint: Uri.parse('org-dartlang-app:///$target/main.dart'),
-        canaryFeatures: moduleFormat == 'ddc' || reload == ReloadConfiguration.hotReload,
-        isFlutterApp: false,
-        experiments: [],
-      );
-
-      final reloadedSourcesUri = Uri.parse('/reloaded_sources.json');
-
-      final loadStrategy = moduleFormat == 'ddc'
-          ? BuildRunnerDdcLibraryBundleStrategyProvider(
-              reload,
-              assetReader,
-              buildSettings,
-              packageConfigPath: findPackageConfigFilePath(),
-              reloadedSourcesUri: reloadedSourcesUri,
-            ).strategy
-          : BuildRunnerRequireStrategyProvider(
-              reload,
-              assetReader,
-              buildSettings,
-              packageConfigPath: findPackageConfigFilePath(),
-            ).strategy;
-
-      if (enableDebugging) {
-        ddcService = ExpressionCompilerService(
-          'localhost',
-          proxyPort,
-          verbose: false,
-          sdkConfigurationProvider: const JasprSdkConfigurationProvider(),
-        );
-      }
-
-      final debugSettings = DebugSettings(
-        enableDebugExtension: enableDebugging,
-        enableDebugging: enableDebugging,
-        ddsConfiguration: DartDevelopmentServiceConfiguration(
-          enable: true,
-          serveDevTools: true,
-          dartExecutable: dartExecutable,
-        ),
-        expressionCompiler: ddcService,
-      );
-
-      final appMetadata = AppMetadata(
-        hostname: 'localhost',
-      );
-
-      final toolConfiguration = ToolConfiguration(
-        loadStrategy: loadStrategy,
-        debugSettings: debugSettings,
-        appMetadata: appMetadata,
-      );
-      dwds = await Dwds.start(
-        toolConfiguration: toolConfiguration,
-        assetReader: assetReader,
-        buildResults: filteredBuildResults,
-        chromeConnection: () async => (await Chrome.connectedInstance).chrome.chromeConnection,
-      );
-
-      if (moduleFormat == 'ddc') {
-        pipeline = pipeline.addMiddleware((Handler innerHandler) {
-          return (Request req) async {
-            if (req.url.path == 'reloaded_sources.json' || req.requestedUri.path == '/reloaded_sources.json') {
-              return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
-            }
-            return innerHandler(req);
-          };
-        });
-      }
-
-      pipeline = pipeline.addMiddleware(dwds.middleware);
-
-      cascade = cascade.add(dwds.handler);
-      cascade = cascade.add(assetHandler);
-    } else {
-      cascade = cascade.add(assetHandler);
     }
+
+    final debugSettings = DebugSettings(
+      enableDebugExtension: enableDebugging,
+      enableDebugging: enableDebugging,
+      ddsConfiguration: DartDevelopmentServiceConfiguration(
+        enable: true,
+        serveDevTools: true,
+        dartExecutable: dartExecutable,
+      ),
+      expressionCompiler: ddcService,
+    );
+
+    final appMetadata = AppMetadata(
+      hostname: 'localhost',
+    );
+
+    final toolConfiguration = ToolConfiguration(
+      loadStrategy: loadStrategy,
+      debugSettings: debugSettings,
+      appMetadata: appMetadata,
+    );
+    dwds = await Dwds.start(
+      toolConfiguration: toolConfiguration,
+      assetReader: assetReader,
+      buildResults: filteredBuildResults,
+      chromeConnection: () async => (await Chrome.connectedInstance).chrome.chromeConnection,
+      useDwdsWebSocketConnection: useDwdsWebSocketConnection,
+    );
+
+    if (moduleFormat == 'ddc') {
+      pipeline = pipeline.addMiddleware((Handler innerHandler) {
+        return (Request req) async {
+          if (req.url.path == 'reloaded_sources.json' || req.requestedUri.path == '/reloaded_sources.json') {
+            return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
+          }
+          return innerHandler(req);
+        };
+      });
+    }
+
+    pipeline = pipeline.addMiddleware(dwds.middleware);
+
+    cascade = cascade.add(dwds.handler);
+    cascade = cascade.add(assetHandler);
 
     return DevProxy._(
       client,
       pipeline.addHandler(cascade.handler),
       filteredBuildResults,
-      !enableDebugging,
       dwds: dwds,
       ddcService: ddcService,
     );
@@ -184,8 +199,12 @@ class DevProxy {
 
   Future<void> stop() async {
     client.close();
-    await dwds?.stop();
+    await dwds.stop();
     await ddcService?.stop();
+    for (final connection in _clientConnections.values) {
+      connection.dispose();
+    }
+    _clientConnections.clear();
   }
 }
 
@@ -249,4 +268,134 @@ String ddcUriToLibraryId(Uri uri) {
     jsPath.length - '.ddc.js'.length,
   );
   return '$prefix.dart';
+}
+
+class ClientConnection {
+  ClientConnection(this.appConnection, this.dwds, this.devProxy);
+
+  final AppConnection appConnection;
+  final Dwds dwds;
+  final DevProxy devProxy;
+
+  DebugConnection? _debugConnection;
+  StreamSubscription<BuildResult>? _resultSub;
+  StreamSubscription<vm.Event>? _stdOutSub;
+  StreamSubscription<vm.Event>? _vmServiceSub;
+
+  bool _isDisposed = false;
+
+  vm.VmService? get vmService => _debugConnection?.vmService;
+
+  void start() async {
+    final appId = appConnection.request.appId;
+    try {
+      final debugConnection = _debugConnection = await dwds.debugConnection(appConnection);
+      final debugUri = debugConnection.ddsUri ?? debugConnection.uri;
+      final vmService = await vmServiceConnectUri(debugUri);
+
+      if (_isDisposed) return;
+
+      unawaited(
+        debugConnection.onDone.then((_) {
+          sendEvent('client.log', {'appId': appId, 'log': 'Lost connection to device.'});
+          sendEvent('client.stop', {'appId': appId});
+          dispose();
+          devProxy._clientConnections.remove(appId);
+        }),
+      );
+
+      sendEvent('client.start', {
+        'appId': appId,
+        'directory': Directory.current.path,
+        'deviceId': 'chrome',
+        'launchMode': 'run',
+      });
+
+      try {
+        await vmService.streamCancel('Stdout');
+      } catch (_) {}
+      try {
+        await vmService.streamListen('Stdout');
+      } catch (_) {}
+
+      try {
+        _vmServiceSub = vmService.onServiceEvent.listen(_onServiceEvent);
+        await vmService.streamListen('Service');
+      } catch (_) {}
+
+      if (_isDisposed) return;
+
+      _stdOutSub = vmService.onStdoutEvent.listen((log) {
+        sendEvent('client.log', {'appId': appId, 'log': utf8.decode(base64.decode(log.bytes!))});
+      });
+
+      sendEvent('client.debugPort', {'appId': appId, 'port': debugConnection.port, 'wsUri': debugConnection.uri});
+    } catch (e) {
+      // noop
+    }
+
+    _resultSub = devProxy.buildResults.listen((r) {
+      _handleBuildResult(r, appId);
+    });
+
+    sendEvent('app.started', {'appId': appId});
+
+    appConnection.runMain();
+  }
+
+  void sendEvent(String method, Map<String, dynamic> params) {
+    print('event: $method $params');
+    devProxy._clientEvents.add({'method': method, 'params': params});
+  }
+
+  // Mapping from service name to service method.
+  final Map<String, String> _registeredMethodsForService = <String, String>{};
+
+  void _onServiceEvent(vm.Event e) {
+    print('service event: ${e.kind} ${e.service} ${e.method}');
+    if (e.kind == vm.EventKind.kServiceRegistered) {
+      final serviceName = e.service!;
+      _registeredMethodsForService[serviceName] = e.method!;
+    }
+
+    if (e.kind == vm.EventKind.kServiceUnregistered) {
+      final serviceName = e.service!;
+      _registeredMethodsForService.remove(serviceName);
+    }
+  }
+
+  Future<vm.Response?> restart() async {
+    final restartMethod = _registeredMethodsForService['hotRestart'] ?? 'hotRestart';
+    final response = await vmService?.callServiceExtension(restartMethod);
+    return response;
+  }
+
+  int? _buildProgressEventId;
+  var _progressEventId = 0;
+
+  void _handleBuildResult(BuildResult result, String appId) {
+    switch (result.status) {
+      case BuildStatus.started:
+        _buildProgressEventId = _progressEventId++;
+        sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'message': 'Building...'});
+      case BuildStatus.failed:
+        sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
+      case BuildStatus.succeeded:
+        sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
+    }
+  }
+
+  Future<void> stop() async {
+    _debugConnection?.close();
+  }
+
+  void dispose() {
+    if (_isDisposed) return;
+    _isDisposed = true;
+
+    _stdOutSub?.cancel();
+    _resultSub?.cancel();
+    _vmServiceSub?.cancel();
+    _debugConnection?.close();
+  }
 }

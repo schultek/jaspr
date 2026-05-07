@@ -398,7 +398,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       buildArgs,
       logger,
       guardResource,
-      enableDebugging: launchInChrome,
+      enableDebugging: launchInChrome, // Debugging is only supported when connected to Chrome.
+      useDwdsWebSocketConnection: !launchInChrome,
       reload: reloadConfig,
       moduleFormat: moduleFormat,
     );

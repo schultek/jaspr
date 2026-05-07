@@ -27,6 +27,7 @@ class ClientWorkflow {
     Logger logger,
     void Function(FutureOr<void> Function()) guard, {
     bool enableDebugging = false,
+    bool useDwdsWebSocketConnection = true,
     ReloadConfiguration reload = ReloadConfiguration.none,
     String moduleFormat = 'amd',
   }) async {
@@ -59,6 +60,7 @@ class ClientWorkflow {
           int.parse(proxyPort),
           client.buildResults,
           enableDebugging: enableDebugging,
+          useDwdsWebSocketConnection: useDwdsWebSocketConnection,
           reload: reload,
           moduleFormat: moduleFormat,
         );
