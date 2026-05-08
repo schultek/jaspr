@@ -287,6 +287,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     logger.write('Starting web compiler...', tag: Tag.cli, progress: ProgressState.running);
 
+    final webHotReload = argResults!.flag('web-hot-reload');
+    final moduleFormat = webHotReload ? 'ddc' : (argResults!.option('module-format') ?? 'ddc');
+
+    logger.write('Starting web compilers...', tag: Tag.cli, progress: ProgressState.running);
+
     final compiler = useWasm
         ? 'dart2wasm'
         : release
