@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:build_daemon/data/build_status.dart' as daemon;
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/dwds.dart';
+import 'package:dwds/src/loaders/build_runner_strategy_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
@@ -43,12 +45,27 @@ class DevProxy {
     bool enableDebugging = false,
     bool enableInjectedClient = true,
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
+    String moduleFormat = 'amd',
   }) async {
     const target = 'web';
+    final reloadedSources = <Map<String, dynamic>>[];
     var pipeline = const Pipeline();
 
     // Only provide relevant build results
     final filteredBuildResults = buildResults.asyncMap<BuildResult>((results) {
+      if (moduleFormat == 'ddc') {
+        reloadedSources.clear();
+        results.changedAssets?.forEach((uri) {
+          if (uri.path.endsWith('.ddc.js')) {
+            final reloadedSource = {
+              'src': ddcUriToSourceUrl('', target, uri),
+              'module': ddcUriToLibraryId(uri),
+              'libraries': [ddcUriToLibraryId(uri)],
+            };
+            reloadedSources.add(reloadedSource);
+          }
+        });
+      }
       final result = results.results.firstWhere((result) => result.target == target);
       switch (result.status) {
         case daemon.BuildStatus.started:
@@ -78,17 +95,27 @@ class DevProxy {
 
       final buildSettings = BuildSettings(
         //appEntrypoint: Uri.parse('org-dartlang-app:///$target/main.dart'),
-        canaryFeatures: false,
+        canaryFeatures: moduleFormat == 'ddc' || reload == ReloadConfiguration.hotReload,
         isFlutterApp: false,
         experiments: [],
       );
 
-      final loadStrategy = BuildRunnerRequireStrategyProvider(
-        reload,
-        assetReader,
-        buildSettings,
-        packageConfigPath: findPackageConfigFilePath(),
-      ).strategy;
+      final reloadedSourcesUri = Uri.parse('/reloaded_sources.json');
+
+      final loadStrategy = moduleFormat == 'ddc'
+          ? BuildRunnerDdcLibraryBundleStrategyProvider(
+              reload,
+              assetReader,
+              buildSettings,
+              packageConfigPath: findPackageConfigFilePath(),
+              reloadedSourcesUri: reloadedSourcesUri,
+            ).strategy
+          : BuildRunnerRequireStrategyProvider(
+              reload,
+              assetReader,
+              buildSettings,
+              packageConfigPath: findPackageConfigFilePath(),
+            ).strategy;
 
       if (enableDebugging) {
         ddcService = ExpressionCompilerService(
@@ -125,7 +152,20 @@ class DevProxy {
         buildResults: filteredBuildResults,
         chromeConnection: () async => (await Chrome.connectedInstance).chrome.chromeConnection,
       );
+
+      if (moduleFormat == 'ddc') {
+        pipeline = pipeline.addMiddleware((Handler innerHandler) {
+          return (Request req) async {
+            if (req.url.path == 'reloaded_sources.json' || req.requestedUri.path == '/reloaded_sources.json') {
+              return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
+            }
+            return innerHandler(req);
+          };
+        });
+      }
+
       pipeline = pipeline.addMiddleware(dwds.middleware);
+
       cascade = cascade.add(dwds.handler);
       cascade = cascade.add(assetHandler);
     } else {
@@ -184,4 +224,29 @@ class JasprSdkConfigurationProvider extends SdkConfigurationProvider {
       ),
     );
   }
+}
+
+String ddcUriToSourceUrl(String basePath, String target, Uri uri) {
+  String jsPath;
+  if (uri.isScheme('asset')) {
+    var pathParts = uri.pathSegments.skip(1);
+    if (pathParts.first == target) {
+      pathParts = pathParts.skip(1);
+    }
+    jsPath = pathParts.join('/');
+  } else if (uri.isScheme('package')) {
+    jsPath = 'packages/${uri.path}';
+  } else {
+    jsPath = uri.path;
+  }
+  return '$basePath/$jsPath';
+}
+
+String ddcUriToLibraryId(Uri uri) {
+  final jsPath = uri.isScheme('package') ? 'package:${uri.path}' : 'org-dartlang-app:///${uri.path}';
+  final prefix = jsPath.substring(
+    0,
+    jsPath.length - '.ddc.js'.length,
+  );
+  return '$prefix.dart';
 }
