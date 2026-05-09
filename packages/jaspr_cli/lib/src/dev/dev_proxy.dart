@@ -173,13 +173,12 @@ class DevProxy {
     );
 
     if (moduleFormat == 'ddc') {
-      pipeline = pipeline.addMiddleware((Handler innerHandler) {
-        return (Request req) async {
-          if (req.url.path == 'reloaded_sources.json' || req.requestedUri.path == '/reloaded_sources.json') {
-            return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
-          }
-          return innerHandler(req);
-        };
+      cascade = cascade.add((Request req) {
+        print("middleware reloaded sources: ${req.url.path}");
+        if (req.url.path == 'reloaded_sources.json') {
+          return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
+        }
+        return Response.notFound('');
       });
     }
 
@@ -370,10 +369,20 @@ class ClientConnection {
     return response;
   }
 
+  Future<vm.Response?> reassemble() async {
+    final reassembleMethod = _registeredMethodsForService['ext.jaspr.reassemble'] ?? 'ext.jaspr.reassemble';
+    try {
+      final response = await vmService?.callServiceExtension(reassembleMethod);
+      return response;
+    } catch (_) {
+      return null;
+    }
+  }
+
   int? _buildProgressEventId;
   var _progressEventId = 0;
 
-  void _handleBuildResult(BuildResult result, String appId) {
+  Future<void> _handleBuildResult(BuildResult result, String appId) async {
     switch (result.status) {
       case BuildStatus.started:
         _buildProgressEventId = _progressEventId++;
@@ -382,6 +391,7 @@ class ClientConnection {
         sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
       case BuildStatus.succeeded:
         sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
+        await reassemble();
     }
   }
 

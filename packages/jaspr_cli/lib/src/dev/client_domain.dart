@@ -51,7 +51,22 @@ class ClientDomain extends Domain {
     }
     final fullRestart = getBoolArg(args, 'fullRestart') ?? false;
     if (!fullRestart) {
-      return {'code': 1, 'message': 'hot reload not yet supported by webdev'};
+      final stopwatch = Stopwatch()..start();
+      sendEvent('app.progress', {
+        'appId': appId,
+        'id': '0',
+        'message': 'Performing hot reload...',
+        'progressId': 'hot.reload',
+      });
+      final response = await appState.reassemble();
+      sendEvent('app.progress', {
+        'appId': appId,
+        'id': '0',
+        'finished': true,
+        'progressId': 'hot.reload',
+      });
+      sendEvent('app.log', {'appId': appId, 'log': 'Reloaded application in ${stopwatch.elapsedMilliseconds}ms'});
+      return {'code': response?.type == 'Success' ? 0 : 1, 'message': response.toString()};
     }
     // TODO(grouma) - Support pauseAfterRestart.
     // var pauseAfterRestart = getBoolArg(args, 'pause') ?? false;

@@ -578,6 +578,23 @@ abstract class State<T extends StatefulComponent> {
   @protected
   @mustCallSuper
   void didChangeDependencies() {}
+
+  /// Called whenever the application is reassembled during debugging, for
+  /// example during hot reload.
+  ///
+  /// This method should rerun any initialization logic that depends on global
+  /// state, for example, image loading from asset bundles (since the asset
+  /// bundle may have changed).
+  ///
+  /// This function will only be called during development. In release builds,
+  /// the `ext.jaspr.reassemble` hook is not available, and so this code will
+  /// never execute.
+  ///
+  /// Implementations of this method should end with a call to the inherited
+  /// method, as in `super.reassemble()`.
+  @protected
+  @mustCallSuper
+  void reassemble() {}
 }
 
 /// Mixin on [State] that preloads state on the server
@@ -725,6 +742,12 @@ class StatefulElement extends BuildableElement {
   void deactivate() {
     state.deactivate();
     super.deactivate();
+  }
+
+  @override
+  void reassemble() {
+    state.reassemble();
+    super.reassemble();
   }
 
   @override
