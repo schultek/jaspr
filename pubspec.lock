@@ -194,13 +194,14 @@ packages:
     source: hosted
     version: "3.5.10"
   build_web_compilers:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: build_web_compilers
-      sha256: f7020628ddf67db7619025ff64b1d3e890419410c4356a28757907db6e61a1f8
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.4.15"
+      path: "builder_pkgs/build_web_compilers"
+      ref: HEAD
+      resolved-ref: f4cabecdb834819022dd845c600978b8e4ecdc38
+      url: "https://github.com/dart-lang/build"
+    source: git
+    version: "4.4.20-wip"
   built_collection:
     dependency: transitive
     description:

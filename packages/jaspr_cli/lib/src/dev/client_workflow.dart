@@ -27,7 +27,9 @@ class ClientWorkflow {
     Logger logger,
     void Function(FutureOr<void> Function()) guard, {
     bool enableDebugging = false,
+    bool useDwdsWebSocketConnection = true,
     ReloadConfiguration reload = ReloadConfiguration.none,
+    String moduleFormat = 'amd',
   }) async {
     var cancelled = false;
 
@@ -42,7 +44,13 @@ class ClientWorkflow {
           return null;
         }
 
-        client.registerBuildTarget(DefaultBuildTarget((b) => b..target = 'web'));
+        client.registerBuildTarget(
+          DefaultBuildTarget(
+            (b) => b
+              ..target = 'web'
+              ..reportChangedAssets = true,
+          ),
+        );
 
         logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
         client.startBuild();
@@ -52,7 +60,9 @@ class ClientWorkflow {
           int.parse(proxyPort),
           client.buildResults,
           enableDebugging: enableDebugging,
+          useDwdsWebSocketConnection: useDwdsWebSocketConnection,
           reload: reload,
+          moduleFormat: moduleFormat,
         );
 
         if (cancelled) {
