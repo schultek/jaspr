@@ -1,3 +1,7 @@
+## Unreleased breaking
+
+- Added hot-reload support.
+
 ## 0.23.1
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.

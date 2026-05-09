@@ -127,9 +127,10 @@ Handler createProxyHandler(http.Client? client) {
   final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: c);
   return (req) async {
     try {
-      // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
-      return await handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
+      return await handler(req);
     } on http.ClientException {
+      return Response(503, headers: {'Retry-After': '1'});
+    } on SocketException {
       return Response(503, headers: {'Retry-After': '1'});
     }
   };

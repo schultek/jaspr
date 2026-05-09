@@ -20,6 +20,7 @@ class DevProxy {
   final http.Client client;
   final Handler handler;
   final Stream<BuildResult> buildResults;
+  final ReloadConfiguration reload;
 
   final Dwds dwds;
   final ExpressionCompilerService? ddcService;
@@ -28,14 +29,16 @@ class DevProxy {
   final _clientEvents = StreamController<Map<String, dynamic>>();
   Stream<Map<String, dynamic>> get clientEvents => _clientEvents.stream;
 
-  DevProxy._(
-    this.client,
-    this.handler,
-    this.buildResults, {
+  DevProxy._({
+    required this.client,
+    required this.handler,
+    required this.buildResults,
+    required this.reload,
     required this.dwds,
     this.ddcService,
   }) {
     _listenToClientConnections();
+    _listenToBuildResults();
   }
 
   Future<void> _listenToClientConnections() async {
@@ -48,6 +51,18 @@ class DevProxy {
       }
 
       _clientConnections[appId] = ClientConnection(appConnection, dwds, this)..start();
+    }
+  }
+
+  void _listenToBuildResults() async {
+    if (reload == ReloadConfiguration.hotReload) {
+      await for (final buildResult in buildResults) {
+        if (buildResult.status == BuildStatus.succeeded) {
+          for (final clientConnection in _clientConnections.values) {
+            await clientConnection.performHotReload();
+          }
+        }
+      }
     }
   }
 
@@ -120,16 +135,19 @@ class DevProxy {
 
     final reloadedSourcesUri = Uri.parse('/reloaded_sources.json');
 
+    // We handle hot-reload ourselves, so we don't need the DDC service to do it.
+    final reloadStrategy = reload == ReloadConfiguration.hotReload ? ReloadConfiguration.none : reload;
+
     final loadStrategy = moduleFormat == 'ddc'
         ? BuildRunnerDdcLibraryBundleStrategyProvider(
-            reload,
+            reloadStrategy,
             assetReader,
             buildSettings,
             packageConfigPath: findPackageConfigFilePath(),
             reloadedSourcesUri: reloadedSourcesUri,
           ).strategy
         : BuildRunnerRequireStrategyProvider(
-            reload,
+            reloadStrategy,
             assetReader,
             buildSettings,
             packageConfigPath: findPackageConfigFilePath(),
@@ -174,7 +192,6 @@ class DevProxy {
 
     if (moduleFormat == 'ddc') {
       cascade = cascade.add((Request req) {
-        print("middleware reloaded sources: ${req.url.path}");
         if (req.url.path == 'reloaded_sources.json') {
           return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
         }
@@ -188,9 +205,10 @@ class DevProxy {
     cascade = cascade.add(assetHandler);
 
     return DevProxy._(
-      client,
-      pipeline.addHandler(cascade.handler),
-      filteredBuildResults,
+      client: client,
+      handler: pipeline.addHandler(cascade.handler),
+      buildResults: filteredBuildResults,
+      reload: reload,
       dwds: dwds,
       ddcService: ddcService,
     );
@@ -287,6 +305,7 @@ class ClientConnection {
 
   void start() async {
     final appId = appConnection.request.appId;
+
     try {
       final debugConnection = _debugConnection = await dwds.debugConnection(appConnection);
       final debugUri = debugConnection.ddsUri ?? debugConnection.uri;
@@ -343,7 +362,6 @@ class ClientConnection {
   }
 
   void sendEvent(String method, Map<String, dynamic> params) {
-    print('event: $method $params');
     devProxy._clientEvents.add({'method': method, 'params': params});
   }
 
@@ -351,7 +369,6 @@ class ClientConnection {
   final Map<String, String> _registeredMethodsForService = <String, String>{};
 
   void _onServiceEvent(vm.Event e) {
-    print('service event: ${e.kind} ${e.service} ${e.method}');
     if (e.kind == vm.EventKind.kServiceRegistered) {
       final serviceName = e.service!;
       _registeredMethodsForService[serviceName] = e.method!;
@@ -367,6 +384,20 @@ class ClientConnection {
     final restartMethod = _registeredMethodsForService['hotRestart'] ?? 'hotRestart';
     final response = await vmService?.callServiceExtension(restartMethod);
     return response;
+  }
+
+  Future<void> performHotReload() async {
+    final isolateId = (await vmService?.getVM())?.isolates?.first.id;
+    vm.ReloadReport? response;
+    for (var i = 0; i < 5; i++) {
+      response = await vmService?.reloadSources(isolateId!);
+      if (response?.success ?? false) {
+        break;
+      }
+    }
+    if (response?.success ?? false) {
+      await reassemble();
+    }
   }
 
   Future<vm.Response?> reassemble() async {
