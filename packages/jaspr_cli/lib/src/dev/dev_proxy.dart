@@ -55,28 +55,29 @@ class DevProxy {
   }
 
   void _listenToBuildResults() async {
-    if (reload == ReloadConfiguration.hotReload) {
-      await for (final buildResult in buildResults) {
-        if (buildResult.status == BuildStatus.succeeded) {
-          for (final clientConnection in _clientConnections.values) {
+    await for (final buildResult in buildResults) {
+      if (buildResult.status == BuildStatus.succeeded) {
+        for (final clientConnection in _clientConnections.values) {
+          if (reload == ReloadConfiguration.hotReload) {
             await clientConnection.performHotReload();
-
-            for (var callback in _postReloadCallbacks) {
-              callback();
-            }
           }
+        }
+
+        for (final callback in _postReloadCallbacks) {
+          // ignore: avoid_dynamic_calls
+          callback(buildResult);
         }
       }
     }
   }
 
-  List<Function> _postReloadCallbacks = [];
+  final List<void Function(BuildResult result)> _postReloadCallbacks = [];
 
-  void registerPostReloadCallback(Function callback) {
+  void registerPostReloadCallback(void Function(BuildResult result) callback) {
     _postReloadCallbacks.add(callback);
   }
 
-  void unregisterPostReloadCallback(Function callback) {
+  void unregisterPostReloadCallback(void Function(BuildResult result) callback) {
     _postReloadCallbacks.remove(callback);
   }
 
@@ -115,18 +116,18 @@ class DevProxy {
           }
         });
       }
-      final result = results.results.firstWhere((result) => result.target == target);
-      switch (result.status) {
-        case daemon.BuildStatus.started:
-          return BuildResult(status: BuildStatus.started);
-        case daemon.BuildStatus.failed:
-          return BuildResult(status: BuildStatus.failed);
-        case daemon.BuildStatus.succeeded:
-          return BuildResult(status: BuildStatus.succeeded);
-        default:
-          break;
+      final resultForTarget = results.results.where((result) => result.target == target).firstOrNull;
+      final result = switch (resultForTarget?.status) {
+        daemon.BuildStatus.started => BuildResult(status: BuildStatus.started),
+        daemon.BuildStatus.failed => BuildResult(status: BuildStatus.failed),
+        daemon.BuildStatus.succeeded => BuildResult(status: BuildStatus.succeeded),
+        _ => null,
+      };
+      if (result == null) {
+        throw StateError('Unexpected Daemon build result: $result');
       }
-      throw StateError('Unexpected Daemon build result: $result');
+      _changedAssetsForBuildResult[result] = results.changedAssets?.toList();
+      return result;
     });
 
     var cascade = Cascade();
@@ -455,4 +456,10 @@ class ClientConnection {
     _vmServiceSub?.cancel();
     _debugConnection?.close();
   }
+}
+
+final Expando<List<Uri>> _changedAssetsForBuildResult = Expando<List<Uri>>();
+
+extension BuildResultExt on BuildResult {
+  List<Uri>? get changedAssets => _changedAssetsForBuildResult[this];
 }

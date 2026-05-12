@@ -120,7 +120,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     handleClientWorkflow(workflow);
 
-    runCssGeneration(workflow);
+    watchCss(workflow);
 
     if (project.flutterMode == FlutterMode.embedded) {
       final flutterProcess = await serveFlutter(useWasm);
