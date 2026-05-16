@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Added a `--port` option to `jaspr build` for configuring the server port used during static generation.
+
 ## 0.23.1
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.
