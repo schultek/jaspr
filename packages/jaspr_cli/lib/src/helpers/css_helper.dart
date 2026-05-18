@@ -59,6 +59,8 @@ class CssRunner {
   VmService? vmService;
   String? isolateId;
 
+  bool _disposed = false;
+
   void prepare() {
     final generatedDir = Directory('.dart_tool/jaspr/generated');
     if (generatedDir.existsSync()) {
@@ -160,14 +162,13 @@ class CssRunner {
       librariesFile.writeAsStringSync(JsonEncoder.withIndent('  ').convert(libraries));
     }
 
-    if (!wrapperFile.existsSync()) {
-      wrapperFile.createSync(recursive: true);
-      wrapperFile.writeAsStringSync('''
+    wrapperFile.createSync(recursive: true);
+    wrapperFile.writeAsStringSync('''
 import 'dart:io';
 import 'package:path/path.dart' as p;
 
 void main(List<String> args) async {
-  final sdkDir = p.dirname(p.dirname(Platform.resolvedExecutable));
+  final sdkDir = r'$dartSdkDir';
   final aotSnapshot = p.join(sdkDir, 'bin', 'snapshots', 'frontend_server_aot.dart.snapshot');
   final newArgs = [...args, '--libraries-spec', '${librariesFile.path}'];
   
@@ -184,7 +185,6 @@ void main(List<String> args) async {
   exit(exitCode);
 }
 ''');
-    }
   }
 
   Future<void> start() async {
@@ -198,9 +198,10 @@ void main(List<String> args) async {
 
     client = await FrontendServerClient.start(
       runnerFile.path,
-      '.dart_tool/jaspr/css/css_runner.dill',
+      Directory.current.absolute.uri.resolve('.dart_tool/jaspr/css/css_runner.dill').toFilePath(),
       platformKernel,
       target: 'vm',
+      sdkRoot: dartSdkDir,
       frontendServerPath: wrapperFile.path,
       packagesJson: packageConfigFile.path,
       printIncrementalDependencies: false,
@@ -220,10 +221,16 @@ void main(List<String> args) async {
   }
 
   Future<void> _startProcess(List<String> cssFiles) async {
+    logger.write("Starting frontend server with input '${runnerFile.path} at ${Directory.current.path}", tag: Tag.cli);
+
     process = await Process.start(
       dartExecutable,
-      ['run', '--enable-vm-service=0', '.dart_tool/jaspr/css/css_runner.dill'],
-      workingDirectory: Directory.current.path,
+      [
+        'run',
+        '--enable-vm-service=0',
+        '.dart_tool/jaspr/css/css_runner.dill',
+      ],
+      workingDirectory: Directory.current.absolute.path,
     );
 
     process!.stdout.transform(utf8.decoder).transform(LineSplitter()).listen((line) async {
@@ -260,6 +267,7 @@ void main(List<String> args) async {
     });
 
     process!.exitCode.then((value) {
+      if (_disposed) return;
       if (value != 0) {
         logger.write('CSS runner exited with code $value', tag: Tag.cli, level: Level.error);
       }
@@ -362,7 +370,7 @@ void main(List<String> args) async {
       return <String>[];
     }
 
-    final runnerFiles = await Glob('$buildDir/**.styles.dart').list(root: Directory.current.path).toList();
+    final runnerFiles = await Glob('$buildDir/**.styles.dart').list(root: Directory.current.absolute.path).toList();
     final validRunnerFiles = runnerFiles.where((f) {
       return f.path.endsWith('.server.styles.dart') || f.path.endsWith('.client.styles.dart');
     }).toList();
@@ -393,7 +401,7 @@ void main(List<String> args) async {
     for (int i = 0; i < validRunnerFiles.length; i++) {
       final relative = p.relative(
         validRunnerFiles[i].path,
-        from: Directory.current.uri.resolve('.dart_tool/jaspr/css/').path,
+        from: Directory.current.absolute.uri.resolve('.dart_tool/jaspr/css/').path,
       );
       runnerCode.writeln("import '$relative' as s$i;");
     }
@@ -459,7 +467,9 @@ void main(List<String> args) async {
   }
 
   void dispose() {
+    _disposed = true;
     client?.kill();
     process?.kill();
+    vmService?.dispose();
   }
 }
