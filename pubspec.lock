@@ -169,14 +169,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.1"
-  build_modules:
-    dependency: transitive
-    description:
-      name: build_modules
-      sha256: "6c5c9fde95400b9a1102fad2de007027e58c787514d5368115c13b5b32f46798"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.8"
   build_runner:
     dependency: transitive
     description:
@@ -194,14 +186,13 @@ packages:
     source: hosted
     version: "3.5.10"
   build_web_compilers:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "builder_pkgs/build_web_compilers"
-      ref: HEAD
-      resolved-ref: f4cabecdb834819022dd845c600978b8e4ecdc38
-      url: "https://github.com/dart-lang/build"
-    source: git
-    version: "4.4.20-wip"
+      name: build_web_compilers
+      sha256: "8da0c6e1e2edaa13601846c0b4782e133a14dc4861932f561e3919f4aba460d1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.6.0"
   built_collection:
     dependency: transitive
     description:
@@ -1148,10 +1139,10 @@ packages:
     dependency: transitive
     description:
       name: matcher
-      sha256: "12956d0ad8390bbcc63ca2e1469c0619946ccb52809807067a7020d57e647aa6"
+      sha256: dc0b7dc7651697ea4ff3e69ef44b0407ea32c487a39fff6a4004fa585e901861
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.18"
+    version: "0.12.19"
   material_color_utilities:
     dependency: transitive
     description:
@@ -1172,10 +1163,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
+      sha256: "1741988757a65eb6b36abe716829688cf01910bbf91c34354ff7ec1c3de2b349"
       url: "https://pub.dev"
     source: hosted
-    version: "1.17.0"
+    version: "1.18.0"
   mime:
     dependency: transitive
     description:
@@ -1468,10 +1459,10 @@ packages:
     dependency: transitive
     description:
       name: scratch_space
-      sha256: "3417e014d20b12cebc5bfb1c0b1f63806054177158596cc31cc4d9aaca767a60"
+      sha256: "564e4d0cef547454171ce97b1ea3ec70fa9bc5b3b9db896a620dd5930dc5e8b8"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   serverpod:
     dependency: transitive
     description:
@@ -1825,26 +1816,26 @@ packages:
     dependency: transitive
     description:
       name: test
-      sha256: "54c516bbb7cee2754d327ad4fca637f78abfc3cbcc5ace83b3eda117e42cd71a"
+      sha256: "8d9ceddbab833f180fbefed08afa76d7c03513dfdba87ffcec2718b02bbcbf20"
       url: "https://pub.dev"
     source: hosted
-    version: "1.29.0"
+    version: "1.31.0"
   test_api:
     dependency: transitive
     description:
       name: test_api
-      sha256: "93167629bfc610f71560ab9312acdda4959de4df6fac7492c89ff0d3886f6636"
+      sha256: "949a932224383300f01be9221c39180316445ecb8e7547f70a41a35bf421fb9e"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.9"
+    version: "0.7.11"
   test_core:
     dependency: transitive
     description:
       name: test_core
-      sha256: "394f07d21f0f2255ec9e3989f21e54d3c7dc0e6e9dbce160e5a9c1a6be0e2943"
+      sha256: "1991d4cfe85d5043241acac92962c3977c8d2f2add1ee73130c7b286417d1d34"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.15"
+    version: "0.6.17"
   test_reflective_loader:
     dependency: transitive
     description:
@@ -2014,5 +2005,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.11.0 <3.12.0-z"
+  dart: ">=3.11.0 <3.13.0-z"
   flutter: ">=3.38.4"
