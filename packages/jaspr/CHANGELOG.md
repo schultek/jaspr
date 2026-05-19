@@ -1,6 +1,8 @@
 ## Unreleased breaking
 
 - Added hot-reload support.
+- Added hot-reloading of generated stylesheets in `standalone` mode.
+- Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
 
 ## 0.23.1
 
