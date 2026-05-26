@@ -21,9 +21,9 @@ extension CodecLoader on BuildStep {
 }
 
 extension CodecReader on Codecs {
-  String getDecoderFor(DartType type, String getter) {
-    final decoder = type.acceptWithArgument(DecoderVisitor(this), getter);
-    return decoder ?? getter;
+  String getDecoderFor(DartType type, String getter, bool allowComponent) {
+    final decoder = type.acceptWithArgument(DecoderVisitor(this, allowComponent), getter);
+    return decoder.decoder.replaceAll('__CAST__', decoder.cast);
   }
 
   String getEncoderFor(DartType type, String getter) {
@@ -75,56 +75,83 @@ class EncoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
   }
 }
 
-class DecoderVisitor extends UnifyingTypeVisitorWithArgument<String?, String> {
-  DecoderVisitor(this.codecs);
+typedef DecoderResult = ({
+  String decoder,
+  String cast,
+});
+
+class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, String> {
+  DecoderVisitor(this.codecs, this.allowComponent);
+
   final Codecs codecs;
+  final bool allowComponent;
 
   @override
-  String? visitDartType(DartType type, String argument) {
+  DecoderResult visitDartType(DartType type, String argument) {
     if (!type.isDartPrimitive) {
       throw const InvalidParameterException();
     }
-    return '$argument as ${type.getDisplayString()}';
+    return (decoder: argument, cast: type.getDisplayString());
   }
 
   @override
-  String? visitInterfaceType(InterfaceType type, String argument) {
+  DecoderResult visitInterfaceType(InterfaceType type, String argument) {
     if (type.isDartCoreList) {
       final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-      final base = '($argument as List<Object?>$nullCheck)';
       if (type.typeArguments.first
           case DynamicType() || DartType(isDartCoreObject: true, nullabilitySuffix: NullabilitySuffix.question)) {
-        return base;
+        return (decoder: argument, cast: 'List<Object?>$nullCheck');
       }
       final nested = type.typeArguments.first.acceptWithArgument(this, 'i');
-      if (RegExp(r'^i as (.*)$').firstMatch(nested ?? '') case final match?) {
-        return '$base$nullCheck.cast<${match.group(1)!}>()';
-      } else {
-        return '$base$nullCheck.map((i) => $nested).toList()';
+      final nestedNullCheck =
+          !nested.cast.endsWith('?') && type.typeArguments.first.nullabilitySuffix == NullabilitySuffix.question
+          ? '?'
+          : '';
+      var decoder = argument.endsWith(' as __CAST__') ? '($argument)$nullCheck' : '$argument$nullCheck';
+      decoder += '.cast<${nested.cast}$nestedNullCheck>()';
+      if (nested.decoder != 'i') {
+        decoder += '.map((i) => ${nested.decoder}).toList()';
       }
+      return (decoder: decoder, cast: 'List<Object?>$nullCheck');
     } else if (type.isDartCoreMap) {
       if (!type.typeArguments.first.isDartCoreString) {
         throw const InvalidParameterException();
       }
 
       final nullCheck = type.nullabilitySuffix == NullabilitySuffix.question ? '?' : '';
-      final base = '($argument as Map<String, Object?>$nullCheck)';
       if (type.typeArguments[1]
           case DynamicType() || DartType(isDartCoreObject: true, nullabilitySuffix: NullabilitySuffix.question)) {
-        return base;
+        return (decoder: argument, cast: 'Map<String, Object?>$nullCheck');
       }
       final nested = type.typeArguments[1].acceptWithArgument(this, 'v');
-      if (RegExp(r'^v as (.*)$').firstMatch(nested ?? '') case final match?) {
-        return '$base$nullCheck.cast<String, ${match.group(1)!}>()';
-      } else {
-        return '$base$nullCheck.map((k, v) => MapEntry(k, $nested))';
+      final nestedNullCheck =
+          !nested.cast.endsWith('?') && type.typeArguments[1].nullabilitySuffix == NullabilitySuffix.question
+          ? '?'
+          : '';
+      var decoder = argument.endsWith(' as __CAST__') ? '($argument)$nullCheck' : '$argument$nullCheck';
+      decoder += '.cast<String, ${nested.cast}$nestedNullCheck>()';
+      if (nested.decoder != 'v') {
+        decoder += '.map((k, v) => MapEntry(k, ${nested.decoder}))';
       }
+      return (decoder: decoder, cast: 'Map<String, Object?>$nullCheck');
     } else if (codecs[type.element.name] case final codec?) {
+      final decoderCall = '[[${codec.import}]].${codec.extension ?? codec.name}.${codec.decoder}';
+      final argRaw = argument.endsWith(' as __CAST__')
+          ? argument.substring(0, argument.length - ' as __CAST__'.length)
+          : argument;
+
+      final decoder = type.nullabilitySuffix == NullabilitySuffix.question
+          ? '$argRaw != null ? $decoderCall($argument) : null'
+          : '$decoderCall($argument)';
+
+      return (decoder: decoder, cast: codec.rawType);
+    } else if (allowComponent &&
+        type.element.name == 'Component' &&
+        type.element.library.identifier == 'package:jaspr/src/framework/framework.dart') {
       if (type.nullabilitySuffix == NullabilitySuffix.question) {
-        return '$argument != null ? [[${codec.import}]].${codec.extension ?? codec.name}.${codec.decoder}($argument as ${codec.rawType}) : null';
-      } else {
-        return '[[${codec.import}]].${codec.extension ?? codec.name}.${codec.decoder}($argument as ${codec.rawType})';
+        return (decoder: 'p.mountOrNull($argument)', cast: 'String?');
       }
+      return (decoder: 'p.mount($argument)', cast: 'String');
     }
     return super.visitInterfaceType(type, argument);
   }

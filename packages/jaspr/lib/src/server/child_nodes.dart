@@ -10,9 +10,10 @@ class ChildNodeData extends BaseChildNode {
 }
 
 class ChildNodeBoundary extends BaseChildNode {
-  ChildNodeBoundary(this.element);
+  ChildNodeBoundary(this.element, [this.priority = 0]);
 
   final Element element;
+  final int priority;
   late final ChildListRange range;
 }
 
@@ -181,7 +182,7 @@ class ChildList with Iterable<MarkupRenderObject> {
     return null;
   }
 
-  ChildListRange wrapElement(Element element) {
+  ChildListRange wrapElement(Element element, [int priority = 0]) {
     final node = find(element.slot.target!.renderObject as MarkupRenderObject);
     assert(node != null, 'Element not found in child list');
 
@@ -191,16 +192,21 @@ class ChildList with Iterable<MarkupRenderObject> {
     while (true) {
       if (startBefore.prev case final ChildNodeBoundary startPrev when startPrev.range.start == startPrev) {
         if (startPrev.element == element) {
-          // Wrapping the same element, apply reverse order
-          startBefore = startPrev;
-          continue;
+          if (priority >= startPrev.priority) {
+            // Wrapping the same element with higher priority, apply around existing wrapper
+            startBefore = startPrev;
+            continue;
+          } else {
+            // Already correct order
+            break;
+          }
         }
         assert(startPrev.element.depth != element.depth);
         if (element.depth > startPrev.element.depth) {
-          // element is a descendant of startPrev, correct order
+          // Element is a descendant of startPrev, correct order
           break;
         } else {
-          // element is an ancestor of startPrev, incorrect order
+          // Element is an ancestor of startPrev, incorrect order
           startBefore = startPrev;
           continue;
         }
@@ -210,16 +216,21 @@ class ChildList with Iterable<MarkupRenderObject> {
     while (true) {
       if (endAfter.next case final ChildNodeBoundary endNext when endNext.range.end == endNext) {
         if (endNext.element == element) {
-          // Wrapping the same element, apply reverse order
-          endAfter = endNext;
-          continue;
+          if (priority >= endNext.priority) {
+            // Wrapping the same element with higher priority, apply around existing wrapper
+            endAfter = endNext;
+            continue;
+          } else {
+            // Already correct order
+            break;
+          }
         }
         assert(endNext.element.depth != element.depth);
         if (element.depth > endNext.element.depth) {
-          // element is a descendant of startPrev, correct order
+          // Element is a descendant of endNext, correct order
           break;
         } else {
-          // element is an ancestor of startPrev, incorrect order
+          // Element is an ancestor of endNext, incorrect order
           endAfter = endNext;
           continue;
         }
@@ -227,8 +238,8 @@ class ChildList with Iterable<MarkupRenderObject> {
       break;
     }
 
-    final start = ChildNodeBoundary(element);
-    final end = ChildNodeBoundary(element);
+    final start = ChildNodeBoundary(element, priority);
+    final end = ChildNodeBoundary(element, priority);
 
     startBefore.insertPrev(start);
     endAfter.insertNext(end);

@@ -1,4 +1,4 @@
-import '../framework/framework.dart';
+import '../../client.dart';
 
 extension AppContext on BuildContext {
   /// The currently visited url.

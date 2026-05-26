@@ -53,8 +53,8 @@ final class ClientTarget<T extends Component> {
 
   const ClientTarget(this.name, {this.params});
 
-  String? dataFor(T component) {
+  String? dataFor(T component, {Object? Function(Object?)? encode}) {
     if (params == null) return null;
-    return const DomValidator().escapeMarkerText(jsonEncode(params!(component)));
+    return const DomValidator().escapeMarkerText(jsonEncode(params!(component), toEncodable: encode));
   }
 }
