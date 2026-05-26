@@ -124,5 +124,108 @@ void main() {
       expect(p2Element.parentNode, equals(divElement));
       expect(p2Element.textContent, equals('Hello B'));
     });
+
+    testClient('should find and hydrate client component with nested server component', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <p>'
+                  '    <!--s${marker}1-->'
+                  '    <span>Server Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '  </p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final pElement = window.document.querySelector('body p')!;
+      final spanElement = window.document.querySelector('body span')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(pElement.parentNode, equals(divElement));
+      expect(spanElement.parentNode, equals(pElement));
+      expect(spanElement.textContent, equals('Server Element'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              return p(classes: 'hydrated', [
+                params.mount(params.get<String>('child')),
+              ]);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(pElement.parentNode, equals(divElement));
+      expect(pElement.className, 'hydrated');
+      expect(spanElement.parentNode, equals(pElement));
+      expect(spanElement.textContent, equals('Server Element'));
+    });
+
+    testClient('should find and hydrate nested client component inside server component', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <div>'
+                  '    <!--s${marker}1-->'
+                  '    <p>'
+                  '      <span>Server Element</span>'
+                  '      <!--${marker}subapp data={"name":"Nested Client"}-->'
+                  '      <strong>Fallback</strong>'
+                  '      <!--/${marker}subapp-->'
+                  '    </p>'
+                  '    <!--/s${marker}1-->'
+                  '  </div>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final outerDivElement = window.document.querySelector('body div > div')!;
+      final pElement = window.document.querySelector('body p')!;
+      final spanElement = window.document.querySelector('body span')!;
+      final strongElement = window.document.querySelector('body strong')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(outerDivElement.parentNode, equals(divElement));
+      expect(pElement.parentNode, equals(outerDivElement));
+      expect(spanElement.parentNode, equals(pElement));
+      expect(strongElement.parentNode, equals(pElement));
+      expect(strongElement.textContent, equals('Fallback'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              return div(classes: 'hydrated', [params.mount(params.get<String>('child'))]);
+            }),
+            'subapp': ClientLoader((params) {
+              return strong(classes: 'hydrated', [Component.text('Hello ${params.get<String>('name')}')]);
+            }),
+          },
+        ),
+      );
+
+      runApp(const ClientApp());
+      await pumpEventQueue();
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(outerDivElement.parentNode, equals(divElement));
+      expect(outerDivElement.className, 'hydrated');
+      expect(pElement.parentNode, equals(outerDivElement));
+      expect(spanElement.parentNode, equals(pElement));
+      expect(strongElement.parentNode, equals(pElement));
+      expect(strongElement.className, 'hydrated');
+      expect(strongElement.textContent, equals('Hello Nested Client'));
+    });
   });
 }

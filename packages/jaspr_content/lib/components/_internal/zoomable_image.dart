@@ -150,20 +150,17 @@ class _ZoomableImageState extends State<ZoomableImage> with ViewTransitionMixin 
   }
 
   Component _buildDialog(BuildContext context) {
-    return Component.element(
+    return dialog(
       key: dialogKey,
-      tag: 'dialog',
       classes: 'zoom-modal not-content',
-      attributes: {
-        if (dialogKey.currentNode?.open ?? false) 'open': '',
-      },
+      open: dialogKey.currentNode?.open ?? false,
       events: {
         'cancel': (e) {
           e.preventDefault();
           zoomOut();
         },
       },
-      children: [
+      [
         div(
           classes: 'image-wrapper',
           events: {
