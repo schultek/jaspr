@@ -104,7 +104,10 @@ void main() {
             App2: ClientTarget<App2>('app2', params: (app) => {'count': app.count, 'label': app.label}),
             App3: ClientTarget<App3>('app3'),
             App4: ClientTarget<App4>('app4'),
-            AppWithServerComponent: ClientTarget<AppWithServerComponent>('app_with_server_component', params: (app) => {'child': app.child}),
+            AppWithServerComponent: ClientTarget<AppWithServerComponent>(
+              'app_with_server_component',
+              params: (app) => {'child': app.child},
+            ),
           },
         ),
       );
