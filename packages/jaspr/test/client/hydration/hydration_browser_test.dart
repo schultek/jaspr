@@ -227,5 +227,87 @@ void main() {
       expect(strongElement.className, 'hydrated');
       expect(strongElement.textContent, equals('Hello Nested Client'));
     });
+
+    testClient('should reload client components and update parameters/sync state on performReload', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"name": "A"}-->'
+                  '  <!--\${"count": 1}-->'
+                  '  <p>Fallback</p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final pElement = window.document.querySelector('body p')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(pElement.parentNode, equals(divElement));
+      expect(pElement.textContent, equals('Fallback'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              return ReloadTestComponent(name: params.get<String>('name'));
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      final pElementHydrated = window.document.querySelector('body p')!;
+      expect(pElementHydrated.textContent, equals('Hello A, Count: 1'));
+
+      // Perform reload with updated options/sync state
+      final newBody = window.document.createElement('body') as HTMLBodyElement;
+      newBody.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"name": "B"}-->'
+                  '  <!--\${"count": 2}-->'
+                  '  <p>Fallback</p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final rootElement = tester.binding.rootElement!;
+      final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
+      rootRenderObject.setRootNode(newBody);
+      rootElement.owner.performReload(rootElement);
+
+      window.document.body!.replaceWith(newBody);
+      await pumpEventQueue();
+
+      final pElementReloaded = window.document.querySelector('body p')!;
+      expect(pElementReloaded.textContent, equals('Hello B, Count: 2'));
+    });
   });
+}
+
+class ReloadTestComponent extends StatefulComponent {
+  const ReloadTestComponent({required this.name, super.key});
+  final String name;
+  @override
+  State<ReloadTestComponent> createState() => ReloadTestComponentState();
+}
+
+class ReloadTestComponentState extends State<ReloadTestComponent>
+    with SyncStateMixin<ReloadTestComponent, Map<String, dynamic>> {
+  int count = 0;
+
+  @override
+  void updateState(Map<String, dynamic> value) {
+    count = value['count'] as int;
+  }
+
+  @override
+  Map<String, dynamic> getState() => {'count': count};
+
+  @override
+  Component build(BuildContext context) {
+    return p([Component.text('Hello ${component.name}, Count: $count')]);
+  }
 }
