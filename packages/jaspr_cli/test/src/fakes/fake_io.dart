@@ -29,7 +29,11 @@ class FakeIO {
   final MockSockets sockets;
 
   final _serverSocketsController = StreamController<FakeServerSocket>();
-  late final StreamQueue<FakeServerSocket> serverSockets = StreamQueue(_serverSocketsController.stream);
+  // Filter port 0, which is used internally by DWDS/DDS so to not interfere
+  // with test server bindings.
+  late final StreamQueue<FakeServerSocket> serverSockets = StreamQueue(
+    _serverSocketsController.stream.where((s) => s.port != 0),
+  );
 
   final FakeStdin stdin;
   final FakeIOSink stdout;
