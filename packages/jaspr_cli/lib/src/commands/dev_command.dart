@@ -58,7 +58,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
-    argParser.addOption('module-format', help: 'The module format to use.', allowed: ['ddc', 'amd']);
+    argParser.addOption('module-format', help: 'The module format to use.', allowed: ['ddc', 'amd'], defaultsTo: 'ddc');
     argParser.addFlag(
       'managed-build-options',
       help:
@@ -315,13 +315,19 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       for (final e in dartDefines.entries) '-D${e.key}=${e.value}',
     ];
 
-    final reloadConfig = switch (mode) {
+    var reloadConfig = switch (mode) {
       'reload' => ReloadConfiguration.hotReload,
       'refresh' => ReloadConfiguration.liveReload,
       'restart' || _ => ReloadConfiguration.hotRestart,
     };
-
-    final moduleFormat = reloadConfig == ReloadConfiguration.hotReload ? 'ddc' : this.moduleFormat ?? 'ddc';
+    final moduleFormat = this.moduleFormat ?? 'ddc';
+    if (moduleFormat == 'amd' && reloadConfig == ReloadConfiguration.hotReload) {
+      logger.write(
+        'The AMD module format does not support hot reload. Using hot restart instead of hot reload.',
+        level: Level.info,
+      );
+      reloadConfig = ReloadConfiguration.hotRestart;
+    }
     final usesDdcLibraryBundles = moduleFormat == 'ddc';
 
     List<String> additionalFlutterBuildArgs() {

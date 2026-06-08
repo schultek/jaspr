@@ -78,7 +78,7 @@ class DevProxy {
     bool enableDebugging = false,
     bool useDwdsWebSocketConnection = true,
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
-    String moduleFormat = 'amd',
+    String moduleFormat = 'ddc',
   }) async {
     const target = 'web';
     final reloadedSources = <Map<String, dynamic>>[];

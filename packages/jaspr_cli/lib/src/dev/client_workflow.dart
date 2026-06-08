@@ -29,7 +29,7 @@ class ClientWorkflow {
     bool enableDebugging = false,
     bool useDwdsWebSocketConnection = true,
     ReloadConfiguration reload = ReloadConfiguration.none,
-    String moduleFormat = 'amd',
+    String moduleFormat = 'ddc',
   }) async {
     var cancelled = false;
 
