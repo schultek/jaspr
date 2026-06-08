@@ -12,6 +12,7 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:vm_service/vm_service.dart' as vm;
 import 'package:vm_service/vm_service_io.dart';
 
+import '../logging.dart';
 import '../project.dart';
 import 'chrome.dart';
 import 'util.dart';
@@ -24,10 +25,11 @@ class DevProxy {
 
   final Dwds dwds;
   final ExpressionCompilerService? ddcService;
+  final Logger? logger;
 
-  final _clientConnections = <String, ClientConnection>{};
-  final _clientEvents = StreamController<Map<String, dynamic>>();
-  Stream<Map<String, dynamic>> get clientEvents => _clientEvents.stream;
+  final Map<String, ClientConnection> _clientConnections = {};
+  final StreamController<Map<String, Object?>> _clientEvents = StreamController();
+  Stream<Map<String, Object?>> get clientEvents => _clientEvents.stream;
 
   DevProxy._({
     required this.client,
@@ -36,6 +38,7 @@ class DevProxy {
     required this.reload,
     required this.dwds,
     this.ddcService,
+    this.logger,
   }) {
     _listenToClientConnections();
     _listenToBuildResults();
@@ -79,6 +82,7 @@ class DevProxy {
     bool useDwdsWebSocketConnection = true,
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
     String moduleFormat = 'ddc',
+    Logger? logger,
   }) async {
     const target = 'web';
     final reloadedSources = <Map<String, dynamic>>[];
@@ -90,10 +94,11 @@ class DevProxy {
         reloadedSources.clear();
         results.changedAssets?.forEach((uri) {
           if (uri.path.endsWith('.ddc.js')) {
+            final libraryId = ddcUriToLibraryId(uri);
             final reloadedSource = {
               'src': ddcUriToSourceUrl('', target, uri),
-              'module': ddcUriToLibraryId(uri),
-              'libraries': [ddcUriToLibraryId(uri)],
+              'module': libraryId,
+              'libraries': [libraryId],
             };
             reloadedSources.add(reloadedSource);
           }
@@ -211,6 +216,7 @@ class DevProxy {
       reload: reload,
       dwds: dwds,
       ddcService: ddcService,
+      logger: logger,
     );
   }
 
@@ -262,8 +268,10 @@ class JasprSdkConfigurationProvider extends SdkConfigurationProvider {
   }
 }
 
+/// Converts a [Uri] that refers to a JavaScript file in the `web` target
+/// to a relative URI from the root of the web server.
 String ddcUriToSourceUrl(String basePath, String target, Uri uri) {
-  String jsPath;
+  final String jsPath;
   if (uri.isScheme('asset')) {
     var pathParts = uri.pathSegments.skip(1);
     if (pathParts.first == target) {
@@ -278,6 +286,8 @@ String ddcUriToSourceUrl(String basePath, String target, Uri uri) {
   return '$basePath/$jsPath';
 }
 
+/// Converts a [Uri] that refers to a JavaScript file in the `web` target
+/// to a library id that can be used to resolve the library in the SDK.
 String ddcUriToLibraryId(Uri uri) {
   final jsPath = uri.isScheme('package') ? 'package:${uri.path}' : 'org-dartlang-app:///${uri.path}';
   final prefix = jsPath.substring(
@@ -348,7 +358,7 @@ class ClientConnection {
       });
 
       sendEvent('client.debugPort', {'appId': appId, 'port': debugConnection.port, 'wsUri': debugConnection.uri});
-    } catch (e) {
+    } catch (_) {
       // noop
     }
 
@@ -366,15 +376,13 @@ class ClientConnection {
   }
 
   // Mapping from service name to service method.
-  final Map<String, String> _registeredMethodsForService = <String, String>{};
+  final Map<String, String> _registeredMethodsForService = {};
 
   void _onServiceEvent(vm.Event e) {
     if (e.kind == vm.EventKind.kServiceRegistered) {
       final serviceName = e.service!;
       _registeredMethodsForService[serviceName] = e.method!;
-    }
-
-    if (e.kind == vm.EventKind.kServiceUnregistered) {
+    } else if (e.kind == vm.EventKind.kServiceUnregistered) {
       final serviceName = e.service!;
       _registeredMethodsForService.remove(serviceName);
     }
@@ -387,16 +395,41 @@ class ClientConnection {
   }
 
   Future<void> performHotReload() async {
-    final isolateId = (await vmService?.getVM())?.isolates?.first.id;
+    final vmService = this.vmService;
+    if (vmService == null) {
+      devProxy.logger?.write(
+        'Tried to perform hot reload before debug connection is ready.',
+        tag: Tag.client,
+        level: Level.warning,
+      );
+      return;
+    }
+
+    final isolateId = (await vmService.getVM()).isolates?.firstOrNull?.id;
+    if (isolateId == null) {
+      devProxy.logger?.write(
+        'Tried to perform hot reload but no isolate was found.',
+        tag: Tag.client,
+        level: Level.warning,
+      );
+      return;
+    }
+
     vm.ReloadReport? response;
     for (var i = 0; i < 5; i++) {
-      response = await vmService?.reloadSources(isolateId!);
-      if (response?.success ?? false) {
+      response = await vmService.reloadSources(isolateId);
+      if (response.success ?? false) {
         break;
       }
     }
     if (response?.success ?? false) {
       await reassemble();
+    } else {
+      devProxy.logger?.write(
+        'Hot reload failed after 5 attempts for unknown reason. Skipping reassemble.',
+        tag: Tag.client,
+        level: Level.warning,
+      );
     }
   }
 

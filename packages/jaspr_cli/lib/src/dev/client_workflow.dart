@@ -63,6 +63,7 @@ class ClientWorkflow {
           useDwdsWebSocketConnection: useDwdsWebSocketConnection,
           reload: reload,
           moduleFormat: moduleFormat,
+          logger: logger,
         );
 
         if (cancelled) {

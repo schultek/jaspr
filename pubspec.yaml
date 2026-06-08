@@ -35,11 +35,6 @@ dev_dependencies:
 dependency_overrides:
   # Until melos upgrades to this version
   cli_util: 0.5.0 
-  # Until 4.4.20 is released
-  build_web_compilers:
-    git:
-      url: https://github.com/dart-lang/build
-      path: builder_pkgs/build_web_compilers
 
 melos:
   command:

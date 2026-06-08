@@ -324,10 +324,18 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (moduleFormat == 'amd' && reloadConfig == ReloadConfiguration.hotReload) {
       logger.write(
         'The AMD module format does not support hot reload. Using hot restart instead of hot reload.',
-        level: Level.info,
+        level: Level.warning,
       );
       reloadConfig = ReloadConfiguration.hotRestart;
     }
+
+    if (reloadConfig == ReloadConfiguration.hotReload) {
+      if (!project.checkHotReloadSupport()) {
+        logger.write('Falling back to hot restart instead of hot reload.', level: Level.warning);
+        reloadConfig = ReloadConfiguration.hotRestart;
+      }
+    }
+
     final usesDdcLibraryBundles = moduleFormat == 'ddc';
 
     List<String> additionalFlutterBuildArgs() {
