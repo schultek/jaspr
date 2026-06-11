@@ -273,7 +273,7 @@ class UncontrolledProviderScope extends InheritedComponent {
 }
 
 @sealed
-class _UncontrolledProviderScopeElement extends InheritedElement {
+class _UncontrolledProviderScopeElement extends InheritedElement implements Vsync {
   _UncontrolledProviderScopeElement(UncontrolledProviderScope super.component);
 
   Task? _task;
@@ -312,7 +312,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
       debugCanModifyProviders ??= _debugCanModifyProviders;
     }
 
-    component.container.scheduler.flutterVsyncs.add(_jasprVsync);
+    component.container.scheduler.flutterVsyncs.add(this);
     super.mount(parent, newSlot);
   }
 
@@ -321,7 +321,17 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     setDependencies(dependent, getDependencies(dependent) ?? ProviderDependencies(dependent, this));
   }
 
-  void _jasprVsync(Task task) {
+  @override
+  void Function()? scheduleDispose(Task task) {
+    return _jasprVsync(task);
+  }
+
+  @override
+  void Function()? scheduleRefresh(Task task) {
+    return _jasprVsync(task);
+  }
+
+  void Function() _jasprVsync(Task task) {
     assert(
       _task == null ||
           // Checks for race conditions where a task has been completed in a different scope.
@@ -333,12 +343,19 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
     );
     _task = task;
 
+    var cancelled = false;
     Future.microtask(() async {
-      while (owner.isFirstBuild) {
+      while (owner.isFirstBuild && !cancelled) {
         await Future(() {});
       }
-      if (_mounted) markNeedsBuild();
+      if (_mounted && !cancelled) markNeedsBuild();
     });
+    return () {
+      cancelled = true;
+      if (identical(_task, task)) {
+        _task = null;
+      }
+    };
   }
 
   void _debugCanModifyProviders() {
@@ -376,7 +393,7 @@ class _UncontrolledProviderScopeElement extends InheritedElement {
       debugCanModifyProviders = null;
     }
 
-    component.container.scheduler.flutterVsyncs.remove(_jasprVsync);
+    component.container.scheduler.flutterVsyncs.remove(this);
     super.unmount();
   }
 
