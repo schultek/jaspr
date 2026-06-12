@@ -44,9 +44,8 @@ void main() {
       ),
     ],{{#flutter}}
     head: [
-      // The generated flutter manifest and bootstrap script.
+      // The generated flutter manifest.
       link(rel: 'manifest', href: 'manifest.json'),
-      script(src: "flutter_bootstrap.js", async: true),
     ],{{/flutter}}
     body: App(),
   ));

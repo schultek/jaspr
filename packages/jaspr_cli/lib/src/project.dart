@@ -262,15 +262,6 @@ class Project {
       );
       _exitFn(1);
     }
-
-    if (flutterMode == FlutterMode.embedded) {
-      logger.write(
-        'Using "--experimental-wasm" is currently not supported together with Flutter embedding.',
-        tag: Tag.cli,
-        level: Level.critical,
-      );
-      _exitFn(1);
-    }
   }
 
   void checkFlutterBuildSupport() {

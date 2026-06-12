@@ -12,6 +12,8 @@ import 'package:shelf_static/shelf_static.dart';
 import '../commands/base_command.dart';
 import '../dev/dev_proxy.dart';
 import '../logging.dart';
+import '../project.dart';
+import 'wasm_loader_helper.dart';
 
 mixin ProxyHelper on BaseCommand {
   Future<HttpServer> startProxy(
@@ -20,6 +22,7 @@ mixin ProxyHelper on BaseCommand {
     required String serverPort,
     String? flutterPort,
     bool redirectNotFound = false,
+    bool useWasm = false,
     void Function(Object?)? onMessage,
   }) async {
     final client = devProxy?.client ?? http.Client();
@@ -40,9 +43,13 @@ mixin ProxyHelper on BaseCommand {
       // This is also the reason why Cascade() won't work here.
       final body = req.read().asBroadcastStream();
 
-      if (flutterHandler != null && req.url.path == 'flutter_bootstrap.js') {
-        return await flutterHandler(req.change(body: body));
+      if (useWasm && req.url.path.endsWith('.dart.js')) {
+        final basename = req.url.path.substring(0, req.url.path.length - 3);
+        final isFlutter = project.flutterMode != FlutterMode.none;
+        final loaderScript = getWasmLoaderScript(basename: basename, isFlutter: isFlutter);
+        return Response.ok(loaderScript, headers: {'content-type': 'application/javascript'});
       }
+
       try {
         // First try to load the resource from the webdev handler.
         var res = await webdevHandler(req.change(body: body));
@@ -75,7 +82,7 @@ mixin ProxyHelper on BaseCommand {
         }
 
         if (res.statusCode == 404 && redirectNotFound && path.extension(req.url.path).isEmpty) {
-          return webdevHandler(
+          return await webdevHandler(
             Request(
               req.method,
               req.requestedUri.replace(path: '/'),

@@ -132,6 +132,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       serverPort: port,
       flutterPort: project.flutterMode == FlutterMode.embedded ? flutterProxyPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
+      useWasm: useWasm,
     );
 
     if (project.requireMode == JasprMode.client) {
@@ -307,8 +308,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final dart2jsDefines = [
       '-Djaspr.flags.release=$release',
       if (!release) '--enable-asserts',
-      if (useWasm && project.flutterMode != FlutterMode.none)
+      if (useWasm) '--enable-deferred-loading',
+      if (useWasm && project.flutterMode != FlutterMode.none) ...[
         '--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
+        '--extra-compiler-option=--import-shared-memory',
+        '--extra-compiler-option=--shared-memory-max-pages=32768',
+      ],
       for (final e in dartDefines.entries) '-D${e.key}=${e.value}',
     ];
 

@@ -64,7 +64,7 @@ mixin FlutterHelper on BaseCommand {
 
     await copyToBuildDir(
       './build/flutter',
-      ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'],
+      ['version.json', 'flutter_service_worker.js', 'assets/', 'canvaskit/'],
     );
 
     return exitCode;

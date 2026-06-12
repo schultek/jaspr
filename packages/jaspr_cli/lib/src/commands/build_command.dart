@@ -15,6 +15,7 @@ import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
+import '../helpers/wasm_loader_helper.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
@@ -448,12 +449,16 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final args = [
       '-Djaspr.flags.release=true',
       '-O${argResults!.option('optimize')}',
-      if (useWasm) //
-        ...argResults!.multiOption('extra-wasm-compiler-option')
-      else
+      if (useWasm) ...[
+        '--enable-deferred-loading',
+        ...argResults!.multiOption('extra-wasm-compiler-option'),
+      ] else
         ...argResults!.multiOption('extra-js-compiler-option'),
-      if (useWasm && project.flutterMode != FlutterMode.none)
+      if (useWasm && project.flutterMode != FlutterMode.none) ...[
         '--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
+        '--extra-compiler-option=--import-shared-memory',
+        '--extra-compiler-option=--shared-memory-max-pages=32768',
+      ],
       for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
     ];
@@ -540,6 +545,21 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await client.close();
     if (exitCode == 0) {
       logger.write('Completed building web assets.', progress: ProgressState.completed);
+
+      if (useWasm) {
+        final rootDir = Directory(outputLocation.output);
+        if (rootDir.existsSync()) {
+          final files = rootDir.listSync(recursive: true);
+          for (final file in files) {
+            if (file is File && file.path.endsWith('.dart.js')) {
+              final basename = p.basenameWithoutExtension(file.path);
+              final isFlutter = project.flutterMode != FlutterMode.none;
+              final loaderScript = getWasmLoaderScript(basename: basename, isFlutter: isFlutter);
+              file.writeAsStringSync(loaderScript);
+            }
+          }
+        }
+      }
 
       if (includeSourceMaps) {
         _fixSourceMaps(outputLocation.output);
