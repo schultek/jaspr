@@ -311,6 +311,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (useWasm) '--enable-deferred-loading',
       if (useWasm && project.flutterMode != FlutterMode.none) ...[
         '--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
+      ],
+      if (useWasm && project.flutterMode == FlutterMode.embedded) ...[
         '--extra-compiler-option=--import-shared-memory',
         '--extra-compiler-option=--shared-memory-max-pages=32768',
       ],
