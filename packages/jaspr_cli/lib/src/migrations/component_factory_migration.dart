@@ -81,12 +81,10 @@ class ComponentFactoryMigration implements Migration {
         for (final (node, arguments) in fragments) {
           builder.replace(node.offset, node.length, 'Component.fragment');
           final childrenArg =
-              arguments.arguments
-                      .where((arg) => arg is NamedExpression && arg.name.label.name == 'children')
-                      .firstOrNull
-                  as NamedExpression?;
+              arguments.arguments.where((arg) => arg is NamedArgument && arg.name.lexeme == 'children').firstOrNull
+                  as NamedArgument?;
           if (childrenArg != null) {
-            final end = childrenArg.expression.offset;
+            final end = childrenArg.argumentExpression.offset;
             builder.delete(childrenArg.name.offset, end - childrenArg.name.offset);
           }
         }

@@ -1,6 +1,6 @@
 ## Unreleased patch
 
-- Support `analyzer` `^12.1.0`.
+- Support `analyzer` `^13.0.0`.
 
 ## 0.23.1
 
