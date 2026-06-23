@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.4.6
 
 - Support `riverpod` version `3.3.2`.
 
