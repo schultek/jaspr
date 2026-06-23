@@ -48,8 +48,10 @@ class UnsafeImportsRule extends AnalysisRule {
 
     if (node.usesCssAnnotation) {
       _checkPubspecConfig(context);
-      if (!usesStylesStandaloneMode && node.usesGlobalCssAnnotation) {
-        registry.addAnnotation(this, CssImportsVisitor(this, node));
+      if (usesStylesStandaloneMode) {
+        registry.addImportDirective(this, StandaloneCssImportsVisitor(this, node));
+      } else if (!isClientMode && node.usesGlobalCssAnnotation) {
+        registry.addImportDirective(this, InlineCssImportsVisitor(this, node));
       }
     }
 
@@ -188,7 +190,7 @@ abstract class ScopeImportsVisitor extends SimpleAstVisitor<void> with ScopeEdge
       rule.reportAtNode(
         edge.directive,
         arguments: [
-          "Unsafe import: '${edge.directive.uri.stringValue}' imports other unsafe libraries which are not available on the ${edgeType.name}. See below for details.",
+          "Unsafe import: '${edge.directive.uri.stringValue}' imports libraries which are not available on the ${edgeType.name}. See below for details.",
         ],
         contextMessages: messages,
       );
@@ -209,6 +211,7 @@ abstract mixin class ServerScopeEdgeVisitor implements ScopeEdgeVisitor {
         lib.identifier == 'dart:html' ||
         lib.identifier == 'dart:js' ||
         lib.identifier == 'dart:js_util' ||
+        lib.identifier == 'dart:ui' ||
         lib.identifier.startsWith('package:flutter/');
   }
 
@@ -257,42 +260,79 @@ class ClientScopeImportsVisitor extends ScopeImportsVisitor {
   }
 }
 
-class CssImportsVisitor extends SimpleAstVisitor<void> with ScopeEdgeVisitor, ServerScopeEdgeVisitor {
-  CssImportsVisitor(this.rule, this.treeNode);
-
-  final UnsafeImportsRule rule;
-  final ScopeTreeNode treeNode;
+abstract class CssImportsVisitor extends ScopeImportsVisitor {
+  CssImportsVisitor(super.rule, super.treeNode);
 
   @override
-  void visitAnnotation(Annotation node) {
-    if (node case Annotation(
-      name: Identifier(name: 'css'),
-      elementAnnotation: ElementAnnotation(isCssAnnotation: true),
-    )) {
-      final messages = [
-        for (final edge in treeNode.childEdges)
-          ...collectUnsafeImports(
-            edge,
-            checkRoot: true,
-            filterNode: (node) {
-              // Skip nodes that also use @css themself, to avoid double-reporting.
-              if (node.usesCssAnnotation) return true;
-              return false;
-            },
-          ),
-      ];
+  EdgeType get edgeType => EdgeType.server;
 
-      if (messages.isNotEmpty) {
-        rule.reportAtNode(
-          node,
-          arguments: [
-            'Unsafe @css usage: Importing client-only libraries is not allowed when using @css. Switch to standalone mode for styles or fix these imports. See below for details.',
-          ],
-          contextMessages: messages,
-        );
-      }
+  @override
+  void reportUnsafeDirectImport(ScopeTreeEdge edge) {
+    rule.reportAtNode(
+      edge.directive,
+      arguments: [
+        "Unsafe import: '${edge.directive.uri.stringValue}' is not available when using @css.\n${suggestionFor(edge.childNode.library)}",
+      ],
+      contextMessages: [
+        for (final f in [...treeNode.cssFields, ...treeNode.cssGlobals])
+          SimpleDiagnosticMessage(
+            filePath: edge.parentNode.library.firstFragment.source.fullName,
+            offset: f.firstFragment.offset,
+            length: f.firstFragment.name?.length ?? 1,
+            message: '@css used here.',
+          ),
+      ],
+    );
+  }
+
+  @override
+  void checkUnsafeTransitiveImports(ScopeTreeEdge edge) {
+    final messages = collectUnsafeImports(
+      edge,
+      filterNode: (node) {
+        // Skip nodes that also use @css themself, to avoid double-reporting.
+        if (node.usesCssAnnotation) return true;
+        return false;
+      },
+    );
+
+    if (messages.isNotEmpty) {
+      rule.reportAtNode(
+        edge.directive,
+        arguments: [
+          "Unsafe import: '${edge.directive.uri.stringValue}' imports libraries which are not available when using @css.\nSee below for details.",
+        ],
+        contextMessages: [
+          for (final f in [...treeNode.cssFields, ...treeNode.cssGlobals])
+            SimpleDiagnosticMessage(
+              filePath: edge.parentNode.library.firstFragment.source.fullName,
+              offset: f.firstFragment.offset,
+              length: f.firstFragment.name?.length ?? 1,
+              message: '@css used here.',
+            ),
+          ...messages,
+        ],
+      );
     }
   }
+}
+
+class StandaloneCssImportsVisitor extends CssImportsVisitor {
+  StandaloneCssImportsVisitor(super.rule, super.treeNode);
+
+  @override
+  bool isUnsafeImport(LibraryElement lib) {
+    return lib.identifier == 'dart:ui' || lib.identifier.startsWith('package:flutter/');
+  }
+
+  @override
+  String suggestionFor(LibraryElement lib) {
+    return 'Try using a conditional import.';
+  }
+}
+
+class InlineCssImportsVisitor extends CssImportsVisitor with ServerScopeEdgeVisitor {
+  InlineCssImportsVisitor(super.rule, super.treeNode);
 }
 
 class SimpleDiagnosticMessage implements DiagnosticMessage {
