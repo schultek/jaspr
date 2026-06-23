@@ -1,4 +1,4 @@
-## Unreleased minor
+## Unreleased patch
 
 - Added a `--port` option to `jaspr build` for configuring the server port used during static generation.
 
