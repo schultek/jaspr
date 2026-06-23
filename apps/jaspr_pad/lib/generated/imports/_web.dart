@@ -12,6 +12,7 @@ import 'dart:html'
         Element,
         CustomEvent,
         MouseEvent,
+        KeyboardEvent,
         Event,
         InputElement,
         IFrameElement,
@@ -35,6 +36,7 @@ export 'dart:html'
         Element,
         CustomEvent,
         MouseEvent,
+        KeyboardEvent,
         Event,
         InputElement,
         IFrameElement,
@@ -59,6 +61,7 @@ typedef EventOrStubbed = Event;
 typedef HtmlDocumentOrStubbed = HtmlDocument;
 typedef IFrameElementOrStubbed = IFrameElement;
 typedef InputElementOrStubbed = InputElement;
+typedef KeyboardEventOrStubbed = KeyboardEvent;
 typedef MDCDialogOrStubbed = MDCDialog;
 typedef MDCMenuOrStubbed = MDCMenu;
 typedef MDCRippleOrStubbed = MDCRipple;
