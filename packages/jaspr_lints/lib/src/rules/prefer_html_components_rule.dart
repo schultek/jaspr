@@ -52,9 +52,9 @@ class _HtmlComponentVisitor extends SimpleAstVisitor<void> {
     }
     if (node.constructorName.name?.name == 'element') {
       final tag = node.argumentList.arguments
-          .whereType<NamedExpression>()
-          .where((n) => n.name.label.name == 'tag')
-          .map((n) => n.expression)
+          .whereType<NamedArgument>()
+          .where((n) => n.name.lexeme == 'tag')
+          .map((n) => n.argumentExpression)
           .whereType<SimpleStringLiteral>()
           .firstOrNull
           ?.value;
@@ -90,9 +90,9 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
   Future<void> compute(ChangeBuilder builder) async {
     if (node case ConstructorName(parent: final InstanceCreationExpression node)) {
       final tag = node.argumentList.arguments
-          .whereType<NamedExpression>()
-          .where((n) => n.name.label.name == 'tag')
-          .map((n) => n.expression)
+          .whereType<NamedArgument>()
+          .where((n) => n.name.lexeme == 'tag')
+          .map((n) => n.argumentExpression)
           .whereType<SimpleStringLiteral>()
           .firstOrNull
           ?.value;
@@ -103,8 +103,8 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
 
       await builder.addDartFileEdit(file, (builder) {
         for (final argument in node.argumentList.arguments) {
-          if (argument is NamedExpression) {
-            final name = argument.name.label.name;
+          if (argument is NamedArgument) {
+            final name = argument.name.lexeme;
             if (name == 'tag') {
               int end;
               if (argument.endToken.next case final next? when next.lexeme == ',') {
@@ -114,7 +114,7 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
               }
               builder.addDeletion(SourceRange(argument.offset, end - argument.offset));
             } else if (name == 'children') {
-              final end = argument.name.endToken.next?.offset ?? argument.end;
+              final end = argument.argumentExpression.offset;
               builder.addDeletion(SourceRange(argument.name.offset, end - argument.name.offset));
             }
           }

@@ -20,13 +20,13 @@ resolution: workspace
 
 dependencies:
   analysis_server_plugin: ^0.3.0
-  analyzer: ^10.0.0
+  analyzer: ^13.0.0
   analyzer_plugin: any
   dart_data_home: ^0.1.0
   path: ^1.9.0
   yaml: ^3.1.2
 
 dev_dependencies:
-  analyzer_testing: ^0.1.9
+  analyzer_testing: ^0.2.5
   test: ^1.29.0
   test_reflective_loader: ^0.4.0

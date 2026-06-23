@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Support `analyzer` `^13.0.0`.
+
 ## 0.7.1
 
 - Fixed stack overflow error when analyzing cyclic dependencies.

@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Support `analyzer` `^13.0.0`.
+
 ## 0.23.1
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.
