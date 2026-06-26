@@ -88,7 +88,7 @@ class CssRunner {
         package as Map<String, Object?>;
 
         if (package case {'name': 'universal_web'}) {
-          package['rootUri'] = p.join(jasprPath, 'lib/src/stub');
+          package['rootUri'] = Uri.file(p.join(jasprPath, 'lib/src/stub')).toString();
           package['packageUri'] = 'web/';
         }
 
