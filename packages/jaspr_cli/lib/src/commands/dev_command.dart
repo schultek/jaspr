@@ -187,7 +187,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     if (useHotReload) {
       final import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
-      serverTarget.writeAsStringSync(serverEntrypoint(import));
+      // hotreloader watches 'bin' and 'test' by default. If they don't exist in this
+      // project, exclude them so it doesn't fall back to a polling watcher for them.
+      final excludedPaths = [
+        for (final dir in ['bin', 'test'])
+          if (!Directory(dir).existsSync()) dir,
+      ];
+      serverTarget.writeAsStringSync(serverEntrypoint(import, excludedPaths));
 
       args.add(serverTarget.path);
     } else {
@@ -450,18 +456,22 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 }
 
-String serverEntrypoint(String import) =>
+String serverEntrypoint(String import, List<String> excludedPaths) =>
     '''
   import '$import' as m;
   import 'package:hotreloader/hotreloader.dart';
-      
+
   void main(List<String> args) async {
     final mainFunc = m.main as dynamic;
     final mainCall = mainFunc is dynamic Function(List<String>) ? () => mainFunc(args) : () => mainFunc();
 
     try {
       await HotReloader.create(
-        debounceInterval: Duration.zero,
+        // A non-zero interval is required: hotreloader falls back to polling watchers
+        // for paths that don't exist (e.g. unused bin/ or test/ dirs), and a zero
+        // pollingDelay there causes a busy loop pinning a CPU core (see #816).
+        debounceInterval: Duration(milliseconds: 200),
+        excludedPaths: {${excludedPaths.map((e) => "'$e'").join(', ')}},
         onAfterReload: (ctx) => mainCall(),
       );
       print('[INFO] Server hot reload is enabled.');

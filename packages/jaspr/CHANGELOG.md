@@ -1,3 +1,10 @@
+## Unreleased patch
+
+- Fixed `jaspr serve` pinning a CPU core at 100% when the project has no `bin/` or `test/`
+  directory. The hot reload server used `debounceInterval: Duration.zero`, which is also used
+  as the polling delay for directory watchers that fall back to polling (e.g. for paths that
+  don't exist), turning it into a tight busy loop. (#816)
+
 ## 0.23.1
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.
