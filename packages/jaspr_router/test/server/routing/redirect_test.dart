@@ -1,10 +1,8 @@
 @TestOn('vm')
 library;
 
-import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_test/server_test.dart';
-import 'package:shelf/shelf.dart';
 
 import '../../utils.dart';
 
