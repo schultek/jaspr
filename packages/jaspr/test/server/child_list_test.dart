@@ -14,7 +14,11 @@ import 'package:shelf/src/headers.dart';
 void main() {
   group('child list', () {
     Future<RenderObjectElement> renderServerApp(Component app) async {
-      final binding = ServerAppBinding((url: '/', basePath: '/', headers: Headers.empty()), loadFile: (_) async => null);
+      final binding = ServerAppBinding((
+        url: '/',
+        basePath: '/',
+        headers: Headers.empty(),
+      ), loadFile: (_) async => null);
       binding.initializeOptions(ServerOptions());
       binding.attachRootComponent(app);
 
