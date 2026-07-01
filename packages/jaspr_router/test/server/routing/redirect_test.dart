@@ -1,8 +1,10 @@
 @TestOn('vm')
 library;
 
+import 'package:jaspr/server.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_test/server_test.dart';
+import 'package:shelf/shelf.dart';
 
 import '../../utils.dart';
 
@@ -94,6 +96,28 @@ void main() {
       response = await tester.request('/a');
       expect(response.statusCode, equals(302));
       expect(response.headers['location'], equals('/'));
+    });
+
+    testServer('should redirect on server with basePath', (tester) async {
+      tester.pumpComponent(
+        Router(
+          routes: [
+            homeRoute(),
+            route('/a'),
+            route('/b', [], null, (_, s) {
+              if (s.location == '/b') {
+                return '/a';
+              }
+              return null;
+            }),
+          ],
+        ),
+      );
+
+      final response = await tester.request('/sub/path/b', handlerPath: '/sub/path/');
+
+      expect(response.statusCode, equals(302));
+      expect(response.headers['location'], equals('/sub/path/a'));
     });
   });
 }

@@ -1,3 +1,8 @@
+## Unreleased patch
+
+- Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
+- Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.
+
 ## 0.23.1
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.
