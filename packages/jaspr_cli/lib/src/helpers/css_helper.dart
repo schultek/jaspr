@@ -170,7 +170,7 @@ void main(List<String> args) async {
 
     final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
 
-    logger.write('Starting CSS generation...', tag: Tag.cli);
+    logger.write('Starting CSS generation...', tag: Tag.css);
 
     client = await FrontendServerClient.start(
       runnerFile.path,
@@ -187,8 +187,8 @@ void main(List<String> args) async {
     client!.accept();
 
     if (compilerResult.errorCount > 0) {
-      logger.write('Failed to compile CSS runner', tag: Tag.cli, level: Level.error);
-      logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.cli, level: Level.error);
+      logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
+      logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
     }
 
     if (compilerResult.dillOutput != null) {
@@ -214,7 +214,7 @@ void main(List<String> args) async {
           } catch (e) {
             logger.write(
               'Failed to connect to CSS runner, styles will not be hot-reloaded: $e',
-              tag: Tag.cli,
+              tag: Tag.css,
               level: Level.warning,
             );
           }
@@ -233,13 +233,13 @@ void main(List<String> args) async {
     });
 
     process!.stderr.transform(utf8.decoder).transform(LineSplitter()).listen((line) async {
-      logger.write('[CSS Runner] $line', tag: Tag.cli, level: Level.error);
+      logger.write('[Runner] $line', tag: Tag.css, level: Level.error);
     });
 
     process!.exitCode.then((value) {
       if (_disposed) return;
       if (value != 0) {
-        logger.write('CSS runner exited with code $value', tag: Tag.cli, level: Level.error);
+        logger.write('CSS runner exited with code $value', tag: Tag.css, level: Level.error);
       }
       process = null;
       vmService = null;
@@ -254,7 +254,7 @@ void main(List<String> args) async {
     final cssFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
 
-    logger.write('Regenerating CSS files...', tag: Tag.cli);
+    logger.write('Regenerating CSS files...', tag: Tag.css);
 
     if (client == null) {
       await start();
@@ -266,8 +266,8 @@ void main(List<String> args) async {
       client!.accept();
 
       if (compilerResult.errorCount > 0) {
-        logger.write('Failed to compile CSS runner', tag: Tag.cli, level: Level.error);
-        logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.cli, level: Level.error);
+        logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
+        logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
       }
 
       if (compilerResult.dillOutput != null) {
@@ -282,7 +282,7 @@ void main(List<String> args) async {
         }
       }
     } catch (e) {
-      logger.write('Failed to hot-reload CSS runner: $e', tag: Tag.cli, level: Level.warning);
+      logger.write('Failed to hot-reload CSS runner: $e', tag: Tag.css, level: Level.warning);
     }
   }
 
@@ -306,8 +306,8 @@ void main(List<String> args) async {
     client.kill();
 
     if (compilerResult.errorCount > 0) {
-      logger.write('Failed to compile CSS runner', tag: Tag.cli, level: Level.error);
-      logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.cli, level: Level.error);
+      logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
+      logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
     }
 
     if (compilerResult.dillOutput == null) {
@@ -317,7 +317,7 @@ void main(List<String> args) async {
     final result = await ProcessRunner.instance.run(dartExecutable, ['run', '.dart_tool/jaspr/css/css_runner.dill']);
 
     if (result.exitCode != 0) {
-      logger.write('Failed to generate css:\n${result.stderr}', tag: Tag.cli, level: Level.error);
+      logger.write('Failed to generate css:\n${result.stderr}', tag: Tag.css, level: Level.error);
       return result.exitCode;
     }
 
@@ -410,10 +410,10 @@ void main(List<String> args) async {
       return;
     }
     try {
-      logger.write('Hot-reloading CSS stylesheets: $cssFiles', tag: Tag.cli, level: Level.verbose);
+      logger.write('Hot-reloading CSS stylesheets: $cssFiles', tag: Tag.css, level: Level.verbose);
       await connection.vmService!.callServiceExtension('ext.jaspr.reload_stylesheets', args: {'urls': cssFiles});
     } catch (e) {
-      logger.write('Failed to reload CSS stylesheets: $e', tag: Tag.cli, level: Level.warning);
+      logger.write('Failed to reload CSS stylesheets: $e', tag: Tag.css, level: Level.warning);
     }
   }
 
@@ -423,7 +423,7 @@ void main(List<String> args) async {
     }
     if (line.isEmpty) return;
     if (!line.trim().startsWith('{')) {
-      logger.write('[CSS Runner] $line', tag: Tag.cli, level: Level.verbose);
+      logger.write('[Runner] $line', tag: Tag.css, level: Level.verbose);
       return;
     }
 
@@ -436,12 +436,12 @@ void main(List<String> args) async {
 
         final currentContent = outputFile.readAsStringSync();
         if (currentContent == cssValue) {
-          logger.write('Skipped $file (unchanged)', tag: Tag.cli);
+          logger.write('Skipped $file (unchanged)', tag: Tag.css);
           return;
         }
 
         outputFile.writeAsStringSync(cssValue);
-        logger.write('Generated $file', tag: Tag.cli);
+        logger.write('Generated $file', tag: Tag.css);
       } else if (json case {'event': 'done'}) {
         onDone?.call();
       }
