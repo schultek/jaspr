@@ -14,6 +14,7 @@ enum Tag {
   server('SERVER', yellow),
   flutter('FLUTTER', blue),
   client('CLIENT', lightGreen),
+  css('CSS', lightMagenta),
   none('', black);
 
   const Tag(this.name, this.color);
