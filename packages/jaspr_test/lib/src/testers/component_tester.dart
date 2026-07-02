@@ -16,6 +16,7 @@ void testComponents(
   String description,
   FutureOr<void> Function(ComponentTester tester) callback, {
   String? url,
+  String basePath = '/',
   bool isClient = true,
   bool? skip,
   Timeout? timeout,
@@ -24,7 +25,7 @@ void testComponents(
   test(
     description,
     () async {
-      final binding = TestComponentsBinding(url ?? '/', isClient);
+      final binding = TestComponentsBinding(url ?? '/', isClient, basePath: basePath);
       final tester = ComponentTester._(binding);
 
       return binding.runTest(() async {
@@ -108,12 +109,14 @@ class ComponentTester {
 }
 
 class TestComponentsBinding extends AppBinding with ComponentsBinding {
-  TestComponentsBinding(this.currentUrl, this.isClient);
+  TestComponentsBinding(this.currentUrl, this.isClient, {this.basePath = '/'});
 
   @override
   final bool isClient;
   @override
   final String currentUrl;
+  @override
+  final String basePath;
 
   @override
   void scheduleFrame(VoidCallback frameCallback) {

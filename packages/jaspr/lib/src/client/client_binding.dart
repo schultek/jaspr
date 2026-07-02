@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
@@ -13,10 +14,27 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   @override
   bool get isClient => true;
 
+  ClientAppBinding() {
+    assert(() {
+      registerExtension('ext.jaspr.reassemble', (method, parameters) async {
+        // ignore: invalid_use_of_protected_member
+        rootElement?.visitChildren((element) => element.reassemble());
+        return ServiceExtensionResponse.result('{}');
+      });
+      return true;
+    }());
+  }
+
   static final String _baseOrigin = () {
-    final base = web.document.querySelector('head>base') as web.HTMLBaseElement?;
-    return base?.href ?? web.window.location.origin;
+    final hasBase = web.document.querySelector('head>base') != null;
+    return hasBase ? web.document.baseURI : web.window.location.origin;
   }();
+
+  @override
+  String get basePath {
+    final path = Uri.parse(_baseOrigin).path;
+    return path.isEmpty ? '/' : path;
+  }
 
   @override
   String get currentUrl {

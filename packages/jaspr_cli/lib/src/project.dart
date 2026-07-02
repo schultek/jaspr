@@ -291,6 +291,27 @@ class Project {
       _exitFn(1);
     }
   }
+
+  bool checkHotReloadSupport() {
+    final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
+    final version = switch (devDependencies?['build_web_compilers']) {
+      final String v => VersionConstraint.parse(v),
+      _ => null,
+    };
+    final minVersion = VersionConstraint.compatibleWith(Version(4, 7, 0));
+    if (version == null || !minVersion.allowsAll(version)) {
+      logger.write(
+        'Using "--mode=reload" requires build_web_compilers 4.7.0 or newer. '
+        'Please update your version constraint in pubspec.yaml.',
+        tag: Tag.cli,
+        level: Level.error,
+      );
+
+      return false;
+    }
+
+    return true;
+  }
 }
 
 const defaultServePort = '8080';

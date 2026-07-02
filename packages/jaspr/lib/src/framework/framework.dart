@@ -747,6 +747,21 @@ abstract class Element implements BuildContext {
     }
   }
 
+  /// Called whenever the application is reassembled during debugging, for
+  /// example during hot reload.
+  ///
+  /// This method should rerun any initialization logic that depends on global
+  /// state, for example, image loading from asset bundles (since the asset
+  /// bundle may have changed).
+  @mustCallSuper
+  @protected
+  void reassemble() {
+    markNeedsBuild();
+    visitChildren((Element child) {
+      child.reassemble();
+    });
+  }
+
   void _updateDepth(int parentDepth) {
     final int expectedDepth = parentDepth + 1;
     if (depth < expectedDepth) {

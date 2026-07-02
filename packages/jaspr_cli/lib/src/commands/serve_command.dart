@@ -1,8 +1,3 @@
-// ignore: implementation_imports
-import 'dart:async';
-
-import '../daemon/daemon.dart';
-import '../dev/client_domain.dart';
 import '../dev/client_workflow.dart';
 import '../logging.dart';
 import 'dev_command.dart';
@@ -25,36 +20,21 @@ class ServeCommand extends DevCommand {
   @override
   late final bool launchInChrome = argResults?.flag('launch-in-chrome') ?? false;
 
-  late Daemon daemon;
-
   @override
-  Future<int> runCommand() async {
-    final fakeInput = StreamController<Map<String, Object?>>();
-    daemon = Daemon(fakeInput.stream, (data) {
-      if (data['event'] == 'client.debugPort') {
-        final params = data['params'] as Map<String, Object?>;
+  void handleClientWorkflow(ClientWorkflow workflow) {
+    workflow.devProxy.clientEvents.listen((event) {
+      if (launchInChrome && event['method'] == 'client.debugPort') {
+        final params = event['params'] as Map<String, Object?>;
         final wsUri = params['wsUri'] as String;
         logger.write(
           'The Dart VM service is listening on http${wsUri.substring(2, wsUri.length - 2)}',
           tag: Tag.client,
         );
       }
-      if (data['event'] == 'client.log') {
-        final params = data['params'] as Map<String, Object?>;
+      if (event['method'] == 'client.log') {
+        final params = event['params'] as Map<String, Object?>;
         logger.write(params['log'] as String, tag: Tag.client);
       }
     });
-    guardResource(() {
-      daemon.shutdown();
-    });
-
-    return super.runCommand();
-  }
-
-  @override
-  void handleClientWorkflow(ClientWorkflow workflow) {
-    if (launchInChrome) {
-      daemon.registerDomain(ClientDomain(daemon, workflow.devProxy));
-    }
   }
 }

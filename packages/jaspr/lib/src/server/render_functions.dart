@@ -13,7 +13,7 @@ import 'run_app.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
 
-typedef RequestLike = ({String url, Headers headers});
+typedef RequestLike = ({String url, String basePath, Headers headers});
 
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
@@ -24,7 +24,11 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
     url = '/$url';
   }
 
-  final RequestLike r = (url: url, headers: Headers.from(request.headersAll));
+  final RequestLike r = (
+    url: url,
+    basePath: request.handlerPath,
+    headers: Headers.from(request.headersAll),
+  );
 
   if (!Jaspr.useIsolates) {
     final binding = ServerAppBinding(r, loadFile: loadFile);
