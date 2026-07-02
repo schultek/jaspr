@@ -186,6 +186,87 @@ void main() {
       });
     });
 
+    test('builds static project with custom port', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'static');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerBuildArgs);
+
+        FakeProcess? serverProcess;
+        when(
+          () => io.process.start(
+            '/fake/bin/dart',
+            any(that: contains('-Djaspr.flags.generate=true')),
+            workingDirectory: '/root/myapp',
+            environment: any(named: 'environment'),
+          ),
+        ).thenAnswer((inv) async {
+          expect(
+            inv.namedArguments[#environment],
+            equals({'PORT': '8181', 'JASPR_PROXY_PORT': serverProxyPort}),
+          );
+
+          return serverProcess = FakeProcess();
+        });
+
+        final buildResult = runner.run(['build', '--port', '8181', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrder([
+            'Building jaspr for static rendering mode.',
+            'Using server entry point: lib/main.server.dart',
+          ]),
+        );
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrder([
+            'Preparing static rendering...',
+            '[SERVER] Starting server app...',
+          ]),
+        );
+
+        expect(serverProcess, isNotNull);
+
+        final proxyConnection = await io.connectToProxy();
+
+        final fakeServer = io.setupFakeServer(8181);
+
+        fakeServer.onRequest('/abc', (request) async {
+          request.response.write('FAKE HTML RESPONSE');
+          await request.response.close();
+        });
+
+        await proxyConnection.sendFakeRequest(r'$jasprMessageHandler', jsonEncode({'route': '/abc'}));
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrder([
+            'Server started',
+            'Generating routes...',
+            '(1/1) Generating route "/abc" ...',
+          ]),
+        );
+
+        expect(io.fs.file('/root/myapp/build/jaspr/abc/index.html').existsSync(), isTrue);
+        expect(io.fs.file('/root/myapp/build/jaspr/abc/index.html').readAsStringSync(), equals('FAKE HTML RESPONSE'));
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrder([
+            'Completed building project to /build/jaspr.',
+            'Terminating server...',
+          ]),
+        );
+
+        expect(await buildResult, equals(0));
+      });
+    });
+
     test('builds project with flutter embedding', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'client', flutterEmbedding: true);

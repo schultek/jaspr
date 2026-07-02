@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Support `analyzer` `^12.1.0`.
+- Added a `--port` option to `jaspr build` for configuring the server port used during static generation.
 
 ## 0.23.1
 
