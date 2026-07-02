@@ -92,7 +92,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
         setState(() {});
       }
       if (context.binding.isClient && match.uri.toString() != location) {
-        PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title);
+        PlatformRouter.instance.history.replace(_normalizeUrl(match.uri.toString()), title: match.title);
       }
     });
   }
@@ -187,10 +187,11 @@ class RouterState extends State<Router> with PreloadStateMixin {
       setState(() {
         _matchList = match;
         if (updateHistory || location != match.uri.toString()) {
+          final historyUrl = _normalizeUrl(match.uri.toString());
           if (!replace) {
-            PlatformRouter.instance.history.push(match.uri.toString(), title: match.title, data: match.extra);
+            PlatformRouter.instance.history.push(historyUrl, title: match.title, data: match.extra);
           } else {
-            PlatformRouter.instance.history.replace(match.uri.toString(), title: match.title, data: match.extra);
+            PlatformRouter.instance.history.replace(historyUrl, title: match.title, data: match.extra);
           }
         }
       });
@@ -214,6 +215,12 @@ class RouterState extends State<Router> with PreloadStateMixin {
 
   Future<RouteMatchList> _matchRoute(String location, {Object? extra}) {
     return component._parser.parseRouteInformation(location, context, extra: extra);
+  }
+
+  String _normalizeUrl(String location) {
+    final basePath = context.binding.basePath;
+    final prefix = basePath.endsWith('/') ? basePath.substring(0, basePath.length - 1) : basePath;
+    return prefix + location;
   }
 
   @override
