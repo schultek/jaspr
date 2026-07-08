@@ -1,4 +1,4 @@
-## Unreleased patch
+## Unreleased breaking
 
 - Support `analyzer` `^13.0.0`.
 

@@ -1,6 +1,12 @@
-## Unreleased patch
+## Unreleased breaking
 
 - Support `analyzer` `^13.0.0`.
+
+## Unreleased patch
+
+- Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
+- Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.
+- Added a `--port` option to `jaspr build` for configuring the server port used during static generation.
 
 ## 0.23.1
 
