@@ -1837,7 +1837,7 @@ packages:
     source: hosted
     version: "1.31.1"
   test_api:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: test_api
       sha256: "2a122cbe059f8b610d3a5415f42e255b6c17b1f21eee1d960f31080237fb4f11"
