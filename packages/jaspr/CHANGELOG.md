@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.23.2
 
 - Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
 - Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.

@@ -2,7 +2,7 @@
 name: jaspr-js-interop
 description: Effectively integrate with Javascript when building Jaspr web applications. Use this skill when wrapping an existing JS library, accessing browser-native APIs, or bridging code safely across environments.
 metadata:
-  jaspr_version: 0.23.1
+  jaspr_version: 0.23.2
 ---
 
 ## Rules for JS Interop

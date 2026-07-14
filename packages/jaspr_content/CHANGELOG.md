@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.5.3
 
 - Added `FileIcon` component.
 
