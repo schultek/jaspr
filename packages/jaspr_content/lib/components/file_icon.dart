@@ -50,7 +50,7 @@ class FileIcon extends StatelessComponent {
       viewBox: '0 0 24 24',
       attributes: {'fill': 'currentColor', 'width': '16', 'height': '16', ...?attributes},
       [
-        RawText(fileIcons[iconName] ?? ''),
+        path(d: fileIcons[iconName] ?? '', []),
       ],
     );
   }
