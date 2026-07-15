@@ -6,6 +6,7 @@ import 'package:io/ansi.dart';
 import 'package:yaml/yaml.dart';
 
 import '../command_runner.dart';
+import '../helpers/print_logo.dart';
 import '../logging.dart';
 import '../migrations/build_method_migration.dart';
 import '../migrations/client_import_migration.dart';
@@ -14,6 +15,7 @@ import '../migrations/dom_import_migration.dart';
 import '../migrations/entrypoint_migration.dart';
 import '../migrations/html_helper_migration.dart';
 import '../migrations/migration_models.dart';
+import '../utils.dart';
 import 'base_command.dart';
 
 class MigrateCommand extends BaseCommand {
@@ -68,12 +70,14 @@ class MigrateCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
+    printLogo();
+
     if (dryRun && apply) {
       usageException('Cannot use both --dry-run and --apply at the same time.');
     }
 
     if (currentVersion == null) {
-      ensureInProject(
+      await ensureInProject(
         requireJasprMode: false,
         preferBuilderDependency: false,
         checkJasprDependencyVersion: false,
@@ -107,7 +111,10 @@ class MigrateCommand extends BaseCommand {
       }
     }
 
-    logger.write('Checking for migrations from $currentJasprVersion to $targetJasprVersion...', level: Level.info);
+    logger.write(
+      'Checking for migrations from ${cyan.wrap(currentJasprVersion)} to ${cyan.wrap(targetJasprVersion)}...',
+      level: Level.info,
+    );
 
     final migrations = allMigrations.where((m) {
       return currentJasprVersion.compareTo(m.minimumJasprVersion) < 0 &&
@@ -115,23 +122,25 @@ class MigrateCommand extends BaseCommand {
     }).toList();
 
     if (migrations.isEmpty) {
+      logger.write('');
       logger.write(
-        'No migrations available. Please update your Jaspr version in pubspec.yaml manually.',
-        level: Level.info,
+        wrapBox(
+          '${styleBold.wrap('No migrations available.')}\n\n'
+          'Please update your Jaspr version in ${cyan.wrap('pubspec.yaml')} manually.',
+        ),
       );
       return 0;
     }
 
     if (!apply && !dryRun) {
-      stdout.write(
-        'Available migrations:\n\n'
-        '${migrations.map((m) => '  ${m.name} · ${m.description}\n${m.hint}').join('\n\n')}\n\n',
+      logger.write('');
+      logger.write(
+        wrapBox(
+          'Available migrations:\n\n'
+          '${migrations.map((m) => '${styleBold.wrap(m.name)} · ${m.description}\n${m.hint}').join('\n\n')}\n\n'
+          'Run with ${cyan.wrap('--dry-run')} to preview all migration changes or ${cyan.wrap('--apply')} to apply them and update pubspec.yaml.',
+        ),
       );
-
-      stdout.write(
-        'Run with --dry-run to preview all migration changes or --apply to apply them and update pubspec.yaml.',
-      );
-
       return 1;
     }
 
@@ -174,6 +183,8 @@ class MigrateCommand extends BaseCommand {
       logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
     }, features: features);
 
+    logger.write('');
+
     final check = green.wrap(styleBold.wrap('✓'));
     final warn = yellow.wrap(styleBold.wrap('⚠'));
 
@@ -182,7 +193,7 @@ class MigrateCommand extends BaseCommand {
         continue;
       }
       final StringBuffer output = StringBuffer();
-      output.write('${result.path}\n');
+      output.write('${styleBold.wrap(result.path)}:\n');
 
       for (final migration in result.migrations) {
         output.write('  $check ${migration.migration.name} · ${migration.description}\n');
@@ -206,18 +217,31 @@ class MigrateCommand extends BaseCommand {
     }
 
     final successCount = results.fold<int>(0, (sum, result) => sum + result.migrations.length);
-
     final warningCount = results.fold<int>(0, (sum, result) => sum + result.warnings.length);
 
     if (successCount == 0 && warningCount == 0) {
-      logger.write('No migration changes found. All done.', level: Level.info);
+      logger.write('');
+      logger.write(wrapBox('No migration changes found. All done.', borderColor: green));
       return 0;
     }
 
-    logger.write(
-      styleBold.wrap('Applied $successCount changes and found $warningCount warnings across ${results.length} files.')!,
-      level: Level.info,
-    );
+    if (warningCount > 0) {
+      logger.write(
+        wrapBox(
+          'Applied ${cyan.wrap(successCount.toString())} changes and found ${yellow.wrap('$warningCount warnings')} across ${cyan.wrap(results.length.toString())} file${results.length != 1 ? 's' : ''}.',
+          borderColor: yellow,
+        ),
+        level: Level.info,
+      );
+    } else {
+      logger.write(
+        wrapBox(
+          'Applied ${cyan.wrap(successCount.toString())} changes across ${cyan.wrap(results.length.toString())} file${results.length != 1 ? 's' : ''}.',
+          borderColor: green,
+        ),
+        level: Level.info,
+      );
+    }
 
     return 0;
   }

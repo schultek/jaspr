@@ -62,6 +62,7 @@ abstract class BaseCommand extends Command<int> {
   Future<int> runCommand();
 
   Future<void> stop() async {
+    logger.clearFooter();
     final gs = [...guards];
     guards.clear();
     for (final g in gs) {
@@ -69,26 +70,32 @@ abstract class BaseCommand extends Command<int> {
     }
   }
 
-  bool _isShutdown = false;
+  Future<Never>? _shutdownFuture;
 
-  Future<void> shutdown() async {
-    if (_isShutdown) return;
-    _isShutdown = true;
+  Future<Never> shutdown() async {
+    if (_shutdownFuture != null) return _shutdownFuture!;
 
-    logger.complete(false);
-    logger.write('Shutting down...');
+    _shutdownFuture = Future<Never>.sync(() async {
+      logger.complete(false);
 
-    await stop();
-    logger.logger?.flush();
+      if (guards.isNotEmpty) {
+        logger.write('\nShutting down...');
+        await stop();
+      }
+
+      exit(1);
+    });
+
+    return _shutdownFuture!;
   }
 
-  void ensureInProject({
+  Future<void> ensureInProject({
     bool requirePubspecYaml = true,
     bool requireJasprDependency = true,
     bool requireJasprMode = true,
     bool preferBuilderDependency = true,
     bool checkJasprDependencyVersion = true,
-  }) {
+  }) async {
     if (requirePubspecYaml) {
       project.requirePubspecYaml;
     }
@@ -99,7 +106,7 @@ abstract class BaseCommand extends Command<int> {
       project.requireMode;
     }
     if (preferBuilderDependency) {
-      project.preferJasprBuilderDependency;
+      await project.preferJasprBuilderDependency();
     }
     if (checkJasprDependencyVersion) {
       project.checkJasprDependencyVersion();
@@ -117,7 +124,6 @@ abstract class BaseCommand extends Command<int> {
           level: Level.critical,
         );
         await shutdown();
-        exit(1);
       }
       if (!File(target).absolute.existsSync()) {
         logger.write(
@@ -125,15 +131,11 @@ abstract class BaseCommand extends Command<int> {
           level: Level.critical,
         );
         await shutdown();
-        exit(1);
       }
-      logger.write('Using server entry point: $target', level: Level.verbose);
       return target;
     }
 
     final entryPoint = await _findServerEntrypoint();
-    logger.write('Using server entry point: $entryPoint', level: Level.verbose);
-
     return entryPoint;
   }
 
@@ -167,7 +169,6 @@ abstract class BaseCommand extends Command<int> {
       level: Level.critical,
     );
     await shutdown();
-    exit(1);
   }
 
   void guardResource(FutureOr<void> Function() fn) {
@@ -177,11 +178,12 @@ abstract class BaseCommand extends Command<int> {
   Future<int> watchProcess(
     String name,
     Process process, {
-    Tag? tag,
+    Tag tag = Tag.none,
     String? progress,
     bool Function(String)? hide,
     bool Function()? onFail,
     Level? Function(String)? levelFor,
+    void Function(int)? onComplete,
   }) async {
     if (progress != null) {
       logger.write(progress, tag: tag, progress: ProgressState.running);
@@ -206,7 +208,7 @@ abstract class BaseCommand extends Command<int> {
     bool wasKilled = false;
     guardResource(() async {
       if (exitCode == null) {
-        logger.write('Terminating $name...');
+        logger.write('Terminating $name...', level: Level.debug);
         process.kill();
         wasKilled = true;
         await errSub.cancel();
@@ -221,15 +223,16 @@ abstract class BaseCommand extends Command<int> {
       return exitCode;
     }
 
-    await Future<void>.delayed(Duration(seconds: 2));
+    await Future<void>.delayed(Duration(milliseconds: 300));
 
     await errSub.cancel();
     await outSub.cancel();
 
+    onComplete?.call(exitCode);
+
     if (exitCode != 0 && (onFail == null || onFail())) {
       logger.complete(false);
       await shutdown();
-      exit(exitCode);
     }
 
     logger.complete(true);

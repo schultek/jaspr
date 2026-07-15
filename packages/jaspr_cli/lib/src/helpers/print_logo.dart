@@ -1,4 +1,8 @@
 import 'dart:math' as math;
+import 'package:mason/mason.dart';
+
+import '../project.dart';
+import '../version.dart';
 import 'print_logo_constants.dart';
 
 // Brand Colors (RGB values, can be customized directly here)
@@ -13,7 +17,6 @@ String _color(List<int> rgb, {bool bg = false}) {
 
 const String _reset = '\x1b[0m';
 const String _bold = '\x1b[1m';
-const String _cyan = '\x1b[36m';
 
 const List<String> _textLines = [
   '     ██╗ █████╗ ███████╗██████╗ ██████╗  ',
@@ -21,15 +24,19 @@ const List<String> _textLines = [
   '     ██║███████║███████╗██████╔╝██████╔╝ ',
   '██   ██║██╔══██║╚════██║██╔═══╝ ██╔══██╗ ',
   '╚█████╔╝██║  ██║███████║██║     ██║  ██║ ',
-  ' ╚════╝ ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝ '
+  ' ╚════╝ ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝ ',
 ];
 
 List<int>? _getRgb(String char) {
   switch (char) {
-    case 'D': return darkBlue;
-    case 'M': return mediumBlue;
-    case 'L': return lightBlue;
-    default: return null;
+    case 'D':
+      return darkBlue;
+    case 'M':
+      return mediumBlue;
+    case 'L':
+      return lightBlue;
+    default:
+      return null;
   }
 }
 
@@ -55,7 +62,7 @@ List<String> _applyGradient(List<String> textLines) {
   for (final line in textLines) {
     if (line.length > maxLen) maxLen = line.length;
   }
-  
+
   final result = <String>[];
   for (final line in textLines) {
     final newLine = StringBuffer();
@@ -73,19 +80,19 @@ List<String> _applyGradient(List<String> textLines) {
   return result;
 }
 
-void printLogo(String version) {
+void printLogo() {
   final mascotLines = <String>[];
-  
+
   // Combine mascot rows vertically into half-blocks
   for (int y = 0; y < mascotGrid.length; y += 2) {
     final line = StringBuffer();
     for (int x = 0; x < mascotGrid[y].length; x++) {
       final c1 = mascotGrid[y][x];
       final c2 = mascotGrid[y + 1][x];
-      
+
       final rgb1 = _getRgb(c1);
       final rgb2 = _getRgb(c2);
-      
+
       if (rgb1 == null && rgb2 == null) {
         line.write(' ');
       } else if (rgb1 == null) {
@@ -103,8 +110,8 @@ void printLogo(String version) {
 
   final textColored = _applyGradient(_textLines);
   textColored.add('');
-  textColored.add('  ${_bold}Jaspr CLI${_reset} • A modern web framework for Dart');
-  textColored.add('  Version $version • ${_cyan}https://jaspr.site${_reset}');
+  textColored.add('  ${_bold}Jaspr CLI$_reset • A modern web framework for Dart');
+  textColored.add('  Version $jasprCliVersion ${darkGray.wrap('• Dart $dartSdkVersionShort')}');
 
   final maxH = math.max(mascotLines.length, textColored.length + 2);
   for (int i = 0; i < maxH; i++) {
@@ -112,4 +119,6 @@ void printLogo(String version) {
     final tPart = (i >= 2 && (i - 2) < textColored.length) ? textColored[i - 2] : '';
     print('$mPart    $tPart');
   }
+
+  print('');
 }

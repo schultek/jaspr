@@ -29,6 +29,9 @@ extension FakeProject on FakeIO {
     when(
       () => process.runSync('where', ['dart.bat', 'dart.exe']),
     ).thenAnswer((_) => ProcessResult(0, 0, '/fake/bin/dart', null));
+    when(
+      () => process.runSync('/fake/bin/dart', ['--version']),
+    ).thenAnswer((_) => ProcessResult(0, 0, 'Dart SDK version: 3.14.0', null));
 
     fs.file('/fake/version').createSync(recursive: true);
   }

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
@@ -75,11 +74,11 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     } on ProcessException catch (error) {
       _logger.err(error.message);
       return ExitCode.unavailable.code;
-    } /*catch (error, stackTrace) {
+    } catch (error, stackTrace) {
       _logger.err('$error');
       _logger.err('$stackTrace');
       return ExitCode.software.code;
-    }*/
+    }
   }
 
   @override
@@ -128,21 +127,4 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
       }
     } catch (_) {}
   }
-}
-
-String wrapBox(String message) {
-  final lines = message.split('\n');
-  final lengths = lines.map((l) => l.replaceAll(RegExp('\x1B\\[\\d+m'), '').length).toList();
-  final maxLength = lengths.reduce(max);
-  final buffer = StringBuffer();
-  final hborder = ''.padLeft(maxLength + 8, '═');
-  buffer.write('╔$hborder╗\n');
-  for (final (i, l) in lines.indexed) {
-    final pad = (maxLength + 8 - lengths[i]) / 2;
-    final padL = ''.padLeft(pad.floor());
-    final padR = ''.padLeft(pad.ceil());
-    buffer.write('║$padL$l$padR║\n');
-  }
-  buffer.write('╚$hborder╝');
-  return buffer.toString();
 }

@@ -8,20 +8,20 @@ import 'package:build_daemon/data/build_status.dart';
 import 'package:build_daemon/data/build_target.dart';
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http show Client, Response;
+import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../dev/util.dart';
 import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
+import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
+import '../utils.dart';
 import 'base_command.dart';
-
-import '../helpers/print_logo.dart';
-import '../version.dart';
 
 class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   BuildCommand({super.logger}) {
@@ -132,10 +132,14 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   @override
   Future<int> runCommand() async {
-    ensureInProject();
-    printLogo(jasprCliVersion);
+    await ensureInProject();
+    printLogo();
 
-    logger.write('Building jaspr for ${project.requireMode.name} rendering mode.');
+    logger.write('Building ${cyan.wrap(project.name)} in ${cyan.wrap(project.requireMode.name)} rendering mode.');
+    if (!verbose) {
+      logger.write('Showing reduced log output. Pass --verbose to see all output.', level: Level.debug);
+    }
+    logger.write('\n');
 
     final dir = Directory('build/jaspr').absolute;
     final webDir = project.requireMode == JasprMode.server ? Directory('build/jaspr/web').absolute : dir;
@@ -185,7 +189,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final serverDefines = getServerDartDefines();
 
     if (project.requireMode == JasprMode.server) {
-      logger.write('Building server app...', progress: ProgressState.running);
+      logger.write('Building server app...', tag: Tag.server, progress: ProgressState.running);
 
       final String? targetOS = argResults!.option('target-os');
       final String? targetArch = argResults!.option('target-arch');
@@ -203,6 +207,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (!['exe', 'aot-snapshot'].contains(compileTarget) && (targetOS != null || targetArch != null)) {
         logger.write(
           'Cross-compilation (--target-os or --target-arch) is only supported with --target=exe or --target=aot-snapshot. Current target: $compileTarget',
+          tag: Tag.server,
           level: Level.error,
         );
         return 1;
@@ -228,7 +233,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
       await watchProcess('server build', process, progress: 'Compiling server executable.');
     } else if (project.requireMode == JasprMode.static) {
-      logger.write('Preparing static rendering...');
+      logger.write('Preparing server for static rendering...', tag: Tag.server, progress: ProgressState.running);
 
       final Map<String, ({String? lastmod, String? changefreq, double? priority})?> generatedRoutes = {};
       final List<String> queuedRoutes = [];
@@ -285,18 +290,19 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         'server',
         process,
         tag: Tag.server,
-        progress: 'Starting server app...',
+        progress: 'Starting server for static rendering...',
         onFail: () {
+          if (done) return false;
           logger.write('Server process failed unexpectedly.', level: Level.error, progress: ProgressState.completed);
-          return !done;
+          return true;
         },
       );
 
       await serverStartedCompleter.future;
 
-      logger.write('Server started', progress: ProgressState.completed);
+      logger.write('Server started', tag: Tag.server, progress: ProgressState.completed);
 
-      logger.write('Generating routes...');
+      logger.write('\nGenerating pages:');
 
       final httpClient = http.Client();
 
@@ -304,7 +310,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         final route = queuedRoutes.removeLast();
 
         logger.write(
-          '(${generatedRoutes.length - queuedRoutes.length}/${generatedRoutes.length}) Generating route "$route" ...',
+          '${cyan.wrap('(${generatedRoutes.length - queuedRoutes.length}/${generatedRoutes.length})')} Generating "$route" ...',
         );
 
         http.Response response;
@@ -313,6 +319,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         } catch (e) {
           logger.write(
             'Failed to generate route "$route". ($e)',
+            tag: Tag.cli,
             level: Level.error,
           );
           hasBuildError = true;
@@ -322,6 +329,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         if (response.statusCode != 200) {
           logger.write(
             'Failed to generate route "$route". (Received status code ${response.statusCode})',
+            tag: Tag.cli,
             level: Level.error,
           );
           hasBuildError = true;
@@ -348,6 +356,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             if (sitemap is! Map<String, Object?>) {
               logger.write(
                 'Invalid sitemap data for route "$route". Expected a map, but got ${sitemap.runtimeType}.',
+                tag: Tag.cli,
                 level: Level.error,
               );
               hasBuildError = true;
@@ -375,7 +384,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       logger.complete(!hasBuildError);
 
       if (sitemapDomain != null) {
-        logger.write('Generating sitemap.xml...');
+        logger.write('Generating sitemap.xml...', tag: Tag.cli);
 
         final content = StringBuffer();
         content.writeln('<?xml version="1.0" encoding="UTF-8"?>');
@@ -430,11 +439,17 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     if (hasBuildError) {
-      logger.write('Failed to build project. Check the logs above for more information.', level: Level.error);
+      logger.write(
+        'Failed to build ${cyan.wrap(project.name)}. Check the logs above for more information.',
+        level: Level.error,
+      );
       return 1;
     }
 
-    logger.write('Completed building project to /build/jaspr.');
+    logger.write('');
+    logger.write(
+      wrapBox('Completed building ${cyan.wrap(project.name)} to ${cyan.wrap('build/jaspr/')}', borderColor: green),
+    );
     return 0;
   }
 
@@ -443,7 +458,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       project.checkWasmSupport();
     }
 
-    logger.write('Building web assets...', progress: ProgressState.running);
+    logger.write('Building web assets...', tag: Tag.builder, progress: ProgressState.running);
 
     final compiler = useWasm ? 'dart2wasm' : 'dart2js';
 
@@ -550,7 +565,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
     await client.close();
     if (exitCode == 0) {
-      logger.write('Completed building web assets.', progress: ProgressState.completed);
+      logger.write('Completed building web assets.', tag: Tag.builder, progress: ProgressState.completed);
 
       if (includeSourceMaps) {
         _fixSourceMaps(outputLocation.output);

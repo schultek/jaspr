@@ -20,7 +20,10 @@ class DaemonLogger extends Logger {
   }
 
   @override
-  void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
+  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
+    if (message.trim().isEmpty) {
+      return;
+    }
     if (tag == Tag.server) {
       const vmUriPrefix = 'The Dart VM service is listening on ';
       if (message.startsWith(vmUriPrefix)) {
@@ -36,13 +39,30 @@ class DaemonLogger extends Logger {
       }
     }
 
-    final String logmessage = '${tag?.format(true) ?? ''}${level.format(message.trim(), true)}';
+    final suffix = progress == ProgressState.running && !message.endsWith('...') ? '...' : '';
+    final String logmessage = '${tag?.format(true) ?? ''}${level.format(message.trim() + suffix, daemon: true)}';
 
     log({'message': logmessage});
   }
 
   @override
   void complete(bool success) {}
+
+  @override
+  void clearFooter() {}
+
+  @override
+  void setFooter(List<String> lines) {}
+
+  @override
+  Future<String> prompt(String message, {String? defaultValue}) async => defaultValue ?? '';
+
+  @override
+  Future<bool> confirm(String message, {bool defaultValue = false, String? hint}) async => defaultValue;
+
+  @override
+  Future<T> chooseOne<T>(String message, {required List<T> choices, String Function(T)? display}) async =>
+      choices.first;
 
   void log(Map<String, Object?> data) {
     event('daemon.log', data);

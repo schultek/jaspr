@@ -61,9 +61,6 @@ final class ServerApp {
     _reassembleController.add(Object());
 
     if (isFirstStartup) {
-      print('[INFO] Running server in ${kDebugMode ? 'debug' : 'release'} mode');
-      print('Serving at http://${kDebugMode ? 'localhost' : _server!.address.host}:${_server!.port}');
-
       if (kGenerateMode) {
         requestRouteGeneration('/');
       }

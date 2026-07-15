@@ -33,8 +33,8 @@ void main() {
           io.stdout.queue,
           emitsInOrder([
             startsWith('[{"event":"daemon.connected","params":{"version":"0.4.2","pid":'),
-            '[{"event":"daemon.log","params":{"message":"Running jaspr in client rendering mode."}}]',
-            r'[{"event":"daemon.log","params":{"message":"\\033[36m[CLI] \\033[0mStarting web compilers..."}}]',
+            '[{"event":"daemon.log","params":{"message":"Starting myapp in client rendering mode."}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[35m[BUILDER] \\033[0mStarting web compilers..."}}]',
             r'[{"event":"daemon.log","params":{"message":"\\033[35m[BUILDER] \\033[0mConnecting to the build daemon..."}}]',
             r'[{"event":"daemon.log","params":{"message":"\\033[35m[BUILDER] \\033[0mStarting initial build..."}}]',
           ]),
@@ -50,8 +50,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            r'[{"event":"daemon.log","params":{"message":"\\033[36m[CLI] \\033[0mDone building web assets."}}]',
-            r'[{"event":"daemon.log","params":{"message":"\\033[36m[CLI] \\033[0mServing at http://localhost:8080"}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[35m[BUILDER] \\033[0mDone building web assets."}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[90m[LOG] \\033[0mServing at http://localhost:8080"}}]',
           ]),
         );
 
@@ -61,7 +61,7 @@ void main() {
           io.stdout.queue,
           emitsInOrder([
             '[{"id":0}]',
-            '[{"event":"daemon.log","params":{"message":"Terminating web compilers..."}}]',
+            '[{"event":"daemon.log","params":{"message":"Stopping web compilers..."}}]',
           ]),
         );
 
