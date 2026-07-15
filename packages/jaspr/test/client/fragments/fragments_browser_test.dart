@@ -161,5 +161,48 @@ void main() {
       expect(divElement.childNodes.item(3), equals(h1Element));
       expect(divElement.childNodes.item(4)?.textContent, equals('End'));
     });
+
+    testClient('should maintain correct order after fragment child removal and insertion', (tester) async {
+      final component = FakeComponent(
+        child: div([
+          Component.text('Start'),
+          Component.fragment(key: ValueKey('f'), [
+            b([Component.text('Emphasized text')]),
+          ]),
+          p([Component.text('End')]),
+        ]),
+      );
+      tester.pumpComponent(component);
+
+      final divElement = window.document.querySelector('body div')!;
+      final bElement = window.document.querySelector('body b')!;
+      final pElement = window.document.querySelector('body p')!;
+
+      expect(divElement.childNodes.length, equals(3));
+      expect(divElement.childNodes.item(0)?.textContent, equals('Start'));
+      expect(divElement.childNodes.item(1), equals(bElement));
+      expect(divElement.childNodes.item(2), equals(pElement));
+
+      // Remove the fragment's child (leaving it empty) and insert a new element after it.
+      // This exercises getRealNodeOf walking the sibling chain past the now-empty fragment.
+      component.updateChild(
+        div([
+          Component.text('Start'),
+          Component.fragment(key: ValueKey('f'), []),
+          h1([Component.text('New heading')]),
+          p([Component.text('End')]),
+        ]),
+      );
+      await pumpEventQueue();
+
+      final h1Element = window.document.querySelector('body h1')!;
+
+      expect(divElement.childNodes.length, equals(3));
+      expect(divElement.childNodes.item(0)?.textContent, equals('Start'));
+      expect(divElement.childNodes.item(1), equals(h1Element));
+      expect(divElement.childNodes.item(2), equals(pElement));
+
+      expect(bElement.parentNode, isNull);
+    });
   });
 }

@@ -226,6 +226,14 @@ enum AutoComplete {
 
 /// {@template jaspr.html.input}
 /// The &lt;input&gt; HTML element is used to create interactive controls for web-based forms in order to accept data from the user; a wide variety of types of input data and control widgets are available, depending on the device and user agent. The &lt;input&gt; element is one of the most powerful and complex in all of HTML due to the sheer number of combinations of input types and attributes.
+///
+/// `T` defines the value type for the input element and must align with the 'type' attribute:
+/// - `bool` for checkbox and radio
+/// - `num` for number and range
+/// - `DateTime` (UTC) for date, time, week, month and datetime-local
+/// - `List<File>` for file
+/// - `Color` for color
+/// - `String` for all other types
 /// {@endtemplate}
 @optionalTypeArgs
 final class input<T> extends StatelessComponent {
@@ -312,6 +320,9 @@ final class input<T> extends StatelessComponent {
 
 /// The type for an &lt;input&gt; element.
 enum InputType {
+  /// The default value. A single-line text field. Line-breaks are automatically removed from the input value.
+  text('text'),
+
   /// A push button with no default behavior displaying the value of the value attribute, empty by default.
   button('button'),
 
@@ -365,9 +376,6 @@ enum InputType {
 
   /// A control for entering a telephone number. Displays a telephone keypad in some devices with dynamic keypads.
   tel('tel'),
-
-  /// The default value. A single-line text field. Line-breaks are automatically removed from the input value.
-  text('text'),
 
   /// A control for entering a time value with no time zone.
   time('time'),

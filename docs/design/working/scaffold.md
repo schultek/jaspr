@@ -22,7 +22,7 @@ The flow is modeled below:
 5. Use Flutter Embedding? (y/N/?)
   - Sets up Flutter web embedding for your project. 
 6. (If 5 Is No) Use Flutter Plugin Interop? (Y/n/?)
-  - Sets up the project to be able to use flutter web plugins (not Flutter widgets). 
+  - Sets up the project to be able to use Flutter web plugins (not Flutter widgets). 
 7. (If 2 Is Auto|Server) Use custom backend? (None, Shelf, Dart Frog, ?)
   - Sets up a custom backend framework to use for the server part of your project. 
 
@@ -32,7 +32,7 @@ Additional options to be considered:
 
 ---
 Welcome to the Jaspr setup wizard. We will go through a series of
-questions to setup your jaspr project.
+questions to set up your jaspr project.
 
 You can either toggle a setting for Yes or No, or select an item from a list of options.
 You can also directly press [ENTER] to select the recommended default setting (marked in UPPERCASE letters). 
@@ -57,7 +57,7 @@ Now lets get started.
 6. Use Flutter Embedding? (y/N/?)
 - Sets up Flutter web embedding for your project.
 7. (If 6 Is No) Use Flutter plugin interop? (Y/n/?)
-- Sets up the project to be able to use flutter web plugins (not Flutter widgets).
+- Sets up the project to be able to use Flutter web plugins (not Flutter widgets).
 8. (If 2 Is Server) Use custom backend? (None, Shelf, Dart Frog, ?)
 - Sets up a custom backend framework to use for the server part of your project. 
 

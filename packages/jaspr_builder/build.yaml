@@ -83,6 +83,20 @@ builders:
     build_to: cache
     required_inputs:
       - '.styles.json'
+  styles_standalone:
+    import: "package:jaspr_builder/builder.dart"
+    builder_factories: [ "buildStylesStandalone" ]
+    build_extensions:
+      ".server.dart":
+        - ".server.styles.dart"
+      ".client.dart":
+        - ".client.styles.dart"
+    auto_apply: root_package
+    build_to: cache
+    required_inputs:
+      - 'styles.bundle.json'
+    runs_before:
+      - build_web_compilers:entrypoint
 # ========================
 # === Sync Mixins ===
 # ========================

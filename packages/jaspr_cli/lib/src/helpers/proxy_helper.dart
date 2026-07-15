@@ -3,28 +3,33 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
+import 'package:shelf_static/shelf_static.dart';
 
 import '../commands/base_command.dart';
+import '../dev/dev_proxy.dart';
 import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
   Future<HttpServer> startProxy(
     String port, {
-    required String webPort,
+    DevProxy? devProxy,
     required String serverPort,
     String? flutterPort,
     bool redirectNotFound = false,
     void Function(Object?)? onMessage,
   }) async {
-    final client = http.Client();
-    final webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
+    final client = devProxy?.client ?? http.Client();
     final flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
+    Directory('.dart_tool/jaspr/generated').createSync(recursive: true);
+    final generatedHandler = createStaticHandler('.dart_tool/jaspr/generated');
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
+    final webdevHandler = devProxy?.handler ?? (req) => Response.notFound(null);
 
-    final cascade = Cascade().add(_sseProxyHandler(client, webPort, logger)).add((req) async {
+    final cascade = Cascade().add(generatedHandler).add((req) async {
       if (req.url.path == r'$jasprMessageHandler') {
         onMessage?.call(jsonDecode(await req.readAsString()));
         return Response.ok(null);
@@ -39,7 +44,7 @@ mixin ProxyHelper on BaseCommand {
         return await flutterHandler(req.change(body: body));
       }
       try {
-        // First try to load the resource from the webdev process.
+        // First try to load the resource from the webdev handler.
         var res = await webdevHandler(req.change(body: body));
 
         // The bootstrap script hardcodes the host:port url for the dwds handler endpoint,
@@ -49,10 +54,8 @@ mixin ProxyHelper on BaseCommand {
           if (!basePath.endsWith('/')) basePath += '/';
           if (!basePath.startsWith('/')) basePath = '/$basePath';
           final body = await res.readAsString();
-          // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<webPort>/$dwdsSseHandler";'
-          return res.change(
-            body: body.replaceAll('http://localhost:$webPort/', 'http://localhost:$serverPort$basePath'),
-          );
+          // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<port>/$dwdsSseHandler";'
+          return res.change(body: body.replaceAll('http://localhost:$port/', 'http://localhost:$serverPort$basePath'));
         }
 
         // Temporary fix for Safari until build_web_compilers is fixed.
@@ -71,7 +74,7 @@ mixin ProxyHelper on BaseCommand {
           res = await flutterHandler(req.change(body: body));
         }
 
-        if (res.statusCode == 404 && redirectNotFound) {
+        if (res.statusCode == 404 && redirectNotFound && path.extension(req.url.path).isEmpty) {
           return webdevHandler(
             Request(
               req.method,
@@ -86,6 +89,9 @@ mixin ProxyHelper on BaseCommand {
 
         return res;
       } catch (e, st) {
+        if (e is HijackException) {
+          rethrow;
+        }
         logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
         logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
 
@@ -96,69 +102,9 @@ mixin ProxyHelper on BaseCommand {
     final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
 
     guardResource(() async {
-      client.close();
       await server.close(force: true);
     });
 
     return server;
   }
-}
-
-Handler _sseProxyHandler(http.Client client, String webPort, Logger logger) {
-  final serverUri = Uri.parse('http://localhost:$webPort');
-
-  Future<Response> createSseConnection(Request req) async {
-    final serverReq =
-        http.StreamedRequest(req.method, serverUri.replace(path: req.url.path, query: req.requestedUri.query))
-          ..followRedirects = false
-          ..headers.addAll(req.headers)
-          ..headers['Host'] = serverUri.authority
-          ..sink.close();
-
-    final serverResponse = await client.send(serverReq);
-
-    req.hijack((channel) {
-      final sink = utf8.encoder.startChunkedConversion(channel.sink)
-        ..add(
-          'HTTP/1.1 200 OK\r\n'
-          'Content-Type: text/event-stream\r\n'
-          'Cache-Control: no-cache\r\n'
-          'Connection: keep-alive\r\n'
-          'Access-Control-Allow-Credentials: true\r\n'
-          'Access-Control-Allow-Origin: ${req.headers['origin']}\r\n'
-          '\r\n',
-        );
-
-      StreamSubscription<void>? serverSseSub;
-      StreamSubscription<void>? reqChannelSub;
-
-      serverSseSub = utf8.decoder
-          .bind(serverResponse.stream)
-          .listen(
-            sink.add,
-            onDone: () {
-              reqChannelSub?.cancel();
-              sink.close();
-            },
-          );
-
-      reqChannelSub = channel.stream.listen(
-        (_) {
-          // SSE is unidirectional.
-        },
-        onDone: () {
-          serverSseSub?.cancel();
-          sink.close();
-        },
-      );
-    });
-  }
-
-  return (Request req) async {
-    if (req.headers['accept'] == 'text/event-stream' && req.method == 'GET') {
-      return await createSseConnection(req);
-    }
-
-    return Response.notFound('');
-  };
 }

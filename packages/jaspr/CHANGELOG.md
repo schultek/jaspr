@@ -1,3 +1,49 @@
+## 0.23.2
+
+- Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
+- Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.
+- Support `analyzer` `^12.1.0`.
+- Added a `--port` option to `jaspr build` for configuring the server port used during static generation.
+
+## 0.23.1
+
+- Fixed expression compilation when debugging a client-side application with an AOT installed CLI.
+- No longer generates empty css files in standalone mode when no `@css` declarations are used.
+- Jaspr now uses OS-specific directories for its settings and cache, better respecting platform conventions. 
+  - The old directory at '~/.jaspr/' is automatically migrated to the new locations on first run.
+  - The new directory location is:
+     - when `DART_DATA_HOME` environment variable is set: `$DART_DATA_HOME/jaspr`
+     - on **Windows**: `%LOCALAPPDATA%\Dart\jaspr`
+     - on **Mac OS**: `$HOME/Library/Application Support/Dart/jaspr`
+     - on **Linux**: `$XDG_STATE_HOME/Dart/jaspr` if `$XDG_STATE_HOME` is defined, and `$HOME/.local/state/Dart/jaspr` otherwise.
+- The cli completion files are no longer auto-installed when the `JASPR_NO_COMPLETION` environment variable is set.
+
+## 0.23.0
+
+- Added **Agent Skills** for Jaspr, which can be installed with `jaspr install-skills`. 
+
+- Multiple improvements to the Jaspr CLI:
+  - Jaspr can now be installed with `dart install jaspr_cli` instead of `dart pub global activate jaspr_cli`.
+  - Added `jaspr convert-html` command to automatically convert raw HTML to Jaspr code.
+  - **Breaking** Removed `jaspr tooling-daemon` command. The functionality is now provided by the `jaspr_lints` package.
+  - Improved logging and overall stability.
+
+- Added `jaspr: styles: standalone` option to `pubspec.yaml`. 
+  - When enabled, all `@css` declarations are rendered to a standalone `.css` file instead of being inlined in the pre-rendered HTML.
+  - `@css` is now also allowed in client mode projects, where standalone mode is enabled by default.
+
+## 0.22.4
+
+- Allow `analyzer` versions 10.x.
+
+- Added new `jaspr.styles: standalone` option to `pubspec.yaml`. 
+  - When enabled, all `@css` declarations are output to a standalone `.css` file instead of being inlined in the HTML.
+  - This is enabled by default in client mode, which is why `@css` is now allowed in client mode projects.
+
+## 0.22.3
+
+- Added `ServerApp.addMiddleware()` method to add custom middleware to Jaspr's HTTP server.
+
 ## 0.22.2
 
 - Added `--web-port` and `--proxy-port` options to `jaspr serve` for configuring webdev and proxy server ports.

@@ -1,7 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
-{{#server}}
-import '../constants/theme.dart';{{/server}}{{#flutter}}
+
+import '../constants/theme.dart';{{#flutter}}
 import 'embedded_counter.dart';{{/flutter}}
 
 class Counter extends StatefulComponent {
@@ -39,7 +39,7 @@ class CounterState extends State<Counter> {
         },
       ),{{/flutter}}
     ]);
-  }{{#server}}
+  }
 
   @css
   static List<StyleRule> get styles => [
@@ -76,5 +76,5 @@ class CounterState extends State<Counter> {
         fontSize: 4.rem,
       ),
     ]),
-  ];{{/server}}
+  ];
 }

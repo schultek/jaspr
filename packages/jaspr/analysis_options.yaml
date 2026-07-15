@@ -1,4 +1,4 @@
-include: package:jaspr_repo/package.yaml
+include: package:jaspr_repo/core.yaml
 
 linter:
   rules:

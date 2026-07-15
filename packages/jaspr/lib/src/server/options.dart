@@ -35,10 +35,11 @@ abstract final class Jaspr {
 /// **DO NOT USE DIRECTLY.**
 /// Use the generated `defaultServerOptions` instead.
 final class ServerOptions {
-  const ServerOptions({this.clientId, this.clients, this.styles});
+  const ServerOptions({this.clientId, this.clients, this.stylesId, this.styles});
 
   final String? clientId;
   final Map<Type, ClientTarget>? clients;
+  final String? stylesId;
   final List<StyleRule> Function()? styles;
 }
 

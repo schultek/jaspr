@@ -1,5 +1,13 @@
 include: package:flutter_lints/flutter.yaml
 
+plugins:
+  jaspr_lints:
+    path: ../jaspr_lints
+    diagnostics:
+      sort_children_last: true
+      prefer_html_components: true
+      styles_ordering: true
+
 linter:
   rules:
     directives_ordering: true

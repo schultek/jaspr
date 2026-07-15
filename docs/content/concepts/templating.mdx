@@ -75,7 +75,7 @@ For more information on data loading read the [Data Loading](/content/concepts/d
 
 ### Mustache Templates
 
-Mustache is a "logic-less" templating language - it focuses on simple variable substitutions and iterations rather than complex logic. 
+Mustache is a "logic-less" templating language - it focuses on simple variable substitutions and iterations rather than complex logic.
 
 To enable Mustache templating, add the `MustacheTemplateEngine` to your page configuration:
 
@@ -121,10 +121,10 @@ ContentApp(
   templateEngine: MustacheTemplateEngine(
     // Customize delimiters (default is "{{ }}")
     delimiters: '{% %}',
-    
+
     // Change where partials are loaded from (default is "content/_partials/")
     partialsRoot: 'content/_includes/',
-    
+
     // Customize the values available in templates
     prepareValues: (page, pages) => {
       ...page.data,
@@ -193,14 +193,14 @@ ContentApp(
   templateEngine: LiquidTemplateEngine(
     // Change where includes are loaded from
     includesPath: 'content/_includes/',
-    
+
     // Customize the template context or add custom tags/filters
     prepareTemplate: (template, page, pages) {
       // Add custom filters
       template.registerFilter('greet', (input) => 'Hello, $input!');
-      
+
       // Add custom tags
-      template.registerTag('current_time', (_) async => 
+      template.registerTag('current_time', (_) async =>
         DateTime.now().toIso8601String()
       );
     },
@@ -246,10 +246,10 @@ class CustomTemplateEngine implements TemplateEngine {
   Future<void> render(Page page, List<Page> pages) async {
     // 1. Access page content with page.content
     final content = page.content;
-    
+
     // 2. Process the content with your templating logic
     final processedContent = myTemplateProcessingFunction(content, page.data, pages);
-    
+
     // 3. Update the page content
     page.apply(content: processedContent);
   }

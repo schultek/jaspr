@@ -12,6 +12,7 @@ import 'src/options/client_options_builder.dart';
 import 'src/options/server_options_builder.dart';
 import 'src/styles/styles_bundle_builder.dart';
 import 'src/styles/styles_module_builder.dart';
+import 'src/styles/styles_standalone_builder.dart';
 import 'src/sync/sync_mixins_builder.dart';
 
 Builder buildClientOptions(BuilderOptions options) => ClientOptionsBuilder(options);
@@ -27,6 +28,7 @@ Builder buildPlatformStubs(BuilderOptions options) => ImportsStubsBuilder(option
 
 Builder buildStylesModule(BuilderOptions options) => StylesModuleBuilder(options);
 Builder buildStylesBundle(BuilderOptions options) => StylesBundleBuilder(options);
+Builder buildStylesStandalone(BuilderOptions options) => StylesStandaloneBuilder(options);
 
 Builder buildSyncMixins(BuilderOptions options) => SyncMixinsBuilder(options);
 

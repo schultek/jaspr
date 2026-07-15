@@ -419,6 +419,10 @@
           "href": "/content/concepts/theming"
         },
         {
+          "title": "Assets",
+          "href": "/content/concepts/assets"
+        },
+        {
           "title": "Secondary Outputs",
           "href": "/content/concepts/secondary_outputs"
         }
@@ -471,6 +475,10 @@
       "tab": "releases",
       "group": "Releases",
       "pages": [
+        {
+          "title": "0.23.0",
+          "href": "/releases/v/0.23.0"
+        },
         {
           "title": "0.22.0",
           "href": "/releases/v/0.22.0"

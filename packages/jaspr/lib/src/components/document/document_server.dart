@@ -145,8 +145,16 @@ class BaseDocument extends StatelessComponent implements Document {
         Component.element(
           tag: 'head',
           children: [
-            if (base != null) Component.element(tag: 'base', attributes: {'href': _normalizedBase!}),
-            if (charset != null) Component.element(tag: 'meta', attributes: {'charset': charset!}),
+            if (_normalizedBase case final normalizedBase?)
+              Component.element(
+                tag: 'base',
+                attributes: {'href': normalizedBase},
+              ),
+            if (charset case final charset?)
+              Component.element(
+                tag: 'meta',
+                attributes: {'charset': charset},
+              ),
             HeadDocument(title: title, meta: {'viewport': ?viewport, ...meta}),
             if (styles.isNotEmpty) //
               Style(styles: styles),
@@ -213,13 +221,14 @@ class TemplateDocumentAdapter extends ElementBoundaryAdapter {
     final MarkupRenderObject parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
 
     MarkupRenderObject? createTree(dom.Node node) {
-      MarkupRenderObject n;
+      final MarkupRenderObject n;
 
       if (node is dom.Text) {
-        if (node.text.trim().isEmpty) {
+        final processedNodeText = node.text.trim();
+        if (processedNodeText.isEmpty) {
           return null;
         }
-        n = parent.createChildRenderText(node.text.trim(), true);
+        n = parent.createChildRenderText(processedNodeText, true);
       } else if (node is dom.Comment) {
         n = parent.createChildRenderText('<!--${node.data}-->', true);
       } else if (node is dom.Element) {
@@ -279,10 +288,17 @@ class HeadDocument extends StatelessComponent implements Document {
       target: 'head',
       attributes: null,
       children: [
-        if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
-        if (meta != null)
-          for (final e in meta!.entries)
-            Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+        if (title case final title?)
+          Component.element(
+            tag: 'title',
+            children: [Component.text(title)],
+          ),
+        if (meta case final meta?)
+          for (final e in meta.entries)
+            Component.element(
+              tag: 'meta',
+              attributes: {'name': e.key, 'content': e.value},
+            ),
         ...?children,
       ],
     );
@@ -309,25 +325,26 @@ final Expando<AttachAdapter> _attach = Expando();
 
 class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
   static void register(BuildContext context, AttachDocument item) {
-    if (context.binding is! ServerAppBinding) {
+    final binding = context.binding;
+    if (binding is! ServerAppBinding) {
       // Return early in component tests.
       return;
     }
 
-    final binding = (context.binding as ServerAppBinding);
     final adapter = _attach[binding] ??= AttachAdapter();
     binding.addRenderAdapter(adapter);
 
-    final entry = adapter.entries[item.target] ??= (attributes: {}, children: []);
-    if (item.attributes != null) {
-      entry.attributes.addAll(item.attributes!);
+    final entry = adapter.targetElements[item.target] ??= (attributes: {}, children: []);
+    if (item.attributes case final itemAttributes?) {
+      entry.attributes.addAll(itemAttributes);
     }
     if (item.children != null) {
       binding.addRenderAdapter(_AttachChildrenAdapter(adapter, item.target, context as Element));
     }
   }
 
-  Map<String, ({Map<String, String> attributes, List<(ChildListRange, int)> children})> entries = {};
+  final Map<String, ({Map<String, String> attributes, List<({ChildListRange range, int depth})> children})>
+  targetElements = {};
 
   @override
   void apply(MarkupRenderObject root) {
@@ -342,7 +359,7 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
       };
     }
 
-    for (final MapEntry(:key, :value) in entries.entries) {
+    for (final MapEntry(:key, :value) in targetElements.entries) {
       final target = switch (key) {
         'html' => html,
         'head' => head,
@@ -358,7 +375,7 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
         target.children.insertBefore(target.createChildRenderText(r'<!--$-->', true));
 
         final List<MarkupRenderObject> nodes = [];
-        final Map<String, (int, int)> indices = {};
+        final Map<String, ({int index, int depth})> indices = {};
 
         void visitRenderObject(MarkupRenderObject o, int depth) {
           if (o is MarkupRenderFragment) {
@@ -376,17 +393,17 @@ class AttachAdapter extends RenderAdapter with DocumentStructureMixin {
           final index = indices[key];
           if (index == null) {
             nodes.add(o);
-            indices[key] = (nodes.length - 1, depth);
+            indices[key] = (index: nodes.length - 1, depth: depth);
           }
-          if (index != null && depth >= index.$2) {
-            nodes[index.$1] = o;
+          if (index != null && depth >= index.depth) {
+            nodes[index.index] = o;
           }
         }
 
-        for (final e in value.children) {
-          e.$1.remove();
-          for (final n in e.$1) {
-            visitRenderObject(n, e.$2);
+        for (final child in value.children) {
+          child.range.remove();
+          for (final n in child.range) {
+            visitRenderObject(n, child.depth);
           }
         }
 
@@ -408,6 +425,6 @@ class _AttachChildrenAdapter extends ElementBoundaryAdapter {
 
   @override
   void prepareBoundary(ChildListRange range) {
-    adapter.entries[target]!.children.add((range, element.depth));
+    adapter.targetElements[target]!.children.add((range: range, depth: element.depth));
   }
 }

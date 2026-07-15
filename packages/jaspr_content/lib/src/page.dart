@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:fbh_front_matter/fbh_front_matter.dart' as fm;
 import 'package:jaspr/server.dart';
+import 'package:path/path.dart' as p;
 
 import 'content.dart';
 import 'data_loader/data_loader.dart';
@@ -17,7 +18,7 @@ import 'utils.dart';
 
 /// A single page of the site.
 ///
-/// It contains the page's path, url, content, and additional data.
+/// It contains the page's source path, url, content, and additional data.
 /// The page object is passed to the different modules of the content package and may be modified by them.
 /// How the page is built is determined by the [PageConfig] object.
 class Page {
@@ -28,9 +29,12 @@ class Page {
     Map<String, Object?> initialData = const {},
     required this.config,
     required this.loader,
-  }) : _data = PageDataMap._({...initialData});
+  }) : _data = PageDataMap._({...initialData}),
+       assert(!path.contains(p.windows.separator), 'Page path must be in posix format (using forward slashes).');
 
-  /// The path of the page including its suffix, e.g. 'index.html', 'some/path.md'.
+  /// The source path of the page including its suffix, e.g. 'index.html', 'some/path.md'.
+  ///
+  /// The path is always in posix format, i.e. using forward slashes.
   final String path;
 
   /// The url of the page, e.g. '/', '/some/path'.
@@ -115,9 +119,13 @@ class Page {
   Future<Component> render() async {
     parseFrontmatter();
     await loadData();
+
+    Future<void>? templatingFuture;
+
     return AsyncBuilder(
       builder: (context) async {
-        await renderTemplate(context.pages);
+        // Cache the templating future so that it is only run once.
+        await (templatingFuture ??= renderTemplate(context.pages));
 
         if (kGenerateMode) {
           if (data.page['sitemap'] case final sitemap?) {
@@ -284,9 +292,9 @@ extension PageHandlersExtension on Page {
   /// Renders the page content using the configured template engine.
   ///
   /// Modifies the page content.
-  FutureOr<void> renderTemplate(List<Page> pages) {
+  Future<void> renderTemplate(List<Page> pages) async {
     if (config.templateEngine != null) {
-      return config.templateEngine!.render(this, pages);
+      await config.templateEngine!.render(this, pages);
     }
   }
 

@@ -4,8 +4,3 @@ analyzer:
   exclude:
     - tool/scaffold/**
     - tool/templates/**
-  
-linter:
-  rules:
-    # Disabled so that we can group dependencies semantically.
-    sort_pub_dependencies: false

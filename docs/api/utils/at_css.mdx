@@ -13,7 +13,7 @@ The `css` utility gives you a convenient way of writing CSS style rules in Dart 
 
 ## Registering style rules
 
-When used as the `@css` annotation, you can register any amount of style definitions to be automatically included in your server-rendered html output.
+When used as the `@css` annotation, you can register any amount of style definitions to be automatically rendered as CSS in your page.
 
 ```dart
 @css
@@ -22,12 +22,6 @@ List<StyleRule> get styles => [
   /* ... */
 ];
 ```
-
-This is then automatically rendered to css and included in your html output after pre-rendering.
-
-<Warning>
-Because `@css` requires pre-rendering, it is only supported in **server** and **static** mode.
-</Warning>
 
 The `@css` annotation can be applied to the following elements:
 
@@ -70,6 +64,48 @@ You should try to use ids or unique class names as selectors to prevent unwanted
 <Success>
 **Tip:** The `jaspr_lints` package provides a convenient lint rule to keep your styles properties organized. Learn more about it [here](/api/linting#lint-rules).
 </Success>
+
+---
+
+How the styles are rendered depends on your [Rendering Mode](/dev/modes):
+
+<Tabs groupId="mode_combined">
+  <TabItem value="static|server" label="Static & Server Mode">
+
+    By default, your styles are rendered during the normal pre-rendering phase and embedded as an inline `<style>` element in your html output.
+
+    You can change this behavior by using the `jaspr.styles = standalone` option in your `pubspec.yaml` file:
+
+    ```yaml title="pubspec.yaml"
+    jaspr:
+      styles: standalone
+    ```
+
+    This will render all your styles to a separate CSS file and include a `<link>` to it in your html output during pre-rendering.
+
+    <Warning>
+      Files using `@css` will always be part of the server scope and therefore **cannot depend on client-only libraries** like `package:web` or `dart:js_interop`. Make sure to only use server-compatible libraries and packages (such as `package:universal_web`) in these files or your styles will not be rendered.
+    </Warning>
+
+  </TabItem>
+  <TabItem value="client" label="Client Mode">
+
+    In client mode, styles are rendered to a separate CSS file. You must include it in your HTML file by adding a `<link>` element for it.
+
+    ```html title="web/index.html"
+    <head>
+      <link rel="stylesheet" href="main.css">
+    </head>
+    ```
+
+    The name of the CSS file is defined by the [client entrypoint](/dev/client#client-entrypoint) file name, e.g. `lib/main.client.dart` will result in `main.css`.
+
+    <Warning>
+      When using `@css` in a file, it will be **executed using the Dart VM** during serve and build. This means you **cannot depend on client-only libraries** like `package:web` or `dart:js_interop` in these files. Make sure to only use vm-compatible libraries and packages (such as `package:universal_web`) in these files or your styles will not be rendered.
+    </Warning>
+
+  </TabItem>
+</Tabs>
 
 ---
 

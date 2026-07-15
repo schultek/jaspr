@@ -4,7 +4,7 @@
 Inspired from React Server Component, we want simple component types that distinguish between interactive client
 components and static server components.
 
-Lower tier components cannot be imported from higher tier components.
+Lower-tier components cannot be imported from higher-tier components.
 
 
 | \            | Tier | pre-rendered | interactive |
@@ -15,10 +15,10 @@ Lower tier components cannot be imported from higher tier components.
 
 
 Mode: Auto
-Based on which components are used in the project, the framework can automatically pick any of the needed rendering 
+Based on which components are used in the project, the framework can automatically pick any of the needed rendering
 phases of SSG, SSR or CSR.
 If no @interactive is used, no client scripts are generated.
-If neiter @static or @dynamic are used (or nothing), nothing is built (+ warning).
+If neither @static or @dynamic are used (or nothing), nothing is built (+ warning).
 
 Mode: Client
 Build outputs main file to web/ directory if not exists.

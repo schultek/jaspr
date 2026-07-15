@@ -140,7 +140,9 @@ class ContentApp extends AsyncStatelessComponent {
 
   @override
   Future<Component> build(BuildContext context) async {
-    final routes = await Future.wait(loaders.map((l) => l.loadRoutes(configResolver, eagerlyLoadAllPages)));
+    final routes = await [
+      for (final loader in loaders) loader.loadRoutes(configResolver, eagerlyLoadAllPages),
+    ].wait;
     _ensureAllowedSuffixes(routes);
     return routerBuilder(routes);
   }

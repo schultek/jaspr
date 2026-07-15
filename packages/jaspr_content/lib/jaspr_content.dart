@@ -1,6 +1,7 @@
 /// A package for building content-driven sites with Jaspr.
 library;
 
+export 'src/asset_manager.dart';
 export 'src/content.dart';
 export 'src/content_app.dart';
 export 'src/data_loader/data_loader.dart';

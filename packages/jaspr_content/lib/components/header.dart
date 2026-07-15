@@ -47,32 +47,32 @@ class Header extends StatelessComponent {
   static List<StyleRule> get _styles => [
     css('.header', [
       css('&').styles(
-        height: 4.rem,
         display: Display.flex,
-        alignItems: AlignItems.center,
-        gap: Gap.column(1.rem),
+        height: 4.rem,
         padding: Padding.symmetric(horizontal: 1.rem, vertical: .25.rem),
         margin: Margin.symmetric(horizontal: Unit.auto),
         border: Border.only(
           bottom: BorderSide(color: Color('#0000000d'), width: 1.px),
         ),
+        alignItems: AlignItems.center,
+        gap: Gap.column(1.rem),
       ),
       css.media(MediaQuery.all(minWidth: 768.px), [css('&').styles(padding: Padding.symmetric(horizontal: 2.5.rem))]),
       css('.header-title', [
         css('&').styles(
           display: Display.inlineFlex,
-          flex: Flex(basis: 17.rem),
           alignItems: AlignItems.center,
           gap: Gap.column(.75.rem),
+          flex: Flex(basis: 17.rem),
         ),
-        css('img').styles(height: 1.5.rem, width: Unit.auto),
+        css('img').styles(width: Unit.auto, height: 1.5.rem),
         css('span').styles(fontWeight: FontWeight.w700),
       ]),
       css('.header-content', [
         css('&').styles(
           display: Display.flex,
-          flex: Flex(grow: 1),
           justifyContent: JustifyContent.end,
+          flex: Flex(grow: 1),
         ),
       ]),
       css('.header-items', [

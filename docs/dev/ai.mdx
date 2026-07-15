@@ -15,6 +15,33 @@ Provide the following url to your AI coding agent to give it access to the Jaspr
 https://jaspr.site/llms.txt
 ```
 
-## AI Rules and Skills
+## Agent Skills
 
-*🚧 Coming Soon 🚧*
+Jaspr ships with a set of **[Agent Skills](https://agentskills.io/)** — structured instruction files that teach AI coding agents how to work with Jaspr effectively. Each skill covers a specific topic:
+
+| Skill | Description |
+| --- | --- |
+| **jaspr-fundamentals** | Core concepts of writing Jaspr components and using HTML components. |
+| **jaspr-pre-rendering-and-hydration** | Techniques for SSR/SSG, async data fetching, hydration, and dual entrypoints. |
+| **jaspr-styling** | Using type-safe CSS-in-Dart for styling components, themes, and CSS properties. |
+| **jaspr-js-interop** | Integrating with JavaScript libraries and browser-native APIs. |
+| **jaspr-convert-html** | Converting existing HTML into Jaspr code using the CLI. |
+
+### Installing Skills
+
+Use the `jaspr install-skills` command to copy the skills into your project's agent directory:
+
+```bash
+jaspr install-skills
+```
+
+Skills are versioned and will only be updated when a new version of Jaspr includes changes.
+
+The command will auto-detect your agent by looking for an existing skills directory (e.g. `.agents/skills/`, `.cursor/skills/`).
+You can also specify an agent explicitly:
+
+```bash
+jaspr install-skills --agent cursor
+```
+
+Supported agents include `cursor`, `antigravity`, `claude-code`, `copilot`, `windsurf`, `cline`, `codex`, `opencode`, `continue`, and `command-code`, as well as `general` which will use the standard `.agents/skills` directory.

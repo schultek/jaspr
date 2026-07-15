@@ -5,7 +5,6 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
 
 import '../utils.dart';
@@ -81,11 +80,6 @@ class _StylesVisitor extends SimpleAstVisitor<void> {
     if (checkOrder(arguments, params) case final argument?) {
       rule.reportAtNode(argument);
     }
-  }
-
-  List<FormalParameterElement> findStylesOrder(InterfaceType stylesType) {
-    final constructor = stylesType.constructors.where((c) => c.name == '').first;
-    return constructor.formalParameters;
   }
 
   static Expression? checkOrder(NodeList<Expression> args, List<String?> params) {

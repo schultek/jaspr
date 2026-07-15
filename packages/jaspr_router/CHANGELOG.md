@@ -1,3 +1,11 @@
+## 0.8.3
+
+- Fixed routing and redirect bug to respect the `<base href="...">` configuration by prepending `basePath` on client history operations, server redirect headers, and `Link` hrefs.
+
+## 0.8.2
+
+- `jaspr` upgraded to `0.23.0`
+
 ## 0.8.1
 
 - `jaspr` upgraded to `0.22.0`

@@ -21,7 +21,7 @@ void main() {
     final runner = setupRunner();
 
     for (final variant in allVariants) {
-      test(variant.name, tags: ['cli', variant.tag], () async {
+      test(variant.name, tags: ['cli-integration-test', variant.tag], () async {
         await runner.run('create --no-pub-get -v ${variant.options} myapp', dir: dirs.root);
 
         for (final f in variant.files) {
@@ -102,7 +102,10 @@ TestRunner setupRunner() {
   });
 
   tearDown(() async {
-    await Future.wait(runner.runner.commands.values.whereType<BaseCommand>().map((c) => c.stop()));
+    await [
+      for (final command in runner.runner.commands.values)
+        if (command is BaseCommand) command.stop(),
+    ].wait;
   });
 
   return runner;

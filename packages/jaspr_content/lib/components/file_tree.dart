@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 
 import '../jaspr_content.dart';
 import '../theme.dart';
-import '_internal/file_tree_icons.dart';
+import 'file_icon.dart';
 
 /// A file tree component for displaying a directory structure.
 ///
@@ -109,13 +109,13 @@ class FileTree extends CustomComponent {
       css('&').styles(
         display: Display.block,
         padding: Padding.all(1.rem),
-        fontSize: 0.8125.rem,
-        backgroundColor: Color.variable(FileTreeTheme._backgroundVariable),
         color: Color.variable(FileTreeTheme._textVariable),
+        fontSize: 0.8125.rem,
         lineHeight: 1.375.rem,
+        backgroundColor: Color.variable(FileTreeTheme._backgroundVariable),
       ),
       css('ul').styles(
-        listStyle: ListStyle.none,
+        padding: Padding.only(left: .125.rem),
         margin: Margin.only(left: .5.rem),
         border: Border.only(
           left: BorderSide.solid(
@@ -123,7 +123,7 @@ class FileTree extends CustomComponent {
             color: Color.variable(FileTreeTheme._iconVariable),
           ),
         ),
-        padding: Padding.only(left: .125.rem),
+        listStyle: ListStyle.none,
       ),
       css('> ul').styles(
         padding: Padding.zero,
@@ -140,9 +140,9 @@ class FileTree extends CustomComponent {
         ),
         css('svg').styles(
           display: Display.inline,
-          margin: Margin.only(left: .25.rem, right: .375.rem),
           width: .875.rem,
           height: .875.rem,
+          margin: Margin.only(left: .25.rem, right: .375.rem),
           color: Color.variable(FileTreeTheme._iconVariable),
           raw: {
             'vertical-align': 'middle',
@@ -255,12 +255,6 @@ class _FileTree extends StatelessComponent {
   Component buildFileTreeEntry(FileTreeItem item) {
     final isPlaceholder = item.name == '...';
 
-    final iconName = item.isFolder
-        ? 'seti:folder'
-        : isPlaceholder
-        ? null
-        : getIconName(item.name);
-
     return span(classes: 'tree-entry', [
       span(
         classes: 'tree-entry-name',
@@ -269,47 +263,13 @@ class _FileTree extends StatelessComponent {
           if (isPlaceholder) 'data-placeholder': '',
         },
         [
-          if (iconName != null) buildIcon(iconName),
+          if (!isPlaceholder)
+            if (item.isFolder) FileIcon.folderIcon else FileIcon.forFile(item.name),
           Component.text(isPlaceholder ? '…' : item.name),
         ],
       ),
       if (item.comment case final comment?) span(classes: 'comment', [comment]),
     ]);
-  }
-
-  String? getIconName(String fileName) {
-    String? icon = definitions['files']![fileName];
-    if (icon != null) {
-      return icon;
-    }
-    icon = getFileIconTypeFromExtension(fileName);
-    if (icon != null) return icon;
-    for (final MapEntry(key: partial, value: partialIcon) in definitions['partials']!.entries) {
-      if (fileName.contains(partial)) return partialIcon;
-    }
-    return 'seti:default';
-  }
-
-  String? getFileIconTypeFromExtension(String fileName) {
-    final firstDotIndex = fileName.indexOf('.');
-    if (firstDotIndex == -1) return null;
-    var extension = fileName.substring(firstDotIndex);
-    while (extension != '') {
-      final icon = definitions['extensions']![extension];
-      if (icon != null) return icon;
-      final nextDotIndex = extension.indexOf('.', 1);
-      if (nextDotIndex == -1) return null;
-      extension = extension.substring(nextDotIndex);
-    }
-    return null;
-  }
-
-  Component buildIcon(String iconName) {
-    return svg(
-      viewBox: '0 0 24 24',
-      attributes: {'fill': 'currentColor', 'width': '16', 'height': '16'},
-      [RawText(fileIcons[iconName] ?? '')],
-    );
   }
 }
 

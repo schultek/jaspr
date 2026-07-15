@@ -9,6 +9,7 @@ import 'src/rules/prefer_html_components_rule.dart';
 import 'src/rules/prefer_styles_getter_rule.dart';
 import 'src/rules/sort_children_last_rule.dart';
 import 'src/rules/styles_ordering_rule.dart';
+import 'src/rules/unsafe_imports_rule.dart';
 
 final plugin = JasprPlugin();
 
@@ -18,6 +19,8 @@ class JasprPlugin extends Plugin {
 
   @override
   void register(PluginRegistry registry) {
+    registry.registerWarningRule(UnsafeImportsRule());
+
     registry.registerLintRule(SortChildrenLastRule());
     registry.registerFixForRule(SortChildrenLastRule.code, SortChildrenLastFix.new);
 

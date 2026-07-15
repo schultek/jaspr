@@ -5,7 +5,7 @@ description: Use layouts to create a consistent look and feel for your pages.
 
 ---
 
-Page layouts define the overall structure and appearance of your pages. They allow you to wrap your page content with common elements like headers, footers, sidebars, and navigation menus, ensuring a consistent user experience across your site.`jaspr_content` allows you to use **pre-built layouts**, create your own **custom layouts**, and easily switch between them.
+Page layouts define the overall structure and appearance of your pages. They allow you to wrap your page content with common elements like headers, footers, sidebars, and navigation menus, ensuring a consistent user experience across your site. `jaspr_content` allows you to use **pre-built layouts**, create your own **custom layouts**, and easily switch between them.
 
 ## How Layouts Work
 
@@ -18,7 +18,7 @@ ContentApp(
   // ...
   layouts: [
     // Default layout (first item)
-    DocsLayout(), 
+    DocsLayout(),
     // Additional layouts
     BlogLayout(),
     MyCustomLayout(),
@@ -70,7 +70,7 @@ The `EmptyLayout` is a minimal layout that renders only the page's content witho
 
 ## Creating Custom Layouts
 
-You can create your own layouts by implementing the `PageLayout` interface or by extending the `PageLayoutBase` class. 
+You can create your own layouts by implementing the `PageLayout` interface or by extending the `PageLayoutBase` class.
 
 <Info>
 `PageLayoutBase` provides a helpful starting point by handling common tasks like setting up the document's `<head>` with meta tags.
@@ -106,7 +106,7 @@ class MyCustomLayout extends PageLayoutBase {
   Component buildBody(Page page, Component child) {
     // `page` contains all page data, including frontmatter.
     // `child` is the rendered content of the page.
-    
+
     return div(classes: 'custom_layout', [
       header([
         // Add a custom header.
