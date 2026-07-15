@@ -181,6 +181,7 @@ abstract class BaseCommand extends Command<int> {
     String? progress,
     bool Function(String)? hide,
     bool Function()? onFail,
+    Level? Function(String)? levelFor,
   }) async {
     if (progress != null) {
       logger.write(progress, tag: tag, progress: ProgressState.running);
@@ -193,10 +194,11 @@ abstract class BaseCommand extends Command<int> {
     final outSub = process.stdout.map(utf8.decode).splitLines().listen((log) {
       if (hide != null && hide.call(log)) return;
 
+      final level = levelFor?.call(log) ?? Level.info;
       if (progress != null) {
-        logger.write(log, tag: tag, progress: ProgressState.running);
+        logger.write(log, tag: tag, level: level, progress: ProgressState.running);
       } else {
-        logger.write(log, tag: tag);
+        logger.write(log, tag: tag, level: level);
       }
     });
 

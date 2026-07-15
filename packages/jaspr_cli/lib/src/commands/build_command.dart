@@ -20,6 +20,9 @@ import '../process_runner.dart';
 import '../project.dart';
 import 'base_command.dart';
 
+import '../helpers/print_logo.dart';
+import '../version.dart';
+
 class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   BuildCommand({super.logger}) {
     argParser.addOption(
@@ -130,6 +133,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   Future<int> runCommand() async {
     ensureInProject();
+    printLogo(jasprCliVersion);
 
     logger.write('Building jaspr for ${project.requireMode.name} rendering mode.');
 

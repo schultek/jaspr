@@ -44,7 +44,6 @@ class ClientWorkflow {
 
         client.registerBuildTarget(DefaultBuildTarget((b) => b..target = 'web'));
 
-        logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
         client.startBuild();
 
         final devProxy = await DevProxy.start(

@@ -13,10 +13,12 @@ import '../dev/client_workflow.dart';
 import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
+import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
+import '../version.dart';
 import 'base_command.dart';
 
 abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
@@ -95,6 +97,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   @override
   Future<int> runCommand() async {
     ensureInProject();
+    printLogo(jasprCliVersion);
 
     logger.write('Running jaspr in ${project.requireMode.name} rendering mode.');
 
@@ -114,6 +117,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       await stop();
       return 1;
     }
+
+    await _runBuildCallback();
 
     handleClientWorkflow(workflow);
 
@@ -155,7 +160,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   }
 
   Future<bool> _startServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
-    logger.write('Starting server...', tag: Tag.cli, progress: ProgressState.running);
+    logger.write('Starting server', tag: Tag.cli, progress: ProgressState.running);
 
     final useHotReload = entryPoint.startsWith('lib/') && !release;
 
@@ -202,8 +207,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       workingDirectory: Directory.current.absolute.path,
     );
 
-    logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
-
     final serverFuture = watchProcess(
       'server',
       process,
@@ -216,6 +219,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           progress: ProgressState.completed,
         );
         return true;
+      },
+      levelFor: (t) {
+        if (t.startsWith('The Dart VM service is listening') ||
+            t.startsWith('The Dart DevTools debugger and profiler is available')) {
+          return Level.verbose;
+        }
+        return null;
       },
     );
 
@@ -255,6 +265,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     }
 
+    logger.write(
+      'Server started and listening on http://localhost:$port',
+      tag: Tag.cli,
+      progress: ProgressState.completed,
+    );
+
     return true;
   }
 
@@ -282,7 +298,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       project.checkWasmSupport();
     }
 
-    logger.write('Starting web compilers...', tag: Tag.cli, progress: ProgressState.running);
+    logger.write('Starting web compilers', tag: Tag.cli, progress: ProgressState.running);
 
     final compiler = useWasm
         ? 'dart2wasm'
@@ -390,8 +406,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           buildCompleter.complete();
         } else {
           logger.write('Rebuilt web assets.', tag: Tag.cli, progress: ProgressState.completed);
+          _runBuildCallback();
         }
-        _runBuildCallback();
       } else if (event.status == BuildStatus.failed) {
         logger.write(
           'Failed building web assets. There is probably more output above.',
@@ -405,9 +421,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       } else if (event.status == BuildStatus.started) {
         if (buildCompleter.isCompleted) {
           logger.write('Rebuilding web assets...', tag: Tag.cli, progress: ProgressState.running);
-        } else {
-          logger.write('Web compilers started.', tag: Tag.cli, progress: ProgressState.completed);
-          logger.write('Building web assets...', tag: Tag.cli, progress: ProgressState.running);
         }
       }
     });
@@ -445,8 +458,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     return workflow;
   }
 
-  void _runBuildCallback() {
-    generateCss();
+  Future<void> _runBuildCallback() async {
+    await generateCss();
   }
 }
 

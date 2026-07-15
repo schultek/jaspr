@@ -22,7 +22,7 @@ enum Tag {
 
   String format([bool daemon = false]) {
     if (this == none) return '';
-    return color.wrap('[$name] ', forScript: daemon)!;
+    return color.wrap('[$name]'.padRight(10, ' '), forScript: daemon)!;
   }
 }
 
@@ -160,7 +160,7 @@ extension on s.Level {
     } else if (this < s.Level.INFO) {
       return Level.debug;
     } else if (this < s.Level.WARNING) {
-      return Level.info;
+      return Level.debug;
     } else if (this < s.Level.SEVERE) {
       return Level.warning;
     } else {
