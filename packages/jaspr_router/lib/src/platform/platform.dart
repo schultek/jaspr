@@ -28,6 +28,9 @@ abstract class HistoryManager {
 
   /// Go back in the history
   void back();
+
+  /// Dispose any listeners or resources
+  void dispose();
 }
 
 abstract class RouteRegistry {

@@ -39,6 +39,11 @@ class HistoryManagerImpl implements HistoryManager {
   void init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState}) {
     // No-op
   }
+
+  @override
+  void dispose() {
+    // No-op
+  }
 }
 
 class RouteRegistryImpl implements RouteRegistry {

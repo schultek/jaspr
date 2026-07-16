@@ -224,6 +224,12 @@ class RouterState extends State<Router> with PreloadStateMixin {
   }
 
   @override
+  void dispose() {
+    PlatformRouter.instance.history.dispose();
+    super.dispose();
+  }
+
+  @override
   Component build(BuildContext context) {
     return Component.fragment([
       if (_matchList?.title case final title?) Document.head(title: title),

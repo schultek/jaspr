@@ -70,6 +70,11 @@ class MockHistoryManager implements HistoryManager {
     history.removeLast();
     onChangeState?.call(null, url: history.last);
   }
+
+  @override
+  void dispose() {
+    onChangeState = null;
+  }
 }
 
 class MockRouteRegistry implements RouteRegistry {
