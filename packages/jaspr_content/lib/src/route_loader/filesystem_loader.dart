@@ -133,6 +133,9 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
 
   void addFile(String path) {
     if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.extension(path))) {
+      // Partials excluded by filterExtensions are not page sources,
+      // but might have dependents that failed while the partial was missing.
+      _invalidateDependentSources(path);
       return;
     }
     // Convert the file path to a posix path.
@@ -147,6 +150,10 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
         keepSuffix: keepSuffixPattern?.matchAsPrefix(posixPath) != null,
       ),
     );
+
+    // Another file might depend on this file, so failed before it was added.
+    // Now that it's added, ensure that the dependent source is rebuilt.
+    _invalidateDependentSources(path);
   }
 
   void removeFile(String path) {
@@ -170,7 +177,7 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   @override
   void removeSource(FilePageSource source) {
     // Invalidate the removed source without rebuilding it,
-    // since its file no longer exists.
+    // since its own file no longer exists.
     super.invalidateSource(source, rebuild: false);
     super.removeSource(source);
 
