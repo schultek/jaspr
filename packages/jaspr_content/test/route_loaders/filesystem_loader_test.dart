@@ -9,10 +9,6 @@ import 'package:watcher/watcher.dart';
 
 import '../utils.dart';
 
-class MockDirectoryWatcher extends Mock implements DirectoryWatcher {}
-
-class MockPage extends Mock implements Page {}
-
 void main() {
   group('FilesystemLoader', () {
     group('loadPageSources()', () {
