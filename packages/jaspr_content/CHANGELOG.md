@@ -1,6 +1,6 @@
-## Unreleased minor
+## Unreleased patch
 
-- Properly invalidate dependents of deleted partials while serving.
+- Invalidate dependents of deleted partials while serving.
 
 ## 0.5.3
 
