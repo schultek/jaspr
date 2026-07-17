@@ -52,6 +52,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   RouteMatchList get matchList => _matchList ?? RouteMatchList.empty;
 
   Map<Object, RouteLoader> routeLoaders = {};
+  VoidCallback? _routeChangeDispose;
 
   @override
   Future<void> preloadState() async {
@@ -64,7 +65,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   @override
   void initState() {
     super.initState();
-    PlatformRouter.instance.history.init(
+    _routeChangeDispose = PlatformRouter.instance.history.init(
       context,
       onChangeState: (state, {url}) {
         _update(url ?? context.url, extra: state, updateHistory: false, replace: true);
@@ -225,7 +226,8 @@ class RouterState extends State<Router> with PreloadStateMixin {
 
   @override
   void dispose() {
-    PlatformRouter.instance.history.dispose();
+    _routeChangeDispose?.call();
+    _routeChangeDispose = null;
     super.dispose();
   }
 

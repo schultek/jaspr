@@ -36,13 +36,9 @@ class HistoryManagerImpl implements HistoryManager {
   }
 
   @override
-  void init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState}) {
+  VoidCallback? init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState}) {
     // No-op
-  }
-
-  @override
-  void dispose() {
-    // No-op
+    return null;
   }
 }
 

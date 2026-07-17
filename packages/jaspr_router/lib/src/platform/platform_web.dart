@@ -23,16 +23,15 @@ class PlatformRouterImpl implements PlatformRouter {
 /// Browser implementation of HistoryManager
 /// Accesses the window.history api
 class HistoryManagerImpl implements HistoryManager {
-  StreamSubscription<void>? _subscription;
-
   @override
-  void init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState}) {
+  VoidCallback? init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState}) {
     if (onChangeState != null) {
-      _subscription?.cancel();
-      _subscription = window.onPopState.listen((event) {
+      final subscription = window.onPopState.listen((event) {
         onChangeState(window.history.state);
       });
+      return subscription.cancel;
     }
+    return null;
   }
 
   @override
@@ -48,12 +47,6 @@ class HistoryManagerImpl implements HistoryManager {
   @override
   void back() {
     window.history.back();
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    _subscription = null;
   }
 }
 
