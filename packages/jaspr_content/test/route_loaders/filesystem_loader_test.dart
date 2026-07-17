@@ -471,7 +471,10 @@ void main() {
           // Assert: The partial's source was removed.
           expect(loader.sources.any((source) => source.file.path == partialPath), isFalse);
 
-          if (!eager) {
+          if (eager) {
+            // In eager mode the dependent page is rebuilt immediately.
+            expect(pageSource.page, isNotNull);
+          } else {
             // In lazy mode the dependent page stays invalidated until requested.
             expect(pageSource.page, isNull);
           }
