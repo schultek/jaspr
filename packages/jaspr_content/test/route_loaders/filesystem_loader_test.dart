@@ -334,6 +334,51 @@ void main() {
         expect(pageSource.page, isNull);
       });
 
+      test('invalidates dependent page when filtered partial is removed', () async {
+        // Arrange the file system layout and content.
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        final loader = FilesystemLoader(
+          'pages',
+          filterExtensions: {'.md'},
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
+
+        final partialPath = 'pages/_includes/header.html';
+        final partialFile = fileSystem.file(partialPath)
+          ..createSync(recursive: true)
+          ..writeAsStringSync('Header');
+        pagesDir.childFile('index.md')
+          ..createSync()
+          ..writeAsStringSync('Page content');
+
+        // Initial load to activate the watcher.
+        await loader.loadRoutes((_) => PageConfig(), false);
+
+        // Confirm that the partial was filtered out of the loader's page sources
+        // even though it remains available to templates.
+        expect(loader.sources.map((source) => source.file.path), isNot(contains(partialPath)));
+
+        // Build the page once to cache the result.
+        final pageSource = loader.sources.single;
+        final cachedComponent = await pageSource.load();
+
+        // Establish dependency by reading the filtered partial.
+        loader.readPartialSync(partialPath, pageSource.page!);
+
+        // Act: Delete the partial and simulate a remove event for it.
+        partialFile.deleteSync();
+        eventController.add(WatchEvent(ChangeType.REMOVE, partialPath));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The dependent page stays invalidated until requested.
+        expect(pageSource.page, isNull);
+
+        // The dependent page is rebuilt instead of serving the cached result.
+        expect(await pageSource.load(), isNot(same(cachedComponent)));
+      });
+
       for (final eager in [false, true]) {
         test('invalidates dependent page when '
             'partial is removed (${eager ? 'eager' : 'lazy'})', () async {
