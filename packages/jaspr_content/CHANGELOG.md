@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Properly invalidate dependents of deleted partials while serving.
+
 ## 0.5.3
 
 - Added `FileIcon` component.
