@@ -237,11 +237,20 @@ abstract class BaseCommand extends Command<int> {
 
   Future<void> copyToBuildDir(String from, [List<String> targets = const ['']]) async {
     final to = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
+
+    // Pending relative paths to copy or inspect while traversing the source tree.
     final moveTargets = [...targets];
+    final visitedTargets = <String>{};
 
     final moves = <Future<void>>[];
     while (moveTargets.isNotEmpty) {
-      final moveTarget = moveTargets.removeAt(0);
+      final moveTarget = p.normalize(moveTargets.removeLast());
+
+      // Explicit targets could overlap with paths discovered while traversing directories.
+      if (!visitedTargets.add(moveTarget)) {
+        continue;
+      }
+
       final file = File('$from/$moveTarget').absolute;
       final directory = Directory('$from/$moveTarget').absolute;
       if (file.existsSync()) {
@@ -249,9 +258,11 @@ abstract class BaseCommand extends Command<int> {
       } else if (directory.existsSync()) {
         await Directory('$to/$moveTarget').absolute.create(recursive: true);
 
-        final files = Directory('$from/$moveTarget').absolute.list(recursive: true);
-        await for (final file in files) {
-          final path = p.relative(file.absolute.path, from: p.join(Directory.current.absolute.path, from));
+        // Queue only direct children.
+        // Recursive listing here would enqueue descendants again
+        // each time one of their parent directories is processed.
+        await for (final entity in directory.list(recursive: false)) {
+          final path = p.relative(entity.absolute.path, from: p.join(Directory.current.absolute.path, from));
           moveTargets.add(path);
         }
       }

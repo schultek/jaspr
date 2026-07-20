@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed repeated copying of nested build assets.
+
 ## 0.23.2
 
 - Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
