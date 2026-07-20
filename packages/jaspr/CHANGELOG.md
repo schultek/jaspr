@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed asynchronous errors escaping the development proxy when falling back to the app root.
+
 ## 0.23.2
 
 - Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
