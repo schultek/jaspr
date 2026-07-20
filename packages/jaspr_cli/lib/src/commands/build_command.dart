@@ -556,7 +556,43 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             if (file is File && file.path.endsWith('.dart.js')) {
               final basename = p.basenameWithoutExtension(file.path);
               final isFlutter = project.flutterMode != FlutterMode.none;
-              final loaderScript = getWasmLoaderScript(basename: basename, isFlutter: isFlutter);
+              
+              List<String>? modulesNeedingSkwasm;
+              bool? needsSkwasmImmediately;
+              
+              if (isFlutter) {
+                modulesNeedingSkwasm = [];
+                needsSkwasmImmediately = false;
+                
+                final dirFiles = rootDir.listSync(recursive: true);
+                for (final f in dirFiles) {
+                  if (f is File && f.path.endsWith('.wasm')) {
+                    final isBase = p.basename(f.path) == '$basename.wasm';
+                    final bytes = f.readAsBytesSync();
+                    final detector = WasmImportsDetector(bytes);
+                    final imports = detector.getImports();
+                    
+                    final hasSkwasm = imports.any((imp) => imp.$1 == 'skwasm' || imp.$1 == 'ffi');
+                    final skwasmWrapperImports = imports.where((imp) => imp.$1 == 'skwasmWrapper').toList();
+                    final hasOnlyAddFunction = skwasmWrapperImports.every((imp) => imp.$2 == 'addFunction');
+                    
+                    if (isBase) {
+                      needsSkwasmImmediately = hasSkwasm || (skwasmWrapperImports.isNotEmpty && !hasOnlyAddFunction);
+                    } else {
+                      if (hasSkwasm || skwasmWrapperImports.isNotEmpty) {
+                        modulesNeedingSkwasm.add(p.basename(f.path));
+                      }
+                    }
+                  }
+                }
+              }
+              
+              final loaderScript = getWasmLoaderScript(
+                basename: basename,
+                isFlutter: isFlutter,
+                modulesNeedingSkwasm: modulesNeedingSkwasm,
+                needsSkwasmImmediately: needsSkwasmImmediately,
+              );
               file.writeAsStringSync(loaderScript);
             }
           }
