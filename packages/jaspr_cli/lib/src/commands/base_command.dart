@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -238,13 +239,13 @@ abstract class BaseCommand extends Command<int> {
   Future<void> copyToBuildDir(String from, [List<String> targets = const ['']]) async {
     final to = project.requireMode != JasprMode.server ? 'build/jaspr' : 'build/jaspr/web';
 
-    // Pending relative paths to copy or inspect while traversing the source tree.
-    final moveTargets = [...targets];
+    // Pending relative paths to copy or inspect in discovery order.
+    final moveTargets = ListQueue<String>.of(targets);
     final visitedTargets = <String>{};
 
     final moves = <Future<void>>[];
     while (moveTargets.isNotEmpty) {
-      final moveTarget = p.normalize(moveTargets.removeLast());
+      final moveTarget = p.normalize(moveTargets.removeFirst());
 
       // Explicit targets could overlap with paths discovered while traversing directories.
       if (!visitedTargets.add(moveTarget)) {
