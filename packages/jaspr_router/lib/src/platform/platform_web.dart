@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:jaspr/jaspr.dart';
@@ -23,12 +24,14 @@ class PlatformRouterImpl implements PlatformRouter {
 /// Accesses the window.history api
 class HistoryManagerImpl implements HistoryManager {
   @override
-  void init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState}) {
+  VoidCallback? init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState}) {
     if (onChangeState != null) {
-      window.onPopState.listen((event) {
+      final subscription = window.onPopState.listen((event) {
         onChangeState(window.history.state);
       });
+      return subscription.cancel;
     }
+    return null;
   }
 
   @override

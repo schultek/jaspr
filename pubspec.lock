@@ -189,10 +189,10 @@ packages:
     dependency: transitive
     description:
       name: build_web_compilers
-      sha256: "3489d44e7a03b68f254c75d5db6dd6172fcbb892528275c3ed968f7e72ede716"
+      sha256: ef4bc35e0e335f8520692a333b872446697adce0618cf23c3084715ace641721
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.4"
+    version: "4.8.5"
   built_collection:
     dependency: transitive
     description:
@@ -1179,10 +1179,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: c82594181e3312f3d0695fc95aaaf7758d75b8d4ae2bbecf223b9fd5109a059d
+      sha256: "307249ce4ff29d58a18e97f6345f539382eb9c9c29ecda628900f31de0443dd9"
       url: "https://pub.dev"
     source: hosted
-    version: "1.18.3"
+    version: "1.19.0"
   mime:
     dependency: transitive
     description:
@@ -2021,5 +2021,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.13.0-107.0.dev <3.13.0-z"
+  dart: ">=3.13.0-107.0.dev <3.14.0-z"
   flutter: ">=3.44.0"

@@ -1,3 +1,8 @@
+## Unreleased patch
+
+- Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
+- Updated `testClient` in `jaspr_test` to automatically unmount the root component and clean up `document.body` between test cases.
+
 ## 0.23.2
 
 - Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
