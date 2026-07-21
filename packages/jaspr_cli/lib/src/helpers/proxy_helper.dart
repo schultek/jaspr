@@ -46,7 +46,7 @@ mixin ProxyHelper on BaseCommand {
       if (useWasm && req.url.path.endsWith('.dart.js')) {
         final basename = req.url.path.substring(0, req.url.path.length - 3);
         final isFlutter = project.flutterMode == FlutterMode.embedded;
-        final loaderScript = getWasmLoaderScript(basename: basename, isFlutter: isFlutter);
+        final loaderScript = getWasmLoaderScript(basename: basename, isFlutter: isFlutter, isServe: true);
         return Response.ok(loaderScript, headers: {'content-type': 'application/javascript'});
       }
 

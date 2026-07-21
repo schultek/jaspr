@@ -110,6 +110,10 @@ melos:
       run: |
         cd packages/jaspr_cli
         dart run tool/generate_versions.dart
+    generate:loader:
+      run: |
+        cd packages/jaspr_cli
+        dart run tool/generate_loader.dart
     activate:cli:
       run: |
         rm -r packages/jaspr_cli/.dart_tool

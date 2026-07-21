@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'wasm_loader_script.dart';
 
 /// A lightweight, GC-compliant binary parser for WebAssembly modules.
 ///
@@ -134,6 +135,7 @@ String getWasmLoaderScript({
   required bool isFlutter,
   List<String>? modulesNeedingSkwasm,
   bool? needsSkwasmImmediately,
+  bool isServe = false,
 }) {
   var cleanBasename = basename;
   if (cleanBasename.endsWith('.dart')) {
@@ -141,246 +143,13 @@ String getWasmLoaderScript({
   }
 
   if (isFlutter) {
-    return _getFlutterWasmLoaderScript(
+    return getFlutterWasmLoaderScript(
       cleanBasename: cleanBasename,
-      modulesNeedingSkwasm: modulesNeedingSkwasm ?? const [],
+      modulesNeedingSkwasmJson: jsonEncode(modulesNeedingSkwasm ?? const []),
       needsSkwasmImmediately: needsSkwasmImmediately ?? false,
+      isServe: isServe,
     );
   } else {
-    return _getStandardWasmLoaderScript(cleanBasename);
+    return getStandardWasmLoaderScript(cleanBasename);
   }
-}
-
-String _getStandardWasmLoaderScript(String cleanBasename) {
-  return '''
-(async () => {
-  const isWorker = typeof document === 'undefined';
-  const thisScript = isWorker ? undefined : document.currentScript;
-
-  function relativeURL(ref) {
-    if (isWorker) {
-      return new URL(ref, self.location.href).toString();
-    }
-    const base = thisScript?.src ?? document.baseURI;
-    return new URL(ref, base).toString();
-  }
-
-  const imports = {};
-
-  const moduleLoadingCache = new Map();
-  function getModuleBytes(m, callback) {
-    const cached = moduleLoadingCache.get(m);
-    if (!!cached) return cached;
-    const loadPromise = fetch(relativeURL(`./\${m}`)).then((b) => callback(m, b));
-    moduleLoadingCache.set(m, loadPromise);
-    return loadPromise;
-  }
-  function loadDeferredModules(modules, handleWasmBytes) {
-    return Promise.all(modules.map((m) => getModuleBytes(m, handleWasmBytes)));
-  }
-
-  let { compileStreaming } = await import(relativeURL("./$cleanBasename.mjs"));
-
-  let app = await compileStreaming(fetch(relativeURL("$cleanBasename.wasm")));
-  let module = await app.instantiate(imports, {
-    loadDeferredModules: loadDeferredModules,
-    loadDynamicModule: async (wasmUri, mjsUri) => {
-      const wasmBytes = fetch(relativeURL(wasmUri));
-      const mjsModule = import(relativeURL(mjsUri));
-      return [await wasmBytes, await mjsModule];
-    }
-  });
-  module.invokeMain();
-})();
-''';
-}
-
-String _getFlutterWasmLoaderScript({
-  required String cleanBasename,
-  List<String> modulesNeedingSkwasm = const [],
-  bool needsSkwasmImmediately = false,
-}) {
-  final modulesNeedingSkwasmJson = jsonEncode(modulesNeedingSkwasm);
-
-  return '''
-(async () => {
-  const isWorker = typeof document === 'undefined';
-  const thisScript = isWorker ? undefined : document.currentScript;
-
-  function relativeURL(ref) {
-    if (isWorker) {
-      return new URL(ref, self.location.href).toString();
-    }
-    const base = thisScript?.src ?? document.baseURI;
-    return new URL(ref, base).toString();
-  }
-
-  const imports = {};
-  let realSkwasmInstance = null;
-  
-  const modulesNeedingSkwasm = $modulesNeedingSkwasmJson;
-
-  const isBlink = (navigator.vendor === 'Google Inc.') || (navigator.userAgent.includes('Edg/'));
-  const hasImageCodecs = typeof ImageDecoder !== "undefined" && isBlink;
-  const hasChromiumBreakIterators = (typeof Intl.v8BreakIterator !== "undefined") && (typeof Intl.Segmenter !== "undefined");
-  const needsHeavy = !hasImageCodecs || !hasChromiumBreakIterators;
-  const fileStem = needsHeavy ? 'skwasm_heavy' : 'skwasm';
-
-  const baseUrl = relativeURL('./canvaskit/');
-  const skwasmUrl = baseUrl + fileStem + '.js';
-  const wasmUrl = baseUrl + fileStem + '.wasm';
-
-  let modulePromise = null;
-  const wasmInstantiator = (imports, successCallback) => {
-    (async () => {
-      if (!modulePromise) {
-        modulePromise = WebAssembly.compileStreaming(fetch(wasmUrl));
-      }
-      const module = await modulePromise;
-      const instance = await WebAssembly.instantiate(module, imports);
-      successCallback(instance, module);
-    })();
-    return {};
-  };
-
-  let skwasmInstancePromise = null;
-  function getSkwasmInstance() {
-    if (skwasmInstancePromise) return skwasmInstancePromise;
-    skwasmInstancePromise = (async () => {
-      const skwasm = await import(skwasmUrl);
-      const skwasmInstance = await skwasm.default({
-        skwasmSingleThreaded: !window.crossOriginIsolated,
-        instantiateWasm: wasmInstantiator,
-        locateFile: (filename) => {
-          if (filename.endsWith('.ww.js')) {
-            return URL.createObjectURL(new Blob(
-              [`
-"use strict";
-
-let eventListener;
-eventListener = (message) => {
-    const pendingMessages = [];
-    const data = message.data;
-    data["instantiateWasm"] = (info,receiveInstance) => {
-        const instance = new WebAssembly.Instance(data["wasm"], info);
-        return receiveInstance(instance, data["wasm"])
-    };
-    import(data.js).then(async (skwasm) => {
-        await skwasm.default(data);
-
-        removeEventListener("message", eventListener);
-        for (const message of pendingMessages) {
-            dispatchEvent(message);
-        }
-    });
-    removeEventListener("message", eventListener);
-    eventListener = (message) => {
-
-        pendingMessages.push(message);
-    };
-
-    addEventListener("message", eventListener);
-};
-addEventListener("message", eventListener);
-`
-              ],
-              { 'type': 'application/javascript' }));
-          }
-          return baseUrl + filename;
-        },
-        mainScriptUrlOrBlob: skwasmUrl,
-      });
-
-      window._flutter_skwasmInstance = skwasmInstance;
-      realSkwasmInstance = skwasmInstance;
-      return skwasmInstance;
-    })();
-    return skwasmInstancePromise;
-  }
-
-  ${!needsSkwasmImmediately ? '''async function checkAndPrepareImportsForModule(moduleName) {
-    if (modulesNeedingSkwasm.includes(moduleName)) {
-      const skwasmInstance = await getSkwasmInstance();
-      Object.assign(imports, {
-        skwasm: skwasmInstance.wasmExports,
-        skwasmWrapper: skwasmInstance,
-        ffi: {
-          memory: skwasmInstance.wasmMemory,
-        },
-      });
-    }
-  }''' : ''}
-
-  const moduleLoadingCache = new Map();
-  function getModuleBytes(m, callback) {
-    const cached = moduleLoadingCache.get(m);
-    if (!!cached) return cached;
-    ${needsSkwasmImmediately ? '''
-    const loadPromise = fetch(relativeURL(`./\${m}`)).then((b) => callback(m, b));
-    ''' : '''
-    const loadPromise = (async () => {
-      const response = await fetch(relativeURL(`./\${m}`));
-      await checkAndPrepareImportsForModule(m.split('/').pop());
-      return callback(m, response);
-    })();
-    '''}
-    moduleLoadingCache.set(m, loadPromise);
-    return loadPromise;
-  }
-  function loadDeferredModules(modules, handleWasmBytes) {
-    return Promise.all(modules.map((m) => getModuleBytes(m, handleWasmBytes)));
-  }
-
-  let { compileStreaming } = await import(relativeURL("./$cleanBasename.mjs"));
-
-  const baseResponse = await fetch(relativeURL("$cleanBasename.wasm"));
-
-  ${needsSkwasmImmediately ? '''
-  const skwasmInstance = await getSkwasmInstance();
-  Object.assign(imports, {
-    skwasm: skwasmInstance.wasmExports,
-    skwasmWrapper: skwasmInstance,
-    ffi: {
-      memory: skwasmInstance.wasmMemory,
-    },
-  });
-  ''' : '''
-  imports.skwasmWrapper = {
-    addFunction: (...args) => {
-      if (!realSkwasmInstance) {
-        throw new Error("skwasmWrapper.addFunction called before skwasm was loaded!");
-      }
-      return realSkwasmInstance.addFunction(...args);
-    }
-  };
-  '''}
-
-  let app = await compileStreaming(baseResponse);
-  let module = await app.instantiate(imports, {
-    loadDeferredModules: loadDeferredModules,
-    loadDynamicModule: async (wasmUri, mjsUri) => {
-      const wasmBytesPromise = fetch(relativeURL(wasmUri));
-      const mjsModulePromise = import(relativeURL(mjsUri));
-      
-      ${needsSkwasmImmediately ? '''
-      return [await wasmBytesPromise, await mjsModulePromise];
-      ''' : '''
-      const response = await wasmBytesPromise;
-      await checkAndPrepareImportsForModule(wasmUri.split('/').pop());
-      return [response, await mjsModulePromise];
-      '''}
-    }
-  });
-
-  ${!needsSkwasmImmediately ? '''if (document.readyState === 'complete') {
-    setTimeout(getSkwasmInstance, 100);
-  } else {
-    window.addEventListener('load', () => {
-      setTimeout(getSkwasmInstance, 100);
-    });
-  }''' : ''}
-
-  module.invokeMain();
-})();
-''';
 }
