@@ -2,6 +2,7 @@
 
 - Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
 - Updated `testClient` in `jaspr_test` to automatically unmount the root component and clean up `document.body` between test cases.
+- Fixed asynchronous errors escaping the development proxy when falling back to the app root.
 
 ## 0.23.2
 
