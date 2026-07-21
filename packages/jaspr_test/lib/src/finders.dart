@@ -228,7 +228,11 @@ abstract class Finder {
   /// See [collectAllElementsFrom].
   @protected
   Iterable<Element> get allCandidates {
-    return collectAllElementsFrom(TestBinding.currentRootElement!);
+    final root = TestBinding.currentRootElement;
+    if (root == null) {
+      return const [];
+    }
+    return collectAllElementsFrom(root);
   }
 
   Iterable<Element>? _cachedResult;

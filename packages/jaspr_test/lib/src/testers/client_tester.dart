@@ -30,12 +30,14 @@ void testClient(
       final binding = ClientAppBinding();
       final tester = ClientTester._(binding);
 
+      addTearDown(() {
+        binding.detachRootComponent();
+        web.document.body?.replaceChildren(<web.Node>[].toJS);
+      });
+
       await binding.runTest(() async {
         await callback(tester);
       });
-
-      // Clear all nodes
-      web.document.body?.replaceChildren(<web.Node>[].toJS);
     },
     skip: skip,
     timeout: timeout,

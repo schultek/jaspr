@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Invalidate dependents of deleted partials while serving.
+
 ## 0.5.3
 
 - Added `FileIcon` component.
