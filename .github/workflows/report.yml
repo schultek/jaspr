@@ -1,5 +1,5 @@
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - main
       - next
@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
 
       - uses: subosito/flutter-action@v2
         with:
@@ -32,17 +30,14 @@ jobs:
           jaspr --disable-analytics
 
       - name: Bump Package Versions
-        id: bump
         run: |
           version bump --dry-run --scope="packages/*" | tee output.txt
-          echo 'version_report<<EOF' >> $GITHUB_OUTPUT
-          echo '## Package Version Report' >> $GITHUB_OUTPUT
-          cat output.txt >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
-          rm -rf output.txt
+          echo "${{ github.event.number }}" > pr_number.txt
 
-      - name: Create PR comment
-        uses: thollander/actions-comment-pull-request@v2
+      - name: Upload Report Artifact
+        uses: actions/upload-artifact@v4
         with:
-          message: ${{ steps.bump.outputs.version_report }}
-          comment_tag: version_report
+          name: version-report
+          path: |
+            output.txt
+            pr_number.txt
