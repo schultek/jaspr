@@ -82,14 +82,14 @@ class _StylesVisitor extends SimpleAstVisitor<void> {
     }
   }
 
-  static Expression? checkOrder(NodeList<Expression> args, List<String?> params) {
+  static Argument? checkOrder(NodeList<Argument> args, List<String?> params) {
     int lastSeenParam = -1;
 
     for (final argument in args) {
-      if (argument is! NamedExpression) {
+      if (argument is! NamedArgument) {
         continue;
       }
-      final paramIndex = params.indexOf(argument.name.label.name);
+      final paramIndex = params.indexOf(argument.name.lexeme);
       if (paramIndex == -1) {
         continue;
       }
@@ -119,7 +119,7 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    if (node case NamedExpression(parent: final ArgumentList arguments)) {
+    if (node case NamedArgument(parent: final ArgumentList arguments)) {
       if (arguments.parent case final InstanceCreationExpression node) {
         final constructor = node.constructorName.element;
         if (constructor == null) {
@@ -148,7 +148,7 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
     }
   }
 
-  Future<void> _sortStyles(ChangeBuilder builder, NodeList<Expression> arguments, List<String?> params) async {
+  Future<void> _sortStyles(ChangeBuilder builder, NodeList<Argument> arguments, List<String?> params) async {
     await builder.addDartFileEdit(file, (builder) {
       final start = arguments.beginToken!.offset;
       final end = arguments.endToken!.end;
@@ -161,8 +161,8 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
 
       final args = [...arguments]
         ..sort((a, b) {
-          if (a is NamedExpression && b is NamedExpression) {
-            return params.indexOf(a.name.label.name).compareTo(params.indexOf(b.name.label.name));
+          if (a is NamedArgument && b is NamedArgument) {
+            return params.indexOf(a.name.lexeme).compareTo(params.indexOf(b.name.lexeme));
           }
           return 0;
         });

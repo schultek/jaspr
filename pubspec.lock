@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: a49d6cf99e8d8e7a8e93668d09ced0bbdb954d0b4fccc2f5f9241c6b87fad95c
+      sha256: cd6add6f846f35fb79f3c315296703c1a24f3cfd7f4739d91a74961c1c7e9f1b
       url: "https://pub.dev"
     source: hosted
-    version: "99.0.0"
+    version: "100.0.0"
   _flutterfire_internals:
     dependency: transitive
     description:
@@ -37,34 +37,34 @@ packages:
     dependency: transitive
     description:
       name: analysis_server_plugin
-      sha256: "3960b28ee740004df39f85d5ebfc91785f7a90e51fd7c9a185e86a36b2f581b4"
+      sha256: c4021359e7a673ecd9c6db5f11fea12fabb55e0ba96fa08c78920ae81936f1d1
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.14"
+    version: "0.3.15"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: "663efa951fb8a45e06f491223a604c93820598f20e6a99c25617a1576065e8b7"
+      sha256: "6ba98576948803398b69e3a444df24eacdbe12ed699c7014e120ea38552debbf"
       url: "https://pub.dev"
     source: hosted
-    version: "12.1.0"
+    version: "13.0.0"
   analyzer_plugin:
     dependency: transitive
     description:
       name: analyzer_plugin
-      sha256: "0057a98d64d7bb872b0c87dff6e73d2c2d80c77156e7a03f127a26f8aa240649"
+      sha256: "9a81dc36f7f71890d7cf83960a3a7df1e6c9a24035f98eb848e91ad48b1d21c6"
       url: "https://pub.dev"
     source: hosted
-    version: "0.14.8"
+    version: "0.14.9"
   analyzer_testing:
     dependency: transitive
     description:
       name: analyzer_testing
-      sha256: df9a63ae68657f2b04b26f9811124d19b06b129961d9573574dbb7971bc4ac22
+      sha256: da27ae9bd4bf3ce4ebab6295cf922ca21a2b14ea8fcacc859342aca796a48a2d
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.5"
+    version: "0.2.6"
   ansi_styles:
     dependency: transitive
     description:
@@ -453,10 +453,10 @@ packages:
     dependency: transitive
     description:
       name: dart_mappable_builder
-      sha256: eb89efebad96bae52333ae4bd6b8fdcfb44c921f8a38f44893f2c72ed15c860c
+      sha256: "0119cde33841f4fa57574381bb1324bed017ff7592594afa220a59b6c04f3ea5"
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.9.0"
   dart_quotes_client:
     dependency: transitive
     description:
@@ -476,10 +476,10 @@ packages:
     dependency: transitive
     description:
       name: dart_style
-      sha256: a4c1ccfee44c7e75ed80484071a5c142a385345e658fd8bd7c4b5c97e7198f98
+      sha256: "59d53ef8eaed9d288ed9767618e2b31c4fa0383a127db59d5eb2e737a7638a60"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.8"
+    version: "3.1.9"
   dds:
     dependency: transitive
     description:
@@ -1829,7 +1829,7 @@ packages:
     source: hosted
     version: "1.31.1"
   test_api:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: test_api
       sha256: "2a122cbe059f8b610d3a5415f42e255b6c17b1f21eee1d960f31080237fb4f11"
