@@ -34,7 +34,7 @@ dev_dependencies:
 
 dependency_overrides:
   # Until melos upgrades to this version
-  cli_util: 0.5.0 
+  cli_util: 0.5.0
 
 melos:
   command:

@@ -1,6 +1,8 @@
 ## Unreleased breaking
 
 - Added hot-reload support.
+- Added hot-reloading of generated stylesheets in `standalone` mode.
+- Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
 
 - Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
 - Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.

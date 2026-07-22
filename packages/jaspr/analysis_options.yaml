@@ -1,5 +1,9 @@
 include: package:jaspr_repo/core.yaml
 
+analyzer:
+  exclude:
+    - lib/src/stub/web/**
+
 linter:
   rules:
     comment_references: true

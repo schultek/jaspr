@@ -123,7 +123,10 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
 }
 
 Handler createProxyHandler(http.Client? client) {
-  final c = retry.RetryClient(client ?? http.Client(), whenError: (e, _) => e is http.ClientException);
+  final c = retry.RetryClient(
+    client ?? http.Client(),
+    whenError: (e, _) => e is http.ClientException || e is SocketException,
+  );
   final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: c);
   return (req) async {
     try {
