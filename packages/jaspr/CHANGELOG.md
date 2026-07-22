@@ -4,6 +4,12 @@
 
 ## Unreleased patch
 
+- Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
+- Updated `testClient` in `jaspr_test` to automatically unmount the root component and clean up `document.body` between test cases.
+- Fixed asynchronous errors escaping the development proxy when falling back to the app root.
+
+## 0.23.2
+
 - Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
 - Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.
 - Added a `--port` option to `jaspr build` for configuring the server port used during static generation.

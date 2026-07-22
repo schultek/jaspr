@@ -2,6 +2,10 @@
 
 - Support `analyzer` `^13.0.0`.
 
+## 0.7.2
+
+- Support `analyzer` `^12.1.0`.
+
 ## 0.7.1
 
 - Fixed stack overflow error when analyzing cyclic dependencies.
