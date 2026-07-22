@@ -6,10 +6,9 @@ WORKDIR /app
 COPY . /app
 WORKDIR /app
 
-RUN dart pub global activate jaspr_cli 0.21.0
 RUN dart pub get
 
-RUN jaspr build
+RUN dart run jaspr_cli:jaspr build -v
 
 FROM dart:stable
 
