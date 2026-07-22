@@ -186,13 +186,13 @@ extension JSAnyUtilityExtension on JSAny? {
 
   bool instanceOfString(String constructorName) => _unsupportedPlatformError();
 
-  bool isA<T extends JSAny?>() => _unsupportedPlatformError();
-
   Object? dartify() => _unsupportedPlatformError();
 }
 
 extension NullableObjectUtilExtension on Object? {
   JSAny? jsify() => _unsupportedPlatformError();
+
+  bool isA<T extends JSAny?>() => _unsupportedPlatformError();
 }
 
 extension JSFunctionUtilExtension on JSFunction {
