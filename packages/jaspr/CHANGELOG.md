@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- The sitemap `priority` tag is now omitted when a route has no priority set, instead of always defaulting to `0.5`.
+
 ## 0.23.2
 
 - Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
