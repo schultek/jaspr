@@ -16,5 +16,10 @@ void main() {
 
       expect(find.text('Count: 1'), findsOneComponent);
     });
+
+    testClient('should clean up and unmount after previous test', (tester) async {
+      expect(find.text('Count: 0'), findsNothing);
+      expect(find.text('Count: 1'), findsNothing);
+    });
   });
 }
