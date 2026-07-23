@@ -226,12 +226,9 @@ export class JasprServeDaemon implements vscode.Disposable {
 
   handleData(data: Buffer | string, isError: boolean) {
     let str = data.toString();
-    let lines = str.trim().split("\n");
+    let lines = str.trimEnd().split("\n");
     for (let line of lines) {
-      line = line.trim();
-      if (line.length === 0) {
-        continue;
-      }
+      line = line.trimEnd();
 
       if (line.startsWith("[{") && line.endsWith("}]")) {
         let event: any;
@@ -258,7 +255,7 @@ export class JasprServeDaemon implements vscode.Disposable {
 
     if (eventName === "daemon.log") {
       let log: string = params.message || "";
-      log = log.replaceAll("\\033", "\x1b");
+      log = log.replaceAll("\\033", "\x1b").split('\r\n').flatMap(line => line.split('\n')).join('\r\n');
 
       this.emitter.fire(log + "\r\n");
       return;

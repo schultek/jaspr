@@ -4,10 +4,11 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:async/async.dart';
-import 'utils.dart';
 import 'package:build_daemon/data/server_log.dart' as s;
 import 'package:io/ansi.dart';
 import 'package:mason/mason.dart' as m;
+
+import 'utils.dart';
 
 typedef Level = m.Level;
 
@@ -29,12 +30,14 @@ enum Tag {
 
   String format([bool daemon = false, bool verbose = false]) {
     if (this == none) return '';
-    final nameStr = (daemon || verbose) ? name : char;
-    if (daemon || !ansiOutputEnabled) {
-      return color.wrap('[$nameStr] ', forScript: daemon)!;
+    final nameStr = verbose ? name.padRight(7, ' ') : char;
+    if (!daemon && !ansiOutputEnabled) {
+      return '[$nameStr] ';
     }
-    final paddedNameStr = verbose ? name.padRight(7, ' ') : char;
-    return '${backgroundColor.wrap(textColor.wrap(styleBold.wrap(' $paddedNameStr ')!)!)!} ';
+    return '${backgroundColor.wrap(
+      textColor.wrap(styleBold.wrap(' $nameStr ', forScript: daemon)!, forScript: daemon)!,
+      forScript: daemon,
+    )!} ';
   }
 }
 
@@ -57,6 +60,37 @@ abstract class Logger {
   // Persistent footer methods
   void setFooter(List<String> lines);
   void clearFooter();
+
+  static (String, int) formatMessage(
+    String message,
+    Tag? tag,
+    Level level, {
+    bool verbose = false,
+    bool daemon = false,
+  }) {
+    final buffer = StringBuffer();
+
+    final tagPrefix = tag?.format(daemon, verbose) ?? '';
+    final levelPrefix = level.tag;
+
+    final prefix =
+        '$tagPrefix'
+        '${levelPrefix.isNotEmpty ? level.format(levelPrefix, daemon: daemon) : ''}';
+    final prefixLength = visualLength(tagPrefix) + (levelPrefix.isNotEmpty ? 2 : 0);
+
+    final lines = message.split('\n');
+
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i];
+      buffer.write(i == 0 ? prefix : (' ' * prefixLength));
+      buffer.write(level.format(line.trimRight(), daemon: daemon));
+      if (i < lines.length - 1) {
+        buffer.writeln();
+      }
+    }
+
+    return (buffer.toString(), prefixLength);
+  }
 }
 
 class _Logger extends Logger {
@@ -125,7 +159,7 @@ class _Logger extends Logger {
 
     message = message.trimRight();
 
-    final (content, prefixLength) = _formatMessage(message, tag, level);
+    final (content, prefixLength) = Logger.formatMessage(message, tag, level, verbose: verbose);
 
     if (!stdout.hasTerminal) {
       if (content.trim().isEmpty) return;
@@ -207,31 +241,6 @@ class _Logger extends Logger {
       stdout.writeln(newContent);
       _drawFooterSpace();
     }
-  }
-
-  (String, int) _formatMessage(String message, Tag? tag, Level level) {
-    final buffer = StringBuffer();
-
-    final tagPrefix = tag?.format(false, verbose) ?? '';
-    final levelPrefix = level.tag;
-
-    final prefix =
-        '$tagPrefix'
-        '${levelPrefix.isNotEmpty ? level.format(levelPrefix) : ''}';
-    final prefixLength = visualLength(tagPrefix) + (levelPrefix.isNotEmpty ? 2 : 0);
-
-    final lines = message.split('\n');
-
-    for (int i = 0; i < lines.length; i++) {
-      final line = lines[i];
-      buffer.write(i == 0 ? prefix : (' ' * prefixLength));
-      buffer.write(level.format(line.trimRight()));
-      if (i < lines.length - 1) {
-        buffer.writeln();
-      }
-    }
-
-    return (buffer.toString(), prefixLength);
   }
 
   Future<String?> _readLine() async {

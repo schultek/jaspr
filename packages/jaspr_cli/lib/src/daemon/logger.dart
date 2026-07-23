@@ -31,18 +31,12 @@ class DaemonLogger extends Logger {
         event('server.started', {'vmServiceUri': uri});
         return;
       }
-
-      event('server.log', {'message': message, 'level': level.name});
-
-      if (level.index < Level.error.index) {
-        return;
-      }
     }
 
     final suffix = progress == ProgressState.running && !message.endsWith('...') ? '...' : '';
-    final String logmessage = '${tag?.format(true) ?? ''}${level.format(message.trim() + suffix, daemon: true)}';
 
-    log({'message': logmessage});
+    final (content, _) = Logger.formatMessage(message.trimRight() + suffix, tag, level, verbose: verbose, daemon: true);
+    log({'message': content});
   }
 
   @override

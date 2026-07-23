@@ -204,7 +204,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       } on SocketException catch (_) {
         logger.complete(false);
         logger.write(
-          'Port $port is already in use.\n\nPlease quit the running process or choose a different port.',
+          'Port $port is already in use.\nPlease quit the running process or choose a different port.',
           tag: Tag.server,
           level: Level.error,
         );

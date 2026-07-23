@@ -13,7 +13,7 @@ String getPubDevBaseUrl() {
 
 /// Returns the visual length of the string, excluding ANSI escape sequences.
 int visualLength(String text) {
-  return text.replaceAll(RegExp(r'\x1B\[[0-9;]*[a-zA-Z]', caseSensitive: false), '').length;
+  return text.replaceAll(RegExp(r'(\x1B|\\033)\[[0-9;]*[a-zA-Z]', caseSensitive: false), '').length;
 }
 
 String wrapText(String text, int maxWidth, {int prefixLength = 0}) {
