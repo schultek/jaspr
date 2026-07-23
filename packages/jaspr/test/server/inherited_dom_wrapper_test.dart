@@ -41,7 +41,7 @@ void main() {
           child: div(
             id: 'main',
             classes: 'container',
-            styles: Styles(color: Colors.green, display: Display.flex),
+            styles: Styles(display: Display.flex, color: Colors.green),
             attributes: {'data-test': 'example'},
             [],
           ),
