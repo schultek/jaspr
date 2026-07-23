@@ -298,6 +298,10 @@ class SlottedChildViewElement extends DomRenderObjectElement {
 
   @override
   void unmount() {
+    for (final element in _appliedParams.keys) {
+      resetElementParams(element);
+    }
+    _appliedParams.clear();
     super.unmount();
     _clearEventListeners(this);
   }

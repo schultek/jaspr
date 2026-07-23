@@ -69,5 +69,50 @@ void main() {
         '<div class="box outer"><div id="header" class="box">Header</div><main><div class="box">Test Content</div></main></div>',
       );
     });
+
+    testClient('cleans up applied params and events on unmount', (tester) async {
+      window.document.body!.innerHTML = '<div><p>Hello World</p></div>'.toJS;
+
+      var clicked = 0;
+
+      tester.pumpComponent(
+        Component.apply(
+          target: ApplyTarget.descendantWith(tag: 'p'),
+          id: 'new-id',
+          classes: 'box',
+          styles: Styles(color: Colors.red),
+          attributes: {'data-test': 'value'},
+          events: {'click': (e) => clicked++},
+          child: SlottedChildView(
+            slots: [
+              ChildSlot.fromQuery('p', child: Component.text('Test')),
+            ],
+          ),
+        ),
+      );
+
+      final pElement = window.document.getElementById('new-id') as HTMLElement?;
+      expect(pElement, isNotNull);
+      expect(pElement!.classList.contains('box'), isTrue);
+      expect(pElement.style.color, 'red');
+      expect(pElement.getAttribute('data-test'), 'value');
+
+      // Trigger click
+      pElement.click();
+      expect(clicked, 1);
+
+      // Now unmount the component tree to test cleanup
+      tester.binding.detachRootComponent();
+
+      // Check that the target element parameters are reset!
+      expect(pElement.id, isEmpty);
+      expect(pElement.classList.contains('box'), isFalse);
+      expect(pElement.style.color, isEmpty);
+      expect(pElement.hasAttribute('data-test'), isFalse);
+
+      // Trigger click again - should not increment clicked
+      pElement.click();
+      expect(clicked, 1);
+    });
   });
 }

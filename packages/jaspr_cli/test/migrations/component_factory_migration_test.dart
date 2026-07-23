@@ -80,7 +80,7 @@ Component build() {
 import 'package:jaspr/jaspr.dart';
 
 Component build() {
-  return Component.wrapElement(
+  return Component.apply(
     classes: 'my-class',
     child: Component.element(tag: 'span', children: [Component.text('Hello, World!')]),
   );

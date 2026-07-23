@@ -42,9 +42,9 @@ Only one `@client` component per file is allowed.
 
 You can use `@client` components normally as any other component. 
 
-To have separate interactive parts of your site, simply annotate multiple components with `@client`. Only the outermost `@client` component of a nested sub-tree will be hydrated on the client, while nested client components will be safely ignored.
+To have separate interactive parts of your site, simply annotate multiple components with `@client`. If you nest a `@client` component directly inside another `@client` component, the nested one will not be hydrated separately, but instead runs as part of the outer client component. However, with Server Components, you can nest `@client` components under server components, which allows them to be hydrated independently.
 
-All `@client` components are mounted on the client as direct children of the `ClientApp` component, usually created inside `main.client.dart` entrypoint (See [Client Entrypoint](/dev/client#client-entrypoint)).
+All outer `@client` components are mounted on the client as direct children of the `ClientApp` component, usually created inside `main.client.dart` entrypoint (See [Client Entrypoint](/dev/client#client-entrypoint)).
 
 ### Sharing State
 

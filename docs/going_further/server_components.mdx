@@ -5,12 +5,12 @@ description: Learn how to pass server-side components into client-side interacti
 
 When building modern web applications, we want both rich, fluid interactivity and fast initial page loads. 
 
-Typically, once you make a parent component interactive by decorating it with `@client`, Jaspr must compile it and **all of its nested children** to JavaScript so they can run in the browser. Without Server Components, the moment a layout or parent container needs some client-side interactivity, every single child in its subtree gets pulled into the client-side JavaScript bundle—even if those children are completely static.
+Typically, once you make a parent component interactive by decorating it with `@client`, Jaspr must compile it and **all of its nested children** so they can run in the browser. Without Server Components, the moment a layout or parent container needs some client-side interactivity, every single child in its subtree gets pulled into the client-side bundle—even if those children are completely static.
 
 **Server Components** solve this by enabling **surgical hydration**. They allow you to render server-side-only components inside parts of an interactive, hydrated client-side application. With this pattern, you can build interactive client-side wrappers (like expandable cards, navigation shells, sidebars, or tabs) while completely skipping compiling or shipping the static or heavy content inside them.
 
 As a result:
-- **Reduced Bundle Size:** The Dart code for server-only components is never compiled to JavaScript or shipped to the browser, significantly reducing the application's JavaScript footprint.
+- **Reduced Bundle Size:** The Dart code for server-only components is never compiled to JavaScript/Wasm or shipped to the browser, significantly reducing the application's client-side footprint.
 - **Surgical Interactivity:** You only ship the parts of the code to the client that actually need to be interactive, skipping parts that are static.
 - **Faster Page Loading:** Less JavaScript to download, parse, and execute means much faster Time-to-Interactive (TTI) for your users.
 - **Access to Server Resources:** The server components within the client wrapper can safely fetch database records or read files using native APIs like `dart:io`.
@@ -73,7 +73,7 @@ import 'package:jaspr/server.dart';
 import 'components/expandable_card.dart';
 
 void main() {
-  Jaspr.initializeAll(options: defaultServerOptions);
+  Jaspr.initializeApp(options: defaultServerOptions);
 
   runApp(
     Document(
@@ -220,11 +220,11 @@ class _ConditionalCardState extends State<ConditionalCard> {
   @override
   Component build(BuildContext context) {
     return div([
-      button(onClick: () => setState(() => showContent = true), [Text('Reveal')]),
-      // WARNING: If showContent is false during SSR, 'widget.content' is not built on the server.
+      button(onClick: () => setState(() => showContent = true), [.text('Reveal')]),
+      // WARNING: If showContent is false during SSR, 'component.content' is not built on the server.
       // When showContent becomes true on the client, it will render as EMPTY because 
       // the client does not have the Dart code to construct the server component.
-      if (showContent) widget.content, 
+      if (showContent) component.content, 
     ]);
   }
 }
