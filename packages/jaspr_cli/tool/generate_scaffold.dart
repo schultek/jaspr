@@ -3,6 +3,11 @@ import 'dart:io';
 void main() async {
   await generate('scaffold');
   await generate('templates/docs');
+  await generate('new_component_bricks/new_stateless_component');
+  await generate('new_component_bricks/new_stateful_component');
+  await generate('new_component_bricks/new_async_component');
+  await generate('new_component_bricks/new_component_test');
+  await generate('new_component_bricks/new_async_component_test');
 
   Process.runSync('dart', 'format lib/src/bundles/ --line-length=120'.split(' '));
 }
