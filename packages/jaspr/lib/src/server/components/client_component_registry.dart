@@ -19,8 +19,8 @@ class ClientComponentRegistryElement extends ObserverElement {
   final Map<Element, ClientTarget> clientElements = {};
 
   int serverElementNum = 1;
-  final Map<Component, int> serverComponents = {};
-  final Map<int, Element?> serverElements = {0: null};
+  final Map<(Element, Component), int> serverComponents = {};
+  final Map<Element, int> serverElements = {};
 
   @override
   void willRebuildElement(Element element) {

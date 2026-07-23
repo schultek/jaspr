@@ -12,7 +12,7 @@ Typically, once you make a parent component interactive by decorating it with `@
 As a result:
 - **Reduced Bundle Size:** The Dart code for server-only components is never compiled to JavaScript/Wasm or shipped to the browser, significantly reducing the application's client-side footprint.
 - **Surgical Interactivity:** You only ship the parts of the code to the client that actually need to be interactive, skipping parts that are static.
-- **Faster Page Loading:** Less JavaScript to download, parse, and execute means much faster Time-to-Interactive (TTI) for your users.
+- **Faster Page Loading:** Less code to download, parse, and execute means faster page loading for your users.
 - **Access to Server Resources:** The server components within the client wrapper can safely fetch database records or read files using native APIs like `dart:io`.
 
 ## How to use Server Component

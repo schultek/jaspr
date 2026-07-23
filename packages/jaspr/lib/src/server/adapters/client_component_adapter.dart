@@ -18,7 +18,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   @override
   void prepareBoundary(ChildListRange range) {
     element.visitAncestorElements((e) {
-      if (registry.serverElements.containsValue(e)) {
+      if (registry.serverElements.containsKey(e)) {
         return false;
       } else if (registry.clientElements.containsKey(e)) {
         _isClientBoundary = false;
@@ -64,36 +64,36 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
   }
 
   String getDataForServerComponent(Component component, Element parent) {
-    if (registry.serverComponents[component] case final s?) {
+    final key = (parent, component);
+    if (registry.serverComponents[key] case final s?) {
       return 's${DomValidator.clientMarkerPrefix}$s';
     }
 
-    Element? element;
+    final elements = <Element>[];
 
-    void findElementFromContext(BuildContext context) {
+    void findElementsFromContext(BuildContext context) {
       context.visitChildElements((e) {
-        if (element != null) return;
         if (identical(e.component, component)) {
-          element = e;
-        } else {
-          findElementFromContext(e);
+          elements.add(e);
         }
+        findElementsFromContext(e);
       });
     }
 
-    findElementFromContext(parent);
+    findElementsFromContext(parent);
 
-    if (element == null) {
+    if (elements.isEmpty) {
       print('Warning: Component parameter not used in build method. This will result in empty html on the client.');
-
-      registry.serverComponents[component] = 0;
+      registry.serverComponents[key] = 0;
       return 's${DomValidator.clientMarkerPrefix}_';
     }
 
-    final s = registry.serverComponents[component] = registry.serverElementNum++;
-    registry.serverElements[s] = element;
+    final s = registry.serverComponents[key] = registry.serverElementNum++;
 
-    binding.addRenderAdapter(ServerComponentAdapter(s, element!));
+    for (final element in elements) {
+      registry.serverElements[element] = s;
+      binding.addRenderAdapter(ServerComponentAdapter(s, element));
+    }
 
     return 's${DomValidator.clientMarkerPrefix}$s';
   }

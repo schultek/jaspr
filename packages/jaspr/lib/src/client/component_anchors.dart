@@ -30,7 +30,7 @@ class ClientComponentAnchor extends ComponentAnchor {
 
   String? data;
   late FutureOr<ClientBuilder> builder;
-  final Map<String, ServerComponentAnchor> serverAnchors = {};
+  final List<ServerComponentAnchor> serverAnchors = [];
 
   void Function(void Function())? _setState;
 
@@ -41,7 +41,7 @@ class ClientComponentAnchor extends ComponentAnchor {
   Future<void> resolve() async {
     final (clientBuilder, _) = await (
       Future.value(builder),
-      serverAnchors.values.map((a) => a.resolve()).wait,
+      serverAnchors.map((a) => a.resolve()).wait,
     ).wait;
     builder = clientBuilder;
   }
@@ -63,7 +63,7 @@ class ClientComponentAnchor extends ComponentAnchor {
     );
   }
 
-  void rebuild(String? data, Map<String, ServerComponentAnchor> serverAnchors) {
+  void rebuild(String? data, List<ServerComponentAnchor> serverAnchors) {
     assert(_setState != null, 'ClientComponentAnchor was not built before calling rebuild()');
     _setState!(() {
       this.data = data;
@@ -122,12 +122,53 @@ class ServerComponentAnchor extends ComponentAnchor {
     nodes.add(endNode);
 
     return SlottedChildView.withNodes(
-      key: UniqueKey(),
+      key: GlobalKey(),
       nodes: nodes,
       slots: [
         for (final client in clientAnchors) client.createSlot(),
       ],
     );
+  }
+}
+
+class ServerComponent extends Component {
+  ServerComponent(this.serverComponents, this.name, {super.key});
+
+  final List<ServerComponentAnchor> serverComponents;
+  final String name;
+
+  @override
+  Element createElement() => ServerComponentElement(this);
+}
+
+class ServerComponentElement extends BuildableElement {
+  ServerComponentElement(ServerComponent super.component);
+
+  Component? serverComponentChild;
+
+  @override
+  void didMount() {
+    final widget = component as ServerComponent;
+    final index = widget.serverComponents.indexWhere((a) => a.name == widget.name);
+    if (index != -1) {
+      serverComponentChild = widget.serverComponents.removeAt(index).build();
+    } else {
+      binding.reportBuildError(
+        this,
+        'Warning: Server component ${widget.name} was mounted more times than it was rendered on the server.',
+        StackTrace.current,
+      );
+    }
+
+    super.didMount();
+  }
+
+  @override
+  Component build() {
+    if (serverComponentChild case final c?) {
+      return c;
+    }
+    return Component.empty();
   }
 }
 
@@ -246,7 +287,7 @@ List<ClientComponentAnchor> extractAnchors({
         comp.endNode = currNode;
 
         assert(anchors.isNotEmpty, 'Found server component without ancestor client component.');
-        (anchors.last as ClientComponentAnchor).serverAnchors[name] = comp;
+        (anchors.last as ClientComponentAnchor).serverAnchors.add(comp);
 
         continue;
       }

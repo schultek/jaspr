@@ -39,7 +39,11 @@ class CounterState extends State<Counter>
         },
         [.text("Increase by ${component.step}")],
       ),
-      if (component.child != null) component.child!,
+      if (component.child != null) ...[
+        component.child!,
+        component.child!,
+        span([if (kIsWeb) component.child!]),
+      ],
     ]);
   }
 }

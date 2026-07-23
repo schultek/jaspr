@@ -16,7 +16,10 @@ void main() {
           var time = DateTime.now();
           return div(classes: 'server', [
             p([.text('Server Time: $time')]),
-            Counter(step: time.second, child: null),
+            Counter(
+              step: time.second,
+              child: div([.text('Hello'), MiniCounter()]),
+            ),
             MiniCounter(),
           ]);
         },

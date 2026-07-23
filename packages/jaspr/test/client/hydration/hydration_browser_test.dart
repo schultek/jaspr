@@ -284,6 +284,90 @@ void main() {
       final pElementReloaded = window.document.querySelector('body p')!;
       expect(pElementReloaded.textContent, equals('Hello B, Count: 2'));
     });
+
+    testClient('should mount server component multiple times up to rendered count and return empty for additional mounts', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <div>'
+                  '    <!--s${marker}1-->'
+                  '    <span>Server Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '  </div>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              final child = params.get<String>('child');
+              return div([
+                params.mount(child), // 1st mount -> mounts s1
+                params.mount(child), // 2nd mount -> empty component
+              ]);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      final divElement = window.document.querySelector('body div')!;
+      // Inner HTML should only contain one span (from the first mount) and the empty text node from the second mount
+      expect(
+        (divElement.innerHTML as JSString).toDart.replaceAll(RegExp(r'\s+'), ''),
+        contains('<span>ServerElement</span>'),
+      );
+    });
+
+    testClient('should mount multiple identical server components sequentially using name matching', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <div>'
+                  '    <!--s${marker}1-->'
+                  '    <span>First Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '    <!--s${marker}1-->'
+                  '    <span>Second Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '  </div>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              final child = params.get<String>('child');
+              return div([
+                params.mount(child), // 1st mount -> mounts the first s1
+                params.mount(child), // 2nd mount -> mounts the second s1
+              ]);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      final divElement = window.document.querySelector('body div div')!;
+      expect(
+        (divElement.innerHTML as JSString).toDart.replaceAll(RegExp(r'\s+'), ''),
+        contains('<span>FirstElement</span>'),
+      );
+      expect(
+        (divElement.innerHTML as JSString).toDart.replaceAll(RegExp(r'\s+'), ''),
+        contains('<span>SecondElement</span>'),
+      );
+    });
   });
 }
 

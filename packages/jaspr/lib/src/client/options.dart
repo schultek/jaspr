@@ -72,19 +72,16 @@ final class ClientLoader {
 typedef ClientBuilder = Component Function(ClientParams params);
 
 final class ClientParams {
-  ClientParams(this._params, this.serverComponents);
+  ClientParams(this._params, List<ServerComponentAnchor> serverComponents)
+    : serverComponents = List.of(serverComponents);
 
   final Map<String, Object?> _params;
-  final Map<String, ServerComponentAnchor> serverComponents;
+  final List<ServerComponentAnchor> serverComponents;
 
   Component mount(String sId) {
     assert(sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
-    final serverAnchor = serverComponents[sId.substring(2)];
-    if (serverAnchor != null) {
-      return serverAnchor.build();
-    } else {
-      return const Component.text('');
-    }
+    final name = sId.substring(2);
+    return ServerComponent(serverComponents, name);
   }
 
   Component? mountOrNull(String? sId) {

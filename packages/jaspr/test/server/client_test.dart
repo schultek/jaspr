@@ -93,6 +93,18 @@ class AppWithServerComponent extends StatelessComponent {
   }
 }
 
+class AppWithMultipleServerComponents extends StatelessComponent {
+  const AppWithMultipleServerComponents({required this.child1, required this.child2});
+
+  final Component child1;
+  final Component child2;
+
+  @override
+  Component build(BuildContext context) {
+    return div(attributes: {'data-app': 'with-multiple'}, [child1, child2]);
+  }
+}
+
 void main() {
   group('@client', () {
     setUpAll(() {
@@ -107,6 +119,10 @@ void main() {
             AppWithServerComponent: ClientTarget<AppWithServerComponent>(
               'app_with_server_component',
               params: (app) => {'child': app.child},
+            ),
+            AppWithMultipleServerComponents: ClientTarget<AppWithMultipleServerComponents>(
+              'app_with_multiple_server_components',
+              params: (app) => {'child1': app.child1, 'child2': app.child2},
             ),
           },
         ),
@@ -200,6 +216,29 @@ void main() {
           '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
           '    <div data-app="with-child"><!--s@1--><span>Hello</span><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('renders multiple identical server components with shared IDs', (tester) async {
+      final serverChild = span([text('Hello')]);
+      tester.pumpComponent(AppWithMultipleServerComponents(child1: serverChild, child2: serverChild));
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app_with_multiple_server_components data={"child1":"s@1","child2":"s@1"}-->\n'
+          '    <div data-app="with-multiple"><!--s@1--><span>Hello</span><!--/s@1--><!--s@1--><span>Hello</span><!--/s@1--></div>\n'
+          '    <!--/@app_with_multiple_server_components-->\n'
           '  </body>\n'
           '</html>\n'
           '',
