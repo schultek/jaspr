@@ -19,6 +19,8 @@ extension CssHelper on BaseCommand {
       return 0;
     }
 
+    logger.write('Generating CSS...', tag: Tag.css, progress: ProgressState.running);
+
     bool hasError = false;
 
     final runnerFiles = Glob('$buildDir/**.styles.dart').list(root: Directory.current.path);
@@ -39,12 +41,13 @@ extension CssHelper on BaseCommand {
       if (result.exitCode != 0) {
         logger.write(
           'Failed to generate $outputFile, the script exited with code ${result.exitCode}:\n${result.stderr}',
-          tag: Tag.cli,
+          tag: Tag.css,
           level: Level.error,
+          progress: ProgressState.completed,
         );
         logger.write(
           'Run: `dart run ${runnerFile.path}` to debug this error.',
-          tag: Tag.cli,
+          tag: Tag.css,
           level: Level.verbose,
         );
         hasError = true;
@@ -58,7 +61,8 @@ extension CssHelper on BaseCommand {
           ..writeAsStringSync(cssValue);
         logger.write(
           'Generated $outputFile',
-          tag: Tag.cli,
+          tag: Tag.css,
+          progress: ProgressState.completed,
         );
       }
     }

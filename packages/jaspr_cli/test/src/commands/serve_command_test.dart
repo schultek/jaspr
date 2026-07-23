@@ -18,7 +18,7 @@ void main() {
 
     setUp(() {
       io = FakeIO();
-      runner = JasprCommandRunner(false);
+      runner = JasprCommandRunner(false, false);
     });
 
     tearDown(() {
@@ -37,8 +37,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            'Running jaspr in client rendering mode.',
-            '[CLI] Starting web compilers...',
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
             '[BUILDER] Connecting to the build daemon...',
             '[BUILDER] Starting initial build...',
           ]),
@@ -54,14 +54,14 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            '[CLI] Done building web assets.',
-            '[CLI] Serving at http://localhost:8080',
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
           ]),
         );
 
         await io.shutdownBuildDaemon(buildDaemon);
 
-        expect(io.stdout.queue, emits('Terminating web compilers...'));
+        expect(io.stdout.queue, emits('Stopping web compilers...'));
 
         expect(await serveResult, equals(0));
       });
@@ -80,9 +80,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            'Running jaspr in server rendering mode.',
-            'Using server entry point: lib/main.server.dart',
-            '[CLI] Starting web compilers...',
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
             '[BUILDER] Connecting to the build daemon...',
             '[BUILDER] Starting initial build...',
           ]),
@@ -90,7 +89,7 @@ void main() {
 
         await io.runInitialBuild(buildDaemon);
 
-        expect(io.stdout.queue, emits('[CLI] Done building web assets.'));
+        expect(io.stdout.queue, emits('[BUILDER] Done building web assets.'));
 
         await expectLater(
           io.serverSockets.next,
@@ -101,7 +100,7 @@ void main() {
 
         server.exit(0);
 
-        expect(io.stdout.queue, emits('Terminating web compilers...'));
+        expect(io.stdout.queue, emits('Stopping web compilers...'));
 
         expect(await serveResult, equals(0));
       });
@@ -137,9 +136,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            'Running jaspr in server rendering mode.',
-            'Using server entry point: lib/main.server.dart',
-            '[CLI] Starting web compilers...',
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
             '[BUILDER] Connecting to the build daemon...',
             '[BUILDER] Starting initial build...',
           ]),
@@ -147,7 +145,7 @@ void main() {
 
         await io.runInitialBuild(buildDaemon);
 
-        expect(io.stdout.queue, emits('[CLI] Done building web assets.'));
+        expect(io.stdout.queue, emits('[BUILDER] Done building web assets.'));
 
         await io.connectToProxy();
 
@@ -160,7 +158,7 @@ void main() {
         expect(
           io.stdout.queue,
           emitsInOrder([
-            'Terminating web compilers...',
+            'Stopping web compilers...',
             'Terminating flutter run...',
           ]),
         );
@@ -228,12 +226,18 @@ extension FakeServerIO on FakeIO {
   }
 
   Future<void> expectServerStarted(FakeProcess server) async {
-    await expectLater(this.stdout.queue, emits('[CLI] Starting server...'));
+    await expectLater(
+      this.stdout.queue,
+      emitsInOrder([
+        '[SERVER] Starting server...',
+        '[SERVER] Using server entry point: lib/main.server.dart',
+      ]),
+    );
 
     expect(fs.file('.dart_tool/jaspr/server_target.dart').existsSync(), isTrue);
     expect(fs.file('.dart_tool/jaspr/server.pid').existsSync(), isTrue);
 
-    await expectLater(this.stdout.queue, emits('[CLI] Server started.'));
+    await expectLater(this.stdout.queue, emits('[SERVER] Server started and listening on http://localhost:8080'));
 
     server.writeStdout('Fake server running.');
 

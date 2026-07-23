@@ -52,5 +52,6 @@ dependencies:
   yaml: ^3.1.0
 
 dev_dependencies:
+  image: ^4.9.1
   mocktail: ^1.0.4
   test: ^1.22.0

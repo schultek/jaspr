@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
+import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../dev/chrome.dart';
@@ -13,6 +14,7 @@ import '../dev/client_workflow.dart';
 import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
+import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
 import '../process_runner.dart';
@@ -94,18 +96,16 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   @override
   Future<int> runCommand() async {
-    ensureInProject();
+    await ensureInProject();
+    printLogo();
 
-    logger.write('Running jaspr in ${project.requireMode.name} rendering mode.');
+    logger.write('Starting ${cyan.wrap(project.name)} in ${cyan.wrap(project.requireMode.name)} rendering mode.');
+    if (!verbose) {
+      logger.write('Showing reduced log output. Pass --verbose to see all output.', level: Level.debug);
+    }
+    logger.write('\n');
 
     final entryPoint = await getServerEntryPoint(input);
-
-    if (entryPoint != null && !entryPoint.startsWith('lib/')) {
-      logger.write(
-        'Entry point is not located inside lib/ folder, disabling server-side hot-reload.',
-        level: Level.warning,
-      );
-    }
 
     final proxyPort = project.requireMode == JasprMode.client ? port : customProxyPort;
 
@@ -114,6 +114,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       await stop();
       return 1;
     }
+
+    await _runBuildCallback();
 
     handleClientWorkflow(workflow);
 
@@ -151,11 +153,64 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         await _runChrome();
       }
     }
+
+    updateFooter(DevStatus.ready);
+
     return await workflow.done;
   }
 
+  void updateFooter(DevStatus status) {
+    final width = stdout.hasTerminal ? stdout.terminalColumns : 80;
+    final leftText = ' Serving on http://localhost:$port';
+    final rightText = switch (status) {
+      DevStatus.ready => 'All ready ',
+      DevStatus.rebuilding => 'Rebuilding... ',
+      DevStatus.error => 'Errors occurred. Fix and save to retry. ',
+    };
+    final spacesCount = width - leftText.length - rightText.length;
+    final spaces = spacesCount < 0 ? 0 : spacesCount;
+    final footerContent = leftText + (' ' * spaces) + rightText;
+    final footerColor = switch (status) {
+      DevStatus.ready => backgroundGreen,
+      DevStatus.rebuilding => backgroundYellow,
+      DevStatus.error => backgroundRed,
+    };
+    final footerLine = footerColor.wrap(black.wrap(styleBold.wrap(footerContent)))!;
+
+    logger.setFooter([
+      '',
+      footerLine,
+    ]);
+  }
+
   Future<bool> _startServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
-    logger.write('Starting server...', tag: Tag.cli, progress: ProgressState.running);
+    logger.write('Starting server...', tag: Tag.server, progress: ProgressState.running);
+
+    logger.write('Using server entry point: $entryPoint', tag: Tag.server, level: Level.verbose);
+
+    if (!entryPoint.startsWith('lib/')) {
+      logger.write(
+        'Server entry point is not located inside lib/ folder, disabling server-side hot-reload.',
+        tag: Tag.server,
+        level: Level.warning,
+      );
+    }
+
+    final parsedPort = int.tryParse(port);
+    if (parsedPort != null && IOOverrides.current == null) {
+      try {
+        final socket = await ServerSocket.bind(InternetAddress.anyIPv4, parsedPort);
+        await socket.close();
+      } on SocketException catch (_) {
+        logger.complete(false);
+        logger.write(
+          'Port $port is already in use.\nPlease quit the running process or choose a different port.',
+          tag: Tag.server,
+          level: Level.error,
+        );
+        await shutdown();
+      }
+    }
 
     final useHotReload = entryPoint.startsWith('lib/') && !release;
 
@@ -202,8 +257,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       workingDirectory: Directory.current.absolute.path,
     );
 
-    logger.write('Server started.', tag: Tag.cli, progress: ProgressState.completed);
-
     final serverFuture = watchProcess(
       'server',
       process,
@@ -216,6 +269,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           progress: ProgressState.completed,
         );
         return true;
+      },
+      levelFor: (t) {
+        if (t.startsWith('The Dart VM service is listening') ||
+            t.startsWith('The Dart DevTools debugger and profiler is available')) {
+          return Level.verbose;
+        }
+        return null;
       },
     );
 
@@ -255,6 +315,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     }
 
+    logger.write(
+      'Server started and listening on http://localhost:$port',
+      tag: Tag.server,
+      progress: ProgressState.completed,
+    );
+
     return true;
   }
 
@@ -270,7 +336,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     guardResource(() async {
       if (chrome != null) {
-        logger.write('Closing Chrome...');
+        logger.write('Closing Chrome...', level: Level.debug);
         chrome?.close();
         chrome = null;
       }
@@ -282,7 +348,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       project.checkWasmSupport();
     }
 
-    logger.write('Starting web compilers...', tag: Tag.cli, progress: ProgressState.running);
+    logger.write('Starting web compilers...', tag: Tag.builder, progress: ProgressState.running);
 
     final compiler = useWasm
         ? 'dart2wasm'
@@ -368,7 +434,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     guardResource(() async {
-      logger.write('Terminating web compilers...');
+      logger.write('Stopping web compilers...', level: Level.debug);
       await workflow.shutDown();
     });
 
@@ -378,36 +444,37 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (!buildCompleter.isCompleted) {
         logger.write(
           'Building web assets... (This takes longer for the initial build)',
-          tag: Tag.cli,
+          tag: Tag.builder,
           progress: ProgressState.running,
         );
       }
     });
 
-    workflow.devProxy.buildResults.listen((event) {
+    workflow.devProxy.buildResults.listen((event) async {
       if (event.status == BuildStatus.succeeded) {
         if (!buildCompleter.isCompleted) {
           buildCompleter.complete();
         } else {
-          logger.write('Rebuilt web assets.', tag: Tag.cli, progress: ProgressState.completed);
+          logger.write('Rebuilt web assets.', tag: Tag.builder, progress: ProgressState.completed);
+          await _runBuildCallback();
+          updateFooter(DevStatus.ready);
         }
-        _runBuildCallback();
       } else if (event.status == BuildStatus.failed) {
         logger.write(
           'Failed building web assets. There is probably more output above.',
-          tag: Tag.cli,
+          tag: Tag.builder,
           level: Level.error,
           progress: ProgressState.completed,
         );
         if (!buildCompleter.isCompleted) {
           buildCompleter.completeError(event);
+        } else {
+          updateFooter(DevStatus.error);
         }
       } else if (event.status == BuildStatus.started) {
         if (buildCompleter.isCompleted) {
-          logger.write('Rebuilding web assets...', tag: Tag.cli, progress: ProgressState.running);
-        } else {
-          logger.write('Web compilers started.', tag: Tag.cli, progress: ProgressState.completed);
-          logger.write('Building web assets...', tag: Tag.cli, progress: ProgressState.running);
+          logger.write('Rebuilding web assets...', tag: Tag.builder, progress: ProgressState.running);
+          updateFooter(DevStatus.rebuilding);
         }
       }
     });
@@ -415,7 +482,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     var aborted = false;
     guardResource(() {
       if (!buildCompleter.isCompleted) {
-        logger.write('Aborting build...');
+        logger.write('Aborting build...', level: Level.debug);
         aborted = true;
         buildCompleter.completeError(Object());
       }
@@ -423,11 +490,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     try {
       await buildCompleter.future;
-      logger.write('Done building web assets.', tag: Tag.cli, progress: ProgressState.completed);
+      logger.write('Done building web assets.', tag: Tag.builder, progress: ProgressState.completed);
     } on BuildResult catch (_) {
       logger.write(
         'Could not start dev server due to build errors.',
-        tag: Tag.cli,
+        tag: Tag.builder,
         level: Level.error,
         progress: ProgressState.completed,
       );
@@ -445,10 +512,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     return workflow;
   }
 
-  void _runBuildCallback() {
-    generateCss();
+  Future<void> _runBuildCallback() async {
+    await generateCss();
   }
 }
+
+enum DevStatus { ready, rebuilding, error }
 
 String serverEntrypoint(String import) =>
     '''
@@ -464,14 +533,7 @@ String serverEntrypoint(String import) =>
         debounceInterval: Duration.zero,
         onAfterReload: (ctx) => mainCall(),
       );
-      print('[INFO] Server hot reload is enabled.');
-    } on StateError catch (e) {
-      if (e.message.contains('VM service not available')) {
-        print('[WARNING] Server hot reload not enabled. Run with --enable-vm-service to enable hot reload.');
-      } else {
-        rethrow;
-      }
-    }
+    } catch (_) {}
     
     mainCall();
   }
