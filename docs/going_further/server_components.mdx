@@ -28,6 +28,7 @@ Let's build a client-side component called `ExpandableCard`. It features a butto
 Here is the interactive card component:
 
 ```dart title="lib/components/expandable_card.dart"
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 @client
@@ -69,6 +70,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
 Here is how you use the `ExpandableCard` component on the server, passing in a server-only component as a parameter:
 
 ```dart title="lib/main.server.dart"
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'components/expandable_card.dart';
 
@@ -122,6 +124,7 @@ You can also pass lists of components. For instance, a client-side `TabBar` that
 Define the tabs client component:
 
 ```dart title="lib/components/tab_bar.dart"
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 @client
