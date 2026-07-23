@@ -1,7 +1,0 @@
-name: new_component
-description: A jaspr_cli brick to create new components
-
-version: 0.1.0
-
-environment:
-  mason: ">=0.1.0-dev.52 <0.1.0"
