@@ -167,6 +167,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
 
   void invalidateSource(T source, {bool rebuild = true}) {
     source.invalidate(rebuild: rebuild);
+    ServerApp.reloadClients(source.url);
   }
 
   void invalidateRoutes() {

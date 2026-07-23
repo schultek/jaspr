@@ -28,6 +28,12 @@ mixin SyncStateMixin<T extends StatefulComponent, U> on State<T> {
     initSyncState(this);
   }
 
+  @override
+  void onReload() {
+    initSyncState(this);
+    super.onReload();
+  }
+
   static void initSyncState(SyncStateMixin<StatefulComponent, Object?> mixin) => s.initSyncState(mixin);
 }
 

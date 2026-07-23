@@ -110,7 +110,7 @@ void main() {
       Jaspr.initializeApp(
         options: ClientOptions(
           clients: {
-            'app': ClientLoader((params) => p([Component.text('Hello ${params['name']}')])),
+            'app': ClientLoader((params) => p([Component.text('Hello ${params.get<String>('name')}')])),
           },
         ),
       );
@@ -124,5 +124,277 @@ void main() {
       expect(p2Element.parentNode, equals(divElement));
       expect(p2Element.textContent, equals('Hello B'));
     });
+
+    testClient('should find and hydrate client component with nested server component', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <p>'
+                  '    <!--s${marker}1-->'
+                  '    <span>Server Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '  </p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final pElement = window.document.querySelector('body p')!;
+      final spanElement = window.document.querySelector('body span')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(pElement.parentNode, equals(divElement));
+      expect(spanElement.parentNode, equals(pElement));
+      expect(spanElement.textContent, equals('Server Element'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              return p(classes: 'hydrated', [
+                params.mount(params.get<String>('child')),
+              ]);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(pElement.parentNode, equals(divElement));
+      expect(pElement.className, 'hydrated');
+      expect(spanElement.parentNode, equals(pElement));
+      expect(spanElement.textContent, equals('Server Element'));
+    });
+
+    testClient('should find and hydrate nested client component inside server component', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <div>'
+                  '    <!--s${marker}1-->'
+                  '    <p>'
+                  '      <span>Server Element</span>'
+                  '      <!--${marker}subapp data={"name":"Nested Client"}-->'
+                  '      <strong>Fallback</strong>'
+                  '      <!--/${marker}subapp-->'
+                  '    </p>'
+                  '    <!--/s${marker}1-->'
+                  '  </div>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final outerDivElement = window.document.querySelector('body div > div')!;
+      final pElement = window.document.querySelector('body p')!;
+      final spanElement = window.document.querySelector('body span')!;
+      final strongElement = window.document.querySelector('body strong')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(outerDivElement.parentNode, equals(divElement));
+      expect(pElement.parentNode, equals(outerDivElement));
+      expect(spanElement.parentNode, equals(pElement));
+      expect(strongElement.parentNode, equals(pElement));
+      expect(strongElement.textContent, equals('Fallback'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              return div(classes: 'hydrated', [params.mount(params.get<String>('child'))]);
+            }),
+            'subapp': ClientLoader((params) {
+              return strong(classes: 'hydrated', [Component.text('Hello ${params.get<String>('name')}')]);
+            }),
+          },
+        ),
+      );
+
+      runApp(const ClientApp());
+      await pumpEventQueue();
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(outerDivElement.parentNode, equals(divElement));
+      expect(outerDivElement.className, 'hydrated');
+      expect(pElement.parentNode, equals(outerDivElement));
+      expect(spanElement.parentNode, equals(pElement));
+      expect(strongElement.parentNode, equals(pElement));
+      expect(strongElement.className, 'hydrated');
+      expect(strongElement.textContent, equals('Hello Nested Client'));
+    });
+
+    testClient('should reload client components and update parameters/sync state on performReload', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"name": "A"}-->'
+                  '  <!--\${"count": 1}-->'
+                  '  <p>Fallback</p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final pElement = window.document.querySelector('body p')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(pElement.parentNode, equals(divElement));
+      expect(pElement.textContent, equals('Fallback'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              return ReloadTestComponent(name: params.get<String>('name'));
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      final pElementHydrated = window.document.querySelector('body p')!;
+      expect(pElementHydrated.textContent, equals('Hello A, Count: 1'));
+
+      // Perform reload with updated options/sync state
+      final newBody = window.document.createElement('body') as HTMLBodyElement;
+      newBody.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"name": "B"}-->'
+                  '  <!--\${"count": 2}-->'
+                  '  <p>Fallback</p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final rootElement = tester.binding.rootElement!;
+      final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
+      rootRenderObject.setRootNode(newBody);
+      rootElement.owner.performReload(rootElement);
+
+      window.document.body!.replaceWith(newBody);
+      await pumpEventQueue();
+
+      final pElementReloaded = window.document.querySelector('body p')!;
+      expect(pElementReloaded.textContent, equals('Hello B, Count: 2'));
+    });
+
+    testClient(
+      'should mount server component multiple times up to rendered count and return empty for additional mounts',
+      (tester) async {
+        final marker = DomValidator.clientMarkerPrefix;
+        window.document.body!.innerHTML =
+            '<div>'
+                    '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                    '  <div>'
+                    '    <!--s${marker}1-->'
+                    '    <span>Server Element</span>'
+                    '    <!--/s${marker}1-->'
+                    '  </div>'
+                    '  <!--/${marker}app-->'
+                    '</div>'
+                .toJS;
+
+        Jaspr.initializeApp(
+          options: ClientOptions(
+            clients: {
+              'app': ClientLoader((params) {
+                final child = params.get<String>('child');
+                return div([
+                  params.mount(child), // 1st mount -> mounts s1
+                  params.mount(child), // 2nd mount -> empty component
+                ]);
+              }),
+            },
+          ),
+        );
+
+        tester.pumpComponent(const ClientApp());
+        await pumpEventQueue();
+
+        final divElement = window.document.querySelector('body div')!;
+        // Inner HTML should only contain one span (from the first mount) and the empty text node from the second mount
+        expect(
+          (divElement.innerHTML as JSString).toDart.replaceAll(RegExp(r'\s+'), ''),
+          contains('<span>ServerElement</span>'),
+        );
+      },
+    );
+
+    testClient('should mount multiple identical server components sequentially using name matching', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <div>'
+                  '    <!--s${marker}1-->'
+                  '    <span>First Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '    <!--s${marker}1-->'
+                  '    <span>Second Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '  </div>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              final child = params.get<String>('child');
+              return div([
+                params.mount(child), // 1st mount -> mounts the first s1
+                params.mount(child), // 2nd mount -> mounts the second s1
+              ]);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      final divElement = window.document.querySelector('body div div')!;
+      expect(
+        (divElement.innerHTML as JSString).toDart.replaceAll(RegExp(r'\s+'), ''),
+        contains('<span>FirstElement</span>'),
+      );
+      expect(
+        (divElement.innerHTML as JSString).toDart.replaceAll(RegExp(r'\s+'), ''),
+        contains('<span>SecondElement</span>'),
+      );
+    });
   });
+}
+
+class ReloadTestComponent extends StatefulComponent {
+  const ReloadTestComponent({required this.name, super.key});
+  final String name;
+  @override
+  State<ReloadTestComponent> createState() => ReloadTestComponentState();
+}
+
+class ReloadTestComponentState extends State<ReloadTestComponent>
+    with SyncStateMixin<ReloadTestComponent, Map<String, dynamic>> {
+  int count = 0;
+
+  @override
+  void updateState(Map<String, dynamic> value) {
+    count = value['count'] as int;
+  }
+
+  @override
+  Map<String, dynamic> getState() => {'count': count};
+
+  @override
+  Component build(BuildContext context) {
+    return p([Component.text('Hello ${component.name}, Count: $count')]);
+  }
 }

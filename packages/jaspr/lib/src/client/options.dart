@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import '../../jaspr.dart';
+import '../dom/validator.dart';
+import 'component_anchors.dart';
 
 /// Main class for initializing the Jaspr framework on the client.
 ///
@@ -67,4 +69,31 @@ final class ClientLoader {
 ///
 /// **DO NOT USE DIRECTLY.**
 /// Use the generated `defaultClientOptions` instead.
-typedef ClientBuilder = Component Function(Map<String, dynamic> params);
+typedef ClientBuilder = Component Function(ClientParams params);
+
+final class ClientParams {
+  ClientParams(this._params, List<ServerComponentAnchor> serverComponents)
+    : serverComponents = List.of(serverComponents);
+
+  final Map<String, Object?> _params;
+  final List<ServerComponentAnchor> serverComponents;
+
+  Component mount(String sId) {
+    assert(sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
+    final name = sId.substring(2);
+    return ServerComponent(serverComponents, name);
+  }
+
+  Component? mountOrNull(String? sId) {
+    if (sId == null) return null;
+    return mount(sId);
+  }
+
+  T get<T>(String key) {
+    final value = _params[key];
+    if (value is! T) {
+      throw StateError('$key is not $T: $value');
+    }
+    return value;
+  }
+}
