@@ -32,15 +32,16 @@ void testClient(
       final binding = ClientAppBinding();
       final tester = ClientTester._(binding);
 
+      addTearDown(() {
+        binding.detachRootComponent();
+        // ignore: invalid_use_of_visible_for_testing_member
+        GlobalComponentsBinding.clearGlobalKeys();
+        web.document.body?.replaceChildren(<web.Node>[].toJS);
+      });
+
       await binding.runTest(() async {
         await callback(tester);
       });
-
-      // Clear all nodes
-      web.document.body?.replaceChildren(<web.Node>[].toJS);
-
-      // ignore: invalid_use_of_visible_for_testing_member
-      GlobalComponentsBinding.clearGlobalKeys();
     },
     skip: skip,
     timeout: timeout,

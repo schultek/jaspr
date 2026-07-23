@@ -75,7 +75,7 @@ extension FakeBuildDaemonIO on FakeIO {
     expect(
       this.stdout.queue,
       emitsInOrder([
-        'Building web assets...',
+        '[BUILDER] Building web assets...',
         '[BUILDER] Connecting to the build daemon...',
       ]),
     );
@@ -113,7 +113,7 @@ extension FakeBuildDaemonIO on FakeIO {
     await expectLater(
       this.stdout.queue,
       emitsInOrder([
-        'Completed building web assets.',
+        '[BUILDER] Completed building web assets.',
       ]),
     );
   }
@@ -127,7 +127,7 @@ extension FakeBuildDaemonIO on FakeIO {
     );
     await buildDaemon.close();
 
-    await expectLater(this.stderr.queue, emits('[BUILDER] [WARNING] Shutting down fake build daemon.'));
+    await expectLater(this.stdout.queue, emits('[BUILDER] [WARNING] Shutting down fake build daemon.'));
   }
 }
 

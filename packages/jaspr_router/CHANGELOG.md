@@ -1,3 +1,13 @@
+## Unreleased minor
+
+- Made `RouteSettings.priority` nullable and default to `null` instead of `0.5`, so the sitemap `priority` tag can be omitted (consistent with `changeFreq`).
+- Added `dispose()` to the `HistoryManager` interface.
+- Implemented `RouterState.dispose()` to cancel `onPopState` subscriptions when the router is unmounted.
+
+## 0.8.3
+
+- Fixed routing and redirect bug to respect the `<base href="...">` configuration by prepending `basePath` on client history operations, server redirect headers, and `Link` hrefs.
+
 ## 0.8.2
 
 - `jaspr` upgraded to `0.23.0`

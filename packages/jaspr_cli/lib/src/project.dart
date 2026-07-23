@@ -92,26 +92,25 @@ class Project {
     }
   }
 
-  void get preferJasprBuilderDependency {
+  Future<void> preferJasprBuilderDependency() async {
     if (requirePubspecYaml case {'dev_dependencies': {'jaspr_builder': _}}) {
       // ok
     } else {
-      final log = logger.logger;
-      if (log == null || !stdout.hasTerminal) {
+      if (!stdout.hasTerminal) {
         logger.write(
           'Missing dependency on jaspr_builder in pubspec.yaml file. Make sure to add jaspr_builder to your dev_dependencies.',
           tag: Tag.cli,
           level: Level.warning,
         );
       } else {
-        final result = log.confirm(
+        final result = await logger.confirm(
           'Missing dependency on jaspr_builder package. Do you want to add jaspr_builder to your dev_dependencies now?',
           defaultValue: true,
         );
         if (result) {
           final result = ProcessRunner.instance.runSync(dartExecutable, ['pub', 'add', '--dev', 'jaspr_builder']);
           if (result.exitCode != 0) {
-            log.err(result.stderr as String?);
+            logger.write(result.stderr as String, tag: Tag.cli, level: Level.error);
             logger.write(
               'Failed to run "dart pub add --dev jaspr_builder". There is probably more output above.',
               tag: Tag.cli,
@@ -120,11 +119,13 @@ class Project {
             _exitFn(1);
           }
 
-          log.success('Successfully added jaspr_builder to your dev_dependencies.');
+          logger.write('Successfully added jaspr_builder to your dev_dependencies.', tag: Tag.cli);
         }
       }
     }
   }
+
+  String get name => requirePubspecYaml['name'] as String? ?? '[unknown]';
 
   YamlMap get _requireJasprOptions {
     final configYaml = requirePubspecYaml['jaspr'];
@@ -353,5 +354,7 @@ final dartSdkVersion = () {
   }
   return 'unknown';
 }();
+
+final dartSdkVersionShort = dartSdkVersion.split(' ').first;
 
 final String dartDevToolsPath = path.join(dartSdkDir, 'bin', 'resources', 'devtools');

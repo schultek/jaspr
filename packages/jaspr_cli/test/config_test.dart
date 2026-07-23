@@ -12,9 +12,25 @@ class TestLogger extends Logger {
   void complete(bool success) {}
 
   @override
-  void writeLine(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
+  void write(String message, {Tag? tag, Level level = Level.info, ProgressState? progress}) {
     messages.add(message);
   }
+
+  @override
+  void clearFooter() {}
+
+  @override
+  void setFooter(List<String> lines) {}
+
+  @override
+  Future<String> prompt(String message, {String? defaultValue}) async => defaultValue ?? '';
+
+  @override
+  Future<bool> confirm(String message, {bool defaultValue = false, String? hint}) async => defaultValue;
+
+  @override
+  Future<T> chooseOne<T>(String message, {required List<T> choices, String Function(T)? display}) async =>
+      choices.first;
 }
 
 void main() {
@@ -118,7 +134,7 @@ jaspr:
     });
 
     group('dependencies', () {
-      test('identifies existing dependencies', () {
+      test('identifies existing dependencies', () async {
         fs.file('pubspec.yaml').writeAsStringSync('''
 name: test
 dependencies:
@@ -130,13 +146,13 @@ dev_dependencies:
 ''');
 
         expect(() => project.requireJasprDependency, isNot(throwsException));
-        expect(() => project.preferJasprBuilderDependency, isNot(throwsException));
+        await expectLater(project.preferJasprBuilderDependency(), completes);
         expect(project.flutterMode, FlutterMode.none);
         expect(logger.messages, isEmpty);
         expect(exits, isEmpty);
       });
 
-      test('identifies missing dependencies', () {
+      test('identifies missing dependencies', () async {
         fs.file('pubspec.yaml').writeAsStringSync('''
 name: test
 ''');
@@ -147,7 +163,7 @@ name: test
           logger.messages,
           contains('Missing dependency on jaspr in pubspec.yaml file. Make sure to add jaspr to your dependencies.'),
         );
-        expect(() => project.preferJasprBuilderDependency, isNot(throwsException));
+        await expectLater(project.preferJasprBuilderDependency(), completes);
         expect(
           logger.messages,
           contains(

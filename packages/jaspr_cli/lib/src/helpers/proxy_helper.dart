@@ -25,7 +25,7 @@ mixin ProxyHelper on BaseCommand {
     final client = devProxy?.client ?? http.Client();
     final flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
     Directory('.dart_tool/jaspr/generated').createSync(recursive: true);
-    final generatedHandler = createStaticHandler('.dart_tool/jaspr/generated');
+    final generatedHandler = noCachingHandler(createStaticHandler('.dart_tool/jaspr/generated'));
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
     final webdevHandler = devProxy?.handler ?? (req) => Response.notFound(null);
 
@@ -75,7 +75,7 @@ mixin ProxyHelper on BaseCommand {
         }
 
         if (res.statusCode == 404 && redirectNotFound && path.extension(req.url.path).isEmpty) {
-          return webdevHandler(
+          return await webdevHandler(
             Request(
               req.method,
               req.requestedUri.replace(path: '/'),
@@ -92,14 +92,45 @@ mixin ProxyHelper on BaseCommand {
         if (e is HijackException) {
           rethrow;
         }
-        logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
-        logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
-
-        return Response.internalServerError();
+        final isConnectionError =
+            e is SocketException ||
+            (e is http.ClientException &&
+                (e.message.contains('Connection closed') || e.message.contains('Connection refused')));
+        if (isConnectionError) {
+          logger.write('Proxy connection to backend failed: $e', tag: Tag.cli, level: Level.verbose);
+          return Response(
+            503,
+            headers: {
+              'Retry-After': '1',
+            },
+          );
+        } else {
+          logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
+          logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
+          return Response.internalServerError();
+        }
       }
     });
 
-    final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
+    final Completer<HttpServer> completer = Completer<HttpServer>();
+    runZonedGuarded(
+      () async {
+        try {
+          final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
+          completer.complete(server);
+        } catch (e, st) {
+          completer.completeError(e, st);
+        }
+      },
+      (error, stackTrace) {
+        if (error is SocketException) {
+          return;
+        }
+        logger.write('Error in proxy server: $error', tag: Tag.cli, level: Level.error);
+        logger.write(stackTrace.toString(), tag: Tag.cli, level: Level.verbose);
+      },
+    );
+    final server = await completer.future;
 
     guardResource(() async {
       await server.close(force: true);
@@ -107,4 +138,27 @@ mixin ProxyHelper on BaseCommand {
 
     return server;
   }
+}
+
+Handler noCachingHandler(Handler handler) {
+  return (request) async {
+    final res = await handler(request);
+    if (res.statusCode == 200) {
+      final newHeaders = Map<String, String>.from(res.headers)
+        ..remove('last-modified')
+        ..remove('Last-Modified')
+        ..remove('etag')
+        ..remove('ETag')
+        ..['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        ..['Pragma'] = 'no-cache'
+        ..['Expires'] = '0';
+      return Response(
+        res.statusCode,
+        body: res.read(),
+        headers: newHeaders,
+        context: res.context,
+      );
+    }
+    return res;
+  };
 }

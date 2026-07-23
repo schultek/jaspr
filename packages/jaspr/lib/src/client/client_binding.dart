@@ -24,9 +24,15 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   bool get isClient => true;
 
   static final String _baseOrigin = () {
-    final base = web.document.querySelector('head>base') as web.HTMLBaseElement?;
-    return base?.href ?? web.window.location.origin;
+    final hasBase = web.document.querySelector('head>base') != null;
+    return hasBase ? web.document.baseURI : web.window.location.origin;
   }();
+
+  @override
+  String get basePath {
+    final path = Uri.parse(_baseOrigin).path;
+    return path.isEmpty ? '/' : path;
+  }
 
   @override
   String get currentUrl {

@@ -5,6 +5,21 @@
 - **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
 - Added stateful server-side reload feature.
 
+## 0.23.3
+
+- Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
+- Updated `testClient` in `jaspr_test` to automatically unmount the root component and clean up `document.body` between test cases.
+- Fixed asynchronous errors escaping the development proxy when falling back to the app root.
+- Fixed repeated copying of nested build assets.
+- The sitemap `priority` tag is now omitted when a route has no priority set, instead of always defaulting to `0.5`.
+
+## 0.23.2
+
+- Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
+- Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.
+- Support `analyzer` `^12.1.0`.
+- Added a `--port` option to `jaspr build` for configuring the server port used during static generation.
+
 ## 0.23.1
 
 - Fixed expression compilation when debugging a client-side application with an AOT installed CLI.

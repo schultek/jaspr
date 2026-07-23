@@ -128,6 +128,6 @@ class TestRunner {
   }
 
   void setup() {
-    runner = JasprCommandRunner();
+    runner = JasprCommandRunner(true, false);
   }
 }

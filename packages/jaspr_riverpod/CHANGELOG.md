@@ -1,3 +1,7 @@
+## 0.4.6
+
+- Support `riverpod` version `3.3.2`.
+
 ## 0.4.5
 
 - `jaspr` upgraded to `0.23.0`

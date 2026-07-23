@@ -30,6 +30,9 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   bool get isClient => false;
 
   @override
+  String get basePath => request.basePath;
+
+  @override
   String get currentUrl => request.url;
 
   /// Unmodifiable view of the cookies sent with the [request].
