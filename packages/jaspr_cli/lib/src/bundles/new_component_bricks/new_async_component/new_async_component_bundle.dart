@@ -8,7 +8,7 @@ final newAsyncComponentBundle = MasonBundle.fromJson(<String, dynamic>{
     {
       "path": "{{name.snakeCase()}}.dart",
       "data":
-          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2RvbS5kYXJ0JzsKaW1wb3J0ICdwYWNrYWdlOmphc3ByL3NlcnZlci5kYXJ0JzsKCmNsYXNzIHt7bmFtZS5wYXNjYWxDYXNlKCl9fSBleHRlbmRzIEFzeW5jU3RhdGVsZXNzQ29tcG9uZW50IHsKICBjb25zdCB7e25hbWUucGFzY2FsQ2FzZSgpfX0oe3N1cGVyLmtleX0pOwoKICBAb3ZlcnJpZGUKICBGdXR1cmU8Q29tcG9uZW50PiBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgYXN5bmMgewogICAgcmV0dXJuIGRpdihbXSk7CiAgfQoKICB7eyNzdHlsZXN9fQogIEBjc3MKICBMaXN0PFN0eWxlUnVsZT4gZ2V0IHN0eWxlcyA9PgoKCgoKCgoKICBbXTsKICB7ey9zdHlsZXN9fQp9Cg==",
+          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2RvbS5kYXJ0JzsKaW1wb3J0ICdwYWNrYWdlOmphc3ByL3NlcnZlci5kYXJ0JzsKCmNsYXNzIHt7bmFtZS5wYXNjYWxDYXNlKCl9fSBleHRlbmRzIEFzeW5jU3RhdGVsZXNzQ29tcG9uZW50IHsKICBjb25zdCB7e25hbWUucGFzY2FsQ2FzZSgpfX0oe3N1cGVyLmtleX0pOwoKICBAb3ZlcnJpZGUKICBGdXR1cmU8Q29tcG9uZW50PiBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgYXN5bmMgewogICAgcmV0dXJuIGRpdihbXSk7CiAgfQoKICB7eyNzdHlsZXN9fQogIEBjc3MKICBMaXN0PFN0eWxlUnVsZT4gZ2V0IHN0eWxlcyA9PiBbXTsKICB7ey9zdHlsZXN9fQp9Cg==",
       "type": "text",
     },
   ],
