@@ -12,7 +12,7 @@ void main() {
 
     setUp(() {
       io = FakeIO();
-      runner = JasprCommandRunner(false);
+      runner = JasprCommandRunner(false, false);
     });
 
     test('fails when neither --html, --file nor --url is provided', () async {

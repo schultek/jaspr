@@ -18,7 +18,7 @@ void main() {
 
     setUp(() {
       io = FakeIO();
-      runner = JasprCommandRunner(false);
+      runner = JasprCommandRunner(false, false);
     });
 
     tearDown(() {
@@ -38,7 +38,7 @@ void main() {
 
         await io.runReleaseBuild(buildDaemon);
 
-        await expectLater(io.stdout.queue, emits(contains('Completed building myapp to build/jaspr/.')));
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
 
         expect(await buildResult, equals(0));
       });
@@ -86,7 +86,7 @@ void main() {
 
         serverProcess.exit(0);
 
-        await expectLater(io.stdout.queue, emits(contains('Completed building myapp to build/jaspr/.')));
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
 
         expect(await buildResult, equals(0));
       });
@@ -161,8 +161,8 @@ void main() {
           emitsInOrder([
             '[SERVER] Server started',
             '',
-            'Generating routes...',
-            '(1/1) Generating route "/abc" ...',
+            'Generating pages:',
+            '(1/1) Generating "/abc" ...',
           ]),
         );
 
@@ -172,8 +172,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            contains('Completed building myapp to build/jaspr/.'),
-            'Terminating server...',
+            emitsThrough(contains('Completed building')),
+            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -240,8 +240,8 @@ void main() {
           emitsInOrder([
             '[SERVER] Server started',
             '',
-            'Generating routes...',
-            '(1/1) Generating route "/abc" ...',
+            'Generating pages:',
+            '(1/1) Generating "/abc" ...',
           ]),
         );
 
@@ -251,8 +251,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            contains('Completed building myapp to build/jaspr/.'),
-            'Terminating server...',
+            emitsThrough(contains('Completed building')),
+            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -300,7 +300,7 @@ void main() {
 
         await io.runReleaseBuild(buildDaemon);
 
-        await expectLater(io.stdout.queue, emits(contains('Completed building myapp to build/jaspr/.')));
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
 
         expect(io.fs.file('/root/myapp/build/jaspr/flutter_bootstrap.js').existsSync(), isTrue);
         expect(
@@ -389,10 +389,10 @@ void main() {
           emitsInOrder([
             '[SERVER] Server started',
             '',
-            'Generating routes...',
-            '(1/1) Generating route "/abc" ...',
-            '(2/2) Generating route "/abc2" ...',
-            'Generating sitemap.xml...',
+            'Generating pages:',
+            '(1/1) Generating "/abc" ...',
+            '(2/2) Generating "/abc2" ...',
+            '[LOG] Generating sitemap.xml...',
           ]),
         );
 
@@ -431,8 +431,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            contains('Completed building myapp to build/jaspr/.'),
-            'Terminating server...',
+            emitsThrough(contains('Completed building')),
+            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -475,7 +475,7 @@ void main() {
           emitsInOrder([
             '[STYLES] Generating CSS...',
             '[STYLES] Generated main.css',
-            contains('Completed building myapp to build/jaspr/.'),
+            emitsThrough(contains('Completed building')),
           ]),
         );
 

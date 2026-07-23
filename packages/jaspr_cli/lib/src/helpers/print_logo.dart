@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:mason/mason.dart';
 
+import '../command_runner.dart';
+import '../commands/base_command.dart';
 import '../project.dart';
 import '../version.dart';
 import 'print_logo_constants.dart';
@@ -80,45 +82,50 @@ List<String> _applyGradient(List<String> textLines) {
   return result;
 }
 
-void printLogo() {
-  final mascotLines = <String>[];
-
-  // Combine mascot rows vertically into half-blocks
-  for (int y = 0; y < mascotGrid.length; y += 2) {
-    final line = StringBuffer();
-    for (int x = 0; x < mascotGrid[y].length; x++) {
-      final c1 = mascotGrid[y][x];
-      final c2 = mascotGrid[y + 1][x];
-
-      final rgb1 = _getRgb(c1);
-      final rgb2 = _getRgb(c2);
-
-      if (rgb1 == null && rgb2 == null) {
-        line.write(' ');
-      } else if (rgb1 == null) {
-        line.write('${_color(rgb2!)}▄$_reset');
-      } else if (rgb2 == null) {
-        line.write('${_color(rgb1)}▀$_reset');
-      } else {
-        line.write('${_color(rgb2)}${_color(rgb1, bg: true)}▄$_reset');
-      }
+extension PrintLogo on BaseCommand {
+  void printLogo() {
+    if (runner case JasprCommandRunner(printLogo: false)) {
+      return;
     }
-    mascotLines.add(line.toString());
+    final mascotLines = <String>[];
+
+    // Combine mascot rows vertically into half-blocks
+    for (int y = 0; y < mascotGrid.length; y += 2) {
+      final line = StringBuffer();
+      for (int x = 0; x < mascotGrid[y].length; x++) {
+        final c1 = mascotGrid[y][x];
+        final c2 = mascotGrid[y + 1][x];
+
+        final rgb1 = _getRgb(c1);
+        final rgb2 = _getRgb(c2);
+
+        if (rgb1 == null && rgb2 == null) {
+          line.write(' ');
+        } else if (rgb1 == null) {
+          line.write('${_color(rgb2!)}▄$_reset');
+        } else if (rgb2 == null) {
+          line.write('${_color(rgb1)}▀$_reset');
+        } else {
+          line.write('${_color(rgb2)}${_color(rgb1, bg: true)}▄$_reset');
+        }
+      }
+      mascotLines.add(line.toString());
+    }
+
+    print('');
+
+    final textColored = _applyGradient(_textLines);
+    textColored.add('');
+    textColored.add('  ${_bold}Jaspr CLI$_reset • A modern web framework for Dart');
+    textColored.add('  Version $jasprCliVersion ${darkGray.wrap('• Dart $dartSdkVersionShort')}');
+
+    final maxH = math.max(mascotLines.length, textColored.length + 2);
+    for (int i = 0; i < maxH; i++) {
+      final mPart = i < mascotLines.length ? mascotLines[i] : '                    ';
+      final tPart = (i >= 2 && (i - 2) < textColored.length) ? textColored[i - 2] : '';
+      print('$mPart    $tPart');
+    }
+
+    print('');
   }
-
-  print('');
-
-  final textColored = _applyGradient(_textLines);
-  textColored.add('');
-  textColored.add('  ${_bold}Jaspr CLI$_reset • A modern web framework for Dart');
-  textColored.add('  Version $jasprCliVersion ${darkGray.wrap('• Dart $dartSdkVersionShort')}');
-
-  final maxH = math.max(mascotLines.length, textColored.length + 2);
-  for (int i = 0; i < maxH; i++) {
-    final mPart = i < mascotLines.length ? mascotLines[i] : '                    ';
-    final tPart = (i >= 2 && (i - 2) < textColored.length) ? textColored[i - 2] : '';
-    print('$mPart    $tPart');
-  }
-
-  print('');
 }

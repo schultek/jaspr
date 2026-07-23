@@ -28,7 +28,7 @@ const executableName = 'jaspr';
 
 /// A [CommandRunner] for the Jaspr CLI.
 class JasprCommandRunner extends CompletionCommandRunner<int> {
-  JasprCommandRunner([this.allowAutoInstall = true])
+  JasprCommandRunner([this.allowAutoInstall = true, this.printLogo = true])
     : super(executableName, 'jaspr - A modern web framework for building websites in Dart.') {
     argParser.addFlag('version', abbr: 'v', negatable: false, help: 'Print the current version info.');
     argParser.addFlag('enable-analytics', negatable: false, help: 'Enable anonymous analytics.');
@@ -49,6 +49,7 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
   final _updater = PubUpdater(null, getPubDevBaseUrl());
 
   final bool allowAutoInstall;
+  final bool printLogo;
 
   @override
   bool get enableAutoInstall {

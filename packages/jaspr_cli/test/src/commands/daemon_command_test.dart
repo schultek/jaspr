@@ -13,7 +13,7 @@ void main() {
 
     setUp(() {
       io = FakeIO();
-      runner = JasprCommandRunner(false);
+      runner = JasprCommandRunner(false, false);
     });
 
     tearDown(() {
@@ -34,9 +34,9 @@ void main() {
           emitsInOrder([
             startsWith('[{"event":"daemon.connected","params":{"version":"0.4.2","pid":'),
             '[{"event":"daemon.log","params":{"message":"Starting myapp in client rendering mode."}}]',
-            r'[{"event":"daemon.log","params":{"message":"\\033[35m[BUILDER] \\033[0mStarting web compilers..."}}]',
-            r'[{"event":"daemon.log","params":{"message":"\\033[35m[BUILDER] \\033[0mConnecting to the build daemon..."}}]',
-            r'[{"event":"daemon.log","params":{"message":"\\033[35m[BUILDER] \\033[0mStarting initial build..."}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[45m\\033[97m\\033[1m BUILDER \\033[22m\\033[0m\\033[0m Starting web compilers..."}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[45m\\033[97m\\033[1m BUILDER \\033[22m\\033[0m\\033[0m Connecting to the build daemon..."}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[45m\\033[97m\\033[1m BUILDER \\033[22m\\033[0m\\033[0m Starting initial build..."}}]',
           ]),
         );
 
@@ -50,8 +50,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrder([
-            r'[{"event":"daemon.log","params":{"message":"\\033[35m[BUILDER] \\033[0mDone building web assets."}}]',
-            r'[{"event":"daemon.log","params":{"message":"\\033[90m[LOG] \\033[0mServing at http://localhost:8080"}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[45m\\033[97m\\033[1m BUILDER \\033[22m\\033[0m\\033[0m Done building web assets."}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[100m\\033[97m\\033[1m LOG     \\033[22m\\033[0m\\033[0m Serving at http://localhost:8080"}}]',
           ]),
         );
 
@@ -61,7 +61,7 @@ void main() {
           io.stdout.queue,
           emitsInOrder([
             '[{"id":0}]',
-            '[{"event":"daemon.log","params":{"message":"Stopping web compilers..."}}]',
+            r'[{"event":"daemon.log","params":{"message":"\\033[90mStopping web compilers...\\033[0m"}}]',
           ]),
         );
 

@@ -30,10 +30,10 @@ enum Tag {
 
   String format([bool daemon = false, bool verbose = false]) {
     if (this == none) return '';
-    final nameStr = verbose ? name.padRight(7, ' ') : char;
     if (!daemon && !ansiOutputEnabled) {
-      return '[$nameStr] ';
+      return '[$name] ';
     }
+    final nameStr = verbose ? name.padRight(7, ' ') : char;
     return '${backgroundColor.wrap(
       textColor.wrap(styleBold.wrap(' $nameStr ', forScript: daemon)!, forScript: daemon)!,
       forScript: daemon,

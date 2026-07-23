@@ -18,7 +18,7 @@ void main() {
 
     setUp(() {
       io = FakeIO();
-      runner = JasprCommandRunner(false);
+      runner = JasprCommandRunner(false, false);
     });
 
     tearDown(() {
