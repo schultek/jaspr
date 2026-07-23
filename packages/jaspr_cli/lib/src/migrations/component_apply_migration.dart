@@ -11,10 +11,9 @@ class ComponentApplyMigration implements Migration {
 
   @override
   String get name => 'component_apply_migration';
-  
+
   @override
-  String get description =>
-      'Migrates `Component.wrapElement` to `Component.apply`.';
+  String get description => 'Migrates `Component.wrapElement` to `Component.apply`.';
 
   @override
   String get hint {
