@@ -8,6 +8,7 @@ void main() async {
   await generate('new_component_bricks/new_async_component');
   await generate('new_component_bricks/new_component_test');
   await generate('new_component_bricks/new_async_component_test');
+  await generate('new_component_bricks/new_flutter_embedded_view');
 
   Process.runSync('dart', 'format lib/src/bundles/ --line-length=120'.split(' '));
 }
