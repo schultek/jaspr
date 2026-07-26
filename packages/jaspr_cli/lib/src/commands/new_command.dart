@@ -12,6 +12,8 @@ import 'package:yaml/yaml.dart';
 import '../bundles/new_component_bricks/new_async_component/new_async_component_bundle.dart';
 import '../bundles/new_component_bricks/new_async_component_test/new_async_component_test_bundle.dart';
 import '../bundles/new_component_bricks/new_component_test/new_component_test_bundle.dart';
+import '../bundles/new_component_bricks/new_flutter_embedded_view/new_flutter_embedded_view_bundle.dart';
+import '../bundles/new_component_bricks/new_sample_flutter_widget/new_sample_flutter_widget_bundle.dart';
 import '../bundles/new_component_bricks/new_stateful_component/new_stateful_component_bundle.dart';
 import '../bundles/new_component_bricks/new_stateless_component/new_stateless_component_bundle.dart';
 import '../logging.dart';
@@ -68,6 +70,7 @@ class ComponentCommand extends BaseCommand {
     );
     argParser.addFlag(
       'dry-run',
+      aliases: ['dry'],
       help: 'Preview the proposed changes but make no changes',
       negatable: false,
       defaultsTo: false,
@@ -117,11 +120,24 @@ class ComponentCommand extends BaseCommand {
       negatable: false,
       defaultsTo: false,
     );
+    argParser.addSeparator('Additional arguments used when creating a Flutter embedded view');
     argParser.addOption(
       'flutter-app-name',
       aliases: ['app-name', 'flutter-name', 'flutter-widget-name'],
       help: 'Provide the name of the Flutter App/Widget to embed (Used only when creating a FlutterEmbeddedView)',
       valueHelp: 'MyFlutterApp',
+    );
+    argParser.addFlag(
+      'with-sample-flutter-widget',
+      aliases: [
+        'with-flutter-widget',
+        'with-sample-flutter-app',
+        'with-flutter-app',
+        'sample-flutter-app',
+        'sample-flutter-widget',
+      ],
+      help: 'Generate a sample flutter widget.',
+      negatable: true,
     );
   }
 
@@ -145,6 +161,7 @@ class ComponentCommand extends BaseCommand {
   late final bool withTest = argResults!.flag('with-test');
   late final bool dryRun = argResults!.flag('dry-run');
   late String flutterAppName = argResults!.option('flutter-app-name') ?? '';
+  late bool? withSampleFlutterWidget = argResults!.flag('with-sample-flutter-widget');
 
   @override
   Future<int> runCommand() async {
@@ -192,8 +209,8 @@ class ComponentCommand extends BaseCommand {
     );
   }
 
-  // Walk up from the start directory until we find the project root (i.e., when we find a pubspec.yaml file)
-  // this means that in a monorepo (e.g., jaspr repo), this walk will stop at the current package's root
+  /// Walk up from the start directory until we find the project root (i.e., when we find a pubspec.yaml file)
+  /// this means that in a monorepo (e.g., jaspr repo), this walk will stop at the current package's root
   Directory? findProjectRoot(Directory start) {
     var dir = start.absolute;
     while (true) {
@@ -270,7 +287,7 @@ class ComponentCommand extends BaseCommand {
     return (directory, componentName);
   }
 
-  // Generate the component with the mason template
+  /// Generate the component with the mason template
   Future<int> createFromTemplate(
     Directory dir,
     String name,
@@ -325,8 +342,10 @@ class ComponentCommand extends BaseCommand {
     // format the generated component
     Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
 
+    final projectRoot = findProjectRoot(dir) ?? Directory.current.absolute;
+
     logger.write(
-      'Generated $componentType component $name: ${blue.wrap(files.first.path)}',
+      'Generated $componentType component $name: ${blue.wrap(p.relative(files.first.path, from: projectRoot.path))}',
       tag: Tag.cli,
       level: Level.info,
       progress: ProgressState.completed,
@@ -339,7 +358,7 @@ class ComponentCommand extends BaseCommand {
     return 0;
   }
 
-  // Generate a test for the newly created component under the /test dir
+  /// Generate a test for the newly created component under the /test dir
   Future<int> createTestFromTemplate(String componentPath, String name) async {
     logger.write(
       'Generating test for "$name"...',
@@ -404,7 +423,7 @@ class ComponentCommand extends BaseCommand {
     Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
 
     logger.write(
-      'Generated test for $name: ${blue.wrap(files.first.path)}',
+      'Generated test for $name: ${blue.wrap(p.relative(files.first.path, from: projectRoot.path))}',
       tag: Tag.cli,
       level: Level.info,
       progress: ProgressState.completed,
@@ -416,11 +435,10 @@ class ComponentCommand extends BaseCommand {
     return 0;
   }
 
-  // for a given list of packages, check if they are already installed, if not then prompt the user to install them
+  /// for a given list of packages, check if they are already installed, if not then prompt the user to install them
   void conditionallyInstalDeps(Directory projectRoot, List<String> packages, {bool isDevDependency = false}) {
     // check if the pubspec.yaml of the target project already contains the jaspr_test dep, if so return early
 
-    // TODO: perhaps use dart pub deps --json and parse the dependencies
     final pubspecMap = readPubspec(projectRoot);
     if (pubspecMap == null) {
       logger.write(
@@ -454,7 +472,7 @@ class ComponentCommand extends BaseCommand {
       }
 
       final result = logger.logger!.confirm(
-        'The $packageName package is required. Do you want to add $packageName to your $depString?',
+        'The ${cyan.wrap(packageName)} package is required. Do you want to add $packageName to your $depString?',
         defaultValue: true,
       );
 
@@ -468,13 +486,13 @@ class ComponentCommand extends BaseCommand {
       }
 
       // if we are adding the flutter dependency, we need to specify that we want to use flutter from the currently installed sdk
-      if (packageName == 'flutter') {
-        packageName = 'flutter@{sdk: flutter}';
+      if (packageName == 'flutter' || packageName == 'flutter_test') {
+        packageName = '$packageName@{sdk: flutter}';
       }
 
       final pubCommand = ProcessRunner.instance.runSync(
         dartExecutable,
-        ['pub', 'add', packageName, if (pubAddArg.isNotEmpty) pubAddArg],
+        ['pub', 'add', '${isDevDependency ? "dev:" : ""}$packageName'],
         workingDirectory: projectRoot.path,
       );
       if (pubCommand.exitCode != 0) {
@@ -497,6 +515,7 @@ class ComponentCommand extends BaseCommand {
     return;
   }
 
+  /// Create and setup the project to add a FlutterEmbeddedView component
   Future<int> createFlutterViewComponent(Directory dir, String name) async {
     // if no flutter app name was provided, prompt for one
     if (flutterAppName.isEmpty) {
@@ -515,6 +534,12 @@ class ComponentCommand extends BaseCommand {
       );
     }
 
+    // ask the user whether to generate a sample flutter app or not
+    withSampleFlutterWidget ??= logger.logger!.confirm(
+      'Do you wish to generate a sample Flutter widget with name $flutterAppName?',
+      defaultValue: true,
+    );
+
     if (withTest) {
       logger.write(
         '--with-test argument ignored for FlutterEmbeddedView components',
@@ -523,24 +548,112 @@ class ComponentCommand extends BaseCommand {
       );
     }
 
-    // TODO: add in the flutter mode change, flutter_bootstrap change, and other
-    // if (dryRun) {
-    //   logger.write(
-    //     'Would generate FlutterEmbeddedView component ${yellow.wrap(name.pascalCase)} embedding $flutterAppName, at dir ${blue.wrap(dir.path)}\n',
-    //     tag: Tag.cli,
-    //     level: Level.info,
-    //   );
-    //   return 0;
-    // }
-
     final projectRoot = findProjectRoot(Directory.current.absolute) ?? Directory.current.absolute;
+
+    if (dryRun) {
+      dryRunFlutterViewComponent(dir, name, projectRoot);
+      return 0;
+    }
 
     // add flutter and jaspr_flutter_embed in dependenies if they aren't present (prompts to add them)
     conditionallyInstalDeps(projectRoot, ['flutter', 'jaspr_flutter_embed'], isDevDependency: false);
+    // also install other useful deps
+    conditionallyInstalDeps(projectRoot, ['flutter_lints', 'flutter_test'], isDevDependency: true);
 
-    // set flutter mode to embedded in pubspec.yaml
+    setFlutterMode(projectRoot);
+
+    setUseMaterialDesignPubspec(projectRoot);
+
+    createFlutterBootstrapScript(projectRoot);
+
+    final mode = readMode(readPubspec(projectRoot));
+    if (mode == null) {
+      warnManualIncludeRef();
+    } else if (mode.isServerOrStatic) {
+      includeBootstrapRefInDoc(projectRoot);
+    } else {
+      includeInIndexHtml(projectRoot);
+    }
+
+    await generateFlutterEmbeddedViewComponent(dir, name, projectRoot);
+
+    return 0;
+  }
+
+  /// preview the changes that createFlutterViewComponent would make, without modifying any file
+  void dryRunFlutterViewComponent(Directory dir, String name, Directory projectRoot) {
+    final pubspecMap = readPubspec(projectRoot);
+
+    void wouldDo(String message) {
+      logger.write(message, tag: Tag.cli, level: Level.info);
+    }
+
+    /// check if the pubspec file contains the packageName as a dep
+    bool hasDep(String packageName, {bool isDevDependency = false}) {
+      final deps = pubspecMap?.nodes[isDevDependency ? 'dev_dependencies' : 'dependencies'];
+      return deps is YamlMap && deps.containsKey(packageName);
+    }
+
+    // dependency install check
+    final missingDeps = ['flutter', 'jaspr_flutter_embed'].where((d) => !hasDep(d));
+    final missingDevDeps = ['flutter_lints', 'flutter_test'].where((d) => !hasDep(d, isDevDependency: true));
+    if (missingDeps.isNotEmpty) {
+      wouldDo('Would prompt to add ${missingDeps.map((d) => cyan.wrap(d)).join(', ')} to dependencies');
+    }
+    if (missingDevDeps.isNotEmpty) {
+      wouldDo('Would prompt to add ${missingDevDeps.map((d) => cyan.wrap(d)).join(', ')} to dev_dependencies');
+    }
+
+    // jaspr flutter mode change
     if (project.flutterMode != FlutterMode.embedded) {
-      final pubspecMap = project.pubspecYaml;
+      if (project.flutterMode == FlutterMode.plugins) {
+        wouldDo(
+          'Would prompt to overwrite the jaspr.flutter mode with ${yellow.wrap('embedded')} in pubspec.yaml',
+        );
+      } else {
+        wouldDo('Would set ${yellow.wrap('flutter: embedded')} in the jaspr block of pubspec.yaml');
+      }
+    }
+
+    // uses-material-design change
+    final flutterNode = pubspecMap?.nodes['flutter'];
+    final hasUsesMaterialDesign = flutterNode is YamlMap && flutterNode.containsKey('uses-material-design');
+    if (!hasUsesMaterialDesign) {
+      wouldDo('Would set ${yellow.wrap('uses-material-design: true')} in the flutter block of pubspec.yaml');
+    }
+
+    // creation of bootstrap script
+    if (!File(p.join(projectRoot.path, 'web', 'flutter_bootstrap.js')).existsSync()) {
+      wouldDo('Would create ${blue.wrap('web/flutter_bootstrap.js')}');
+    }
+
+    // inclusion of bootstrap script in Document
+    final mode = readMode(pubspecMap);
+    if (mode == null) {
+      wouldDo('Could not read the jaspr mode, the flutter_bootstrap.js script ref would need to be included manually');
+    } else if (mode.isServerOrStatic) {
+      wouldDo(
+        'Would include a flutter_bootstrap.js script ref in the head of the Document in ${blue.wrap('lib/main.server.dart')}',
+      );
+    } else {
+      wouldDo('Would include a flutter_bootstrap.js script tag in the head of ${blue.wrap('web/index.html')}');
+    }
+
+    // generation of component and sample widget
+    wouldDo(
+      'Would generate FlutterEmbeddedView component ${yellow.wrap(name.pascalCase)} embedding $flutterAppName at dir ${blue.wrap(dir.path)}',
+    );
+    if (withSampleFlutterWidget == true) {
+      wouldDo('Would generate sample Flutter widget ${yellow.wrap(flutterAppName)} in ${blue.wrap('lib/widgets/')}');
+    }
+  }
+
+  /// Sets the flutter mode to embedded in the pubspec.yaml file for the project
+  /// if the project has jaspr.flutter set to 'plugins', we ask the user if they want to change it to embedded or not
+  void setFlutterMode(Directory projectRoot) {
+    if (project.flutterMode != FlutterMode.embedded) {
+      // NOTE: we re-read the pubspec file after the potential installation of packages
+      final pubspecMap = readPubspec(projectRoot);
       if (pubspecMap != null) {
         logger.write(
           'Enabling Flutter embedding support in pubspec.yaml.',
@@ -553,9 +666,15 @@ class ComponentCommand extends BaseCommand {
           final builder = EditBuilder(LineInfo.fromContent(pubspecContent));
 
           if (pubspecMap.nodes['jaspr'] case final YamlMap jasprMap) {
-            // if there is already a flutter mode, then it presumably is set to "plugins", so we replace it to be "embedded"
+            // if there is already a flutter mode, then it presumably is set to "plugins", so we ask the user to confirm that they want to change it
             if (jasprMap.nodes['flutter'] case final YamlScalar flutterNode when flutterNode.value != null) {
-              builder.replace(flutterNode.span.start.offset, flutterNode.span.length, 'embedded');
+              final bool overwritePlugins = logger.logger!.confirm(
+                'This project is set with jaspr.flutter mode set to plugins. Do you want to overwrite it to "embedded" to allow Flutter embedding?',
+                defaultValue: false,
+              );
+              if (overwritePlugins) {
+                builder.replace(flutterNode.span.start.offset, flutterNode.span.length, 'embedded');
+              }
             } else {
               // there was presumably no flutter mode set in the jaspr block, so we add it.
               // we need an offset to be able to add this new line with the flutter mode, and we know that there will
@@ -581,10 +700,73 @@ class ComponentCommand extends BaseCommand {
           tag: Tag.cli,
           level: Level.error,
         );
-        return 1;
+        exit(1);
       }
     }
+  }
 
+  /// ensure that "uses-material-design: true" is set in the flutter block of pubspec.yaml
+  /// it allows the embedded Flutter app to use Material icons and fonts
+  void setUseMaterialDesignPubspec(Directory projectRoot) {
+    final pubspecMap = readPubspec(projectRoot);
+    if (pubspecMap == null) {
+      logger.write(
+        'Failed to find pubspec.yaml file in dir ${blue.wrap(projectRoot.path)}',
+        tag: Tag.cli,
+        level: Level.error,
+      );
+      return;
+    }
+
+    final pubspecFile = File(p.join(projectRoot.path, 'pubspec.yaml'));
+
+    try {
+      final pubspecContent = pubspecFile.readAsStringSync();
+      final builder = EditBuilder(LineInfo.fromContent(pubspecContent));
+
+      final flutterNode = pubspecMap.nodes['flutter'];
+
+      if (flutterNode is YamlMap) {
+        if (flutterNode.nodes['uses-material-design'] case final YamlScalar _) {
+          // if the key is present, it might be true or false, if false we don't want to overwrite it
+          return;
+        } else {
+          // the flutter block is present but doesn't have the uses-material-design key, so we add it as the first entry
+          // reusing the indentation of the existing entries
+          final indent = ''.padLeft(flutterNode.span.start.column);
+          builder.insert(flutterNode.span.start.offset, 'uses-material-design: true\n$indent');
+        }
+      } else if (flutterNode == null) {
+        // there is no flutter block, append one at the end of the file
+        final trailingNewline = pubspecContent.endsWith('\n') ? '' : '\n';
+        builder.insert(pubspecContent.length, '$trailingNewline\nflutter:\n  uses-material-design: true\n');
+      } else {
+        logger.write(
+          'Could not set uses-material-design in pubspec.yaml, please add it manually in the flutter block.',
+          tag: Tag.cli,
+          level: Level.warning,
+        );
+        return;
+      }
+
+      logger.write(
+        'Enabled uses-material-design in pubspec.yaml.',
+        tag: Tag.cli,
+        level: Level.info,
+      );
+
+      pubspecFile.writeAsStringSync(builder.apply(pubspecContent));
+    } catch (e) {
+      logger.write(
+        'Failed to update pubspec.yaml: $e',
+        level: Level.error,
+        tag: Tag.cli,
+      );
+    }
+  }
+
+  /// Create the flutter bootstrap script in the web dir
+  void createFlutterBootstrapScript(Directory projectRoot) {
     // creating the flutter_bootstrap.js file, this doesn't modify an existing file
     final bootstrapFile = File(p.join(projectRoot.path, 'web', 'flutter_bootstrap.js'));
     try {
@@ -604,32 +786,56 @@ class ComponentCommand extends BaseCommand {
     } catch (e) {
       logger.write('Failed to open or create web/flutter_bootstrap.js: $e', level: Level.error, tag: Tag.cli);
     }
-
-    // TODO: include the bootstrap page in the Document in server or static mode, or add it to the index.hmtl for clients
-    final mode = readMode(readPubspec(projectRoot));
-    if (mode == null) {
-      logger.write(
-        'Could not find a jaspr mode in pubspec.yaml, please add a reference to the flutter_bootstrap.js script in the head of your main Document (or index.html for client-side sites)',
-        level: Level.warning,
-        tag: Tag.cli,
-      );
-    } else if (mode.isServerOrStatic) {
-      // include the script in the head of Document in server or static mode
-      includeBootstrapRefInDoc(projectRoot);
-    } else {
-      // includeInIndexHtml(projectRoot);
-    }
-
-    // TODO: generate the component
-
-    logger.write('Generating FlutterEmbeddedView component "$name"...', progress: ProgressState.running);
-
-    // Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
-    // logger.write('Generated FlutterEmbeddedView component $name: ${blue.wrap(files.first.path)}', progress: ProgressState.completed);
-
-    return 0;
   }
 
+  /// generate the FlutterEmbeddedView component at dirrectory dir and with a specified name
+  /// also generates a sample flutter widget depending on the withSampleFlutterWidget command flag
+  Future<void> generateFlutterEmbeddedViewComponent(Directory dir, String name, Directory projectRoot) async {
+    logger.write('Generating FlutterEmbeddedView component "$name"...', progress: ProgressState.running);
+    final generator = await MasonGenerator.fromBundle(newFlutterEmbeddedViewBundle);
+    final files = await generator.generate(
+      DirectoryGeneratorTarget(dir),
+      vars: {
+        'name': name,
+        'static_or_server': project.requireMode.isServerOrStatic,
+        'flutterAppName': flutterAppName,
+      },
+      logger: logger.logger,
+    );
+
+    Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
+    logger.write(
+      'Generated FlutterEmbeddedView component $name: ${blue.wrap(p.relative(files.first.path, from: projectRoot.path))}',
+      progress: ProgressState.completed,
+    );
+
+    if (withSampleFlutterWidget != null && withSampleFlutterWidget!) {
+      // if required, create the sample widget in the widgets dir
+      final sampleWidgetDir = Directory(p.join(projectRoot.path, 'lib/widgets/'));
+
+      if (!sampleWidgetDir.existsSync()) {
+        sampleWidgetDir.createSync(recursive: true);
+      }
+
+      logger.write('Generating sample Flutter widget "$flutterAppName"...', progress: ProgressState.running);
+
+      final generator = await MasonGenerator.fromBundle(newSampleFlutterWidgetBundle);
+      final files = await generator.generate(
+        DirectoryGeneratorTarget(sampleWidgetDir),
+        vars: {
+          'flutterAppName': flutterAppName,
+        },
+        logger: logger.logger,
+      );
+      Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
+      logger.write(
+        'Generated sample Flutter widget $flutterAppName: ${blue.wrap(p.relative(files.first.path, from: projectRoot.path))}',
+        progress: ProgressState.completed,
+      );
+    }
+  }
+
+  /// read the current jaspr mode in the provided pubspec yaml file
   JasprMode? readMode(YamlMap? pubspec) {
     if (pubspec?['jaspr'] case final YamlMap jaspr) {
       if (jaspr['mode'] case final String mode) {
@@ -639,7 +845,7 @@ class ComponentCommand extends BaseCommand {
     return null;
   }
 
-  // include a ref to the bootstrap script in the main document, used when jaspr.mode is either server or static
+  /// include a ref to the bootstrap script in the main document, used when jaspr.mode is either server or static
   void includeBootstrapRefInDoc(Directory projectRoot) {
     final File? serverEntrypoint = getServerEntrypoint(projectRoot);
     if (serverEntrypoint == null) {
@@ -651,23 +857,85 @@ class ComponentCommand extends BaseCommand {
     } else {
       // the server entrypoint contains a document, so we'll insert the script ref in the head
       final String scriptTag = 'script(src: "flutter_bootstrap.js", async: true),';
-      
+
       final content = serverEntrypoint.readAsStringSync();
       final result = parseString(
         content: content,
         featureSet: FeatureSet.latestLanguageVersion(flags: ['dot-shorthands']),
       );
       final builder = EditBuilder(result.lineInfo);
-      
-      // TODO: finish this
-      // file.writeAsStringSync(builder.apply(content));
-      // MethodInvocation? document;
-      // result.unit.visitChildren(DocumentVisitor((node) => document ??= node));
 
+      MethodInvocation? document;
+      result.unit.visitChildren(DocumentVisitor((node) => document ??= node));
+
+      // we didn't find the Document somehow, so warn the user that they must include the script ref themselves
+      if (document == null) {
+        warnManualIncludeRef();
+        return;
+      }
+
+      final headArgument = document!.argumentList.arguments
+          .whereType<NamedExpression>()
+          .where((a) => a.name.label.name == 'head')
+          .firstOrNull;
+
+      if (headArgument == null) {
+        // there was no head arg, so we add it as the first argument
+        final anchor = document!.argumentList.arguments.firstOrNull;
+        // we'll place the head arg right before the first existing arg, if there are none, we just place it after the left parenthesis of DOcument()
+        final offset = anchor?.offset ?? document!.argumentList.leftParenthesis.end;
+        builder.insert(offset, 'head: [\n        $scriptTag\n      ],\n      ');
+      } else if (headArgument.expression case final ListLiteral list) {
+        // if there already exists a head argument, we can add the script ref in there only if it doesn't already exist
+        if (!list.toSource().contains('flutter_bootstrap.js')) {
+          final indent = list.elements.isNotEmpty
+              ? ''.padLeft(builder.getLineIndent(list.elements.last))
+              : ''.padLeft(builder.getLineIndent(headArgument) + 2);
+          builder.insert(list.rightBracket.offset, '$scriptTag\n$indent');
+        }
+      }
+
+      // add an import for dom if not present
+      final hasDomImport = result.unit.directives.whereType<ImportDirective>().any(
+        (d) => d.uri.stringValue == 'package:jaspr/dom.dart',
+      );
+
+      // we place the import last, this gets sorted by dart format later on
+      if (!hasDomImport) {
+        final lastImport = result.unit.directives.whereType<ImportDirective>().lastOrNull;
+        if (lastImport != null) {
+          builder.insert(lastImport.end, "\nimport 'package:jaspr/dom.dart';");
+        } else {
+          // there were no other imports, add to the top
+          builder.insert(0, "import 'package:jaspr/dom.dart';\n");
+        }
+      }
+
+      serverEntrypoint.writeAsStringSync(builder.apply(content));
+      Process.runSync('dart', ['format', serverEntrypoint.path, '--line-length=120']);
     }
   }
 
-  // returns the main.server.dart file if it exists and contains a Document, null otherwise
+  /// include a ref to the flutter_bootstrap script in the index.html file
+  /// used for client mode apps
+  void includeInIndexHtml(Directory projectRoot) {
+    final indexFile = File(p.join(projectRoot.path, 'web', 'index.html'));
+
+    if (indexFile.existsSync()) {
+      final html = indexFile.readAsStringSync();
+      if (!html.contains('flutter_bootstrap.js')) {
+        // place the script ref before the end of the head section
+        final endOfHead = html.indexOf('</head>');
+        indexFile.writeAsStringSync(
+          html.replaceRange(endOfHead, endOfHead, '    <script src="flutter_bootstrap.js" async></script>\n'),
+        );
+      }
+    } else {
+      warnManualIncludeRef();
+    }
+  }
+
+  /// returns the main.server.dart file if it exists and contains a Document, null otherwise
   File? getServerEntrypoint(Directory projectRoot) {
     final libDir = Directory(p.join(projectRoot.path, 'lib'));
     if (!libDir.existsSync()) return null;
@@ -681,6 +949,16 @@ class ComponentCommand extends BaseCommand {
       return file;
     }
     return null;
+  }
+
+  /// warn the user if the reference to the flutter_bootstrap.js script was not automatically included
+  void warnManualIncludeRef() {
+    logger.write(
+      'Could not automatically include the Flutter bootstrap script.\n'
+      '${project.requireMode.isServerOrStatic ? 'Add this to the head of your Document:\n  ${green.wrap('script(src: "flutter_bootstrap.js", async: true),')}' : 'Add this to the head of web/index.html:\n  ${green.wrap('<script src="flutter_bootstrap.js" async></script>')}'}',
+      tag: Tag.cli,
+      level: Level.warning,
+    );
   }
 }
 

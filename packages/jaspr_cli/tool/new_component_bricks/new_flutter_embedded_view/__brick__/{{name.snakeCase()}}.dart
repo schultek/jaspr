@@ -1,27 +1,31 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
-{{#static_or_server}}
-// Import your Flutter app widget, but only on web.
-@Import.onWeb('{{flutterAppName.snakeCase()}}.dart', show: [#{{flutterAppName.pascalCase()}}]);
-import '<current_filename>.imports.dart';
-{{/static_or_server}}
-{{^static_or_server}}
-// Import your flutter app widget.
-import '{{flutterAppName.snakeCase()}}.dart';
-{{/static_or_server}}
+// The flutter widget is only imported on the web (as the server cannot import flutter)
+// and is imported as a deferred library, to not block hydration of the remaining website.
+@Import.onWeb('../widgets/{{flutterAppName.snakeCase()}}.dart', show: [#{{flutterAppName.pascalCase()}}])
+import '{{name.snakeCase()}}.imports.dart' deferred as flutter_app;
+
 class {{name.pascalCase()}} extends StatelessComponent {
   const {{name.pascalCase()}}({super.key});
 
 
   @override
   Component build(BuildContext context) {
-    return FlutterEmbedView(
-      // You can provide a loader that will be shown while the Flutter app loads
-      // loader: MyCustomLoader(),
-      widget: {{#static_or_server}}kIsWeb ?{{/static_or_server}} {{flutterAppName.pascalCase()}}(
-        // You can pass any properties of callbacks to your widget
-      ){{#static_or_server}} : null{{/static_or_server}},
+    return FlutterEmbedView.deferred(
+      styles: Styles(margin: .only(top: 2.rem)),
+      // We need to set constraints as the flutter view cannot dynamically size itself.
+      constraints: ViewConstraints(
+        minWidth: 300,
+        minHeight: 100,
+        maxWidth: double.infinity,
+        maxHeight: double.infinity,
+      ),
+      // The [FlutterEmbedView.deferred] component will take care of loading
+      // the widget and initializing flutter.
+      loadLibrary: flutter_app.loadLibrary(),
+      builder: () => flutter_app.{{flutterAppName.pascalCase()}}(),
     );
   }
 }
