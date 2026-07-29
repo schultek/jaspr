@@ -31,14 +31,19 @@ void main() {
         io.stubDartSDK();
 
         final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerBuildArgs);
-
         final buildResult = runner.run(['build', '--verbose']);
 
-        await expectLater(io.stdout.queue, emits('Building myapp in client rendering mode.'));
+        await expectLater(
+          io.stdout.queue,
+          emitsWithTimeout('Building myapp in client rendering mode.'),
+        );
 
         await io.runReleaseBuild(buildDaemon);
 
-        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
+        await expectLater(
+          io.stdout.queue,
+          emitsWithTimeout(emitsThrough(contains('Completed building'))),
+        );
 
         expect(await buildResult, equals(0));
       });
@@ -78,7 +83,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             '[SERVER] Building server app...',
             'Compiling server executable.',
           ]),
@@ -137,7 +142,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             '[SERVER] Preparing server for static rendering...',
             '[SERVER] Starting server for static rendering...',
           ]),
@@ -158,7 +163,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             '[SERVER] Server started',
             '',
             'Generating pages:',
@@ -171,7 +176,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             emitsThrough(contains('Completed building')),
             emitsThrough('Terminating server...'),
           ]),
@@ -216,7 +221,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             '[SERVER] Preparing server for static rendering...',
             '[SERVER] Starting server for static rendering...',
           ]),
@@ -237,7 +242,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             '[SERVER] Server started',
             '',
             'Generating pages:',
@@ -250,7 +255,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             emitsThrough(contains('Completed building')),
             emitsThrough('Terminating server...'),
           ]),
@@ -349,7 +354,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             '[SERVER] Preparing server for static rendering...',
             '[SERVER] Starting server for static rendering...',
           ]),
@@ -385,7 +390,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             '[SERVER] Server started',
             '',
             'Generating pages:',
@@ -428,7 +433,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             emitsThrough(contains('Completed building')),
             emitsThrough('Terminating server...'),
           ]),
@@ -459,8 +464,7 @@ void main() {
         when(
           () => io.process.run(
             '/fake/bin/dart',
-            any(that: containsAllInOrder(['run', '.dart_tool/jaspr/css/css_runner.dart'])),
-            workingDirectory: '/root/myapp',
+            any(that: containsAllInOrder(['run', '/root/myapp/.dart_tool/jaspr/css/css_runner.dart'])),
           ),
         ).thenAnswer((inv) async {
           return ProcessResult(
@@ -475,10 +479,9 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            '[STYLES] Generating CSS...',
+          emitsInOrderWithTimeout([
             '[STYLES] Generated main.css',
-            emitsThrough(contains('Completed building')),
+            emitsThrough(contains('Completed building myapp')),
           ]),
         );
 

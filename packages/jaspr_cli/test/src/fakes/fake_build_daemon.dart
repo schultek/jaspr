@@ -32,7 +32,7 @@ extension FakeBuildDaemonIO on FakeIO {
 
       fs.file(portFilePath('/root/myapp'))
         ..createSync(recursive: true)
-        ..writeAsStringSync('1234');
+        ..writeAsStringSync('1234\nabc');
       fs.file(assetServerPortFilePath('/root/myapp'))
         ..createSync(recursive: true)
         ..writeAsStringSync('1235');
@@ -53,7 +53,7 @@ extension FakeBuildDaemonIO on FakeIO {
   Future<void> runInitialBuild(FakeBuildDaemon buildDaemon) async {
     await expectLater(
       buildDaemon.messages,
-      emitsInOrder([
+      emitsInOrderWithTimeout([
         isA<BuildTargetRequest>(),
         isA<BuildRequest>(),
       ]),
@@ -72,9 +72,9 @@ extension FakeBuildDaemonIO on FakeIO {
   }
 
   Future<void> runReleaseBuild(FakeBuildDaemon buildDaemon) async {
-    expect(
+    await expectLater(
       this.stdout.queue,
-      emitsInOrder([
+      emitsInOrderWithTimeout([
         '[BUILDER] Building web assets...',
         '[BUILDER] Connecting to the build daemon...',
       ]),
@@ -82,7 +82,7 @@ extension FakeBuildDaemonIO on FakeIO {
 
     await expectLater(
       buildDaemon.messages,
-      emitsInOrder([
+      emitsInOrderWithTimeout([
         isA<BuildTargetRequest>(),
         isA<BuildRequest>(),
       ]),
@@ -112,7 +112,7 @@ extension FakeBuildDaemonIO on FakeIO {
 
     await expectLater(
       this.stdout.queue,
-      emitsInOrder([
+      emitsInOrderWithTimeout([
         '[BUILDER] Completed building web assets.',
       ]),
     );
@@ -127,7 +127,10 @@ extension FakeBuildDaemonIO on FakeIO {
     );
     await buildDaemon.close();
 
-    await expectLater(this.stdout.queue, emits('[BUILDER] [WARNING] Shutting down fake build daemon.'));
+    await expectLater(
+      this.stdout.queue,
+      emitsWithTimeout(emits('[BUILDER] [WARNING] Shutting down fake build daemon.')),
+    );
   }
 }
 

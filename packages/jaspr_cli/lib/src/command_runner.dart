@@ -17,6 +17,7 @@ import 'commands/migrate_command.dart';
 import 'commands/serve_command.dart';
 import 'commands/update_command.dart';
 import 'helpers/analytics.dart';
+import 'process_runner.dart';
 import 'utils.dart';
 import 'version.dart';
 
@@ -76,6 +77,9 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
       _logger.err(error.message);
       return ExitCode.unavailable.code;
     } catch (error, stackTrace) {
+      if (!ProcessRunner.isDefault) {
+        rethrow;
+      }
       _logger.err('$error');
       _logger.err('$stackTrace');
       return ExitCode.software.code;
