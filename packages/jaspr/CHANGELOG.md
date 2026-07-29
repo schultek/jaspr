@@ -5,6 +5,7 @@
 - Fixed asynchronous errors escaping the development proxy when falling back to the app root.
 - Fixed repeated copying of nested build assets.
 - The sitemap `priority` tag is now omitted when a route has no priority set, instead of always defaulting to `0.5`.
+- Fixed a misconfiguration of server hotreload that caused `jaspr serve` consuming excessive CPU.
 
 ## 0.23.2
 
