@@ -16,10 +16,17 @@ export async function checkJasprVersion(): Promise<string | undefined> {
       );
 
       if (action === "Install Now") {
-        await dartExtensionApi.sdk.runDart(cwd(), [
+        const result = await dartExtensionApi.sdk.runDart(cwd(), [
           "install",
           "jaspr_cli",
         ]);
+
+        if (result && result.stdout.toLowerCase().includes('not on your path')) {
+          await vs.window.showWarningMessage(
+            `Installation finished with warnings:\n${result.stdout.split("Warning:")[1]}`,
+          );
+          return undefined;
+        }
       } else {
         return undefined;
       }
@@ -44,7 +51,8 @@ export async function checkJasprVersion(): Promise<string | undefined> {
     installedVersion = await getInstalledVersion();
     if (installedVersion === undefined || installedVersion < minimumJasprVersion) {
       vs.window.showErrorMessage(
-        `Failed to install or update Jaspr CLI. Installed version: ${installedVersion}`
+        `Failed to install or update Jaspr CLI. Please try running 'dart install jaspr_cli' manually.`
+         + (installedVersion ? ` Installed version: ${installedVersion}` : '')
       );
       return undefined;
     }

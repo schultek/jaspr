@@ -133,6 +133,9 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
 
   void addFile(String path) {
     if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.extension(path))) {
+      // Partials excluded by filterExtensions are not page sources,
+      // but might have dependents that failed while the partial was missing.
+      _invalidateDependentSources(path);
       return;
     }
     // Convert the file path to a posix path.
@@ -147,12 +150,20 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
         keepSuffix: keepSuffixPattern?.matchAsPrefix(posixPath) != null,
       ),
     );
+
+    // Another file might depend on this file, so failed before it was added.
+    // Now that it's added, ensure that the dependent source is rebuilt.
+    _invalidateDependentSources(path);
   }
 
   void removeFile(String path) {
     final source = sources.where((source) => source.file.path == path).firstOrNull;
     if (source != null) {
       removeSource(source);
+    } else {
+      // Partials excluded by filterExtensions are not page sources,
+      // but might still have dependents registered through readPartial.
+      _invalidateDependentSources(path);
     }
   }
 
@@ -164,10 +175,34 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   }
 
   @override
+  void removeSource(FilePageSource source) {
+    // Invalidate the removed source without rebuilding it,
+    // since its own file no longer exists.
+    super.invalidateSource(source, rebuild: false);
+    super.removeSource(source);
+
+    // Remove the source from the dependents of partials it read,
+    // dropping entries that no longer have any dependents.
+    dependentSources.removeWhere((_, dependencies) {
+      dependencies.remove(source);
+      return dependencies.isEmpty;
+    });
+
+    // If other sources depend on it,
+    // invalidate them too so they don't keep serving stale content.
+    _invalidateDependentSources(source.file.path);
+  }
+
+  @override
   void invalidateSource(FilePageSource source, {bool rebuild = true}) {
     super.invalidateSource(source, rebuild: rebuild);
-    final dependencies = {...?dependentSources[source.file.path]};
-    dependentSources[source.file.path]?.clear();
+    _invalidateDependentSources(source.file.path, rebuild: rebuild);
+  }
+
+  void _invalidateDependentSources(String path, {bool rebuild = true}) {
+    final dependencies = dependentSources.remove(path);
+    if (dependencies == null) return;
+
     for (final dependent in dependencies) {
       invalidateSource(dependent, rebuild: rebuild);
     }

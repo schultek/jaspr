@@ -6,9 +6,11 @@ import 'package:path/path.dart' as p;
 
 import '../bundles/bundles.dart';
 import '../bundles/scaffold/scaffold_bundle.dart';
+import '../helpers/print_logo.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -105,17 +107,19 @@ class CreateCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
-    final (dir, name) = getTargetDirectory();
+    printLogo();
+
+    final (dir, name) = await getTargetDirectory();
 
     final template = argResults!.option('template');
     if (template != null) {
       return await createFromTemplate(template, dir, name);
     }
 
-    final useMode = getRenderingMode();
-    final (useRouting, useMultiPageRouting) = getRouting(useMode.useServer);
-    final useFlutterMode = getFlutter();
-    final useBackend = useMode == RenderingMode.server ? getBackend() : null;
+    final useMode = await getRenderingMode();
+    final (useRouting, useMultiPageRouting) = await getRouting(useMode.useServer);
+    final useFlutterMode = await getFlutter();
+    final useBackend = useMode == RenderingMode.server ? await getBackend() : null;
 
     final usedPrefixes = {
       if (useMode.useServer) 'server',
@@ -132,7 +136,9 @@ class CreateCommand extends BaseCommand {
       updater.getLatestVersion('build_web_compilers'),
     ).wait;
 
-    final progress = logger.logger!.progress('Generating project...');
+    logger.write('\n');
+
+    logger.write('Generating project...', progress: ProgressState.running);
     final generator = await MasonGenerator.fromBundle(scaffoldBundle);
     final files = await generator.generate(
       ScaffoldGeneratorTarget(dir, usedPrefixes),
@@ -153,9 +159,8 @@ class CreateCommand extends BaseCommand {
         'jasprLintsVersion': jasprLintsVersion,
         'webCompilersVersion': webCompilersVersion,
       },
-      logger: logger.logger,
     );
-    progress.complete('Generated ${files.length} file(s)');
+    logger.write('Generated ${files.length} file(s)', progress: ProgressState.completed);
 
     if (runPubGet) {
       final process = await ProcessRunner.instance.start(dartExecutable, [
@@ -166,22 +171,35 @@ class CreateCommand extends BaseCommand {
       await watchProcess(
         'pub',
         process,
-        tag: Tag.cli,
         progress: 'Resolving dependencies...',
         hide: (s) => s == '...' || s.contains('+'),
+        onComplete: (code) {
+          if (code == 0) {
+            logger.write('Finished getting dependencies', progress: ProgressState.running);
+          } else {
+            logger.write('Failed to get dependencies', level: Level.error, progress: ProgressState.running);
+          }
+        },
       );
     }
 
-    logger.write(
-      '\n'
-      'Created project $name! In order to get started, run the following commands:\n\n',
-    );
-
     final relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
-    if (relativePath != '.') {
-      logger.write('  cd $relativePath\n');
-    }
-    logger.write('  jaspr serve\n');
+    final commands = [
+      if (relativePath != '.') 'cd $relativePath',
+      'jaspr serve',
+    ];
+
+    logger.write('\n');
+    logger.write(
+      wrapBox(
+        'Created project ${cyan.wrap(styleBold.wrap(name))}!\n'
+        '\n'
+        'In order to get started, run the following commands:\n'
+        '\n'
+        '${commands.map((cmd) => '  ${darkGray.wrap('\$')} ${styleBold.wrap(cmd)}').join('\n')}',
+        borderColor: green,
+      ),
+    );
 
     return 0;
   }
@@ -206,7 +224,7 @@ class CreateCommand extends BaseCommand {
       updater.getLatestVersion('build_web_compilers'),
     ).wait;
 
-    final progress = logger.logger!.progress('Generating project from template "$template"...');
+    logger.write('Generating project from template "$template"...', tag: Tag.cli, progress: ProgressState.running);
     final generator = await MasonGenerator.fromBundle(bundle);
     final files = await generator.generate(
       DirectoryGeneratorTarget(dir),
@@ -221,9 +239,8 @@ class CreateCommand extends BaseCommand {
         'jasprLintsVersion': jasprLintsVersion,
         'webCompilersVersion': webCompilersVersion,
       },
-      logger: logger.logger,
     );
-    progress.complete('Generated ${files.length} file(s)');
+    logger.write('Generated ${files.length} file(s)', tag: Tag.cli, progress: ProgressState.completed);
 
     if (runPubGet) {
       final process = await ProcessRunner.instance.start(dartExecutable, [
@@ -254,8 +271,8 @@ class CreateCommand extends BaseCommand {
     return 0;
   }
 
-  (Directory, String) getTargetDirectory() {
-    final targetPath = argResults!.rest.firstOrNull ?? logger.logger!.prompt('Specify a target directory:');
+  Future<(Directory, String)> getTargetDirectory() async {
+    final targetPath = argResults!.rest.firstOrNull ?? await logger.prompt('Specify a target directory:');
 
     final directory = Directory(targetPath).absolute;
     final dir = p.basenameWithoutExtension(p.normalize(directory.path));
@@ -276,7 +293,7 @@ class CreateCommand extends BaseCommand {
     return (directory, name);
   }
 
-  RenderingMode getRenderingMode() {
+  Future<RenderingMode> getRenderingMode() async {
     final opt = argResults!.option('mode');
     return switch (opt?.split(':')) {
       ['client'] => RenderingMode.client,
@@ -291,11 +308,11 @@ class CreateCommand extends BaseCommand {
       }(),
       [final m] => RenderingMode.values.byName(m),
 
-      _ => () {
+      _ => await () async {
         if (!stdout.hasTerminal) {
           throw usageException('No rendering mode specified.');
         }
-        final mode = logger.logger!.chooseOne(
+        final mode = await logger.chooseOne(
           'Select a rendering mode:',
           choices: RenderingMode.values,
           display: (o) => '${o.name}: ${o.help}.',
@@ -305,23 +322,23 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  (bool, bool) getRouting(bool useServer) {
+  Future<(bool, bool)> getRouting(bool useServer) async {
     final opt = argResults!.option('routing');
 
     return switch (opt) {
       'none' => (false, false),
       'single-page' => (true, false),
       'multi-page' => !useServer ? usageException('Cannot use multi-page routing in client mode.') : (true, true),
-      _ => () {
+      _ => await () async {
         if (!stdout.hasTerminal) {
           return useServer ? (true, true) : (true, false);
         }
-        final routing = logger.logger!.confirm('Setup routing for different pages of your site?', defaultValue: true);
+        final routing = await logger.confirm('Setup routing for different pages of your site?', defaultValue: true);
         final multiPage = routing && useServer
-            ? logger.logger!.confirm(
-                '(Recommended) Use multi-page (server-side) routing? '
-                '${darkGray.wrap('Choosing [no] sets up a single-page application with client-side routing instead.')}',
+            ? await logger.confirm(
+                '(Recommended) Use multi-page (server-side) routing?',
                 defaultValue: true,
+                hint: 'Choosing [no] sets up a single-page application with client-side routing instead.',
               )
             : false;
         return (routing, multiPage);
@@ -329,22 +346,22 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  FlutterMode getFlutter() {
+  Future<FlutterMode> getFlutter() async {
     final opt = argResults!.option('flutter');
 
     return switch (opt) {
       'none' => FlutterMode.none,
       'embedded' => FlutterMode.embedded,
       'plugins-only' => FlutterMode.plugins,
-      _ => () {
+      _ => await () async {
         if (!stdout.hasTerminal) {
           return FlutterMode.none;
         }
-        final flutter = logger.logger!.confirm('Setup Flutter web embedding?', defaultValue: false);
+        final flutter = await logger.confirm('Setup Flutter web embedding?', defaultValue: false);
         if (flutter) {
           return FlutterMode.embedded;
         }
-        final plugins = logger.logger!.confirm(
+        final plugins = await logger.confirm(
           'Enable support for using Flutter web plugins in your project?',
           defaultValue: false,
         );
@@ -356,35 +373,33 @@ class CreateCommand extends BaseCommand {
     };
   }
 
-  String? getBackend() {
+  Future<String?> getBackend() async {
     final opt = argResults!.option('backend');
 
     return switch (opt) {
       'none' => null,
       final String b => b,
-      null => () {
+      null => await () async {
         if (!stdout.hasTerminal) {
           return null;
         }
-        final backend = logger.logger!.confirm(
+        final backend = await logger.confirm(
           'Use a custom backend package or framework for the server part of your project?',
           defaultValue: false,
         );
         if (!backend) return null;
 
-        final b = logger.logger!
-            .chooseOne(
-              'Select a backend framework:',
-              choices: [
-                ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
-                // (
-                //   'dart_frog',
-                //   'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.',
-                // ),
-              ],
-              display: (o) => o.$2,
-            )
-            .$1;
+        final b = (await logger.chooseOne(
+          'Select a backend framework:',
+          choices: [
+            ('shelf', 'Shelf: An official and well-supported minimal server package by the Dart Team.'),
+            // (
+            //   'dart_frog',
+            //   'Dart Frog: (Coming Soon) A fast, minimalistic backend framework for Dart built by Very Good Ventures.',
+            // ),
+          ],
+          display: (o) => o.$2,
+        )).$1;
 
         // if (b == 'dart_frog') {
         //   usageException('Support for Dart Frog is coming soon.');

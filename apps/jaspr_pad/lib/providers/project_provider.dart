@@ -124,10 +124,11 @@ ProjectDataBase createDefaultProject() {
         '  font-family: sans-serif;\n'
         '}',
     mainDartFile:
-        "import 'package:jaspr/jaspr.dart';\n\n"
+        "import 'package:jaspr/jaspr.dart';\n"
+        "import 'package:jaspr/dom.dart';\n\n"
         "void main() {\n"
         "  runApp(h1([\n"
-        "    text('Hello World!'),\n"
+        "    .text('Hello World!'),\n"
         "  ]));\n"
         "}",
   );

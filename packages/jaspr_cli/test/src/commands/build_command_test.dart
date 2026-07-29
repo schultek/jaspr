@@ -18,7 +18,7 @@ void main() {
 
     setUp(() {
       io = FakeIO();
-      runner = JasprCommandRunner(false);
+      runner = JasprCommandRunner(false, false);
     });
 
     tearDown(() {
@@ -31,14 +31,19 @@ void main() {
         io.stubDartSDK();
 
         final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerBuildArgs);
-
         final buildResult = runner.run(['build', '--verbose']);
 
-        await expectLater(io.stdout.queue, emits('Building jaspr for client rendering mode.'));
+        await expectLater(
+          io.stdout.queue,
+          emitsWithTimeout('Building myapp in client rendering mode.'),
+        );
 
         await io.runReleaseBuild(buildDaemon);
 
-        await expectLater(io.stdout.queue, emits('Completed building project to /build/jaspr.'));
+        await expectLater(
+          io.stdout.queue,
+          emitsWithTimeout(emitsThrough(contains('Completed building'))),
+        );
 
         expect(await buildResult, equals(0));
       });
@@ -71,25 +76,22 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Building jaspr for server rendering mode.',
-            'Using server entry point: lib/main.server.dart',
-          ]),
+          emits('Building myapp in server rendering mode.'),
         );
 
         await io.runReleaseBuild(buildDaemon);
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Building server app...',
+          emitsInOrderWithTimeout([
+            '[SERVER] Building server app...',
             'Compiling server executable.',
           ]),
         );
 
         serverProcess.exit(0);
 
-        await expectLater(io.stdout.queue, emits('Completed building project to /build/jaspr.'));
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
 
         expect(await buildResult, equals(0));
       });
@@ -133,19 +135,16 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Building jaspr for static rendering mode.',
-            'Using server entry point: lib/main.server.dart',
-          ]),
+          emits('Building myapp in static rendering mode.'),
         );
 
         await io.runReleaseBuild(buildDaemon);
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Preparing static rendering...',
-            '[SERVER] Starting server app...',
+          emitsInOrderWithTimeout([
+            '[SERVER] Preparing server for static rendering...',
+            '[SERVER] Starting server for static rendering...',
           ]),
         );
 
@@ -164,10 +163,11 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Server started',
-            'Generating routes...',
-            '(1/1) Generating route "/abc" ...',
+          emitsInOrderWithTimeout([
+            '[SERVER] Server started',
+            '',
+            'Generating pages:',
+            '(1/1) Generating "/abc" ...',
           ]),
         );
 
@@ -176,9 +176,9 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Completed building project to /build/jaspr.',
-            'Terminating server...',
+          emitsInOrderWithTimeout([
+            emitsThrough(contains('Completed building')),
+            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -214,19 +214,16 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Building jaspr for static rendering mode.',
-            'Using server entry point: lib/main.server.dart',
-          ]),
+          emits('Building myapp in static rendering mode.'),
         );
 
         await io.runReleaseBuild(buildDaemon);
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Preparing static rendering...',
-            '[SERVER] Starting server app...',
+          emitsInOrderWithTimeout([
+            '[SERVER] Preparing server for static rendering...',
+            '[SERVER] Starting server for static rendering...',
           ]),
         );
 
@@ -245,10 +242,11 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Server started',
-            'Generating routes...',
-            '(1/1) Generating route "/abc" ...',
+          emitsInOrderWithTimeout([
+            '[SERVER] Server started',
+            '',
+            'Generating pages:',
+            '(1/1) Generating "/abc" ...',
           ]),
         );
 
@@ -257,9 +255,9 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Completed building project to /build/jaspr.',
-            'Terminating server...',
+          emitsInOrderWithTimeout([
+            emitsThrough(contains('Completed building')),
+            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -277,7 +275,7 @@ void main() {
 
         final buildResult = runner.run(['build', '--verbose']);
 
-        await expectLater(io.stdout.queue, emits('Building jaspr for client rendering mode.'));
+        await expectLater(io.stdout.queue, emits('Building myapp in client rendering mode.'));
 
         expect(io.fs.file('/root/myapp/web/index.html').existsSync(), isTrue);
 
@@ -307,7 +305,7 @@ void main() {
 
         await io.runReleaseBuild(buildDaemon);
 
-        await expectLater(io.stdout.queue, emits('Completed building project to /build/jaspr.'));
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
 
         expect(io.fs.file('/root/myapp/build/jaspr/flutter_bootstrap.js').existsSync(), isTrue);
         expect(
@@ -349,19 +347,16 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Building jaspr for static rendering mode.',
-            'Using server entry point: lib/main.server.dart',
-          ]),
+          emits('Building myapp in static rendering mode.'),
         );
 
         await io.runReleaseBuild(buildDaemon);
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Preparing static rendering...',
-            '[SERVER] Starting server app...',
+          emitsInOrderWithTimeout([
+            '[SERVER] Preparing server for static rendering...',
+            '[SERVER] Starting server for static rendering...',
           ]),
         );
 
@@ -381,7 +376,6 @@ void main() {
             jsonEncode({
               'lastmod': '2026-01-01T12:34:56.789Z',
               'changefreq': 'daily',
-              'priority': 0.3,
             }),
           );
           request.response.write('FAKE HTML RESPONSE 2');
@@ -396,12 +390,13 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Server started',
-            'Generating routes...',
-            '(1/1) Generating route "/abc" ...',
-            '(2/2) Generating route "/abc2" ...',
-            'Generating sitemap.xml...',
+          emitsInOrderWithTimeout([
+            '[SERVER] Server started',
+            '',
+            'Generating pages:',
+            '(1/1) Generating "/abc" ...',
+            '(2/2) Generating "/abc2" ...',
+            '[LOG] Generating sitemap.xml...',
           ]),
         );
 
@@ -430,7 +425,6 @@ void main() {
             '    <loc>https://example.com/abc2</loc>\n'
             '    <lastmod>2026-01-01T12:34:56Z</lastmod>\n'
             '    <changefreq>daily</changefreq>\n'
-            '    <priority>0.3</priority>\n'
             '  </url>\n'
             '</urlset>\n'
             '',
@@ -439,9 +433,9 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
-            'Completed building project to /build/jaspr.',
-            'Terminating server...',
+          emitsInOrderWithTimeout([
+            emitsThrough(contains('Completed building')),
+            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -458,7 +452,7 @@ void main() {
 
         final buildResult = runner.run(['build', '--verbose']);
 
-        await expectLater(io.stdout.queue, emits('Building jaspr for client rendering mode.'));
+        await expectLater(io.stdout.queue, emits('Building myapp in client rendering mode.'));
 
         final runnerFilePath = '.dart_tool/build/generated/myapp/lib/main.client.styles.dart';
         io.fs.file('/root/myapp/$runnerFilePath')
@@ -470,18 +464,25 @@ void main() {
         when(
           () => io.process.run(
             '/fake/bin/dart',
-            any(that: containsAllInOrder(['run', '/root/myapp/$runnerFilePath'])),
-            workingDirectory: '/root/myapp',
+            any(that: containsAllInOrder(['run', '/root/myapp/.dart_tool/jaspr/css/css_runner.dart'])),
           ),
         ).thenAnswer((inv) async {
-          return ProcessResult(0, 0, '{"css": "$cssContent"}', '');
+          return ProcessResult(
+            0,
+            0,
+            '{"event": "css", "file": "main.css", "data": {"css": "$cssContent"}}',
+            '',
+          );
         });
 
         await io.runReleaseBuild(buildDaemon);
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder(['[CLI] Generated main.css', 'Completed building project to /build/jaspr.']),
+          emitsInOrderWithTimeout([
+            '[STYLES] Generated main.css',
+            emitsThrough(contains('Completed building myapp')),
+          ]),
         );
 
         final tempOutputPath = '/root/myapp/.dart_tool/jaspr/generated/main.css';

@@ -17,8 +17,10 @@ abstract class PlatformRouter {
 /// Interface for history management
 /// Will be implemented separately on browser and server
 abstract class HistoryManager {
-  /// Initialize the history manager and setup any listeners to history changes
-  void init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState});
+  /// Initialize the history manager and setup any listeners to history changes.
+  ///
+  /// Returns a callback that can be used to stop listening.
+  VoidCallback? init(BuildContext context, {void Function(Object? state, {String? url})? onChangeState});
 
   /// Push a new state to the history
   void push(String url, {String? title, Object? data});

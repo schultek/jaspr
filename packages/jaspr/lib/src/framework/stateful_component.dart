@@ -595,6 +595,11 @@ abstract class State<T extends StatefulComponent> {
   @protected
   @mustCallSuper
   void reassemble() {}
+
+  /// Called when the page is reloaded.
+  @protected
+  @mustCallSuper
+  void onReload() {}
 }
 
 /// Mixin on [State] that preloads state on the server
@@ -774,5 +779,11 @@ class StatefulElement extends BuildableElement {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _didChangeDependencies = true;
+  }
+
+  @override
+  void onReload() {
+    state.onReload();
+    super.onReload();
   }
 }

@@ -1,20 +1,24 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:http/http.dart' as http;
+import 'package:sse/client/sse_client.dart';
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
+import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'dom_render_object.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
-  @override
-  bool get isClient => true;
-
   ClientAppBinding() {
+    if (kDebugMode) {
+      _debugInitializeEvents();
+    }
     assert(() {
       registerExtension('ext.jaspr.reassemble', (method, parameters) async {
         // ignore: invalid_use_of_protected_member
@@ -24,6 +28,9 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       return true;
     }());
   }
+
+  @override
+  bool get isClient => true;
 
   static final String _baseOrigin = () {
     final hasBase = web.document.querySelector('head>base') != null;
@@ -49,22 +56,16 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   late String _attachTarget;
-  (web.Node, web.Node)? _attachBetween;
 
   @override
-  void attachRootComponent(Component app, {String attachTo = 'body', (web.Node, web.Node)? attachBetween}) {
+  void attachRootComponent(Component app, {String attachTo = 'body'}) {
     _attachTarget = attachTo;
-    _attachBetween = attachBetween;
     super.attachRootComponent(app);
   }
 
   @override
   RenderObject createRootRenderObject() {
-    if (_attachBetween case (final start, final end)) {
-      return RootDomRenderObject.between(start, end);
-    } else {
-      return RootDomRenderObject(web.document.querySelector(_attachTarget)!);
-    }
+    return RootDomRenderObject(web.document.querySelector(_attachTarget)!);
   }
 
   @override
@@ -83,5 +84,106 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   @override
   void reportBuildError(Element element, Object error, StackTrace stackTrace) {
     web.console.error('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace'.toJS);
+  }
+
+  SseClient? _debugEventsClient;
+
+  void _debugInitializeEvents() {
+    if (_debugEventsClient != null) return;
+
+    _debugEventsClient = SseClient(r'/$jasprEventsHandler');
+    _debugEventsClient!.stream.listen(
+      (event) {
+        final data = jsonDecode(event);
+        if (data case ['ReloadStylesheetsRequest', final List<Object?> urls]) {
+          _reloadStylesheets(urls.cast<String>());
+        } else if (data case ['ReloadRequest']) {
+          _reloadPage();
+        }
+      },
+      onDone: () {
+        _debugEventsClient!.close();
+        _debugEventsClient = null;
+      },
+    );
+    _debugEventsClient!.sink.add(jsonEncode(['RouteInfo', web.window.location.pathname]));
+  }
+
+  void _reloadStylesheets(List<String> urls) {
+    // Reload all stylesheet <link> tags.
+    for (final url in urls) {
+      final link = web.document.querySelector('link[rel="stylesheet"][href^="$url"]');
+      if (link != null) {
+        _reloadStylesheet(link, url);
+      }
+    }
+  }
+
+  void _reloadStylesheet(web.Element oldLink, String url, {int retries = 5}) {
+    final newLink = web.document.createElement('link') as web.HTMLLinkElement;
+    newLink.rel = 'stylesheet';
+    newLink.href = '$url?v=${DateTime.now().millisecondsSinceEpoch}';
+
+    StreamSubscription<void>? loadSub;
+    StreamSubscription<void>? errorSub;
+
+    void cleanup() {
+      loadSub?.cancel();
+      errorSub?.cancel();
+    }
+
+    loadSub = web.EventStreamProvider<web.Event>('load').forElement(newLink).listen((_) {
+      cleanup();
+      oldLink.remove();
+    });
+
+    errorSub = web.EventStreamProvider<web.Event>('error').forElement(newLink).listen((_) {
+      cleanup();
+      newLink.remove();
+      if (retries > 0) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _reloadStylesheet(oldLink, url, retries: retries - 1);
+        });
+      } else {
+        print('Failed to reload stylesheet $url after 5 retries.');
+      }
+    });
+
+    oldLink.parentNode?.insertBefore(newLink, oldLink.nextSibling);
+  }
+
+  void _reloadPage([String? path]) async {
+    final response = await http.get(
+      Uri.parse(web.window.location.href).replace(path: path),
+      headers: {'X-Jaspr-Reload': 'true'},
+    );
+    if (response.statusCode != 200) {
+      web.console.error('[Jaspr] Failed to reload page: ${response.statusCode} ${response.reasonPhrase}'.toJS);
+      return;
+    }
+
+    final doc = web.Document.parseHTMLUnsafe(response.body.toJS);
+    final body = doc.body;
+
+    if (body == null) {
+      web.console.error('[Jaspr] Failed to reload page: No body found'.toJS);
+      return;
+    }
+
+    final sw = Stopwatch()..start();
+
+    final newNode = _attachTarget == 'body' ? body : body.querySelector(_attachTarget)!;
+
+    final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;
+    rootRenderObject.setRootNode(newNode);
+    rootElement!.owner.performReload(rootElement!);
+
+    web.document.body!.replaceWith(body);
+
+    sw.stop();
+
+    if (kVerboseMode) {
+      print('Page reloaded in ${sw.elapsedMilliseconds}ms');
+    }
   }
 }
