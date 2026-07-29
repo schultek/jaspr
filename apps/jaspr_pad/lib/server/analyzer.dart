@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path;
 import '../models/api_models.dart';
 import 'project.dart';
 import 'scheduler.dart';
+import 'validation.dart';
 
 // Use very long timeouts to ensure that the server has enough time to restart.
 const Duration _analysisServerTimeout = Duration(seconds: 35);
@@ -49,6 +50,7 @@ class Analyzer {
   Future<AnalyzeResponse> analyze(AnalyzeRequest request) {
     return serverScheduler.schedule(
       ClosureTask<AnalyzeResponse>(() async {
+        request.sources.keys.forEach(validateSourceFileName);
         var sources = request.sources.map((k, v) => MapEntry(path.join(jasprBasicTemplatePath, 'lib', k), v));
         await _loadSources(sources);
         final errors = (await analysisServer.analysis.getErrors(mainPath)).errors;
@@ -112,6 +114,8 @@ class Analyzer {
   Future<DocumentResponse> document(DocumentRequest request) async {
     return serverScheduler.schedule(
       ClosureTask<DocumentResponse>(() async {
+        request.sources.keys.forEach(validateSourceFileName);
+        validateSourceFileName(request.name);
         var sources = request.sources.map((k, v) => MapEntry(path.join(jasprBasicTemplatePath, 'lib', k), v));
         await _loadSources(sources);
 

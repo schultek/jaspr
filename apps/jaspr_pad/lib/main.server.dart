@@ -2,6 +2,7 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_mappable/dart_mappable.dart';
@@ -76,8 +77,15 @@ Handler get apiRouter {
 
 Handler mappedHandler<R, T>(FutureOr<R> Function(T request) handler) {
   return (Request request) async {
-    var body = await request.readAsString();
-    var result = await handler(MapperContainer.globals.fromJson(body));
-    return Response.ok(MapperContainer.globals.toJson(result), headers: {'Content-Type': 'application/json'});
+    try {
+      var body = await request.readAsString();
+      var result = await handler(MapperContainer.globals.fromJson(body));
+      return Response.ok(MapperContainer.globals.toJson(result), headers: {'Content-Type': 'application/json'});
+    } on FormatException catch (e) {
+      return Response.badRequest(
+        body: jsonEncode({'error': e.message}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
   };
 }

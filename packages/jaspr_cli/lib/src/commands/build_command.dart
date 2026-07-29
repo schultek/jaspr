@@ -50,6 +50,13 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       help: 'Compile to a specific target architecture (only in server mode)',
       allowed: ['arm', 'arm64', 'riscv64', 'x64'],
     );
+    argParser.addOption(
+      'port',
+      abbr: 'p',
+      help:
+          'Specify a port to run the server on during static generation. '
+          'Defaults to {jaspr.port} from pubspec.yaml or "$defaultServePort".',
+    );
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
     argParser.addMultiOption(
       'extra-js-compiler-option',
@@ -223,7 +230,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       final List<String> queuedRoutes = [];
 
       final serverStartedCompleter = Completer<void>();
-      final serverPort = project.port ?? defaultServePort;
+      final serverPort = argResults!.option('port') ?? project.port ?? defaultServePort;
 
       await startProxy(
         serverProxyPort,
@@ -394,7 +401,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           if (sitemapData.changefreq != null) {
             content.writeln('    <changefreq>${sitemapData.changefreq}</changefreq>');
           }
-          content.writeln('    <priority>${sitemapData.priority ?? 0.5}</priority>');
+          if (sitemapData.priority != null) {
+            content.writeln('    <priority>${sitemapData.priority}</priority>');
+          }
           content.writeln('  </url>');
         }
         content.writeln('</urlset>');

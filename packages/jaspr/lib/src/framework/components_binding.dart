@@ -15,6 +15,18 @@ mixin ComponentsBinding on AppBinding {
     buildOwner.performInitialBuild(element, completeInitialFrame);
   }
 
+  /// Detaches the current root component from the tree and disposes/unmounts it.
+  void detachRootComponent() {
+    if (_rootElement != null) {
+      final buildOwner = _rootElement!._owner!;
+      buildOwner.lockState(() {
+        buildOwner._inactiveElements.add(_rootElement!);
+        buildOwner._inactiveElements._unmountAll();
+      });
+      _rootElement = null;
+    }
+  }
+
   RenderObject createRootRenderObject();
 
   BuildOwner createRootBuildOwner() {

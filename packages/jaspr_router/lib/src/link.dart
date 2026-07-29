@@ -64,8 +64,17 @@ class Link extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
+    final resolvedUrl = () {
+      if (to.startsWith('/') && !to.startsWith('//')) {
+        final basePath = context.binding.basePath;
+        final prefix = basePath.endsWith('/') ? basePath.substring(0, basePath.length - 1) : basePath;
+        return prefix + to;
+      }
+      return to;
+    }();
+
     return a(
-      href: to,
+      href: resolvedUrl,
       target: target,
       referrerPolicy: referrer,
       classes: classes,

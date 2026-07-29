@@ -349,16 +349,14 @@ class ScopeTreeNode {
 
           final libConfigurations = configuration.where(
             (c) =>
-                c.name.components.length == 3 &&
-                c.name.components[0].name == 'dart' &&
-                c.name.components[1].name == 'library',
+                c.name.tokens.length == 5 && c.name.tokens[0].lexeme == 'dart' && c.name.tokens[2].lexeme == 'library',
           );
 
           final clientConfiguration = libConfigurations
-              .where((c) => clientLibs.contains(c.name.components.last.name))
+              .where((c) => clientLibs.contains(c.name.tokens.last.lexeme))
               .firstOrNull;
           final serverConfiguration = libConfigurations
-              .where((c) => serverLibs.contains(c.name.components.last.name))
+              .where((c) => serverLibs.contains(c.name.tokens.last.lexeme))
               .firstOrNull;
 
           final baseLib = getBaseLibraryForDirective(directive);

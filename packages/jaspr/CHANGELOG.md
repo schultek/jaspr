@@ -1,9 +1,18 @@
 ## Unreleased patch
 
-- Fixed `jaspr serve` pinning a CPU core at 100% when the project has no `bin/` or `test/`
-  directory. The hot reload server used `debounceInterval: Duration.zero`, which is also used
-  as the polling delay for directory watchers that fall back to polling (e.g. for paths that
-  don't exist), turning it into a tight busy loop. (#816)
+- Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
+- Updated `testClient` in `jaspr_test` to automatically unmount the root component and clean up `document.body` between test cases.
+- Fixed asynchronous errors escaping the development proxy when falling back to the app root.
+- Fixed repeated copying of nested build assets.
+- The sitemap `priority` tag is now omitted when a route has no priority set, instead of always defaulting to `0.5`.
+- Fixed a misconfiguration of server hotreload that caused `jaspr serve` consuming excessive CPU.
+
+## 0.23.2
+
+- Added `basePath` property to `AppBinding` to support hosting applications under a sub-path.
+- Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.
+- Support `analyzer` `^12.1.0`.
+- Added a `--port` option to `jaspr build` for configuring the server port used during static generation.
 
 ## 0.23.1
 

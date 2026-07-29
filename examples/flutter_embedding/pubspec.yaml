@@ -9,7 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  firebase_core: ^3.4.1
+  firebase_core: ^4.8.0
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.0.0

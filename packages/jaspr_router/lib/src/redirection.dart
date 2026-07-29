@@ -211,7 +211,10 @@ void _addRedirect(List<RouteMatchList> redirects, RouteMatchList newMatch, Uri p
 }
 
 RouteMatchList _setRedirectHeader(BuildContext context, RouteMatchList matchList) {
-  PlatformRouter.instance.redirect(context, matchList.uri.path);
+  final basePath = context.binding.basePath;
+  final prefix = basePath.endsWith('/') ? basePath.substring(0, basePath.length - 1) : basePath;
+  final redirectUrl = prefix + matchList.uri.path;
+  PlatformRouter.instance.redirect(context, redirectUrl);
   return _redirectMatch(matchList.uri);
 }
 
