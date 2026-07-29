@@ -14,10 +14,17 @@ typedef SetupFunction = void Function(ServerAppBinding binding);
 /// An object to be returned from [runApp] on the server and
 /// provide access to the internal http server.
 final class ServerApp {
+  static ServerApp? _instance;
+
   ServerApp._(this._setup);
 
   factory ServerApp.run(SetupFunction setup) {
-    return ServerApp._(setup).._run();
+    if (_instance case final instance?) {
+      instance._reload(setup);
+      return instance;
+    } else {
+      return (_instance = ServerApp._(setup)).._run();
+    }
   }
 
   static final createTestHandler = createHandler;
@@ -34,52 +41,50 @@ final class ServerApp {
     _middleware.add(middleware);
   }
 
-  final SetupFunction _setup;
+  SetupFunction _setup;
+  Handler? _handler;
 
-  static Object? _runLock;
+  static final http.Client _client = http.Client();
   static HttpServer? _server;
-  static http.Client? _client;
 
-  void _run() async {
-    final isFirstStartup = _server == null;
+  Future<void> _run() async {
+    assert(_server == null);
 
-    final lock = _runLock = Object();
-    final (client, server) = await _createServer();
-
-    if (_runLock != lock) {
-      server.close(force: true);
-      client.close();
-      return;
-    }
-
-    _server?.close(force: true);
+    _handler = _createHandler();
+    final server = await _createServer();
     _server = server;
 
-    _client?.close();
-    _client = client;
-
-    _reassembleController.add(Object());
-    reloadClients();
-
-    if (isFirstStartup) {
-      if (kGenerateMode) {
-        requestRouteGeneration('/');
-      }
-    } else {
-      print('[INFO] Server application reloaded.');
+    if (kGenerateMode) {
+      requestRouteGeneration('/');
     }
   }
 
-  Future<(http.Client, HttpServer)> _createServer() async {
-    final port = int.parse(Platform.environment['PORT'] ?? '8080');
-    final client = http.Client();
+  void _reload(SetupFunction setup) {
+    _setup = setup;
+    if (_middleware.isNotEmpty) {
+      _handler = _createHandler();
+    }
+    _reassembleController.add(Object());
+    reloadClients();
+  }
+
+  Handler _createHandler() {
     var pipeline = const Pipeline();
     for (final middleware in _middleware) {
       pipeline = pipeline.addMiddleware(middleware);
     }
     _middleware.clear();
-    final handler = createHandler((_, render) => render(_setup), client: client);
-    return (client, await shelf_io.serve(pipeline.addHandler(handler), InternetAddress.anyIPv4, port, shared: true));
+    return createHandler((_, render) => render(_setup), client: _client);
+  }
+
+  Future<HttpServer> _createServer() async {
+    final port = int.parse(Platform.environment['PORT'] ?? '8080');
+    return await shelf_io.serve(
+      (req) => _handler?.call(req) ?? Response(503, headers: {'Retry-After': '1'}),
+      InternetAddress.anyIPv4,
+      port,
+      shared: true,
+    );
   }
 
   static final _requestedRoutes = <String, (String?, String?, double?)>{};
@@ -103,15 +108,10 @@ final class ServerApp {
   }
 
   static Future<void> _sendDebugMessage(Object message) async {
-    final postWithClient = _client?.post ?? http.post;
-    await postWithClient(Uri.http('localhost:$jasprProxyPort', r'$jasprMessageHandler'), body: jsonEncode(message));
+    await _client.post(Uri.http('localhost:$jasprProxyPort', r'$jasprMessageHandler'), body: jsonEncode(message));
   }
 
   static void reloadClients([String? route]) {
-    for (final connection in ClientConnection.connections) {
-      if (route == null || route == connection.currentRoute) {
-        connection.reload();
-      }
-    }
+    _sendDebugMessage({'reload': route ?? true});
   }
 }

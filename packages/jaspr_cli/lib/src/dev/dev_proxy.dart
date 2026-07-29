@@ -41,6 +41,7 @@ class DevProxy {
     this.logger,
   }) {
     _listenToClientConnections();
+    _listenToBuildResults();
   }
 
   Future<void> _listenToClientConnections() async {
@@ -54,39 +55,52 @@ class DevProxy {
 
       _clientConnections[appId] = ClientConnection(appConnection, dwds, this)..start();
     }
-    _listenToBuildResults();
   }
 
   void _listenToBuildResults() async {
     await for (final buildResult in buildResults) {
       if (buildResult.status == BuildStatus.succeeded) {
+        for (final callback in _preReloadCallbacks) {
+          await callback();
+        }
         if (reload == ReloadConfiguration.hotReload) {
           for (final clientConnection in _clientConnections.values) {
             await clientConnection.performHotReload();
           }
+        } else if (reload == ReloadConfiguration.hotRestart) {
+          for (final clientConnection in _clientConnections.values) {
+            await clientConnection.restart();
+          }
         }
-
         for (final callback in _postReloadCallbacks) {
-          // ignore: avoid_dynamic_calls
-          callback(buildResult);
+          await callback();
         }
       }
     }
   }
 
-  final List<void Function(BuildResult result)> _postReloadCallbacks = [];
+  final List<FutureOr<void> Function()> _preReloadCallbacks = [];
+  final List<FutureOr<void> Function()> _postReloadCallbacks = [];
 
-  void registerPostReloadCallback(void Function(BuildResult result) callback) {
+  void registerPreReloadCallback(FutureOr<void> Function() callback) {
+    _preReloadCallbacks.add(callback);
+  }
+
+  void registerPostReloadCallback(FutureOr<void> Function() callback) {
     _postReloadCallbacks.add(callback);
   }
 
-  void unregisterPostReloadCallback(void Function(BuildResult result) callback) {
+  void unregisterPostReloadCallback(FutureOr<void> Function() callback) {
     _postReloadCallbacks.remove(callback);
   }
 
   ClientConnection? getClientConnection(String? appId) {
     if (appId == null) return null;
     return _clientConnections[appId];
+  }
+
+  Iterable<ClientConnection> getClientConnections() {
+    return _clientConnections.values;
   }
 
   static Future<DevProxy> start(
@@ -469,7 +483,6 @@ class ClientConnection {
         sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
       case BuildStatus.succeeded:
         sendEvent('client.progress', {'appId': appId, 'id': '$_buildProgressEventId', 'finished': true});
-        await reassemble();
     }
   }
 

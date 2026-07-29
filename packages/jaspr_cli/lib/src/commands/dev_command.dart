@@ -8,6 +8,8 @@ import 'package:dwds/data/build_result.dart';
 import 'package:dwds/src/loaders/strategy.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
+import 'package:vm_service/vm_service.dart' as vm;
+import 'package:vm_service/vm_service_io.dart';
 
 import '../dev/chrome.dart';
 import '../dev/client_workflow.dart';
@@ -34,7 +36,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'mode',
       abbr: 'm',
       help: 'Sets the reload/refresh mode.',
-      allowed: ['reload', 'refresh', 'none'],
+      allowed: ['reload', 'restart', 'refresh', 'none'],
       allowedHelp: {
         'reload': 'Hot-reloads both client and server apps',
         'restart': 'Restarts the client app (loses current state)',
@@ -138,6 +140,19 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       serverPort: port,
       flutterPort: project.flutterMode == FlutterMode.embedded ? flutterProxyPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
+      onMessage: (message) async {
+        if (message case {'reload': final Object reload}) {
+          final String? route = reload is String ? reload : null;
+          for (final connection in workflow.devProxy.getClientConnections()) {
+            try {
+              await connection.vmService?.callServiceExtension(
+                'ext.jaspr.reload',
+                args: route != null ? {'path': route} : null,
+              );
+            } catch (_) {}
+          }
+        }
+      },
     );
 
     await cssRunner.initialGenerationComplete;
@@ -218,10 +233,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     }
 
-    final useHotReload = entryPoint.startsWith('lib/') && !release;
+    final useServerReload = entryPoint.startsWith('lib/') && !release;
 
     final serverTarget = File('.dart_tool/jaspr/server_target.dart').absolute;
-    if (useHotReload && !serverTarget.existsSync()) {
+    if (useServerReload && !serverTarget.existsSync()) {
       serverTarget.createSync(recursive: true);
     }
 
@@ -246,7 +261,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       args.add('--pause-isolates-on-start');
     }
 
-    if (useHotReload) {
+    if (useServerReload) {
       final import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
       serverTarget.writeAsStringSync(serverEntrypoint(import));
 
@@ -263,10 +278,50 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       workingDirectory: Directory.current.absolute.path,
     );
 
+    String? vmServiceUri;
+    vm.VmService? vmService;
+
+    Future<void> connectToVmService([int retries = 2]) async {
+      if (vmServiceUri == null) return;
+      try {
+        final wsUri = '${vmServiceUri!.replaceFirst('http', 'ws')}ws';
+        final currentVmService = vmService = await vmServiceConnectUri(wsUri);
+
+        currentVmService.onDone.then((_) {
+          if (currentVmService == vmService) {
+            vmService = null;
+            Future.delayed(Duration(seconds: 1), () => connectToVmService());
+          }
+        });
+      } catch (e) {
+        if (retries > 0) {
+          Future.delayed(Duration(seconds: 1), () => connectToVmService(retries - 1));
+        } else {
+          logger.write('Failed to connect to server VM service: $e', tag: Tag.cli, level: Level.warning);
+        }
+      }
+    }
+
+    guardResource(() {
+      final currentVmService = vmService;
+      vmService = null;
+      currentVmService?.dispose();
+    });
+
     final serverFuture = watchProcess(
       'server',
       process,
       tag: Tag.server,
+      hide: (log) {
+        if (vmServiceUri == null) {
+          final match = RegExp(r'The Dart VM service is listening on (http://[a-zA-Z0-9:/_=\-\.\?]+)').firstMatch(log);
+          if (match != null) {
+            vmServiceUri = match.group(1)!;
+            connectToVmService();
+          }
+        }
+        return false;
+      },
       onFail: () {
         logger.write(
           'Server stopped unexpectedly. There is probably more output above.',
@@ -284,6 +339,20 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         return null;
       },
     );
+
+    workflow.devProxy.registerPostReloadCallback(() async {
+      if (vmService != null) {
+        try {
+          final vmObj = await vmService!.getVM();
+          final mainIsolate = vmObj.isolates!.first;
+          await vmService!.reloadSources(mainIsolate.id!);
+          await vmService!.callServiceExtension('ext.jaspr.reload', isolateId: mainIsolate.id!);
+          logger.write('Server reloaded.', tag: Tag.server);
+        } catch (e) {
+          logger.write('Failed to reload server: $e', tag: Tag.server, level: Level.warning);
+        }
+      }
+    });
 
     var serverClosed = false;
     serverFuture.then((code) {
@@ -571,18 +640,16 @@ enum DevStatus { ready, rebuilding, error }
 String serverEntrypoint(String import) =>
     '''
   import '$import' as m;
-  import 'package:hotreloader/hotreloader.dart';
+  import 'dart:developer';
       
   void main(List<String> args) async {
     final mainFunc = m.main as dynamic;
     final mainCall = mainFunc is dynamic Function(List<String>) ? () => mainFunc(args) : () => mainFunc();
 
-    try {
-      await HotReloader.create(
-        debounceInterval: Duration.zero,
-        onAfterReload: (ctx) => mainCall(),
-      );
-    } catch (_) {}
+    registerExtension('ext.jaspr.reload', (method, parameters) async {
+      await mainCall();
+      return ServiceExtensionResponse.result('{}');
+    });
     
     mainCall();
   }

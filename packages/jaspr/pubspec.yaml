@@ -20,7 +20,6 @@ environment:
 resolution: workspace
 
 dependencies:
-  hotreloader: ^4.1.0
   html: ^0.15.0
   http: '>=0.13.0 <2.0.0'
   meta: ^1.7.0
