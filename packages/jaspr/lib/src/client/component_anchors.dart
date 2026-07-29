@@ -215,7 +215,7 @@ List<ClientComponentAnchor> extractAnchors({
         final resolvedKey = key != null
             ? '@$name#$key'
             : (() {
-                final count = clientKeyCounters[name] ?? -1;
+                final count = clientKeyCounters[name] ?? 0;
                 clientKeyCounters[name] = count + 1;
                 return '@$name-${anchors.length}-$count';
               })();
