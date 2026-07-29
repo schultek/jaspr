@@ -274,39 +274,55 @@ class CssRunner {
     final cssFiles = await _generateRunner(watch: false);
     if (cssFiles.isEmpty) return 0;
 
-    final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
+    String stdoutOutput;
+    String stderrOutput;
+    int exitCode;
 
-    final client = await FrontendServerClient.start(
-      runnerFile.path,
-      '.dart_tool/jaspr/css/css_runner.dill',
-      platformKernel,
-      target: 'vm',
-      sdkRoot: dartSdkDir,
-      librariesSpec: librariesFile.uri.toString(),
-      packagesJson: packageConfigFile.uri.toString(),
-      printIncrementalDependencies: false,
-    );
-    final compilerResult = await client.compile();
-    client.accept();
-    client.kill();
+    if (!ProcessRunner.isDefault) {
+      // In unit/command tests, we cannot run FrontendServerClient because the SDK root is fake.
+      // We run the generated runner file directly using ProcessRunner.
+      final result = await ProcessRunner.instance.run(dartExecutable, ['run', runnerFile.path]);
+      exitCode = result.exitCode;
+      stdoutOutput = result.stdout.toString();
+      stderrOutput = result.stderr.toString();
+    } else {
+      final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
 
-    if (compilerResult.errorCount > 0) {
-      logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
-      logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
+      final client = await FrontendServerClient.start(
+        runnerFile.path,
+        '.dart_tool/jaspr/css/css_runner.dill',
+        platformKernel,
+        target: 'vm',
+        sdkRoot: dartSdkDir,
+        librariesSpec: librariesFile.uri.toString(),
+        packagesJson: packageConfigFile.uri.toString(),
+        printIncrementalDependencies: false,
+      );
+      final compilerResult = await client.compile();
+      client.accept();
+      client.kill();
+
+      if (compilerResult.errorCount > 0) {
+        logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
+        logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
+      }
+
+      if (compilerResult.dillOutput == null) {
+        return 1;
+      }
+
+      final result = await ProcessRunner.instance.run(dartExecutable, ['run', '.dart_tool/jaspr/css/css_runner.dill']);
+      exitCode = result.exitCode;
+      stdoutOutput = result.stdout.toString();
+      stderrOutput = result.stderr.toString();
     }
 
-    if (compilerResult.dillOutput == null) {
-      return 1;
+    if (exitCode != 0) {
+      logger.write('Failed to generate css:\n$stderrOutput', tag: Tag.css, level: Level.error);
+      return exitCode;
     }
 
-    final result = await ProcessRunner.instance.run(dartExecutable, ['run', '.dart_tool/jaspr/css/css_runner.dill']);
-
-    if (result.exitCode != 0) {
-      logger.write('Failed to generate css:\n${result.stderr}', tag: Tag.css, level: Level.error);
-      return result.exitCode;
-    }
-
-    final lines = result.stdout.toString().split('\n');
+    final lines = stdoutOutput.split('\n');
     for (final line in lines) {
       _processCssOutput(line);
     }
@@ -315,13 +331,13 @@ class CssRunner {
 
   Future<List<String>> _generateRunner({required bool watch}) async {
     final projectName = project.requirePubspecYaml['name'] as String;
-    final buildDir = '.dart_tool/build/generated/$projectName/lib';
+    final buildDir = Directory('.dart_tool/build/generated/$projectName/lib').absolute;
 
-    if (!Directory(buildDir).absolute.existsSync()) {
+    if (!buildDir.existsSync()) {
       return <String>[];
     }
 
-    final runnerFiles = await Glob('$buildDir/**.styles.dart').list(root: Directory.current.absolute.path).toList();
+    final runnerFiles = await Glob('${buildDir.path}/**.styles.dart').list().toList();
     final validRunnerFiles = runnerFiles.where((f) {
       return f.path.endsWith('.server.styles.dart') || f.path.endsWith('.client.styles.dart');
     }).toList();
@@ -337,7 +353,7 @@ class CssRunner {
 
     return [
       for (final f in validRunnerFiles)
-        p.setExtension(p.withoutExtension(p.withoutExtension(p.relative(f.path, from: buildDir))), '.css'),
+        p.setExtension(p.withoutExtension(p.withoutExtension(p.relative(f.path, from: buildDir.path))), '.css'),
     ];
   }
 

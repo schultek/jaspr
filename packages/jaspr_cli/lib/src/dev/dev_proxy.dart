@@ -79,7 +79,7 @@ class DevProxy {
         _ => null,
       };
       if (result == null) {
-        throw StateError('Unexpected Daemon build result: $result');
+        throw StateError('Unexpected Daemon build result: $resultForTarget');
       }
       return result;
     });

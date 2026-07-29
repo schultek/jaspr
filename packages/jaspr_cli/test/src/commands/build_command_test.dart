@@ -459,11 +459,16 @@ void main() {
         when(
           () => io.process.run(
             '/fake/bin/dart',
-            any(that: containsAllInOrder(['run', '/root/myapp/$runnerFilePath'])),
+            any(that: containsAllInOrder(['run', '.dart_tool/jaspr/css/css_runner.dart'])),
             workingDirectory: '/root/myapp',
           ),
         ).thenAnswer((inv) async {
-          return ProcessResult(0, 0, '{"css": "$cssContent"}', '');
+          return ProcessResult(
+            0,
+            0,
+            '{"event": "css", "file": "main.css", "data": {"css": "$cssContent"}}',
+            '',
+          );
         });
 
         await io.runReleaseBuild(buildDaemon);
