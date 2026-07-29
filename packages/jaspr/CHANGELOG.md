@@ -7,6 +7,9 @@
 
 ## 0.23.3
 
+- Added hot-reloading of generated stylesheets in `standalone` mode.
+- Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
+
 - Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
 - Updated `testClient` in `jaspr_test` to automatically unmount the root component and clean up `document.body` between test cases.
 - Fixed asynchronous errors escaping the development proxy when falling back to the app root.

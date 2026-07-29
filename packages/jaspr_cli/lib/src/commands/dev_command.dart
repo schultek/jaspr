@@ -116,9 +116,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       return 1;
     }
 
-    await _runBuildCallback();
-
     handleClientWorkflow(workflow);
+
+    final cssRunner = await watchCss(workflow);
 
     if (project.flutterMode == FlutterMode.embedded) {
       final flutterProcess = await serveFlutter(useWasm);
@@ -136,6 +136,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       flutterPort: project.flutterMode == FlutterMode.embedded ? flutterProxyPort : null,
       redirectNotFound: project.requireMode == JasprMode.client,
     );
+
+    await cssRunner.initialGenerationComplete;
 
     if (project.requireMode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
@@ -463,7 +465,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           buildCompleter.complete();
         } else {
           logger.write('Rebuilt web assets.', tag: Tag.builder, progress: ProgressState.completed);
-          await _runBuildCallback();
           updateFooter(DevStatus.ready);
         }
       } else if (event.status == BuildStatus.failed) {
@@ -517,10 +518,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     return workflow;
-  }
-
-  Future<void> _runBuildCallback() async {
-    await generateCss();
   }
 }
 

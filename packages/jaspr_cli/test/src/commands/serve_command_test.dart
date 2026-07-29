@@ -36,7 +36,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             'Starting myapp in client rendering mode.',
             '[BUILDER] Starting web compilers...',
             '[BUILDER] Connecting to the build daemon...',
@@ -53,7 +53,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             '[BUILDER] Done building web assets.',
             '[LOG] Serving at http://localhost:8080',
           ]),
@@ -61,7 +61,13 @@ void main() {
 
         await io.shutdownBuildDaemon(buildDaemon);
 
-        expect(io.stdout.queue, emits('Stopping web compilers...'));
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+            'Terminating CSS runner...',
+          ]),
+        );
 
         expect(await serveResult, equals(0));
       });
@@ -79,7 +85,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             'Starting myapp in server rendering mode.',
             '[BUILDER] Starting web compilers...',
             '[BUILDER] Connecting to the build daemon...',
@@ -100,7 +106,13 @@ void main() {
 
         server.exit(0);
 
-        expect(io.stdout.queue, emits('Stopping web compilers...'));
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+            'Terminating CSS runner...',
+          ]),
+        );
 
         expect(await serveResult, equals(0));
       });
@@ -135,7 +147,7 @@ void main() {
 
         await expectLater(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             'Starting myapp in server rendering mode.',
             '[BUILDER] Starting web compilers...',
             '[BUILDER] Connecting to the build daemon...',
@@ -157,8 +169,9 @@ void main() {
 
         expect(
           io.stdout.queue,
-          emitsInOrder([
+          emitsInOrderWithTimeout([
             'Stopping web compilers...',
+            'Terminating CSS runner...',
             'Terminating flutter run...',
           ]),
         );
@@ -228,7 +241,7 @@ extension FakeServerIO on FakeIO {
   Future<void> expectServerStarted(FakeProcess server) async {
     await expectLater(
       this.stdout.queue,
-      emitsInOrder([
+      emitsInOrderWithTimeout([
         '[SERVER] Starting server...',
         '[SERVER] Using server entry point: lib/main.server.dart',
       ]),

@@ -86,7 +86,9 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     _debugEventsClient!.stream.listen(
       (event) {
         final data = jsonDecode(event);
-        if (data case ['ReloadRequest']) {
+        if (data case ['ReloadStylesheetsRequest', final List<Object?> urls]) {
+          _reloadStylesheets(urls.cast<String>());
+        } else if (data case ['ReloadRequest']) {
           _reloadPage();
         }
       },
@@ -96,6 +98,49 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       },
     );
     _debugEventsClient!.sink.add(jsonEncode(['RouteInfo', web.window.location.pathname]));
+  }
+
+  void _reloadStylesheets(List<String> urls) {
+    // Reload all stylesheet <link> tags.
+    for (final url in urls) {
+      final link = web.document.querySelector('link[rel="stylesheet"][href^="$url"]');
+      if (link != null) {
+        _reloadStylesheet(link, url);
+      }
+    }
+  }
+
+  void _reloadStylesheet(web.Element oldLink, String url, {int retries = 5}) {
+    final newLink = web.document.createElement('link') as web.HTMLLinkElement;
+    newLink.rel = 'stylesheet';
+    newLink.href = '$url?v=${DateTime.now().millisecondsSinceEpoch}';
+
+    StreamSubscription<void>? loadSub;
+    StreamSubscription<void>? errorSub;
+
+    void cleanup() {
+      loadSub?.cancel();
+      errorSub?.cancel();
+    }
+
+    loadSub = web.EventStreamProvider<web.Event>('load').forElement(newLink).listen((_) {
+      cleanup();
+      oldLink.remove();
+    });
+
+    errorSub = web.EventStreamProvider<web.Event>('error').forElement(newLink).listen((_) {
+      cleanup();
+      newLink.remove();
+      if (retries > 0) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _reloadStylesheet(oldLink, url, retries: retries - 1);
+        });
+      } else {
+        print('Failed to reload stylesheet $url after 5 retries.');
+      }
+    });
+
+    oldLink.parentNode?.insertBefore(newLink, oldLink.nextSibling);
   }
 
   void _reloadPage([String? path]) async {

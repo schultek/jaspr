@@ -300,7 +300,7 @@ const flutterProxyPort = '5678';
 
 // The path to the Dart executable in either the Dart or Flutter SDK.
 final dartExecutable = () {
-  final String? executable;
+  String? executable;
   if (Platform.isWindows) {
     // Use 'where.exe' to support powershell as well
     final result = (ProcessRunner.instance.runSync('where.exe', ['dart.bat', 'dart.exe'])).stdout.toString();
@@ -312,6 +312,8 @@ final dartExecutable = () {
   if (executable == null || executable.isEmpty) {
     throw Exception('Could not find Dart executable. Make sure Dart is installed and added to your PATH.');
   }
+
+  executable = path.canonicalize(executable);
 
   bool isSdkExecutable(String executable) {
     final maybeSdkDir = path.dirname(path.dirname(executable));

@@ -7,6 +7,7 @@ import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:jaspr_cli/src/process_runner.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:test/test.dart';
 
 import 'fake_socket.dart';
 
@@ -272,3 +273,22 @@ class FakeStdin extends Stream<List<int>> implements io.Stdin {
   @override
   bool get supportsAnsiEscapes => false;
 }
+
+StreamMatcher emitsWithTimeout(
+  dynamic matcher, {
+  Duration timeout = const Duration(seconds: 5),
+}) {
+  final streamMatcher = matcher is StreamMatcher ? matcher : emits(matcher);
+  return StreamMatcher((queue) async {
+    try {
+      return await streamMatcher.matchQueue(queue).timeout(timeout);
+    } on TimeoutException {
+      return 'timed out after ${timeout.inSeconds} seconds';
+    }
+  }, '${streamMatcher.description} with timeout ${timeout.inSeconds}s');
+}
+
+StreamMatcher emitsInOrderWithTimeout(
+  Iterable<dynamic> matchers, {
+  Duration timeout = const Duration(seconds: 5),
+}) => emitsWithTimeout(emitsInOrder(matchers), timeout: timeout);

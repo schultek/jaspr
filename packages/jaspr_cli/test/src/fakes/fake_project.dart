@@ -21,6 +21,9 @@ extension FakeProject on FakeIO {
         ..createSync()
         ..writeAsStringSync(fakeMainServerDart());
     }
+    fs.file('/root/$name/.dart_tool/package_config.json')
+      ..createSync(recursive: true)
+      ..writeAsStringSync(fakePackageConfig());
     fs.currentDirectory = '/root/$name';
   }
 
@@ -80,3 +83,15 @@ void main() {
   runApp(Document(body: div([])));
 }
 ''';
+
+String fakePackageConfig() => jsonEncode({
+      'configVersion': 2,
+      'packages': [
+        {
+          'name': 'jaspr',
+          'rootUri': 'file:///fake/jaspr',
+          'packageUri': 'lib/',
+          'languageVersion': '3.0'
+        }
+      ]
+    });
