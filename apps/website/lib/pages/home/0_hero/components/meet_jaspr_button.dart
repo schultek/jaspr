@@ -54,7 +54,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
   Component build(BuildContext context) {
     if (notifier.done) {
       return div(id: 'meet-jaspr-button', [
-        .wrapElement(
+        .apply(
           events: {
             'click': (event) {
               event.preventDefault();
@@ -77,7 +77,7 @@ class MeetJasprButtonState extends State<MeetJasprButton> {
     }
 
     return div(id: 'meet-jaspr-button', [
-      .wrapElement(
+      .apply(
         classes: touchTimer != null ? 'active' : null,
         events: {
           'mousemove': (event) {

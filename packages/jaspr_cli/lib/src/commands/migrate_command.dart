@@ -10,6 +10,7 @@ import '../helpers/print_logo.dart';
 import '../logging.dart';
 import '../migrations/build_method_migration.dart';
 import '../migrations/client_import_migration.dart';
+import '../migrations/component_apply_migration.dart';
 import '../migrations/component_factory_migration.dart';
 import '../migrations/dom_import_migration.dart';
 import '../migrations/entrypoint_migration.dart';
@@ -66,6 +67,7 @@ class MigrateCommand extends BaseCommand {
     HtmlHelperMigration(),
     ClientImportMigration(),
     EntrypointMigration(),
+    ComponentApplyMigration(),
   ];
 
   @override

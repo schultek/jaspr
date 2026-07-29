@@ -139,7 +139,7 @@ class ClientModule {
   };
 
   String componentFactory() {
-    return '[[$import]].$name(${params.where((p) => !p.isNamed).map((p) => p.decoder).followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder}')).join(', ')})';
+    return '[[$import]].$name(${params.where((p) => !p.isNamed).map((p) => '${p.decoder}, ').followedBy(params.where((p) => p.isNamed).map((p) => '${p.name}: ${p.decoder},')).join(' ')})';
   }
 }
 
@@ -172,7 +172,7 @@ List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
   for (final param in params) {
     if (!param.isInitializingFormal) {
       throw UnsupportedError(
-        'Client components only support initializing formal constructor parameters. '
+        'Client components only support initializing formal constructor parameters.\n'
         'Failing element: ${e.name}.${constr.name}($param)',
       );
     }
@@ -180,12 +180,12 @@ List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
 
   return params.map((p) {
     try {
-      final decoder = codecs.getDecoderFor(p.type, "p['${p.name}']");
+      final decoder = codecs.getDecoderFor(p.type, "p.get<__CAST__>('${p.name}')", true);
       final encoder = codecs.getEncoderFor(p.type, 'c.${p.name}');
       return ClientParam(name: p.name ?? '', isNamed: p.isNamed, decoder: decoder, encoder: encoder);
     } on InvalidParameterException catch (_) {
       throw UnsupportedError(
-        '@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. '
+        '@client components only support parameters of primitive serializable types, Components or types that define @decoder and @encoder methods.\n'
         'Failing parameter: [$p] in ${e.name}.${constr.name}()',
       );
     }

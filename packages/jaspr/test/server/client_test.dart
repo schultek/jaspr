@@ -82,6 +82,29 @@ class _App4State extends State<App4> with SyncStateMixin<App4, Map<String, Objec
   }
 }
 
+class AppWithServerComponent extends StatelessComponent {
+  const AppWithServerComponent({required this.child});
+
+  final Component child;
+
+  @override
+  Component build(BuildContext context) {
+    return div(attributes: {'data-app': 'with-child'}, [child]);
+  }
+}
+
+class AppWithMultipleServerComponents extends StatelessComponent {
+  const AppWithMultipleServerComponents({required this.child1, required this.child2});
+
+  final Component child1;
+  final Component child2;
+
+  @override
+  Component build(BuildContext context) {
+    return div(attributes: {'data-app': 'with-multiple'}, [child1, child2]);
+  }
+}
+
 void main() {
   group('@client', () {
     setUpAll(() {
@@ -93,6 +116,14 @@ void main() {
             App2: ClientTarget<App2>('app2', params: (app) => {'count': app.count, 'label': app.label}),
             App3: ClientTarget<App3>('app3'),
             App4: ClientTarget<App4>('app4'),
+            AppWithServerComponent: ClientTarget<AppWithServerComponent>(
+              'app_with_server_component',
+              params: (app) => {'child': app.child},
+            ),
+            AppWithMultipleServerComponents: ClientTarget<AppWithMultipleServerComponents>(
+              'app_with_multiple_server_components',
+              params: (app) => {'child1': app.child1, 'child2': app.child2},
+            ),
           },
         ),
       );
@@ -164,6 +195,51 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body><!--@app4--><!--\${"label":"world"}--><div data-app="4"></div><!--/@app4--></body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('renders server components inside client components', (tester) async {
+      tester.pumpComponent(AppWithServerComponent(child: span([text('Hello')])));
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <div data-app="with-child"><!--s@1--><span>Hello</span><!--/s@1--></div>\n'
+          '    <!--/@app_with_server_component-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('renders multiple identical server components with shared IDs', (tester) async {
+      final serverChild = span([text('Hello')]);
+      tester.pumpComponent(AppWithMultipleServerComponents(child1: serverChild, child2: serverChild));
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app_with_multiple_server_components data={"child1":"s@1","child2":"s@1"}-->\n'
+          '    <div data-app="with-multiple"><!--s@1--><span>Hello</span><!--/s@1--><!--s@1--><span>Hello</span><!--/s@1--></div>\n'
+          '    <!--/@app_with_multiple_server_components-->\n'
+          '  </body>\n'
           '</html>\n'
           '',
         ),

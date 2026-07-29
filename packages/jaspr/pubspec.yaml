@@ -29,6 +29,7 @@ dependencies:
   shelf_gzip: ^4.0.0
   shelf_proxy: ^1.0.1
   shelf_static: ^1.1.0
+  sse: ^4.1.8
   universal_web: ^1.1.0
 
 dev_dependencies:
