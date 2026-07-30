@@ -61,9 +61,7 @@ final class ServerApp {
 
   void _reload(SetupFunction setup) {
     _setup = setup;
-    if (_middleware.isNotEmpty) {
-      _handler = _createHandler();
-    }
+    _handler = _createHandler();
     _reassembleController.add(Object());
     reloadClients();
   }

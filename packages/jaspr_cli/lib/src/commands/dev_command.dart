@@ -313,7 +313,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       process,
       tag: Tag.server,
       hide: (log) {
-        if (vmServiceUri == null) {
+        if (mode != 'none' && vmServiceUri == null) {
           final match = RegExp(r'The Dart VM service is listening on (http://[a-zA-Z0-9:/_=\-\.\?]+)').firstMatch(log);
           if (match != null) {
             vmServiceUri = match.group(1)!;
@@ -340,19 +340,21 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
     );
 
-    workflow.devProxy.registerPostReloadCallback(() async {
-      if (vmService != null) {
-        try {
-          final vmObj = await vmService!.getVM();
-          final mainIsolate = vmObj.isolates!.first;
-          await vmService!.reloadSources(mainIsolate.id!);
-          await vmService!.callServiceExtension('ext.jaspr.reload', isolateId: mainIsolate.id!);
-          logger.write('Server reloaded.', tag: Tag.server);
-        } catch (e) {
-          logger.write('Failed to reload server: $e', tag: Tag.server, level: Level.warning);
+    if (mode != 'none') {
+      workflow.devProxy.registerPostReloadCallback(() async {
+        if (vmService case final vmService?) {
+          try {
+            final vmObj = await vmService.getVM();
+            final mainIsolate = vmObj.isolates!.first;
+            await vmService.reloadSources(mainIsolate.id!);
+            await vmService.callServiceExtension('ext.jaspr.reload', isolateId: mainIsolate.id!);
+            logger.write('Server reloaded.', tag: Tag.server);
+          } catch (e) {
+            logger.write('Failed to reload server: $e', tag: Tag.server, level: Level.warning);
+          }
         }
-      }
-    });
+      });
+    }
 
     var serverClosed = false;
     serverFuture.then((code) {

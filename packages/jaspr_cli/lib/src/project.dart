@@ -293,6 +293,10 @@ class Project {
     }
   }
 
+  /// Validates that this project supports hot reload.
+  ///
+  /// Logs an error and returns `false` when the configured
+  /// `build_web_compilers` dependency constraint doesn't support hot reload.
   bool checkHotReloadSupport() {
     final devDependencies = pubspecYaml?['dev_dependencies'] as Map<Object?, Object?>?;
     final version = switch (devDependencies?['build_web_compilers']) {

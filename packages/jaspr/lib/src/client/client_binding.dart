@@ -14,7 +14,13 @@ import 'dom_render_object.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
-  ClientAppBinding() {
+  static final ClientAppBinding _instance = ClientAppBinding._();
+
+  static ClientAppBinding ensureInitialized() {
+    return _instance;
+  }
+
+  ClientAppBinding._() {
     assert(() {
       registerExtension('ext.jaspr.reassemble', (method, parameters) async {
         // ignore: invalid_use_of_protected_member
@@ -29,19 +35,24 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
         return ServiceExtensionResponse.result('{}');
       });
       registerExtension('ext.jaspr.reload_stylesheets', (method, parameters) async {
-        final urlsParam = parameters['urls'];
-        List<String> urls = [];
-        if (urlsParam != null) {
+        List<String>? stylesheetUrls;
+        if (parameters['urls'] case final urlsParameter?) {
           try {
-            final decoded = jsonDecode(urlsParam);
-            if (decoded is List) {
-              urls = decoded.cast<String>();
+            final decoded = jsonDecode(urlsParameter);
+            if (decoded is List<Object?>) {
+              stylesheetUrls = decoded.cast<String>();
             }
           } catch (_) {
-            urls = urlsParam.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+            stylesheetUrls = urlsParameter
+                .split(',')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList(growable: false);
           }
         }
-        _reloadStylesheets(urls);
+        if (stylesheetUrls != null) {
+          _reloadStylesheets(stylesheetUrls);
+        }
         return ServiceExtensionResponse.result('{}');
       });
       return true;
