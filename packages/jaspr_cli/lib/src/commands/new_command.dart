@@ -8,6 +8,7 @@ import '../bundles/new_component_bricks/new_async_component/new_async_component_
 import '../bundles/new_component_bricks/new_async_component_test/new_async_component_test_bundle.dart';
 import '../bundles/new_component_bricks/new_component_test/new_component_test_bundle.dart';
 import '../bundles/new_component_bricks/new_flutter_embedded_view/new_flutter_embedded_view_bundle.dart';
+import '../bundles/new_component_bricks/new_inherited_component/new_inherited_component_bundle.dart';
 import '../bundles/new_component_bricks/new_sample_flutter_widget/new_sample_flutter_widget_bundle.dart';
 import '../bundles/new_component_bricks/new_stateful_component/new_stateful_component_bundle.dart';
 import '../bundles/new_component_bricks/new_stateless_component/new_stateless_component_bundle.dart';
@@ -17,17 +18,53 @@ import '../logging.dart';
 import '../project.dart';
 import 'base_command.dart';
 
-Map<String, MasonBundle> compTypeToBundle = {
-  'stateless': newStatelessComponentBundle,
-  'stateful': newStatefulComponentBundle,
-  'async': newAsyncComponentBundle,
-};
+enum ComponentType { stateless, stateful, async, inherited, flutter }
 
-Map<String, MasonBundle> compTypeToTestBundle = {
-  'stateless': newComponentTestBundle,
-  'stateful': newComponentTestBundle,
-  'async': newAsyncComponentTestBundle,
-};
+extension CompTypeEx on ComponentType {
+  /// returns the component's MasonBundle based on the component type
+  MasonBundle get getBundle {
+    switch (this) {
+      case ComponentType.stateless:
+        return newStatelessComponentBundle;
+      case ComponentType.stateful:
+        return newStatefulComponentBundle;
+      case ComponentType.async:
+        return newAsyncComponentBundle;
+      case ComponentType.inherited:
+        return newInheritedComponentBundle;
+      case ComponentType.flutter:
+        throw UnimplementedError();
+    }
+  }
+
+  /// returns the test's MasonBundle based on the type of component to test
+  MasonBundle get getTestBundle {
+    switch (this) {
+      case ComponentType.stateless:
+        return newComponentTestBundle;
+      case ComponentType.stateful:
+        return newComponentTestBundle;
+      case ComponentType.async:
+        return newAsyncComponentTestBundle;
+      case ComponentType.inherited:
+        throw UnimplementedError();
+      case ComponentType.flutter:
+        throw UnimplementedError();
+    }
+  }
+
+  // the default path for the component to generate depends on its type
+  // for inherited components we place them in lib because they don't really fit in lib/components
+  // where the rest of the components go
+  String get getDefaultOutputPath {
+    switch (this) {
+      case ComponentType.inherited:
+        return 'lib/';
+      default:
+        return 'lib/components';
+    }
+  }
+}
 
 class NewCommand extends BaseCommand {
   NewCommand({super.logger}) {
@@ -70,7 +107,7 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
       negatable: false,
       defaultsTo: false,
     );
-    argParser.addSeparator('Component flags: choose which type of component to create (Only use one of these 4 flags)');
+    argParser.addSeparator('Component flags: choose which type of component to create (Only use one of these 5 flags)');
     argParser.addFlag(
       'stateless',
       help: 'Create a new stateless component.',
@@ -92,6 +129,13 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
     argParser.addFlag(
       'flutter',
       help: 'Create a new FlutterEmbedView component.',
+      negatable: false,
+      defaultsTo: false,
+    );
+    argParser.addFlag(
+      'inherited',
+      aliases: ['inherited-component'],
+      help: 'Create a new InheritedComponent.',
       negatable: false,
       defaultsTo: false,
     );
@@ -119,7 +163,7 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
     argParser.addOption(
       'flutter-app-name',
       aliases: ['app-name', 'flutter-name', 'flutter-widget-name'],
-      help: 'Provide the name of the Flutter App/Widget to embed (Used only when creating a FlutterEmbeddedView)',
+      help: 'Provide the name of the Flutter App/Widget to embed (Used only when creating a FlutterEmbedView)',
       valueHelp: 'MyFlutterApp',
     );
     argParser.addFlag(
@@ -150,12 +194,15 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
   late final bool isStateless = argResults!.flag('stateless');
   late final bool isStateful = argResults!.flag('stateful');
   late final bool isAsync = argResults!.flag('async');
+  late final bool isInherited = argResults!.flag('inherited');
   late final bool isFlutter = argResults!.flag('flutter');
-  late final bool withStyles = argResults!.flag('with-styles');
-  late final bool isClient = argResults!.flag('client');
-  late final bool withTest = argResults!.flag('with-test');
+  late bool withStyles = argResults!.flag('with-styles');
+  late bool isClient = argResults!.flag('client');
+  late bool withTest = argResults!.flag('with-test');
   late final bool dryRun = argResults!.flag('dry-run');
   late String flutterAppName = argResults!.option('flutter-app-name') ?? '';
+
+  late final ComponentType componentType;
 
   // nullable bool so that we know if the user passed the flag (true), negated the flag (false), or didn't pass it in (null)
   // if null, then prompt the user to ask if they want to generate the sample widget or not. If false, we respect it and don't prompt it
@@ -165,47 +212,55 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
 
   @override
   Future<int> runCommand() async {
-    final (dir, name) = getTargetDirectory();
-
     // validate component flag combinations
-    final componentFlagCount = [isStateless, isStateful, isAsync, isFlutter].where((f) => f).length;
+    final componentFlagCount = [isStateless, isStateful, isAsync, isInherited, isFlutter].where((f) => f).length;
 
     if (componentFlagCount > 1) {
       logger.write(
-        'Cannot use multiple component type flags together. Please specify only one of: --stateless, --stateful, --async, or --flutter.',
+        'Cannot use multiple component type flags together. Please specify only one of: --stateless, --stateful, --async, --inherited, or --flutter.',
         tag: Tag.cli,
         level: Level.error,
       );
       return 1;
     }
 
-    if (isFlutter) {
+    componentType = () {
+      if (isAsync) return ComponentType.async;
+      if (isStateless) return ComponentType.stateless;
+      if (isStateful) return ComponentType.stateful;
+      if (isInherited) return ComponentType.inherited;
+      if (isFlutter) return ComponentType.flutter;
+      return ComponentType.stateless; // defaults to stateless if no flags are used
+    }();
+
+    final (dir, name) = getTargetDirectory();
+
+    if (componentType == ComponentType.flutter) {
       return createFlutterViewComponent(dir, name);
     }
-
-    // Default to stateless if no flag is specified
-    final useStateless = isStateless || (!isStateful && !isAsync && !isFlutter);
-
     // don't create a client component if the component is an AsyncStatelessComponent
-    var useClient = isClient;
     if (isAsync && isClient) {
       logger.write(
         'Cannot create a client AsyncStatelessComponent. Creating a server-side component instead.',
         level: Level.warning,
       );
 
-      useClient = false;
+      isClient = false;
+    }
+
+    // warn if the user set the client or styles flag with the inherited comp flag
+    if (isInherited && isClient || isInherited && withStyles || isInherited && withTest) {
+      logger.write(
+        'Incompatible flags found with --inherited. Inherited components cannot be client components and cannot have styles.',
+      );
+      isClient = false;
+      withStyles = false;
+      withTest = false;
     }
 
     return await createFromTemplate(
       dir,
       name,
-      useStateless,
-      isStateful,
-      isAsync,
-      withStyles,
-      useClient,
-      withTest,
     );
   }
 
@@ -234,13 +289,13 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
     final pathOption = argResults!.option('path');
     Directory directory;
     if (pathOption == null) {
-      // no path given, so we create the component in lib/components
+      // no path given, so we create the component in the default path based on the component type
 
       // try to find the root of the project (where pubspec.yaml is), if it is the cwd then the command
       // was ran at the project root, otherwise it might have been ran elsewhere (e.g. "lib/components")
       final projectRoot = findProjectRoot(Directory.current.absolute) ?? Directory.current.absolute;
 
-      directory = Directory(p.join(projectRoot.path, 'lib/components'));
+      directory = Directory(p.join(projectRoot.path, componentType.getDefaultOutputPath));
     } else {
       // if the user passed a directory, then we use that
       directory = Directory(pathOption).absolute;
@@ -256,18 +311,10 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
   Future<int> createFromTemplate(
     Directory dir,
     String name,
-    bool isStateless,
-    bool isStateful,
-    bool isAsync,
-    bool withStyles,
-    bool isClient,
-    bool withTest,
   ) async {
-    final componentType = isAsync ? 'async' : (isStateless ? 'stateless' : 'stateful');
-
     if (dryRun) {
       logger.write(
-        'Would generate ${isClient ? "client" : "server"} $componentType component ${yellow.wrap(name.pascalCase)}${withStyles ? " with styles" : ""} at dir ${blue.wrap(dir.path)}\n',
+        'Would generate ${isClient ? "client" : "server"} ${componentType.name} component ${yellow.wrap(name.pascalCase)}${withStyles ? " with styles" : ""} at dir ${blue.wrap(dir.path)}\n',
         tag: Tag.cli,
         level: Level.info,
       );
@@ -282,15 +329,14 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
     }
 
     logger.write(
-      'Generating $componentType component "$name"...',
+      'Generating ${componentType.name} component "$name"...',
       tag: Tag.cli,
       level: Level.info,
       progress: ProgressState.running,
     );
 
     // select the right bundle based on the required component type
-    // e.g., stateful components will use the "new_stateful_component" bundle
-    final generator = await MasonGenerator.fromBundle(compTypeToBundle[componentType]!);
+    final generator = await MasonGenerator.fromBundle(componentType.getBundle);
     final files = await generator.generate(
       DirectoryGeneratorTarget(dir),
       vars: {
@@ -310,7 +356,7 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
     final projectRoot = findProjectRoot(dir) ?? Directory.current.absolute;
 
     logger.write(
-      'Generated $componentType component $name: ${blue.wrap(p.relative(files.first.path, from: projectRoot.path))}',
+      'Generated ${componentType.name} component $name: ${blue.wrap(p.relative(files.first.path, from: projectRoot.path))}',
       tag: Tag.cli,
       level: Level.info,
       progress: ProgressState.completed,
@@ -333,7 +379,6 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
     );
 
     final componentFile = File(componentPath).absolute;
-    final componentType = isAsync ? 'async' : (isStateless ? 'stateless' : 'stateful');
 
     // try to find the root of the project (where pubspec.yaml is), if it is the cwd then the command
     // was ran at the project root, otherwise it might have been ran elsewhere (e.g. "lib/components")
@@ -375,7 +420,7 @@ class ComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSetup
       testDir.createSync(recursive: true);
     }
 
-    final generator = await MasonGenerator.fromBundle(compTypeToTestBundle[componentType]!);
+    final generator = await MasonGenerator.fromBundle(componentType.getTestBundle);
     final files = await generator.generate(
       DirectoryGeneratorTarget(testDir),
       vars: {
