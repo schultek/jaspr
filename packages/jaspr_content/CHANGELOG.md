@@ -1,3 +1,11 @@
+## Unreleased patch
+
+- Invalidate dependents of deleted partials while serving.
+
+## 0.5.3
+
+- Added `FileIcon` component.
+
 ## 0.5.2
 
 - Fixed running templating multiple times for the same page when reloading or using secondary outputs.

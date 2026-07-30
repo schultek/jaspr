@@ -6,9 +6,7 @@ import 'base_command.dart';
 
 class CleanCommand extends BaseCommand {
   CleanCommand({super.logger}) {
-    if (Platform.isMacOS || Platform.isLinux) {
-      argParser.addFlag('kill', abbr: 'k', help: 'Kill runaway processes.', defaultsTo: null, negatable: false);
-    }
+    argParser.addFlag('kill', abbr: 'k', help: 'Kill runaway processes.', defaultsTo: null, negatable: false);
   }
 
   @override
@@ -44,28 +42,25 @@ class CleanCommand extends BaseCommand {
       await ProcessRunner.instance.run(dartExecutable, ['run', 'build_runner', 'clean']);
     }
 
-    // TODO support windows
-    if (Platform.isMacOS || Platform.isLinux) {
-      final pids = await findRunawayProcesses([
-        // server, vm, proxy, flutter
-        defaultServePort, '8181', serverProxyPort, flutterProxyPort,
-      ]);
+    final pids = await findRunawayProcesses([
+      // server, vm, proxy, flutter
+      defaultServePort, '8181', serverProxyPort, flutterProxyPort,
+    ]);
 
-      if (pids.isNotEmpty) {
-        bool kill = false;
-        if (argResults!.wasParsed('kill')) {
-          kill = argResults!.flag('kill');
-          if (kill) {
-            logger.write('Killing ${pids.length} runaway processes.');
-          }
-        } else if (stdout.hasTerminal) {
-          kill = logger.logger!.confirm('Kill ${pids.length} runaway processes?');
-        }
-
+    if (pids.isNotEmpty) {
+      bool kill = false;
+      if (argResults!.wasParsed('kill')) {
+        kill = argResults!.flag('kill');
         if (kill) {
-          for (final pid in pids) {
-            Process.killPid(pid);
-          }
+          logger.write('Killing ${pids.length} runaway processes.');
+        }
+      } else if (stdout.hasTerminal) {
+        kill = await logger.confirm('Kill ${pids.length} runaway processes?');
+      }
+
+      if (kill) {
+        for (final pid in pids) {
+          Process.killPid(pid);
         }
       }
     }
@@ -75,21 +70,46 @@ class CleanCommand extends BaseCommand {
 }
 
 Future<List<int>> findRunawayProcesses(List<String> ports) async {
-  final pids = <int>[];
+  final pids = <int>{};
 
-  for (final port in ports) {
-    final proc = await ProcessRunner.instance.run('lsof', ['-i', ':$port']);
-
+  if (Platform.isWindows) {
+    final proc = await ProcessRunner.instance.run('netstat', ['-ano']);
     if (proc.exitCode == 0) {
-      pids.addAll(
-        (proc.stdout as String)
+      final lines = (proc.stdout as String).split('\n');
+      for (final line in lines) {
+        final trimmed = line.trim();
+        if (trimmed.isEmpty) continue;
+        final tokens = trimmed.split(RegExp(r'\s+'));
+        if (tokens.length < 4) continue;
+
+        final localAddress = tokens[1];
+        final parts = localAddress.split(':');
+        if (parts.isNotEmpty) {
+          final port = parts.last;
+          if (ports.contains(port)) {
+            final pidStr = tokens.last;
+            final pid = int.tryParse(pidStr);
+            if (pid != null && pid != 0) {
+              pids.add(pid);
+            }
+          }
+        }
+      }
+    }
+  } else {
+    for (final port in ports) {
+      final proc = await ProcessRunner.instance.run('lsof', ['-i', ':$port']);
+
+      if (proc.exitCode == 0) {
+        final newPids = (proc.stdout as String)
             .split('\n')
             .skip(1)
             .where((s) => s.startsWith('dart'))
             .map((s) => s.split(RegExp(r'\s+')).skip(1).first)
-            .map(int.parse),
-      );
+            .map(int.parse);
+        pids.addAll(newPids);
+      }
     }
   }
-  return pids;
+  return pids.toList();
 }

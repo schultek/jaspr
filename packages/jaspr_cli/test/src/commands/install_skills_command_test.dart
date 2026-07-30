@@ -13,7 +13,7 @@ void main() {
 
     setUp(() {
       io = FakeIO();
-      runner = JasprCommandRunner(false);
+      runner = JasprCommandRunner(false, false);
     });
 
     /// Sets up a fake package_config.json that points to a jaspr package at [jasprRootUri].

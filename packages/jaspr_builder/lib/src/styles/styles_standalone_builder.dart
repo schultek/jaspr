@@ -66,6 +66,11 @@ class StylesStandaloneBuilder implements Builder {
       return;
     }
 
+    final outputName = buildStep.inputId.path
+        .replaceFirst('lib/', '')
+        .replaceFirst('.server.dart', '.css')
+        .replaceFirst('.client.dart', '.css');
+
     final outputId = buildStep.inputId.changeExtension('.styles.dart');
     final runnerCode = ImportsWriter().resolve('''
     import 'dart:io';
@@ -74,11 +79,15 @@ class StylesStandaloneBuilder implements Builder {
     import 'package:jaspr/src/dom/styles/rules.dart' show StyleRule, StyleRulesRender;
     [[/]]
 
-    void main() {
+    void run() {
       final List<StyleRule> styles = ${styles.toOutputString()};
 
-      stdout.write(jsonEncode({
-        'css': styles.render(),
+      stdout.writeln(jsonEncode({
+        'event': 'css',
+        'file': '$outputName',
+        'data': {
+          'css': styles.render(),
+        }
       }));
     }
     ''');

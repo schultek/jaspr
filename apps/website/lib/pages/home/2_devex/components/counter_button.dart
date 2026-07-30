@@ -51,7 +51,7 @@ class CounterButtonState extends State<CounterButton> {
   Component build(BuildContext context) {
     return div(classes: 'counter-container', [
       Particles(particles: particles),
-      .wrapElement(
+      .apply(
         events: {
           'click': (event) {
             event.preventDefault();

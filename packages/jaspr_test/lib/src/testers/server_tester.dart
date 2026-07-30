@@ -86,10 +86,10 @@ class ServerTester {
 
   /// Perform a virtual request to your app that renders the components and returns the
   /// resulting document.
-  Future<DocumentResponse> request(String location) async {
+  Future<DocumentResponse> request(String location, {String? handlerPath}) async {
     final uri = Uri.parse('http://test.server$location');
 
-    final response = await _handler(Request('GET', uri));
+    final response = await _handler(Request('GET', uri, handlerPath: handlerPath));
     final statusCode = response.statusCode;
     final headers = response.headers;
     final body = await response.readAsString();

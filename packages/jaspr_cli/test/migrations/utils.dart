@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:file/file.dart';
 import 'package:jaspr_cli/src/logging.dart';
@@ -13,7 +14,10 @@ void testUnitMigration(
   Object? expectedWarnings,
   List<String> features = const [],
 }) {
-  final result = parseString(content: input);
+  final result = parseString(
+    content: input,
+    featureSet: FeatureSet.latestLanguageVersion(flags: ['dot-shorthands']),
+  );
 
   final builder = EditBuilder(result.lineInfo);
   final reporter = MigrationReporter(builder);

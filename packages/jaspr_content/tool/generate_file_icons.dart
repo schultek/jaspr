@@ -64,7 +64,17 @@ Future<(Map<String, dynamic>, Map<String, String>)> fetchIconDefinitions() async
       .replaceAll(RegExp(r',\s*}'), ' }');
   final icons = jsonDecode(iconsJson) as Map<String, dynamic>;
 
-  return (definitions, icons.cast<String, String>());
+  return (definitions, icons.cast<String, String>().map((key, value) => MapEntry(key, _extractPath(value))));
+}
+
+final _pathRegex = RegExp(r'^<path\s+d="([^"]+)"\s*/>$');
+
+String _extractPath(String icon) {
+  final match = _pathRegex.firstMatch(icon);
+  if (match == null) {
+    throw Exception('Could not extract path from icon: $icon');
+  }
+  return match.group(1)!;
 }
 
 const copyrightNotice = '''
@@ -110,7 +120,7 @@ const definitions = ${JsonEncoder.withIndent('  ').convert(definitions)};
 const fileIcons = ${JsonEncoder.withIndent('  ').convert(svgPaths)};
 ''';
 
-  final filePath = path.join('..', '..', 'lib', 'components', '_internal', 'file_tree_icons.dart');
+  final filePath = path.join('lib', 'components', '_internal', 'file_tree_icons.dart');
 
   await File(filePath).writeAsString(content);
 }

@@ -8,16 +8,28 @@ import 'package:path/path.dart' as path;
 
 import '../models/project.dart';
 import 'project.dart';
+import 'validation.dart';
 
 Future<Response> downloadProject(Request request) async {
-  var param = request.url.queryParameters['project']!;
-  var data = jsonDecode(utf8.decode(base64Decode(param)));
-  var project = ProjectDataMapper.fromMap(data);
+  try {
+    var param = request.url.queryParameters['project']!;
+    var data = jsonDecode(utf8.decode(base64Decode(param)));
+    var project = ProjectDataMapper.fromMap(data);
 
-  var encoder = ZipProjectEncoder();
-  await encoder.zipProject(project);
+    for (var file in project.dartFiles.keys) {
+      validateSourceFileName(file);
+    }
 
-  return Response.ok(encoder._output.getBytes());
+    var encoder = ZipProjectEncoder();
+    await encoder.zipProject(project);
+
+    return Response.ok(encoder._output.getBytes());
+  } on FormatException catch (e) {
+    return Response.badRequest(
+      body: jsonEncode({'error': e.message}),
+      headers: {'Content-Type': 'application/json'},
+    );
+  }
 }
 
 class ZipProjectEncoder {

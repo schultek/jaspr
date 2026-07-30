@@ -69,9 +69,9 @@ class ComponentFactoryMigration implements Migration {
     }
 
     if (wrapDomComponents.isNotEmpty) {
-      context.reporter.createMigration('Replaced DomComponent.wrap() with Component.wrapElement()', (builder) {
+      context.reporter.createMigration('Replaced DomComponent.wrap() with Component.apply()', (builder) {
         for (final node in wrapDomComponents) {
-          builder.replace(node.offset, node.length, 'Component.wrapElement');
+          builder.replace(node.offset, node.length, 'Component.apply');
         }
       });
     }

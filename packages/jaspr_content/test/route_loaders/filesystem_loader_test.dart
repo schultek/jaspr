@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:file/memory.dart';
 import 'package:jaspr_content/jaspr_content.dart';
@@ -7,10 +8,6 @@ import 'package:test/test.dart';
 import 'package:watcher/watcher.dart';
 
 import '../utils.dart';
-
-class MockDirectoryWatcher extends Mock implements DirectoryWatcher {}
-
-class MockPage extends Mock implements Page {}
 
 void main() {
   group('FilesystemLoader', () {
@@ -258,12 +255,18 @@ void main() {
     });
 
     group('Partials and Dependencies', () {
+      late MockDirectoryWatcher mockWatcher;
+      late StreamController<WatchEvent> eventController;
+
+      setUp(() {
+        mockWatcher = MockDirectoryWatcher();
+        eventController = StreamController<WatchEvent>.broadcast();
+        addTearDown(eventController.close);
+        when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
+      });
+
       test('invalidates dependent page when partial changes', () async {
         // Arrange
-        final mockWatcher = MockDirectoryWatcher();
-        final eventController = StreamController<WatchEvent>.broadcast();
-        when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
-
         final fileSystem = MemoryFileSystem();
         final pagesDir = fileSystem.directory('pages')..createSync();
         final loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
@@ -297,10 +300,6 @@ void main() {
 
       test('invalidates dependent page when partial changes on windows', () async {
         // Arrange
-        final mockWatcher = MockDirectoryWatcher();
-        final eventController = StreamController<WatchEvent>.broadcast();
-        when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
-
         final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
         final pagesDir = fileSystem.directory('pages')..createSync();
         final loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
@@ -331,6 +330,155 @@ void main() {
         // Assert: The page was invalidated
         expect(pageSource.page, isNull);
       });
+
+      test('invalidates dependent page when filtered partial is removed', () async {
+        // Arrange the file system layout and content.
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        final loader = FilesystemLoader(
+          'pages',
+          filterExtensions: {'.md'},
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
+
+        final partialPath = 'pages/_includes/header.html';
+        final partialFile = fileSystem.file(partialPath)
+          ..createSync(recursive: true)
+          ..writeAsStringSync('Header');
+        pagesDir.childFile('index.md')
+          ..createSync()
+          ..writeAsStringSync('Page content');
+
+        // Initial load to activate the watcher.
+        await loader.loadRoutes((_) => PageConfig(), false);
+
+        // Confirm that the partial was filtered out of the loader's page sources
+        // even though it remains available to templates.
+        expect(loader.sources.map((source) => source.file.path), isNot(contains(partialPath)));
+
+        // Build the page once to cache the result.
+        final pageSource = loader.sources.single;
+        final cachedComponent = await pageSource.load();
+
+        // Establish dependency by reading the filtered partial.
+        loader.readPartialSync(partialPath, pageSource.page!);
+
+        // Act: Delete the partial and simulate a remove event for it.
+        partialFile.deleteSync();
+        eventController.add(WatchEvent(ChangeType.REMOVE, partialPath));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The dependent page stays invalidated until requested.
+        expect(pageSource.page, isNull);
+
+        // The dependent page is rebuilt instead of serving the cached result.
+        expect(await pageSource.load(), isNot(same(cachedComponent)));
+      });
+
+      for (final filtered in [false, true]) {
+        test('invalidates dependent page when removed partial is restored '
+            '(${filtered ? 'filtered' : 'unfiltered'})', () async {
+          // Arrange the file system layout and content.
+          final fileSystem = MemoryFileSystem();
+          final pagesDir = fileSystem.directory('pages')..createSync();
+          final loader = FilesystemLoader(
+            'pages',
+            filterExtensions: filtered ? {'.md'} : const {},
+            fileSystem: fileSystem,
+            watcherFactory: (_) => mockWatcher,
+          );
+
+          final partialPath = 'pages/_includes/header.html';
+          final partialFile = fileSystem.file(partialPath)
+            ..createSync(recursive: true)
+            ..writeAsStringSync('Header');
+          pagesDir.childFile('index.md')
+            ..createSync()
+            ..writeAsStringSync('Page content');
+
+          // Initial load to activate the watcher.
+          await loader.loadRoutes((_) => PageConfig(), false);
+
+          final pageSource = loader.sources.firstWhere((s) => s.path == 'index.md');
+          await pageSource.load();
+
+          // Establish the original dependency, then remove the partial.
+          loader.readPartialSync(partialPath, pageSource.page!);
+          partialFile.deleteSync();
+          eventController.add(WatchEvent(ChangeType.REMOVE, partialPath));
+          await Future<void>.delayed(Duration.zero);
+
+          // Simulate rebuilding and attempting to render while the partial is missing.
+          final componentWithMissingPartial = await pageSource.load();
+          expect(
+            () => loader.readPartialSync(partialPath, pageSource.page!),
+            throwsA(isA<FileSystemException>()),
+          );
+
+          // Act: Restore the partial and simulate its add event.
+          partialFile
+            ..createSync(recursive: true)
+            ..writeAsStringSync('Restored header');
+          eventController.add(WatchEvent(ChangeType.ADD, partialPath));
+          await Future<void>.delayed(Duration.zero);
+
+          // Assert: The failed page is invalidated and rebuilt.
+          expect(pageSource.page, isNull);
+          expect(await pageSource.load(), isNot(same(componentWithMissingPartial)));
+        });
+      }
+
+      for (final eager in [false, true]) {
+        test('invalidates dependent page when '
+            'partial is removed (${eager ? 'eager' : 'lazy'})', () async {
+          // Arrange the file system layout and content.
+          final fileSystem = MemoryFileSystem();
+          final pagesDir = fileSystem.directory('pages')..createSync();
+          final loader = FilesystemLoader(
+            'pages',
+            fileSystem: fileSystem,
+            watcherFactory: (_) => mockWatcher,
+          );
+
+          final partialPath = 'pages/_includes/header.html';
+          final partialFile = fileSystem.file(partialPath)
+            ..createSync(recursive: true)
+            ..writeAsStringSync('Header');
+          pagesDir.childFile('index.md')
+            ..createSync()
+            ..writeAsStringSync('Page content');
+
+          // Initial load to activate the watcher.
+          await loader.loadRoutes((_) => PageConfig(), eager);
+
+          // Build the page once to cache the result.
+          final pageSource = loader.sources.firstWhere((s) => s.path == 'index.md');
+          final cachedComponent = await pageSource.load();
+
+          // Establish dependency by reading the partial.
+          loader.readPartialSync(partialPath, pageSource.page!);
+
+          // Act: Delete the partial and simulate a remove event for it.
+          partialFile.deleteSync();
+          eventController.add(WatchEvent(ChangeType.REMOVE, partialPath));
+          await Future<void>.delayed(Duration.zero);
+
+          // Assert: The partial's source was removed.
+          expect(loader.sources.any((source) => source.file.path == partialPath), isFalse);
+
+          if (eager) {
+            // In eager mode the dependent page is rebuilt immediately.
+            expect(pageSource.page, isNotNull);
+          } else {
+            // In lazy mode the dependent page stays invalidated until requested.
+            expect(pageSource.page, isNull);
+          }
+
+          // The dependent page is rebuilt instead of serving the cached result.
+          expect(await pageSource.load(), isNot(same(cachedComponent)));
+        });
+      }
     });
   });
 }

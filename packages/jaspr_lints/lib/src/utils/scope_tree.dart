@@ -168,8 +168,12 @@ class ScopeTreeNode {
 
   NodeLocation? serverScopeLocation;
   NodeLocation? clientScopeLocation;
-  bool usesCssAnnotation = false;
-  bool usesGlobalCssAnnotation = false;
+
+  List<Element> cssFields = [];
+  List<Element> cssGlobals = [];
+
+  bool get usesCssAnnotation => cssFields.isNotEmpty || cssGlobals.isNotEmpty;
+  bool get usesGlobalCssAnnotation => cssGlobals.isNotEmpty;
 
   final List<NodeLocation> components = [];
 
@@ -212,9 +216,9 @@ class ScopeTreeNode {
       clientScopeLocation = findMainFunction();
     }
 
-    final (usesCssAnnotation, usesGlobalCssAnnotation) = findCssAnnotation();
-    this.usesCssAnnotation = usesCssAnnotation;
-    this.usesGlobalCssAnnotation = usesGlobalCssAnnotation;
+    final annotations = findCssAnnotations();
+    cssFields = annotations.fields;
+    cssGlobals = annotations.globals;
   }
 
   NodeLocation? findMainFunction() {
@@ -231,7 +235,7 @@ class ScopeTreeNode {
     );
   }
 
-  (bool, bool) findCssAnnotation() {
+  ({List<Element> fields, List<Element> globals}) findCssAnnotations() {
     final annotatedFields = library.classes
         .where((e) => !e.isPrivate)
         .expand<Element>(
@@ -254,7 +258,7 @@ class ScopeTreeNode {
         .where((element) => !element.isPrivate)
         .where((element) => element.metadata.annotations.any((a) => a.isCssAnnotation));
 
-    return (annotatedFields.isNotEmpty || annotatedGlobals.isNotEmpty, annotatedGlobals.isNotEmpty);
+    return (fields: annotatedFields.toList(), globals: annotatedGlobals.toList());
   }
 
   void analyzeChildren() {
@@ -349,16 +353,14 @@ class ScopeTreeNode {
 
           final libConfigurations = configuration.where(
             (c) =>
-                c.name.components.length == 3 &&
-                c.name.components[0].name == 'dart' &&
-                c.name.components[1].name == 'library',
+                c.name.tokens.length == 5 && c.name.tokens[0].lexeme == 'dart' && c.name.tokens[2].lexeme == 'library',
           );
 
           final clientConfiguration = libConfigurations
-              .where((c) => clientLibs.contains(c.name.components.last.name))
+              .where((c) => clientLibs.contains(c.name.tokens.last.lexeme))
               .firstOrNull;
           final serverConfiguration = libConfigurations
-              .where((c) => serverLibs.contains(c.name.components.last.name))
+              .where((c) => serverLibs.contains(c.name.tokens.last.lexeme))
               .firstOrNull;
 
           final baseLib = getBaseLibraryForDirective(directive);

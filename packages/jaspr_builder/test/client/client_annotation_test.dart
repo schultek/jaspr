@@ -9,6 +9,7 @@ import 'sources/client_basic.dart';
 import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
 import 'sources/client_model_extension.dart';
+import 'sources/client_with_server_components.dart';
 
 void main() {
   group('client annotation', () {
@@ -71,7 +72,7 @@ void main() {
         expect(
           errorLog,
           equals(
-            'ClientModuleBuilder on lib/component_basic.dart:\nClient components only support initializing formal constructor parameters. '
+            'ClientModuleBuilder on lib/component_basic.dart:\nClient components only support initializing formal constructor parameters.\n'
             'Failing element: Component.new(String a)',
           ),
         );
@@ -95,8 +96,20 @@ void main() {
         expect(
           errorLog,
           equals(
-            'ClientModuleBuilder on lib/component_basic.dart:\n@client components only support parameters of primitive serializable types or types that define @decoder and @encoder methods. Failing parameter: [DateTime time] in Component.new()',
+            'ClientModuleBuilder on lib/component_basic.dart:\n@client components only support parameters of primitive serializable types, Components or types that define @decoder and @encoder methods.\n'
+            'Failing parameter: [DateTime time] in Component.new()',
           ),
+        );
+      });
+    });
+
+    group('on component with server components as params', () {
+      test('generates json module', () async {
+        await testBuilder(
+          ClientModuleBuilder(BuilderOptions({})),
+          clientWithServerComponentsSources,
+          outputs: {...clientWithServerComponentsModuleOutputs},
+          readerWriter: reader,
         );
       });
     });
@@ -108,6 +121,7 @@ void main() {
           ...clientBasicModuleOutputs,
           ...clientModelClassModuleOutputs,
           ...clientModelExtensionModuleOutputs,
+          ...clientWithServerComponentsModuleOutputs,
         },
         outputs: clientBundleOutputs,
         readerWriter: reader,
