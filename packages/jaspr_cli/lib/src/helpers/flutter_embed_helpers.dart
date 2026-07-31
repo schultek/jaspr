@@ -169,11 +169,11 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
   }
 
   /// include a ref to the bootstrap script in the main document, used when jaspr.mode is either server or static
-  void includeBootstrapRefInDoc(Directory projectRoot) {
-    final File? serverEntrypoint = findDocumentEntrypoint(projectRoot);
-    if (serverEntrypoint == null) {
+  Future<void> includeBootstrapRefInDoc(Directory projectRoot) async {
+    final String? serverEntrypointPath = await getServerEntryPoint(null);
+    if (serverEntrypointPath == null) {
       logger.write(
-        "Either couldn't find main.server.dart, or couldn't find a Document constructor in main.server.dart. You will need to add the following in the head of your Document: ${cyan.wrap('script(src: "flutter_bootstrap.js", async: true)')}",
+        "Couldn't find main.server.dart, You will need to add the following in the head of your Document: ${cyan.wrap('script(src: "flutter_bootstrap.js", async: true)')}",
         level: Level.warning,
         tag: Tag.cli,
       );
@@ -181,7 +181,9 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
       // the server entrypoint contains a document, so we'll insert the script ref in the head
       final String scriptTag = 'script(src: "flutter_bootstrap.js", async: true),';
 
+      final File serverEntrypoint = File(serverEntrypointPath);
       final content = serverEntrypoint.readAsStringSync();
+
       final result = parseString(
         content: content,
         featureSet: FeatureSet.latestLanguageVersion(flags: ['dot-shorthands']),
@@ -256,22 +258,6 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
     } else {
       warnManualIncludeRef();
     }
-  }
-
-  /// returns the main.server.dart file if it exists and contains a Document, null otherwise
-  File? findDocumentEntrypoint(Directory projectRoot) {
-    final libDir = Directory(p.join(projectRoot.path, 'lib'));
-    if (!libDir.existsSync()) return null;
-
-    final file = File(p.join(libDir.path, 'main.server.dart'));
-    if (!file.existsSync()) {
-      return null;
-    }
-
-    if (file.readAsStringSync().contains('Document(')) {
-      return file;
-    }
-    return null;
   }
 
   /// warn the user if the reference to the flutter_bootstrap.js script was not automatically included

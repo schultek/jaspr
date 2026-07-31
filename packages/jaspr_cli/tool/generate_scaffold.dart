@@ -11,6 +11,7 @@ void main() async {
   await generate('new_component_bricks/new_flutter_embedded_view');
   await generate('new_component_bricks/new_sample_flutter_widget');
   await generate('new_component_bricks/new_inherited_component');
+  await generate('new_component_bricks/new_content_page');
 
   Process.runSync('dart', 'format lib/src/bundles/ --line-length=120'.split(' '));
 }

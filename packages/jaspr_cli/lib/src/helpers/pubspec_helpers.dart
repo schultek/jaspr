@@ -48,6 +48,12 @@ mixin PubspecHelper on BaseCommand {
     }
   }
 
+  /// check if the pubspec file contains the packageName as a dep
+  bool hasDep(YamlMap? pubspecMap, String packageName, {bool isDevDependency = false}) {
+    final deps = pubspecMap?.nodes[isDevDependency ? 'dev_dependencies' : 'dependencies'];
+    return deps is YamlMap && deps.containsKey(packageName);
+  }
+
   /// for a given list of packages, check if they are already installed, if not then prompt the user to install them
   void conditionallyInstallDeps(Directory projectRoot, List<String> packages, {bool isDevDependency = false}) {
     // check if the pubspec.yaml of the target project already contains the deps, if so return early
@@ -76,7 +82,6 @@ mixin PubspecHelper on BaseCommand {
 
       final log = logger.logger;
       if (log == null) {
-        
         // the confirm method on mason's logger require a terminal to be attached,
         // if it isn't the case we tell the user to install the package themselves
         logger.write(
@@ -101,7 +106,7 @@ mixin PubspecHelper on BaseCommand {
         continue;
       }
 
-      // if we are adding either the flutter of flutter_test dependency, 
+      // if we are adding either the flutter of flutter_test dependency,
       // we need to specify that we want to use flutter from the currently installed sdk
       // TODO: maybe find a better way than this
       if (packageName == 'flutter' || packageName == 'flutter_test') {
