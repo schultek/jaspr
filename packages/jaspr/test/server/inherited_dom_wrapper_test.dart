@@ -31,6 +31,21 @@ void main() {
       );
     });
 
+    test('normalizes whitespace between applied class names', () async {
+      final result = await renderComponent(
+        Component.apply(
+          classes: '  first\tsecond\n ',
+          child: div([]),
+        ),
+        standalone: true,
+      );
+
+      expect(
+        result.body,
+        decodedMatches('<div class="first second"></div>\n'),
+      );
+    });
+
     test('merges component props with inherited props', () async {
       final result = await renderComponent(
         Component.apply(
