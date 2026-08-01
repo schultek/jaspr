@@ -13,6 +13,7 @@ extension FakeProject on FakeIO {
       ..createSync()
       ..writeAsStringSync(fakePubspec(name, mode, flutterEmbedding));
     fs.directory('/root/$name/lib').createSync();
+    fs.directory('/root/$name/web').createSync();
     fs.file('/root/$name/lib/main.client.dart')
       ..createSync()
       ..writeAsStringSync(fakeMainClientDart());
@@ -20,6 +21,10 @@ extension FakeProject on FakeIO {
       fs.file('/root/$name/lib/main.server.dart')
         ..createSync()
         ..writeAsStringSync(fakeMainServerDart());
+    } else {
+      fs.file('/root/$name/web/index.html')
+        ..createSync()
+        ..writeAsStringSync(fakeIndexHtml());
     }
     fs.currentDirectory = '/root/$name';
   }
@@ -76,4 +81,15 @@ import 'package:jaspr/dom.dart';
 void main() {
   runApp(Document(body: div([])));
 }
+''';
+
+String fakeIndexHtml() => '''
+<!DOCTYPE html>
+<html>
+    <head>
+        <script defer src="main.client.dart.js"></script>
+    </head>
+    <body>
+    </body>
+</html>
 ''';

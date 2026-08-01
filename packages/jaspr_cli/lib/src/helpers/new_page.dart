@@ -254,12 +254,18 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
     // if no custom parsers are used and the format provided is not parsable, then warn the user
     // e.g., if the user want's a markdown page but only the HtmlParser is used
     if (parsers.isNotEmpty && !parsers.contains(pageFormat) && !parsers.contains('custom')) {
-      final confirmRes =
-          logger.logger?.confirm(
-            '\n[WARNING] Could not find the parser required to parse the provided format "$pageFormat". Do you want to continue anyway?',
-            defaultValue: false,
-          ) ??
-          false;
+      bool confirmRes = false;
+      
+      // only prompt if there is a terminal attached
+      if (stdout.hasTerminal) {
+        confirmRes =
+            logger.logger?.confirm(
+              '\n[WARNING] Could not find the parser required to parse the provided format "$pageFormat". Do you want to continue anyway?',
+              defaultValue: false,
+            ) ??
+            false;
+      }
+      
       if (!confirmRes) {
         logger.write(
           'Cancelling... Please add the required parser to parse $pageFormat',
@@ -273,12 +279,16 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
     // if the layouts section isnt empty and the user has passed in a specific layout, but that layout isn't a predefined layout and the layouts section does not contain a custom layout
     // then warn the user that this layout may or may not work as they expect
     if (layouts.isNotEmpty && pageLayout.isNotEmpty && !layouts.contains(pageLayout) && !layouts.contains('custom')) {
-      final confirmRes =
-          logger.logger?.confirm(
-            '\n[WARNING] Could not find the prebuilt layout to display the requested "$pageLayout" and no custom layout is defined. Do you want to continue anyway?',
-            defaultValue: false,
-          ) ??
-          false;
+      bool confirmRes = false;
+      if (stdout.hasTerminal) {
+        confirmRes =
+            logger.logger?.confirm(
+              '\n[WARNING] Could not find the prebuilt layout to display the requested "$pageLayout" and no custom layout is defined. Do you want to continue anyway?',
+              defaultValue: false,
+            ) ??
+            false;
+      }
+
       if (!confirmRes) {
         logger.write(
           'Cancelling... Please add the required prebuilt layout to correctly display $pageLayout',
