@@ -58,7 +58,7 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
     argParser.addFlag(
       'sitemap-exclude',
       aliases: ['exclude-from-sitemap', 'sitemap-excluded'],
-      help: 'Prevent the new page page from being included in the sitemap.',
+      help: 'Prevent the new page from being included in the sitemap.',
       defaultsTo: false,
       negatable: false,
     );
@@ -255,7 +255,7 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
     // e.g., if the user want's a markdown page but only the HtmlParser is used
     if (parsers.isNotEmpty && !parsers.contains(pageFormat) && !parsers.contains('custom')) {
       bool confirmRes = false;
-      
+
       // only prompt if there is a terminal attached
       if (stdout.hasTerminal) {
         confirmRes =
@@ -265,7 +265,7 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
             ) ??
             false;
       }
-      
+
       if (!confirmRes) {
         logger.write(
           'Cancelling... Please add the required parser to parse $pageFormat',
@@ -394,7 +394,7 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
       final layouts = _layoutNames(argument('layouts'));
 
       logger.write(
-        'Found parsers: ${yellow.wrap(parsers.toString())}.',
+        'Found layouts: ${yellow.wrap(layouts.toString())}.',
         level: Level.verbose,
         tag: Tag.cli,
       );

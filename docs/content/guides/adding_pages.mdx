@@ -36,6 +36,12 @@ This would create the following routes:
 The url paths are based on the directory structure relative to the root content directory. The file name is used as the last part of the path, except for files named `index.*`, which are used to create a route for the directory they are in.
 </Info>
 
+Instead of creating these files by hand, you can also use the `jaspr new page` command, which creates the file in your content directory and fills in the frontmatter for you:
+
+```shell
+jaspr new page posts/post3
+```
+
 ### Private Files
 
 Files and folders starting with `_` or `.` are considered private and will be ignored. This is useful for files that are not meant to be publicly accessible, such as configuration files or template partials.
