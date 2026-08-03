@@ -38,7 +38,7 @@ class ClientOptionsBuilder implements Builder {
   };
 
   Future<void> generateClientOptions(BuildStep buildStep) async {
-    final (_, flutter, _) = await buildStep.loadProjectMode();
+    final (mode, flutter, _) = await buildStep.loadProjectMode();
 
     final serverId = AssetId(
       buildStep.inputId.package,
@@ -48,8 +48,8 @@ class ClientOptionsBuilder implements Builder {
     final shouldInitializePlugins = flutter == FlutterMode.embedded || flutter == FlutterMode.plugins;
 
     var (clients, sources, plugins) = await (
-      buildStep.loadClients(),
-      buildStep.loadTransitiveSourcesFor(serverId),
+      mode != JasprMode.client ? buildStep.loadClients() : Future.value(<ClientModule>[]),
+      mode != JasprMode.client ? buildStep.loadTransitiveSourcesFor(serverId) : Future.value(<AssetId>[]),
       shouldInitializePlugins ? loadWebPlugins(buildStep) : Future.value(<Plugin>[]),
     ).wait;
 
