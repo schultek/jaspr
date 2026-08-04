@@ -6,6 +6,7 @@
 - Fixed repeated copying of nested build assets.
 - The sitemap `priority` tag is now omitted when a route has no priority set, instead of always defaulting to `0.5`.
 - Fixed a misconfiguration of server hotreload that caused `jaspr serve` consuming excessive CPU.
+- Require `build_daemon ^4.1.4` to fix build error due to version mismatch.
 
 ## 0.23.2
 
