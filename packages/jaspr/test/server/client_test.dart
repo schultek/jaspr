@@ -245,5 +245,53 @@ void main() {
         ),
       );
     });
+
+    testServer('renders client components nested inside server components nested inside client components', (
+      tester,
+    ) async {
+      tester.pumpComponent(AppWithServerComponent(child: div([App1()])));
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <div data-app="with-child"><!--s@1--><div><!--@app1--><div data-app="1"></div><!--/@app1--></div><!--/s@1--></div>\n'
+          '    <!--/@app_with_server_component-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('renders client components directly nested as server components inside client components', (
+      tester,
+    ) async {
+      tester.pumpComponent(AppWithServerComponent(child: App1()));
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <div data-app="with-child"><!--s@1--><!--@app1--><div data-app="1"></div><!--/@app1--><!--/s@1--></div>\n'
+          '    <!--/@app_with_server_component-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
   });
 }

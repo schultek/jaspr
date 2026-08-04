@@ -17,15 +17,25 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   @override
   void prepareBoundary(ChildListRange range) {
-    element.visitAncestorElements((e) {
-      if (registry.serverElements.containsKey(e)) {
-        return false;
-      } else if (registry.clientElements.containsKey(e)) {
-        _isClientBoundary = false;
-        return false;
-      }
-      return true;
-    });
+    // If a client component is itself a server component, it is a client boundary.
+    if (registry.serverElements.containsKey(element)) {
+      _isClientBoundary = true;
+    } else {
+      element.visitAncestorElements((e) {
+        // If a client component is nested in a server component it is also a client boundary.
+        if (registry.serverElements.containsKey(e)) {
+          _isClientBoundary = true;
+          return false;
+        }
+        // If a client component is nested in a client component (with no server component in-between)
+        // it is not a client boundary.
+        if (registry.clientElements.containsKey(e)) {
+          _isClientBoundary = false;
+          return false;
+        }
+        return true;
+      });
+    }
 
     if (!_isClientBoundary) {
       return;

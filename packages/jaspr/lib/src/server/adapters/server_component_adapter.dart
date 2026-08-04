@@ -3,7 +3,7 @@ import '../markup_render_object.dart';
 import 'element_boundary_adapter.dart';
 
 class ServerComponentAdapter extends ElementBoundaryAdapter {
-  ServerComponentAdapter(this.id, super.element);
+  ServerComponentAdapter(this.id, super.element) : super(priority: 2000);
 
   final int id;
 
