@@ -292,12 +292,22 @@ class CreateCommand extends BaseCommand {
       [final m] => RenderingMode.values.byName(m),
 
       _ => () {
-        if (!stdout.hasTerminal) {
+        final choices = RenderingMode.values;
+
+        // mason_logger's chooseOne redraws the list on every key press, however if the terminal
+        // scrolls, the entire list is re-printed. THe workaround below prints the rows to
+        // scroll before and moves back up
+        // Related to mason_logger issue #1356 https://github.com/felangel/mason/issues/1356
+        if (stdin.hasTerminal && stdout.hasTerminal && stdout.supportsAnsiEscapes) {
+          stdout.write('\n' * (choices.length + 1));
+          stdout.write('\x1b[${choices.length + 1}A'); // move back up
+        } else {
           throw usageException('No rendering mode specified.');
         }
+        
         final mode = logger.logger!.chooseOne(
           'Select a rendering mode:',
-          choices: RenderingMode.values,
+          choices: choices,
           display: (o) => '${o.name}: ${o.help}.',
         );
         return mode;
