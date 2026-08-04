@@ -304,7 +304,7 @@ class CreateCommand extends BaseCommand {
         } else {
           throw usageException('No rendering mode specified.');
         }
-        
+
         final mode = logger.logger!.chooseOne(
           'Select a rendering mode:',
           choices: choices,
