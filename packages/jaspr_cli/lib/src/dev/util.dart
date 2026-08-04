@@ -15,27 +15,27 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
   if (ProcessRunner.isDefault) {
     try {
       return await BuildDaemonClient.connect(workingDirectory, args, logHandler: logger.writeServerLog);
-    } on OptionsSkew {
+    } on OptionsSkew catch (e) {
       logger.write(
-        'Incompatible options with current running build daemon.\n\n'
+        'Incompatible options with current running build daemon: ${e.details}\n\n'
         'Please stop other Jaspr processes running in this directory and try again.',
         tag: Tag.cli,
         level: Level.critical,
         progress: ProgressState.completed,
       );
       return null;
-    } on VersionSkew {
+    } on VersionSkew catch (e) {
       logger.write(
-        'Incompatible version with current running build daemon.\n\n'
-        'Please stop other Jaspr processes running in this directory and try again.',
+        'Incompatible version with current running build daemon: ${e.details}\n\n'
+        'Please use the latest version of build_runner and try again.',
         tag: Tag.cli,
         level: Level.critical,
         progress: ProgressState.completed,
       );
       return null;
-    } on MissingPortFile {
+    } on MissingPortFile catch (e) {
       logger.write(
-        'Failed to start build daemon, port file is missing.\n\n'
+        'Failed to start build daemon: ${e.details}.\n\n'
         'Please use the latest version of build_runner and try again.',
         tag: Tag.cli,
         level: Level.critical,
