@@ -476,7 +476,7 @@ class _ComponentFinder extends MatchFinder {
 }
 
 class _ComponentPredicateFinder extends MatchFinder {
-  _ComponentPredicateFinder(this.predicate, {String? description}) : _description = description, super();
+  _ComponentPredicateFinder(this.predicate, {this._description}) : super();
 
   final ComponentPredicate predicate;
   final String? _description;
@@ -491,7 +491,7 @@ class _ComponentPredicateFinder extends MatchFinder {
 }
 
 class _ElementPredicateFinder extends MatchFinder {
-  _ElementPredicateFinder(this.predicate, {String? description}) : _description = description, super();
+  _ElementPredicateFinder(this.predicate, {this._description}) : super();
 
   final ElementPredicate predicate;
   final String? _description;
