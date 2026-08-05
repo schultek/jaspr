@@ -26,9 +26,8 @@ jobs:
 
       - name: Deploy
         run: |
-          dart pub global activate melos
           dart pub global activate jaspr_cli
+          dart pub get
           gcloud auth configure-docker
           jaspr --disable-analytics
-          melos deploy:jasprpad
-
+          dart run melos deploy:jasprpad

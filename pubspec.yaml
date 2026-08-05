@@ -30,10 +30,7 @@ workspace:
   - examples/package_riverpod
 
 dev_dependencies:
-  melos: ^7.1.0
-
-dependency_overrides:
-  cli_util: 0.5.0 # Until melos upgrades to this version
+  melos: ^8.2.2
 
 melos:
   command:
@@ -51,10 +48,9 @@ melos:
       steps:
         - melos exec --ignore=jaspr_cli -- "dart format . --set-exit-if-changed"
         - melos exec --scope=jaspr_cli -- "dart format lib --set-exit-if-changed"
-    analyze: melos exec -- "dart analyze . --fatal-infos --no-use-aot-snapshot"
     test:
-      run: dart test --exclude-tags=cli
       exec:
+        command: dart test --exclude-tags=cli
         concurrency: 1
       packageFilters:
         scope:
@@ -68,10 +64,10 @@ melos:
             jaspr_router,
           ]
     coverage:
-      run: |
-        dart test --coverage=coverage --exclude-tags=cli-integration-test &&
-        dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/\$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
       exec:
+        command: |
+          dart test --coverage=coverage --exclude-tags=cli-integration-test &&
+          dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/\$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
         concurrency: 1
       packageFilters:
         scope:
