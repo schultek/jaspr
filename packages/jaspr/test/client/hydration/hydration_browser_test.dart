@@ -228,6 +228,55 @@ void main() {
       expect(strongElement.textContent, equals('Hello Nested Client'));
     });
 
+    testClient('should find and hydrate client component with nested client component as parameter', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <div>'
+                  '    <!--s${marker}1-->'
+                  '    <!--${marker}subapp data={"name":"Nested Client"}-->'
+                  '    <strong>Fallback</strong>'
+                  '    <!--/${marker}subapp-->'
+                  '    <!--/s${marker}1-->'
+                  '  </div>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final outerDivElement = window.document.querySelector('body div > div')!;
+      final strongElement = window.document.querySelector('body strong')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(outerDivElement.parentNode, equals(divElement));
+      expect(strongElement.parentNode, equals(outerDivElement));
+      expect(strongElement.textContent, equals('Fallback'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              return div(classes: 'hydrated', [params.mount(params.get<String>('child'))]);
+            }),
+            'subapp': ClientLoader((params) {
+              return strong(classes: 'hydrated', [Component.text('Hello ${params.get<String>('name')}')]);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(outerDivElement.parentNode, equals(divElement));
+      expect(outerDivElement.className, 'hydrated');
+      expect(strongElement.parentNode, equals(outerDivElement));
+      expect(strongElement.className, 'hydrated');
+      expect(strongElement.textContent, equals('Hello Nested Client'));
+    });
+
     testClient('should reload client components and update parameters/sync state on performReload', (tester) async {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =

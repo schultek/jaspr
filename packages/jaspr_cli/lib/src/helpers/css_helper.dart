@@ -339,7 +339,7 @@ class CssRunner {
       return <String>[];
     }
 
-    final runnerFiles = await Glob('${buildDir.path}/**.styles.dart').list().toList();
+    final runnerFiles = await Glob('${buildDir.path.replaceAll(r'\', '/')}/**.styles.dart').list().toList();
     final validRunnerFiles = runnerFiles.where((f) {
       return f.path.endsWith('.server.styles.dart') || f.path.endsWith('.client.styles.dart');
     }).toList();
