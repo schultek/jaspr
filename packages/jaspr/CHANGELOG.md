@@ -5,10 +5,10 @@
 - **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
 - Added stateful server-side reload feature.
 
-## 0.23.3
-
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
+
+## 0.23.3
 
 - Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
 - Updated `testClient` in `jaspr_test` to automatically unmount the root component and clean up `document.body` between test cases.
