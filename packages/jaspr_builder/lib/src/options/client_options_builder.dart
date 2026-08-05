@@ -65,7 +65,7 @@ class ClientOptionsBuilder implements Builder {
     var source =
         '''
       import 'package:jaspr/client.dart';
-      ${plugins.isNotEmpty ? "import 'package:flutter_web_plugins/flutter_web_plugins.dart';" : ''}
+      ${plugins.isNotEmpty ? "import 'package:flutter_web_plugins/flutter_web_plugins.dart';\nimport 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';" : ''}
       [[/]]
 
       /// Default [ClientOptions] for use with your Jaspr project.
@@ -75,12 +75,12 @@ class ClientOptionsBuilder implements Builder {
       /// Example:
       /// ```dart
       /// import '${outputId.path.split('/').last}';
-      /// 
+      ///
       /// void main() {
       ///   Jaspr.initializeApp(
       ///     options: defaultClientOptions,
       ///   );
-      ///   
+      ///
       ///   runApp(...);
       /// }
       /// ```
@@ -99,9 +99,11 @@ class ClientOptionsBuilder implements Builder {
 
     return '''
       initialize: () {
-        final Registrar registrar = webPluginRegistrar;
-        ${plugins.map((p) => '[[${p.import}]].${p.pluginClass}.registerWith(registrar);').join('\n')}
-        registrar.registerMessageHandler();
+        FlutterEmbedView.preload().then((_) {
+          final Registrar registrar = webPluginRegistrar;
+          ${plugins.map((p) => '[[${p.import}]].${p.pluginClass}.registerWith(registrar);').join('\n')}
+          registrar.registerMessageHandler();
+        });
       },''';
   }
 
