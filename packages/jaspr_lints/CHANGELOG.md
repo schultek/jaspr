@@ -1,3 +1,7 @@
+## Unreleased breaking
+
+- Support `analyzer` `^13.0.0`.
+
 ## 0.7.2
 
 - Support `analyzer` `^12.1.0`.

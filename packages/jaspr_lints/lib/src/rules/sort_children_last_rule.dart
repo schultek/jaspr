@@ -46,7 +46,7 @@ class _HtmlComponentVisitor extends SimpleAstVisitor<void> {
     for (final argument in node.argumentList.arguments) {
       if (argument is ListLiteral && isComponentListType(argument.staticType)) {
         childrenArg = argument;
-      } else if (childrenArg != null && argument is NamedExpression) {
+      } else if (childrenArg != null && argument is NamedArgument) {
         violatesLint = true;
       }
     }

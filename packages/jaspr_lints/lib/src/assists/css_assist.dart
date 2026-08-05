@@ -41,18 +41,17 @@ class AddStyles extends ResolvedCorrectionProducer {
       return;
     }
 
-    final idArg = argumentList.arguments
-        .whereType<NamedExpression>()
-        .where((e) => e.name.label.name == 'id')
-        .firstOrNull;
-    final idVal = idArg?.expression is StringLiteral ? (idArg!.expression as StringLiteral).stringValue : null;
+    final idArg = argumentList.arguments.whereType<NamedArgument>().where((e) => e.name.lexeme == 'id').firstOrNull;
+    final idVal = idArg?.argumentExpression is StringLiteral
+        ? (idArg!.argumentExpression as StringLiteral).stringValue
+        : null;
 
     final classesArg = argumentList.arguments
-        .whereType<NamedExpression>()
-        .where((e) => e.name.label.name == 'classes')
+        .whereType<NamedArgument>()
+        .where((e) => e.name.lexeme == 'classes')
         .firstOrNull;
-    final classesVal = classesArg?.expression is StringLiteral
-        ? (classesArg!.expression as StringLiteral).stringValue?.split(' ').first
+    final classesVal = classesArg?.argumentExpression is StringLiteral
+        ? (classesArg!.argumentExpression as StringLiteral).stringValue?.split(' ').first
         : null;
 
     final styles = comp.$1.body.childEntities
@@ -98,12 +97,12 @@ class AddStyles extends ResolvedCorrectionProducer {
 
       if (idVal == null && classesVal == null) {
         if (classesArg != null) {
-          builder.addInsertion(classesArg.expression.offset, (edit) {
+          builder.addInsertion(classesArg.argumentExpression.offset, (edit) {
             edit.write("'");
             edit.addSimpleLinkedEdit('className', 'myclass');
             edit.write(' \${');
           });
-          builder.addInsertion(classesArg.expression.end, (edit) {
+          builder.addInsertion(classesArg.argumentExpression.end, (edit) {
             edit.write("}'");
           });
         } else {

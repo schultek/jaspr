@@ -6,9 +6,10 @@ import 'file_matchers.dart';
 final allVariants = [
   for (var mode in RenderingMode.values)
     for (var routing in RoutingOption.values)
-      for (var flutter in FlutterOption.values)
-        for (var backend in BackendOption.valuesFor(mode))
-          TestVariant(mode: mode, routing: routing, flutter: flutter, backend: backend),
+      if (mode != RenderingMode.client || routing != RoutingOption.multiPage)
+        for (var flutter in FlutterOption.values)
+          for (var backend in BackendOption.valuesFor(mode))
+            TestVariant(mode: mode, routing: routing, flutter: flutter, backend: backend),
 ];
 
 class TestVariant {

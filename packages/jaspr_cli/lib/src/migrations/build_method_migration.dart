@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:io/ansi.dart';
 
@@ -283,8 +284,8 @@ class BuilderVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitBlockFunctionBody(BlockFunctionBody node) {
     if (node.parent case FunctionExpression(
-      parent: NamedExpression(
-        name: Label(label: SimpleIdentifier(name: 'builder')),
+      parent: NamedArgument(
+        name: Token(lexeme: 'builder'),
         parent: ArgumentList(
           parent: MethodInvocation(
             methodName: SimpleIdentifier(
@@ -304,8 +305,8 @@ class BuilderVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (node.parent case FunctionExpression(
-      parent: NamedExpression(
-        name: Label(label: SimpleIdentifier(name: 'builder')),
+      parent: NamedArgument(
+        name: Token(lexeme: 'builder'),
         parent: ArgumentList(parent: final MethodInvocation m),
       ),
     )) {

@@ -34,6 +34,17 @@ dev_dependencies:
 
 dependency_overrides:
   cli_util: 0.5.0 # Until melos upgrades to this version
+  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  # ATTENTION / SCREAMING COMMENT:
+  # Why test_api is overridden to 0.7.12:
+  # On Flutter stable CI runners (e.g., Flutter 3.44.5 / channel stable), the bundled
+  # flutter_test package pins test_api to 0.7.11. Because test >=1.31.0 requires
+  # test_api >=0.7.12, pub is forced to downgrade test to <1.31.0. However, those
+  # older test versions conflict with our analyzer ^13.0.0 constraint!
+  # We MUST override test_api to 0.7.12 here so CI can resolve analyzer ^13.0.0.
+  # We may have to wait until the next Flutter stable roll before this can be removed.
+  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  test_api: 0.7.12
 
 melos:
   command:
