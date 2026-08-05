@@ -46,8 +46,8 @@ melos:
   scripts:
     format:
       steps:
-        - melos exec --ignore=jaspr_cli -- "dart format . --set-exit-if-changed"
-        - melos exec --scope=jaspr_cli -- "dart format lib --set-exit-if-changed"
+        - dart run melos exec --ignore=jaspr_cli -- "dart format . --set-exit-if-changed"
+        - dart run melos exec --scope=jaspr_cli -- "dart format lib --set-exit-if-changed"
     test:
       exec:
         command: dart test --exclude-tags=cli
@@ -86,14 +86,14 @@ melos:
         dart test --concurrency=1 --tags="$VARIANT"
     coverage:all:
       run: |
-        melos run coverage --no-select
+        dart run melos run coverage --no-select
         genhtml --ignore-errors unmapped -p $MELOS_ROOT_PATH/packages -o $MELOS_ROOT_PATH/coverage/report $MELOS_ROOT_PATH/coverage/*_lcov.info
         open $MELOS_ROOT_PATH/coverage/report/index.html
     generate:build:
       packageFilters:
         dependsOn: build_runner
       run: |
-        melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
+        dart run melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
     generate:html:
       run: |
         cd packages/jaspr
