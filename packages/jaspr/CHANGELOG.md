@@ -5,16 +5,18 @@
 - **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
 - Added stateful server-side reload feature.
 
-## 0.23.3
-
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
+
+## 0.23.3
 
 - Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
 - Updated `testClient` in `jaspr_test` to automatically unmount the root component and clean up `document.body` between test cases.
 - Fixed asynchronous errors escaping the development proxy when falling back to the app root.
 - Fixed repeated copying of nested build assets.
 - The sitemap `priority` tag is now omitted when a route has no priority set, instead of always defaulting to `0.5`.
+- Fixed a misconfiguration of server hotreload that caused `jaspr serve` consuming excessive CPU.
+- Require `build_daemon ^4.1.4` to fix build error due to version mismatch.
 
 ## 0.23.2
 

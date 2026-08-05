@@ -1,4 +1,4 @@
-## Unreleased minor
+## 0.9.0
 
 - Made `RouteSettings.priority` nullable and default to `null` instead of `0.5`, so the sitemap `priority` tag can be omitted (consistent with `changeFreq`).
 - Added `dispose()` to the `HistoryManager` interface.
