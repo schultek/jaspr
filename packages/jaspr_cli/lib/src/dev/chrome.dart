@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'package:browser_launcher/browser_launcher.dart' as browser_launcher;
 import 'package:path/path.dart' as path;
+
 import '../helpers/settings_helper.dart';
 import '../logging.dart';
 
