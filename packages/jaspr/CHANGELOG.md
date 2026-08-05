@@ -1,3 +1,7 @@
+## Unreleased patch
+
+- Fixed uninitialized `assetManager` when using Flutter plugins.
+
 ## 0.23.3
 
 - Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
