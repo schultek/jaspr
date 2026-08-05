@@ -98,7 +98,7 @@ melos:
     test:cli:integration:
       run: |
         cd packages/jaspr_cli &&
-        dart test --tags="$VARIANT"
+        dart test --concurrency=1 --tags="$VARIANT"
     coverage:all:
       run: |
         melos run coverage --no-select

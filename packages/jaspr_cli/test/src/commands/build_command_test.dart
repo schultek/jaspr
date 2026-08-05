@@ -381,7 +381,6 @@ void main() {
             jsonEncode({
               'lastmod': '2026-01-01T12:34:56.789Z',
               'changefreq': 'daily',
-              'priority': 0.3,
             }),
           );
           request.response.write('FAKE HTML RESPONSE 2');
@@ -430,7 +429,6 @@ void main() {
             '    <loc>https://example.com/abc2</loc>\n'
             '    <lastmod>2026-01-01T12:34:56Z</lastmod>\n'
             '    <changefreq>daily</changefreq>\n'
-            '    <priority>0.3</priority>\n'
             '  </url>\n'
             '</urlset>\n'
             '',

@@ -401,7 +401,9 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           if (sitemapData.changefreq != null) {
             content.writeln('    <changefreq>${sitemapData.changefreq}</changefreq>');
           }
-          content.writeln('    <priority>${sitemapData.priority ?? 0.5}</priority>');
+          if (sitemapData.priority != null) {
+            content.writeln('    <priority>${sitemapData.priority}</priority>');
+          }
           content.writeln('  </url>');
         }
         content.writeln('</urlset>');

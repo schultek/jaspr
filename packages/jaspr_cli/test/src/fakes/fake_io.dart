@@ -11,8 +11,8 @@ import 'package:mocktail/mocktail.dart';
 import 'fake_socket.dart';
 
 class FakeIO {
-  FakeIO()
-    : fs = MemoryFileSystem(),
+  FakeIO({void Function(String context, FileSystemOp operation)? fileSystemOpHandler})
+    : fs = MemoryFileSystem(opHandle: fileSystemOpHandler ?? (_, _) {}),
       process = MockProcessRunner(),
       sockets = MockSockets(),
       stdin = FakeStdin(),

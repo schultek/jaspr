@@ -2,7 +2,7 @@
 name: jaspr-styling
 description: Write type-safe CSS-in-Dart to style Jaspr components. Use this skill when styling components, implementing themes, or using CSS properties.
 metadata:
-  jaspr_version: 0.23.2
+  jaspr_version: 0.23.3
 ---
 
 ## Rules for Styling

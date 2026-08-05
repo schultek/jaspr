@@ -126,7 +126,7 @@ mixin LazyRouteBase on RouteBase {
 
 /// Settings for a route.
 class RouteSettings {
-  const RouteSettings({this.lastMod, this.changeFreq, this.priority = 0.5});
+  const RouteSettings({this.lastMod, this.changeFreq, this.priority});
 
   /// The date of last modification of the page.
   final DateTime? lastMod;
@@ -135,10 +135,11 @@ class RouteSettings {
   final ChangeFreq? changeFreq;
 
   /// The priority of this URL relative to other pages on the site.
-  /// Valid values are between 0.0 and 1.0, with 0.5 being the default.
+  /// Valid values are between 0.0 and 1.0.
   ///
-  /// Search engines may use this value to prioritize crawling.
-  final double priority;
+  /// When null, the `priority` tag is omitted from the sitemap. Note that
+  /// Google no longer uses this value.
+  final double? priority;
 }
 
 /// How frequently the page is likely to change. This value provides general information to search engines and may not correlate exactly to how often they crawl the page.
