@@ -47,7 +47,7 @@ jobs:
         run: dart run melos run format
 
       - name: Check linting
-        run: dart run melos analyze
+        run: dart run melos analyze --fatal-infos
 
   test:
     name: Test Packages
