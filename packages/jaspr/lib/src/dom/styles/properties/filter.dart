@@ -120,11 +120,13 @@ class _ContrastFilter extends _FilterWithPercentage {
 }
 
 class _DropShadowFilter implements _ListableFilter {
-  const _DropShadowFilter({required Unit offsetX, required Unit offsetY, Unit? spread, Color? color})
-    : _offsetX = offsetX,
-      _offsetY = offsetX,
-      _spread = spread,
-      _color = color;
+  const _DropShadowFilter({
+    required Unit offsetX,
+    required Unit offsetY,
+    this._spread,
+    this._color,
+  }) : _offsetX = offsetX,
+       _offsetY = offsetX;
 
   final Unit _offsetX;
   final Unit _offsetY;

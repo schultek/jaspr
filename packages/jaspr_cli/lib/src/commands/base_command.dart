@@ -17,7 +17,7 @@ import '../utils.dart';
 abstract class BaseCommand extends Command<int> {
   Set<FutureOr<void> Function()> guards = {};
 
-  BaseCommand({Logger? logger}) : _logger = logger {
+  BaseCommand({this._logger}) {
     argParser.addFlag('verbose', abbr: 'v', help: 'Enable verbose logging.', negatable: false);
   }
 

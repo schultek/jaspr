@@ -3,7 +3,7 @@ description: Shared utilities and tools for contributing to the Jaspr project.
 publish_to: none
 
 environment:
-  sdk: ^3.8.0
+  sdk: ^3.13.0-0
 
 resolution: workspace
 

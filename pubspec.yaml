@@ -3,7 +3,7 @@ publish_to: none
 repository: https://github.com/schultek/jaspr
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"
+  sdk: ^3.13.0-0
 
 workspace:
   - packages/jaspr

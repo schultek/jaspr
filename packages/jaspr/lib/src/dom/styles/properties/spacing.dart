@@ -55,11 +55,7 @@ class _QuadSpacing implements Spacing {
   final Unit? _bottom;
 
   const _QuadSpacing(this._left, this._top, this._right, this._bottom);
-  const _QuadSpacing.only({Unit? left, Unit? top, Unit? right, Unit? bottom})
-    : _left = left,
-      _top = top,
-      _right = right,
-      _bottom = bottom;
+  const _QuadSpacing.only({this._left, this._top, this._right, this._bottom});
 
   @override
   Unit get left => _left ?? Unit.zero;
