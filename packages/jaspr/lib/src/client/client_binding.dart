@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:http/http.dart' as http;
-import 'package:sse/client/sse_client.dart';
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
@@ -14,10 +14,49 @@ import 'dom_render_object.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
-  ClientAppBinding() {
-    if (kDebugMode) {
-      _debugInitializeEvents();
-    }
+  static final ClientAppBinding _instance = ClientAppBinding._();
+
+  static ClientAppBinding ensureInitialized() {
+    return _instance;
+  }
+
+  ClientAppBinding._() {
+    assert(() {
+      registerExtension('ext.jaspr.reassemble', (method, parameters) async {
+        // ignore: invalid_use_of_protected_member
+        rootElement?.visitChildren((element) => element.reassemble());
+        return ServiceExtensionResponse.result('{}');
+      });
+      registerExtension('ext.jaspr.reload', (method, parameters) async {
+        final path = parameters['path'];
+        if (path == null || path == web.window.location.pathname) {
+          _reloadPage();
+        }
+        return ServiceExtensionResponse.result('{}');
+      });
+      registerExtension('ext.jaspr.reload_stylesheets', (method, parameters) async {
+        List<String>? stylesheetUrls;
+        if (parameters['urls'] case final urlsParameter?) {
+          try {
+            final decoded = jsonDecode(urlsParameter);
+            if (decoded is List<Object?>) {
+              stylesheetUrls = decoded.cast<String>();
+            }
+          } catch (_) {
+            stylesheetUrls = urlsParameter
+                .split(',')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList(growable: false);
+          }
+        }
+        if (stylesheetUrls != null) {
+          _reloadStylesheets(stylesheetUrls);
+        }
+        return ServiceExtensionResponse.result('{}');
+      });
+      return true;
+    }());
   }
 
   @override
@@ -77,29 +116,6 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     web.console.error('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace'.toJS);
   }
 
-  SseClient? _debugEventsClient;
-
-  void _debugInitializeEvents() {
-    if (_debugEventsClient != null) return;
-
-    _debugEventsClient = SseClient(r'/$jasprEventsHandler');
-    _debugEventsClient!.stream.listen(
-      (event) {
-        final data = jsonDecode(event);
-        if (data case ['ReloadStylesheetsRequest', final List<Object?> urls]) {
-          _reloadStylesheets(urls.cast<String>());
-        } else if (data case ['ReloadRequest']) {
-          _reloadPage();
-        }
-      },
-      onDone: () {
-        _debugEventsClient!.close();
-        _debugEventsClient = null;
-      },
-    );
-    _debugEventsClient!.sink.add(jsonEncode(['RouteInfo', web.window.location.pathname]));
-  }
-
   void _reloadStylesheets(List<String> urls) {
     // Reload all stylesheet <link> tags.
     for (final url in urls) {
@@ -153,7 +169,9 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       return;
     }
 
-    final doc = web.Document.parseHTMLUnsafe(response.body.toJS);
+    final responseBody = utf8.decode(response.bodyBytes);
+    final doc = web.Document.parseHTMLUnsafe(responseBody.toJS);
+
     final body = doc.body;
 
     if (body == null) {

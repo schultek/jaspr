@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:dwds/data/build_result.dart';
+import 'package:dwds/dwds.dart';
 import 'package:frontend_server_client/frontend_server_client.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
@@ -14,6 +14,7 @@ import 'package:vm_service/vm_service_io.dart';
 
 import '../commands/base_command.dart';
 import '../dev/client_workflow.dart';
+import '../dev/dev_proxy.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
@@ -202,11 +203,12 @@ class CssRunner {
           if (!_initialGenerationCompleter.isCompleted) {
             _initialGenerationCompleter.complete();
           }
-          // if (workflow?.devProxy.reload == ReloadConfiguration.hotReload) {
-          //   for (final connection in workflow!.devProxy.getClientConnections()) {
-          //     _reloadStylesheets(connection, cssFiles);
-          //   }
-          // }
+          if (workflow?.devProxy.reload == ReloadConfiguration.hotReload ||
+              workflow?.devProxy.reload == ReloadConfiguration.hotRestart) {
+            for (final connection in workflow!.devProxy.getClientConnections()) {
+              _reloadStylesheets(connection, cssFiles);
+            }
+          }
         },
       );
     });
@@ -229,7 +231,7 @@ class CssRunner {
     });
   }
 
-  Future<void> reload(BuildResult result) async {
+  Future<void> reload() async {
     final cssFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
 
@@ -406,17 +408,20 @@ class CssRunner {
     return runnerCode.toString();
   }
 
-  // Future<void> _reloadStylesheets(ClientConnection connection, List<String> cssFiles) async {
-  //   if (connection.vmService == null) {
-  //     return;
-  //   }
-  //   try {
-  //     logger.write('Hot-reloading CSS stylesheets: $cssFiles', tag: Tag.css, level: Level.verbose);
-  //     await connection.vmService!.callServiceExtension('ext.jaspr.reload_stylesheets', args: {'urls': cssFiles});
-  //   } catch (e) {
-  //     logger.write('Failed to reload CSS stylesheets: $e', tag: Tag.css, level: Level.warning);
-  //   }
-  // }
+  Future<void> _reloadStylesheets(ClientConnection connection, List<String> cssFiles) async {
+    if (connection.vmService == null) {
+      return;
+    }
+    try {
+      logger.write('Hot-reloading CSS stylesheets: $cssFiles', tag: Tag.css, level: Level.verbose);
+      await connection.vmService!.callServiceExtension(
+        'ext.jaspr.reload_stylesheets',
+        args: {'urls': jsonEncode(cssFiles)},
+      );
+    } catch (e) {
+      logger.write('Failed to reload CSS stylesheets: $e', tag: Tag.css, level: Level.warning);
+    }
+  }
 
   void _processCssOutput(String line, {void Function(String uri)? onVmServiceUri, void Function()? onDone}) {
     while (line.startsWith('Running build hooks...')) {
