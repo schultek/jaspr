@@ -54,11 +54,10 @@ void main() {
       test('resolves relative paths in data properties', () async {
         when(() => page.data).thenReturn(
           {
-                'image': 'image.png',
-                'meta': {'image': 'meta_image.png'},
-                'other': 'other.png',
-              }
-              as PageDataMap,
+            'image': 'image.png',
+            'meta': {'image': 'meta_image.png'},
+            'other': 'other.png',
+          } as PageDataMap,
         );
 
         await assetManager.dataLoader.loadData(page);
@@ -72,10 +71,9 @@ void main() {
       test('ignores absolute URLs and resolves root-relative paths', () async {
         when(() => page.data).thenReturn(
           {
-                'image': '/absolute/image.png',
-                'meta': {'image': 'https://example.com/image.png'},
-              }
-              as PageDataMap,
+            'image': '/absolute/image.png',
+            'meta': {'image': 'https://example.com/image.png'},
+          } as PageDataMap,
         );
 
         await assetManager.dataLoader.loadData(page);

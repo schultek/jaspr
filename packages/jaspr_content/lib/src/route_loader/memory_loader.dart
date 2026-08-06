@@ -9,7 +9,7 @@ import 'route_loader.dart';
 ///
 /// Takes a list of [MemoryPage]s and creates routes from them.
 class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
-  MemoryLoader({required List<MemoryPage> pages, super.debugPrint}) : _pages = pages;
+  MemoryLoader({required this._pages, super.debugPrint});
 
   final List<MemoryPage> _pages;
 

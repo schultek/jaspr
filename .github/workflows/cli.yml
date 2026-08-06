@@ -40,7 +40,8 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          # TODO: Change back to stable once Dart 3.13 is stable.
+          channel: beta
 
       - name: Bootstrap
         run: |

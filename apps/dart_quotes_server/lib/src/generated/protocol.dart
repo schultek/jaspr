@@ -12,6 +12,7 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
+
 import 'quote.dart' as _i4;
 import 'quote_init.dart' as _i5;
 export 'quote.dart';
