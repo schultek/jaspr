@@ -34,9 +34,9 @@ jobs:
 
       - name: Bootstrap
         run: |
-          dart pub global activate melos 7.1.0
           dart pub global activate -s git https://github.com/schultek/semantic_changelog
-          melos bootstrap --no-private
+          dart pub get
+          dart run melos bootstrap --no-private
           jaspr --disable-analytics
           gcloud auth print-identity-token --audiences=https://pub.dev | dart pub token add https://pub.dev
 
@@ -54,12 +54,12 @@ jobs:
 
       - name: Apply Versions
         run: |
-          melos bootstrap
+          dart run melos bootstrap
 
       - name: Update CLI
         run: |
-          melos run generate:versions
-          melos run format || true
+          dart run melos run generate:versions
+          dart run melos run format || true
 
       - name: Commit Versions
         if: steps.bump.outputs.did_bump != '0'

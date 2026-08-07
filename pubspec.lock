@@ -165,10 +165,10 @@ packages:
     dependency: transitive
     description:
       name: build_daemon
-      sha256: "57c62a6d85c39d2a8c984e3b73b29bf2775a865e690309405aeade647fb2184c"
+      sha256: "79e05eaf15a48d7230b053a4363b8eaac0cc234bbd0134c3229455481f55cbc6"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.4"
+    version: "4.1.5"
   build_runner:
     dependency: transitive
     description:
@@ -282,13 +282,13 @@ packages:
     source: hosted
     version: "0.3.3+2"
   cli_util:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: cli_util
-      sha256: "53f32da4e0c381951938e2229e217f3568699e3113463daa382261e0c6fead9e"
+      sha256: "71e43f1976c3eae2d9468a5b4d6600bf8cae61508b87f27fa1799228935d48ab"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.5.2"
   clock:
     dependency: transitive
     description:
@@ -1204,10 +1204,10 @@ packages:
     dependency: "direct dev"
     description:
       name: melos
-      sha256: "5fc1a858e3d90fdc42f2f423b95f901214bbc3d9e80c99125d9352f12453721d"
+      sha256: "2d588cd21b34ea4cadf5a20542bcd5042a60833aa3eae09ecdc319291cd06f69"
       url: "https://pub.dev"
     source: hosted
-    version: "7.8.2"
+    version: "8.2.2"
   meta:
     dependency: transitive
     description:

@@ -45,12 +45,12 @@ jobs:
 
       - name: Bootstrap
         run: |
-          dart pub global activate melos
           dart pub global activate coverage
-          melos bootstrap --no-private
+          dart pub get
+          dart run melos bootstrap --no-private
           jaspr --disable-analytics
 
       - name: Run cli test
-        run: melos run test:cli:integration
+        run: dart run melos run test:cli:integration
         env:
           VARIANT: ${{matrix.VARIANT}}
