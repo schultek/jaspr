@@ -21,9 +21,22 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
   /// Sets the flutter mode to embedded in the pubspec.yaml file for the project
   /// if the project has jaspr.flutter set to 'plugins', we ask the user if they want to change it to embedded or not
   void setFlutterMode(Directory projectRoot) {
-    if (project.flutterMode != FlutterMode.embedded) {
-      // NOTE: we re-read the pubspec file after the potential installation of packages
-      final pubspecMap = readPubspec(projectRoot);
+    FlutterMode currentFlutterMode;
+
+    // NOTE: we re-read the pubspec file after the potential installation of packages
+    final pubspecMap = readPubspec(projectRoot);
+
+    final configYaml = pubspecMap?['jaspr'];
+    if (configYaml is! YamlMap) {
+      currentFlutterMode = FlutterMode.none;
+    }
+    final modeYaml = configYaml['flutter'];
+    if (modeYaml is! String) {
+      currentFlutterMode = FlutterMode.none;
+    }
+    currentFlutterMode = FlutterMode.values.where((v) => v.name == modeYaml).firstOrNull ?? FlutterMode.none;
+
+    if (currentFlutterMode != FlutterMode.embedded) {
       if (pubspecMap != null) {
         logger.write(
           'Enabling Flutter embedding support in pubspec.yaml.',
@@ -32,7 +45,9 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
         );
 
         try {
-          final pubspecContent = project.pubspecFile.readAsStringSync();
+          final pubspecFile = File(p.join(projectRoot.path, 'pubspec.yaml'));
+
+          final pubspecContent = pubspecFile.readAsStringSync();
           final builder = EditBuilder(LineInfo.fromContent(pubspecContent));
 
           if (pubspecMap.nodes['jaspr'] case final YamlMap jasprMap) {
@@ -56,7 +71,7 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
             }
           }
 
-          project.pubspecFile.writeAsStringSync(builder.apply(pubspecContent));
+          pubspecFile.writeAsStringSync(builder.apply(pubspecContent));
         } catch (e) {
           logger.write(
             'Failed to update pubspec.yaml: $e',

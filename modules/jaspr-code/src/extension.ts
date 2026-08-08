@@ -14,6 +14,7 @@ import { HtmlPasteProvider } from "./jaspr/html_paste_provider";
 import { dartExtensionApi } from "./api";
 import { ComponentCodeLensProvider } from "./code_lenses/component_code_lens";
 import { ServeCodeLensProvider } from "./code_lenses/serve_code_lens";
+import { createJasprComponent } from "./new_components";
 
 export async function activate(context: vscode.ExtensionContext) {
   let projects = await findJasprProjectFolders();
@@ -64,6 +65,11 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("jaspr.serve", jasprServe(context))
   );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("jaspr.new", createJasprComponent)
+  );
+
 
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider(
