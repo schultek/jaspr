@@ -1,0 +1,21 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, implicit_dynamic_list_literal, implicit_dynamic_map_literal, inference_failure_on_collection_literal
+
+import 'package:mason/mason.dart';
+
+final newFlutterEmbeddedViewBundle = MasonBundle.fromJson(<String, dynamic>{
+  "files": [
+    {
+      "path": "{{name.snakeCase()}}.dart",
+      "data":
+          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2RvbS5kYXJ0JzsKaW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwppbXBvcnQgJ3BhY2thZ2U6amFzcHJfZmx1dHRlcl9lbWJlZC9qYXNwcl9mbHV0dGVyX2VtYmVkLmRhcnQnOwoKLy8gVGhlIGZsdXR0ZXIgd2lkZ2V0IGlzIG9ubHkgaW1wb3J0ZWQgb24gdGhlIHdlYiAoYXMgdGhlIHNlcnZlciBjYW5ub3QgaW1wb3J0IGZsdXR0ZXIpCi8vIGFuZCBpcyBpbXBvcnRlZCBhcyBhIGRlZmVycmVkIGxpYnJhcnksIHRvIG5vdCBibG9jayBoeWRyYXRpb24gb2YgdGhlIHJlbWFpbmluZyB3ZWJzaXRlLgpASW1wb3J0Lm9uV2ViKCcuLi93aWRnZXRzL3t7Zmx1dHRlckFwcE5hbWUuc25ha2VDYXNlKCl9fS5kYXJ0Jywgc2hvdzogWyN7e2ZsdXR0ZXJBcHBOYW1lLnBhc2NhbENhc2UoKX19XSkKaW1wb3J0ICd7e25hbWUuc25ha2VDYXNlKCl9fS5pbXBvcnRzLmRhcnQnIGRlZmVycmVkIGFzIGZsdXR0ZXJfYXBwOwoKY2xhc3Mge3tuYW1lLnBhc2NhbENhc2UoKX19IGV4dGVuZHMgU3RhdGVsZXNzQ29tcG9uZW50IHsKICBjb25zdCB7e25hbWUucGFzY2FsQ2FzZSgpfX0oe3N1cGVyLmtleX0pOwoKCiAgQG92ZXJyaWRlCiAgQ29tcG9uZW50IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb250ZXh0KSB7CiAgICByZXR1cm4gRmx1dHRlckVtYmVkVmlldy5kZWZlcnJlZCgKICAgICAgc3R5bGVzOiBTdHlsZXMobWFyZ2luOiAub25seSh0b3A6IDIucmVtKSksCiAgICAgIC8vIFdlIG5lZWQgdG8gc2V0IGNvbnN0cmFpbnRzIGFzIHRoZSBmbHV0dGVyIHZpZXcgY2Fubm90IGR5bmFtaWNhbGx5IHNpemUgaXRzZWxmLgogICAgICBjb25zdHJhaW50czogVmlld0NvbnN0cmFpbnRzKAogICAgICAgIG1pbldpZHRoOiAzMDAsCiAgICAgICAgbWluSGVpZ2h0OiAxMDAsCiAgICAgICAgbWF4V2lkdGg6IGRvdWJsZS5pbmZpbml0eSwKICAgICAgICBtYXhIZWlnaHQ6IGRvdWJsZS5pbmZpbml0eSwKICAgICAgKSwKICAgICAgLy8gVGhlIFtGbHV0dGVyRW1iZWRWaWV3LmRlZmVycmVkXSBjb21wb25lbnQgd2lsbCB0YWtlIGNhcmUgb2YgbG9hZGluZwogICAgICAvLyB0aGUgd2lkZ2V0IGFuZCBpbml0aWFsaXppbmcgZmx1dHRlci4KICAgICAgbG9hZExpYnJhcnk6IGZsdXR0ZXJfYXBwLmxvYWRMaWJyYXJ5KCksCiAgICAgIGJ1aWxkZXI6ICgpID0+IGZsdXR0ZXJfYXBwLnt7Zmx1dHRlckFwcE5hbWUucGFzY2FsQ2FzZSgpfX0oKSwKICAgICk7CiAgfQp9Cg==",
+      "type": "text",
+    },
+  ],
+  "hooks": [],
+  "name": "new_flutter_embedded_view",
+  "description": "A jaspr_cli brick to add a FlutterEmbeddedView",
+  "version": "0.1.0",
+  "environment": {"mason": ">=0.1.0-dev.52 <0.1.0"},
+  "vars": {},
+});

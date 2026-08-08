@@ -1,0 +1,7 @@
+name: new_stateless_component
+description: A jaspr_cli brick to create stateless components
+
+version: 0.1.0
+
+environment:
+  mason: ">=0.1.0-dev.52 <0.1.0"

@@ -60,6 +60,11 @@
         "command": "jaspr.doctor",
         "title": "Doctor",
         "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.new",
+        "title": "New Component",
+        "category": "Jaspr"
       }
     ],
     "menus": {
@@ -77,6 +82,10 @@
         },
         {
           "command": "jaspr.doctor"
+        },
+        {
+          "command": "jaspr.new",
+          "when": "jaspr-code:anyJasprProjectLoaded"
         }
       ]
     },

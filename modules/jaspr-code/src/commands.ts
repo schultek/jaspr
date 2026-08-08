@@ -3,6 +3,7 @@ import { checkJasprInstalled } from "./helpers/install_helper";
 import { runJasprCommand, runJasprCommandInFolder } from "./helpers/process_helper";
 import { getFolderToRunCommandIn } from "./helpers/project_helper";
 import { JasprServeDaemon } from "./jaspr/serve_daemon";
+import { JasprNewComponentOptions } from "./new_components";
 
 export type JasprMode = "static" | "server" | "client";
 export type JasprModeOption = JasprMode | "static:auto" | "server:auto";
@@ -86,4 +87,78 @@ export function jasprServe(context: ExtensionContext) {
       args: !!input ? ['--input=' + input] : []
     });
   }
+}
+
+export async function jasprNew(
+  projectDir: string,
+  completePath: string,
+  options: JasprNewComponentOptions,
+  name: string,
+  flutterAppName?: string,
+): Promise<boolean> {
+  const isInstalled = await checkJasprInstalled();
+  if (!isInstalled) {
+    return false;
+  }
+
+  const args = ["new", "component"];
+
+  switch (options.type) {
+    case "stateless":
+      args.push("--stateless");
+      break;
+    case "stateful":
+      args.push("--stateful");
+      break;
+    case "async":
+      args.push("--async");
+      break;
+    case "flutter":
+      args.push("--flutter");
+      break;
+    case "inherited":
+      args.push("--inherited");
+      break;
+  }
+
+  // compatibility checks done here to avoid cli errors
+  if (options.componentOptions) {
+    for (const option of options.componentOptions) {
+      switch (option) {
+        case "client":
+          if (options.type === "stateless" || options.type === "stateful") {
+            args.push("--client");
+          }
+          break;
+        case "with-styles":
+          if (options.type !== "inherited") {
+            args.push("--with-styles");
+          }
+          break;
+        case "with-test":
+          if (options.type !== "inherited") {
+            args.push("--with-test");
+          }
+          break;
+      }
+    }
+  }
+
+  // Flutter embed options
+  if (options.type === "flutter") {
+    if (options.flutterEmbedOptions?.includes("with-sample-widget")) {
+      args.push("--with-sample-flutter-widget");
+    }
+    if (flutterAppName) {
+      args.push("--flutter-app-name", flutterAppName);
+    }
+  }
+
+  args.push("--path", completePath);
+
+  args.push(name);
+
+  const exitCode = await runJasprCommandInFolder(projectDir, args, undefined);
+
+  return exitCode === 0;
 }
