@@ -38,23 +38,21 @@ Clone the project with the following command:
 git clone https://github.com/schultek/jaspr.git
 ```
 
-Jaspr uses [Melos](https://github.com/invertase/melos) to manage the project and dependencies. To install Melos, run the following command:
+Jaspr uses [Melos](https://github.com/invertase/melos) to manage the project and dependencies. Install the workspace dependencies with:
 
 ```dart
-dart pub global activate melos
+dart pub get
 ```
 
 Next, at the root of your locally cloned repository run the bootstrap command:
 
 ```dart
-melos bootstrap
+dart run melos bootstrap
 ```
 
 The bootstrap command locally links all dependencies within the project without having to provide manual `dependency_overrides`. This allows all packages, examples and tests to build from the local clone project.
 
-> You do not need to run `dart pub get` once bootstrap has been completed.
-
-This also overrides the global `jaspr` command to use the local project, so you have the latest cli version. Whenever you change something in the `jaspr_cli` package and want to test it using the global `jaspr` command run `melos activate:cli` to re-activate the package.
+This also overrides the global `jaspr` command to use the local project, so you have the latest cli version. Whenever you change something in the `jaspr_cli` package and want to test it using the global `jaspr` command run `dart run melos activate:cli` to re-activate the package.
 
 > [!IMPORTANT]
 > The Flutter stable channel may not always be compatible with our development branch and might result in issues like [SDK version pinning](https://dart.dev/go/sdk-version-pinning). For such cases, use Flutter beta channel and prefer using a flutter version manager like [puro](https://puro.dev) or [FVM](https://fvm.app).
@@ -64,13 +62,13 @@ This also overrides the global `jaspr` command to use the local project, so you 
 To run all tests across packages, run:
 
 ```shell
-melos run test
+dart run melos run test
 ```
 
 To also compute the coverage and open the report in your browser, run:
 
 ```shell
-melos run coverage
+dart run melos run coverage
 ```
 
 ### 3. Generate html component methods
@@ -79,7 +77,7 @@ When you change something in the html component library, re-generate the compone
 methods by running:
 
 ```shell
-melos run generate:html
+dart run melos run generate:html
 ```
 
 ### 4. Generate cli scaffold
@@ -87,7 +85,7 @@ melos run generate:html
 When you change or add the `jaspr create` scaffold, re-generate the bundle for the cli by running:
 
 ```shell
-melos run generate:scaffold
+dart run melos run generate:scaffold
 ```
 
 ## Pull Requests & Versioning

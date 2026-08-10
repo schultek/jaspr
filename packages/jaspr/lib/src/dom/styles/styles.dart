@@ -448,9 +448,8 @@ class _Styles extends Styles {
     this.backgroundSize,
     this.backgroundClip,
     // Raw Styles
-    Map<String, String>? raw,
-  }) : _raw = raw,
-       super._();
+    this._raw,
+  }) : super._();
 
   @override
   Map<String, String> get properties => {

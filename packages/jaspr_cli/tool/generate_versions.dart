@@ -7,7 +7,12 @@ void main() async {
     '// GENERATED FILE - DO NOT MODIFY\n\n',
   );
 
-  final packages = await Process.run('melos', 'list --no-private --json'.split(' '), stdoutEncoding: utf8);
+  final packages = await Process.run(
+    Platform.resolvedExecutable,
+    ['run', 'melos', 'list', '--no-private', '--json'],
+    workingDirectory: '../..',
+    stdoutEncoding: utf8,
+  );
   final jsonStartIndex = (packages.stdout as String).indexOf('[');
   final packagesJson = (jsonDecode((packages.stdout as String).substring(jsonStartIndex)) as List<Object?>)
       .cast<Map<String, Object?>>();

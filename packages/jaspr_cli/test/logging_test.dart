@@ -129,8 +129,7 @@ void main() {
           final serverLog = s.ServerLog(
             (b) => b
               ..level = s.Level.SEVERE
-              ..message =
-                  'build_web_compilers:entrypoint transitive libraries have sdk dependencies that not supported on this platform flutter|lib'
+              ..message = 'build_web_compilers:entrypoint transitive libraries have sdk dependencies that not supported on this platform flutter|lib'
               ..loggerName = 'builder',
           );
           logger.writeServerLog(serverLog);

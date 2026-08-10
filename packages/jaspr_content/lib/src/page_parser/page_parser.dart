@@ -130,8 +130,7 @@ abstract mixin class CustomComponentBase implements CustomComponent {
 }
 
 class _CustomComponent extends CustomComponentBase {
-  const _CustomComponent({required this.pattern, required CustomComponentBuilder builder, this.theme})
-    : _builder = builder;
+  const _CustomComponent({required this.pattern, required this._builder, this.theme});
 
   @override
   final Pattern pattern;

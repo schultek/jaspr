@@ -28,8 +28,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'input',
       abbr: 'i',
-      help:
-          'Specify the entry file for the server app. Must end in ".server.dart".\nDefaults to the first found "*.server.dart" file in the project.',
+      help: 'Specify the entry file for the server app. Must end in ".server.dart".\nDefaults to the first found "*.server.dart" file in the project.',
     );
     argParser.addOption(
       'target',
