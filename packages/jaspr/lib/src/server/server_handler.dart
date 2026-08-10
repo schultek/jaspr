@@ -199,4 +199,3 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
 }
 
 // coverage:ignore-end
-
