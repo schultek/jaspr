@@ -69,7 +69,7 @@ class UnsafeImportsRule extends AnalysisRule {
     final packageRoot = context.package?.root;
     if (packageRoot == null) return;
 
-    final pubspecFile = packageRoot.getChildAssumingFile('pubspec.yaml');
+    final pubspecFile = packageRoot.getFile('pubspec.yaml');
     final digest = pubspecFile.lengthSync ^ pubspecFile.modificationStamp;
     if (digest == pubspecDigest) return;
     pubspecDigest = digest;

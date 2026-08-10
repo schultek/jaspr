@@ -109,11 +109,11 @@ class RemoveComponent extends ResolvedCorrectionProducer {
 
       final children = <AstNode>[
         for (final arg in node.argumentList.arguments)
-          if (arg is NamedExpression)
-            if (arg.name.label.name == 'child' && isComponentType(arg.staticType))
-              arg.expression
-            else if (arg.name.label.name == 'children' && arg.expression is ListLiteral)
-              ...(arg.expression as ListLiteral).elements
+          if (arg is NamedArgument)
+            if (arg.name.lexeme == 'child' && isComponentType(arg.argumentExpression.staticType))
+              arg.argumentExpression
+            else if (arg.name.lexeme == 'children' && arg.argumentExpression is ListLiteral)
+              ...(arg.argumentExpression as ListLiteral).elements
             else
               ...[]
           else if (arg is ListLiteral)

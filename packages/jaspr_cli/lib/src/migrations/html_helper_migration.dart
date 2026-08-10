@@ -104,8 +104,8 @@ class HelperVisitor extends RecursiveAstVisitor<void> {
     if (args.arguments.isEmpty) return false;
     if (args.arguments.length == 1) return true;
     if (args.arguments.length == 2) {
-      final named = args.arguments.whereType<NamedExpression>().toList();
-      return named.length == 1 && named.first.name.label.name == 'key';
+      final named = args.arguments.whereType<NamedArgument>().toList();
+      return named.length == 1 && named.first.name.lexeme == 'key';
     }
     return false;
   }

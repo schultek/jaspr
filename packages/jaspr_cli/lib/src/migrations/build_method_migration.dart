@@ -282,33 +282,37 @@ class BuilderVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitBlockFunctionBody(BlockFunctionBody node) {
-    if (node.parent case FunctionExpression(
-      parent: NamedExpression(
-        name: Label(label: SimpleIdentifier(name: 'builder')),
-        parent: ArgumentList(
-          parent: MethodInvocation(
-            methodName: SimpleIdentifier(
-              name: 'Builder' ||
-                  'StatefulBuilder' ||
-                  'AsyncBuilder' ||
-                  'ListenableBuilder' ||
-                  'StreamBuilder' ||
-                  'FutureBuilder',
+    if (node.parent
+        case FunctionExpression(
+          parent: NamedArgument(
+            name: final name,
+            parent: ArgumentList(
+              parent: MethodInvocation(
+                methodName: SimpleIdentifier(
+                  name: 'Builder' ||
+                      'StatefulBuilder' ||
+                      'AsyncBuilder' ||
+                      'ListenableBuilder' ||
+                      'StreamBuilder' ||
+                      'FutureBuilder',
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    )) {
+        )
+        when name.lexeme == 'builder') {
       onBuilderFunction(node);
       return;
     }
 
-    if (node.parent case FunctionExpression(
-      parent: NamedExpression(
-        name: Label(label: SimpleIdentifier(name: 'builder')),
-        parent: ArgumentList(parent: final MethodInvocation m),
-      ),
-    )) {
+    if (node.parent
+        case FunctionExpression(
+          parent: NamedArgument(
+            name: final name,
+            parent: ArgumentList(parent: final MethodInvocation m),
+          ),
+        )
+        when name.lexeme == 'builder') {
       if (m case MethodInvocation(
         methodName: SimpleIdentifier(name: 'single'),
         target: SimpleIdentifier(name: 'Builder'),
