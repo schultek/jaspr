@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:io/ansi.dart';
 
@@ -282,37 +283,33 @@ class BuilderVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitBlockFunctionBody(BlockFunctionBody node) {
-    if (node.parent
-        case FunctionExpression(
-          parent: NamedArgument(
-            name: final name,
-            parent: ArgumentList(
-              parent: MethodInvocation(
-                methodName: SimpleIdentifier(
-                  name: 'Builder' ||
-                      'StatefulBuilder' ||
-                      'AsyncBuilder' ||
-                      'ListenableBuilder' ||
-                      'StreamBuilder' ||
-                      'FutureBuilder',
-                ),
-              ),
+    if (node.parent case FunctionExpression(
+      parent: NamedArgument(
+        name: Token(lexeme: 'builder'),
+        parent: ArgumentList(
+          parent: MethodInvocation(
+            methodName: SimpleIdentifier(
+              name: 'Builder' ||
+                  'StatefulBuilder' ||
+                  'AsyncBuilder' ||
+                  'ListenableBuilder' ||
+                  'StreamBuilder' ||
+                  'FutureBuilder',
             ),
           ),
-        )
-        when name.lexeme == 'builder') {
+        ),
+      ),
+    )) {
       onBuilderFunction(node);
       return;
     }
 
-    if (node.parent
-        case FunctionExpression(
-          parent: NamedArgument(
-            name: final name,
-            parent: ArgumentList(parent: final MethodInvocation m),
-          ),
-        )
-        when name.lexeme == 'builder') {
+    if (node.parent case FunctionExpression(
+      parent: NamedArgument(
+        name: Token(lexeme: 'builder'),
+        parent: ArgumentList(parent: final MethodInvocation m),
+      ),
+    )) {
       if (m case MethodInvocation(
         methodName: SimpleIdentifier(name: 'single'),
         target: SimpleIdentifier(name: 'Builder'),
