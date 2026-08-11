@@ -41,18 +41,17 @@ class AddStyles extends ResolvedCorrectionProducer {
       return;
     }
 
-    final idArg = argumentList.arguments.whereType<NamedArgument>().where((e) => e.name.lexeme == 'id').firstOrNull;
-    final idArgExpression = idArg?.argumentExpression;
-    final idVal = idArgExpression is StringLiteral ? idArgExpression.stringValue : null;
+    final idArg = argumentList.namedArgument('id');
+    final idVal = switch (idArg?.argumentExpression) {
+      StringLiteral(:final stringValue) => stringValue,
+      _ => null,
+    };
 
-    final classesArg = argumentList.arguments
-        .whereType<NamedArgument>()
-        .where((e) => e.name.lexeme == 'classes')
-        .firstOrNull;
-    final classesArgExpression = classesArg?.argumentExpression;
-    final classesVal = classesArgExpression is StringLiteral
-        ? classesArgExpression.stringValue?.split(' ').first
-        : null;
+    final classesArg = argumentList.namedArgument('classes');
+    final classesVal = switch (classesArg?.argumentExpression) {
+      StringLiteral(:final stringValue) => stringValue?.split(' ').first,
+      _ => null,
+    };
 
     final styles = comp.$1.body.childEntities
         .whereType<ClassMember>()

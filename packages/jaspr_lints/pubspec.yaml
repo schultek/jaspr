@@ -19,7 +19,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  analysis_server_plugin: ^0.3.0
+  analysis_server_plugin: ^0.3.17
   analyzer: '>=13.3.0 <15.0.0'
   analyzer_plugin: any
   dart_data_home: ^0.1.0

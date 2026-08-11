@@ -5,6 +5,7 @@
 - **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
 - Added stateful server-side reload feature.
 - Require Dart 3.13 or later.
+- Update `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
 
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.

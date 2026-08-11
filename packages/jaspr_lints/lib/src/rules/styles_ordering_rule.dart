@@ -82,7 +82,7 @@ class _StylesVisitor extends SimpleAstVisitor<void> {
     }
   }
 
-  static Argument? checkOrder(NodeList<Argument> args, List<String?> params) {
+  static NamedArgument? checkOrder(NodeList<Argument> args, List<String?> params) {
     int lastSeenParam = -1;
 
     for (final argument in args) {

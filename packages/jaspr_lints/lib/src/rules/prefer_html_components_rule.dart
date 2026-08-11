@@ -4,7 +4,6 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/source/source_range.dart';
 
 import '../all_html_tags.dart';
 import '../utils.dart';
@@ -52,13 +51,7 @@ class _HtmlComponentVisitor extends SimpleAstVisitor<void> {
       return;
     }
     if (node.constructorName.name?.name == 'element') {
-      final tag = node.argumentList.arguments
-          .whereType<NamedArgument>()
-          .where((n) => n.name.lexeme == 'tag')
-          .map((n) => n.argumentExpression)
-          .whereType<SimpleStringLiteral>()
-          .firstOrNull
-          ?.value;
+      final tag = _tagArgumentValue(node.argumentList);
       if (tag == null || !allHtmlTags.contains(tag)) {
         return;
       }
@@ -90,13 +83,7 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     if (node case ConstructorName(parent: final InstanceCreationExpression node)) {
-      final tag = node.argumentList.arguments
-          .whereType<NamedArgument>()
-          .where((n) => n.name.lexeme == 'tag')
-          .map((n) => n.argumentExpression)
-          .whereType<SimpleStringLiteral>()
-          .firstOrNull
-          ?.value;
+      final tag = _tagArgumentValue(node.argumentList);
       if (tag == null) {
         return;
       }
@@ -113,16 +100,24 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
               } else {
                 end = argument.endToken.next?.offset ?? argument.end;
               }
-              builder.addDeletion(SourceRange(argument.offset, end - argument.offset));
+              builder.addDeletion(range.startOffsetEndOffset(argument.offset, end));
             } else if (name == 'children') {
-              final end = argument.argumentExpression.offset;
-              builder.addDeletion(SourceRange(argument.name.offset, end - argument.name.offset));
+              builder.addDeletion(range.startStart(argument.name, argument.argumentExpression));
             }
           }
         }
 
-        builder.addSimpleReplacement(SourceRange(node.constructorName.offset, node.constructorName.length), tag);
+        builder.addSimpleReplacement(range.node(node.constructorName), tag);
       });
     }
   }
+}
+
+/// Returns the value of the named 'tag' argument when it is a string literal.
+String? _tagArgumentValue(ArgumentList argumentList) {
+  if (argumentList.namedArgument('tag')?.argumentExpression case SimpleStringLiteral(:final value)) {
+    return value;
+  }
+
+  return null;
 }
