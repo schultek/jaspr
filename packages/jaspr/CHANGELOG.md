@@ -1,3 +1,10 @@
+## Unreleased patch
+
+- Fixed static rendering hanging instead of failing when a step of the initial build throws outside of a component's
+  `build` method. Such an error left the task chain the render was waiting on uncompleted, so the HTTP response was
+  never produced and `jaspr build` waited indefinitely. The failure is now reported through
+  `AppBinding.reportBuildError` and the render completes.
+
 ## 0.23.3
 
 - Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
