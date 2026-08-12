@@ -51,7 +51,9 @@ class TaskChain {
   TaskChain.start() : _done = true;
 
   bool _done;
-  final Set<void Function()> _listeners = {};
+
+  /// Callbacks waiting on this chain, run in insertion order once it completes.
+  final List<void Function()> _listeners = [];
 
   /// The failure this chain completed with, if any.
   ({Object error, StackTrace stackTrace})? _failure;
