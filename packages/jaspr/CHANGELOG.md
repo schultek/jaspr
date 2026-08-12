@@ -1,3 +1,9 @@
+## Unreleased patch
+
+- Worked around a Dart VM fault that crashed static rendering on `linux_x64` with
+  `NoSuchMethodError: The method '&' was called on null`, raised from `_LinkedHashSetMixin.add` while `TaskChain`
+  registered a continuation. `TaskChain` no longer hashes those callbacks.
+
 ## 0.23.3
 
 - Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
