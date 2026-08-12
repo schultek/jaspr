@@ -4,7 +4,6 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/source/source_range.dart';
 
 import '../all_html_tags.dart';
 import '../utils.dart';
@@ -52,13 +51,7 @@ class _HtmlComponentVisitor extends SimpleAstVisitor<void> {
       return;
     }
     if (node.constructorName.name?.name == 'element') {
-      final tag = node.argumentList.arguments
-          .whereType<NamedExpression>()
-          .where((n) => n.name.label.name == 'tag')
-          .map((n) => n.expression)
-          .whereType<SimpleStringLiteral>()
-          .firstOrNull
-          ?.value;
+      final tag = _tagArgumentValue(node.argumentList);
       if (tag == null || !allHtmlTags.contains(tag)) {
         return;
       }
@@ -90,13 +83,7 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     if (node case ConstructorName(parent: final InstanceCreationExpression node)) {
-      final tag = node.argumentList.arguments
-          .whereType<NamedExpression>()
-          .where((n) => n.name.label.name == 'tag')
-          .map((n) => n.expression)
-          .whereType<SimpleStringLiteral>()
-          .firstOrNull
-          ?.value;
+      final tag = _tagArgumentValue(node.argumentList);
       if (tag == null) {
         return;
       }
@@ -104,8 +91,8 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
 
       await builder.addDartFileEdit(file, (builder) {
         for (final argument in node.argumentList.arguments) {
-          if (argument is NamedExpression) {
-            final name = argument.name.label.name;
+          if (argument is NamedArgument) {
+            final name = argument.name.lexeme;
             if (name == 'tag') {
               int end;
               if (argument.endToken.next case final next? when next.lexeme == ',') {
@@ -113,16 +100,24 @@ class ConvertHtmlComponentFix extends ResolvedCorrectionProducer {
               } else {
                 end = argument.endToken.next?.offset ?? argument.end;
               }
-              builder.addDeletion(SourceRange(argument.offset, end - argument.offset));
+              builder.addDeletion(range.startOffsetEndOffset(argument.offset, end));
             } else if (name == 'children') {
-              final end = argument.name.endToken.next?.offset ?? argument.end;
-              builder.addDeletion(SourceRange(argument.name.offset, end - argument.name.offset));
+              builder.addDeletion(range.startStart(argument.name, argument.argumentExpression));
             }
           }
         }
 
-        builder.addSimpleReplacement(SourceRange(node.constructorName.offset, node.constructorName.length), tag);
+        builder.addSimpleReplacement(range.node(node.constructorName), tag);
       });
     }
   }
+}
+
+/// Returns the value of the named 'tag' argument when it is a string literal.
+String? _tagArgumentValue(ArgumentList argumentList) {
+  if (argumentList.namedArgument('tag')?.argumentExpression case SimpleStringLiteral(:final value)) {
+    return value;
+  }
+
+  return null;
 }

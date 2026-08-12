@@ -170,7 +170,7 @@ List<ClientParam> getParamsFor(ClassElement e, Codecs codecs) {
   final params = constr.formalParameters.where((e) => !keyChecker.isAssignableFromType(e.type)).toList();
 
   for (final param in params) {
-    if (!param.isInitializingFormal) {
+    if (param is! FieldFormalParameterElement) {
       throw UnsupportedError(
         'Client components only support initializing formal constructor parameters.\n'
         'Failing element: ${e.name}.${constr.name}($param)',

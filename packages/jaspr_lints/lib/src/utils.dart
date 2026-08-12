@@ -100,6 +100,18 @@ extension Indent on String {
   }
 }
 
+extension ArgumentListNamedArgument on ArgumentList {
+  /// The named argument called [name], or `null` if there is none.
+  NamedArgument? namedArgument(String name) {
+    for (final argument in arguments) {
+      if (argument is NamedArgument && argument.name.lexeme == name) {
+        return argument;
+      }
+    }
+    return null;
+  }
+}
+
 extension AstSourceRange on AstNode {
   SourceRange get sourceRange => SourceRange(offset, length);
 }

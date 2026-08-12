@@ -1,5 +1,6 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart' show LinkedEditSuggestionKind;
 
 import '../assist.dart';
@@ -109,15 +110,15 @@ class RemoveComponent extends ResolvedCorrectionProducer {
 
       final children = <AstNode>[
         for (final arg in node.argumentList.arguments)
-          if (arg is NamedExpression)
-            if (arg.name.label.name == 'child' && isComponentType(arg.staticType))
-              arg.expression
-            else if (arg.name.label.name == 'children' && arg.expression is ListLiteral)
-              ...(arg.expression as ListLiteral).elements
-            else
-              ...[]
-          else if (arg is ListLiteral)
-            ...arg.elements,
+          ...switch (arg) {
+            NamedArgument(name: Token(lexeme: 'child'), :final argumentExpression)
+                when isComponentType(argumentExpression.staticType) =>
+              <AstNode>[argumentExpression],
+            NamedArgument(name: Token(lexeme: 'children'), argumentExpression: ListLiteral(:final elements)) =>
+              elements,
+            ListLiteral(:final elements) => elements,
+            _ => const <AstNode>[],
+          },
       ];
 
       if (children.isEmpty) {
