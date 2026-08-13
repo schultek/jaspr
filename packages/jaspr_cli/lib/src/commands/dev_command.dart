@@ -410,6 +410,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     final buildArgs = [
+      // Enable build_runner debugging
+      // '--force-jit',
+      // '--dart-jit-vm-arg=--observe',
+      // '--dart-jit-vm-arg=--pause-isolates-on-start',
+      if (verbose) '--verbose',
       if (release) '--release',
       '--delete-conflicting-outputs',
       if (managedBuildOptions) ...[
