@@ -277,6 +277,49 @@ void main() {
       expect(strongElement.textContent, equals('Hello Nested Client'));
     });
 
+    testClient('should apply inherited dom params from outer client component to inner client component via server slot', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}outer data={"child":"s${marker}1"}-->'
+                  '  <!--s${marker}1-->'
+                  '  <!--${marker}inner-->'
+                  '  <button class="highlighted" data-outer="true">Click me</button>'
+                  '  <!--/${marker}inner-->'
+                  '  <!--/s${marker}1-->'
+                  '  <!--/${marker}outer-->'
+                  '</div>'
+              .toJS;
+
+      final buttonElement = window.document.querySelector('button')!;
+      expect(buttonElement.classList.contains('highlighted'), isTrue);
+      expect(buttonElement.getAttribute('data-outer'), equals('true'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'outer': ClientLoader((params) {
+              return Component.apply(
+                classes: 'highlighted',
+                attributes: const {'data-outer': 'true'},
+                child: params.mount(params.get<String>('child')),
+              );
+            }),
+            'inner': ClientLoader((_) {
+              return button([Component.text('Click me')]);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      final buttonHydrated = window.document.querySelector('button')!;
+      expect(buttonHydrated.classList.contains('highlighted'), isTrue);
+      expect(buttonHydrated.getAttribute('data-outer'), equals('true'));
+    });
+
     testClient('should reload client components and update parameters/sync state on performReload', (tester) async {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
