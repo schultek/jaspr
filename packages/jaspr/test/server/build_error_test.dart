@@ -1,3 +1,4 @@
+/// @docImport 'package:jaspr/src/server/async_build_owner.dart';
 @TestOn('vm')
 library;
 
