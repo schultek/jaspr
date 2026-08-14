@@ -8,7 +8,6 @@ import 'package:meta/meta.dart';
 
 import '../../jaspr.dart';
 import '../devtools/dev_tools_service.dart';
-import 'adapters/debug_info_adapter.dart';
 import 'adapters/document_structure_helper.dart';
 import 'adapters/element_boundary_adapter.dart';
 import 'adapters/global_styles_adapter.dart';
@@ -23,16 +22,11 @@ typedef FileLoader = Future<String?> Function(String);
 /// Global component binding for the server.
 class ServerAppBinding extends AppBinding with ComponentsBinding {
   ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile {
-    if (kDebugMode) {
-      addRenderAdapter(debugInfoAdapter = DebugInfoAdapter());
-    }
     addRenderAdapter(GlobalStylesAdapter());
   }
 
   final RequestLike request;
   final FileLoader _fileLoader;
-
-  DebugInfoAdapter? debugInfoAdapter;
 
   @override
   bool get isClient => false;
@@ -88,22 +82,30 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       }
     }
 
-    if (kDebugMode) {
-      DevToolsService.instance.sendServerTree(
-        debugInfoAdapter!.renderId,
-        currentUrl,
-        rootElement,
-        _adaptersToDiagnosticableMap(_adapters),
-        (tree) => debugInfoAdapter!.tree = tree,
-      );
-    }
-
     for (final adapter in _adapters.reversed) {
       adapter.apply(root);
     }
 
     if (!standalone) {
-      createDocumentStructure(root, true);
+      final (body: _, :head, html: _) = createDocumentStructure(root, true);
+
+      if (kDebugMode) {
+        final (:renderId, :serverTree) = DevToolsService.instance.sendServerTree(
+          currentUrl,
+          rootElement,
+          _adaptersToDiagnosticableMap(_adapters),
+        );
+
+        head.children.insertAfter(
+          head.createChildRenderElement('meta')..update(null, null, null, {
+            'name': 'jaspr-debug-data',
+            'content': jsonEncode({
+              'renderId': renderId,
+              'serverTree': serverTree.toJsonMap(),
+            }),
+          }, null),
+        );
+      }
     }
 
     if (_responseBodyOverride case final override?) {

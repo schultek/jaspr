@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math';
 
 import 'package:listen/listen.dart';
 import 'package:meta/meta.dart';
@@ -120,20 +121,20 @@ class DevToolsService {
     });
   }
 
-  void sendServerTree(
-    String? id,
+  ({String renderId, DiagnosticsNode serverTree}) sendServerTree(
     String url,
     Element rootElement,
-    Map<Element, Diagnosticable> extensions, [
-    void Function(DiagnosticsNode node)? onTreeBuilt,
-  ]) {
+    Map<Element, Diagnosticable> extensions,
+  ) {
+    final renderId = Random().nextInt(0xffffffff).toRadixString(16);
+
     final tree = _elementToNode(rootElement, extensions);
-    onTreeBuilt?.call(tree);
     postEvent('ext.jaspr.serverTree', {
-      'id': id,
+      'id': renderId,
       'url': url,
       'tree': tree.toJsonMap(),
     });
+    return (renderId: renderId, serverTree: tree);
   }
 
   void sendClientTree(String url, String attachTarget, Element rootElement) {

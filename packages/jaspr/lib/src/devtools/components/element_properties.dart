@@ -106,27 +106,27 @@ class ElementPropertiesTooltip extends StatelessComponent {
     css('.jaspr-dev-properties-tooltip', [
       css('&').styles(
         display: Display.flex,
-        flexDirection: FlexDirection.column,
         padding: Padding.all(8.px),
+        flexDirection: FlexDirection.column,
         gap: Gap.all(8.px),
-        fontSize: 14.px,
         color: Colors.white,
+        fontSize: 14.px,
       ),
       css('.jaspr-dev-properties-tooltip-content', [
         css('&').styles(
-          margin: Margin.zero,
           padding: Padding.all(8.px),
-          backgroundColor: Color('rgba(0, 0, 0, 0.4)'),
+          margin: Margin.zero,
           radius: BorderRadius.circular(4.px),
           overflow: Overflow.auto,
+          backgroundColor: Color('rgba(0, 0, 0, 0.4)'),
         ),
         css('& pre, & code').styles(
           all: All.unset,
-          whiteSpace: WhiteSpace.pre,
           margin: Margin.zero,
           fontFamily: FontFamilies.monospace,
           fontSize: 12.px,
           lineHeight: 1.4.em,
+          whiteSpace: WhiteSpace.pre,
         ),
         css('.json-key').styles(color: Color('#9cdcfe')),
         css('.json-string').styles(color: Color('#ce9178')),

@@ -20,7 +20,7 @@ mixin DevToolsHelper on BaseCommand {
     try {
       final Handler devtoolsHandler;
       if (Platform.environment['JASPR_DEVTOOLS_PROXY'] case final proxyPort?) {
-        devtoolsHandler = proxyHandler('http://localhost:${proxyPort}');
+        devtoolsHandler = proxyHandler('http://localhost:$proxyPort');
       } else {
         final uri = await Isolate.resolvePackageUri(Uri.parse('package:jaspr_cli/src/devtools/web/'));
         if (uri == null) {

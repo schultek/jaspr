@@ -33,10 +33,10 @@ class HighlightedElement extends StatefulComponent {
   static List<StyleRule> get styles => [
     css('.jaspr-dev-toolbar-highlight', [
       css('&').styles(
-        boxSizing: BoxSizing.borderBox,
         zIndex: ZIndex(999998),
-        backgroundColor: Color.variable('--highlight-color').withOpacity(0.3),
+        boxSizing: BoxSizing.borderBox,
         border: Border.all(color: Color.variable('--highlight-color'), width: 2.px),
+        backgroundColor: Color.variable('--highlight-color').withOpacity(0.3),
       ),
       css('&.client').styles(raw: {'--highlight-color': '#3b82f6'}),
       css('&.server').styles(raw: {'--highlight-color': '#ff9f1b'}),
@@ -49,8 +49,8 @@ class HighlightedElement extends StatefulComponent {
       ),
       css('> span').styles(
         position: Position.absolute(left: Unit.expression('calc(var(--label-offset, 2) * -1px)')),
-        backgroundColor: Color.variable('--highlight-color'),
         border: Border.all(color: Color.variable('--highlight-color'), width: 2.px),
+        backgroundColor: Color.variable('--highlight-color'),
       ),
       css('> span.top').styles(
         position: Position.absolute(bottom: 100.percent),

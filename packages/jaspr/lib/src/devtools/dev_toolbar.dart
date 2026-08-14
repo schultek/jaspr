@@ -3,7 +3,6 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../client.dart';
 import '../../dom.dart';
-import '../client/slotted_child_view.dart';
 import 'components/element_properties.dart';
 import 'components/highlighted_element.dart';
 import 'dev_tools_service.dart';
@@ -481,7 +480,10 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
               ],
             ),
             span([]),
-            button([PowerIcon(), text('Disable toolbar for this session')], onClick: _disableToolbar),
+            button(onClick: _disableToolbar, [
+              PowerIcon(),
+              text('Disable toolbar for this session'),
+            ]),
           ]),
         ],
       ),
@@ -543,35 +545,35 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
       css('.jaspr-dev-toolbar', [
         css('&').styles(
           display: Display.flex,
-          backgroundColor: Color('#050505'),
           border: Border.all(color: Color('#111'), width: 1.px),
+          radius: BorderRadius.circular(24.px),
           shadow: BoxShadow(offsetX: 2.px, offsetY: 1.px, blur: 6.px, color: Color('#00000055')),
+          userSelect: UserSelect.none,
           flexDirection: FlexDirection.row,
           alignItems: AlignItems.stretch,
           color: Colors.white,
-          radius: BorderRadius.circular(24.px),
           fontFamily: FontFamily('sans-serif'),
           fontSize: 14.px,
-          userSelect: UserSelect.none,
+          backgroundColor: Color('#050505'),
         ),
         css('> button', [
           css('&').styles(
             display: Display.flex,
-            alignItems: AlignItems.center,
-            justifyContent: JustifyContent.center,
-            backgroundColor: Colors.transparent,
             border: Border.unset,
-            color: Colors.white,
             cursor: Cursor.pointer,
+            justifyContent: JustifyContent.center,
+            alignItems: AlignItems.center,
+            color: Colors.white,
             fontSize: 18.px,
+            backgroundColor: Colors.transparent,
           ),
           css('&[compact]').styles(padding: Padding.all(8.px)),
           css('&:hover').styles(
             backgroundColor: Color('#222'), // highlight
           ),
           css('&.active').styles(
-            backgroundColor: Color('#333'), // Highlighting select mode
-            color: Colors.white,
+            color: Colors.white, // Highlighting select mode
+            backgroundColor: Color('#333'),
           ),
         ]),
       ]),
@@ -604,11 +606,11 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
       css('.jaspr-dev-toolbar-menu', [
         css('&').styles(
           display: Display.flex,
-          flexDirection: FlexDirection.column,
-          gap: Gap.all(4.px),
           padding: Padding.all(4.px),
           border: Border.only(top: BorderSide(color: Color('#111'))),
           radius: BorderRadius.circular(12.px),
+          flexDirection: FlexDirection.column,
+          gap: Gap.all(4.px),
           backgroundColor: Color('#050505'),
         ),
         css('> span').styles(
@@ -625,34 +627,34 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
           alignItems: AlignItems.center,
           gap: Gap.all(8.px),
           color: Colors.white,
-          fontSize: 14.px,
           textAlign: TextAlign.left,
-          backgroundColor: Colors.transparent,
+          fontSize: 14.px,
           whiteSpace: WhiteSpace.noWrap,
+          backgroundColor: Colors.transparent,
         ),
         css('button:hover').styles(
           backgroundColor: Color('#222'),
         ),
         css('input[type="checkbox"]', [
           css('&').styles(
+            position: Position.relative(),
             width: 32.px,
             height: 18.px,
             margin: Margin.zero,
-            backgroundColor: Color('#444'),
             radius: BorderRadius.circular(9.px),
-            position: Position.relative(),
-            cursor: Cursor.pointer,
             appearance: Appearance.none,
+            cursor: Cursor.pointer,
             transition: Transition('background-color', duration: 200.ms),
+            backgroundColor: Color('#444'),
           ),
           css('&::after').styles(
             content: '',
             position: Position.absolute(top: 2.px, left: 2.px),
             width: 14.px,
             height: 14.px,
-            backgroundColor: Colors.white,
             radius: BorderRadius.circular(50.percent),
             transition: Transition('transform', duration: 200.ms),
+            backgroundColor: Colors.white,
           ),
           css('&:checked').styles(
             backgroundColor: Color('#3b82f6'),
@@ -670,8 +672,8 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
         pointerEvents: PointerEvents.none,
       ),
       css('path').styles(
-        raw: {'fill': 'rgba(59, 130, 246, 0.05)'},
         transition: Transition('all', duration: 200.ms),
+        raw: {'fill': 'rgba(59, 130, 246, 0.05)'},
       ),
       css('&.active path').styles(
         raw: {'fill': 'rgba(59, 130, 246, 0.2)'},
@@ -689,7 +691,7 @@ class _DevToolbarDropZone extends StatelessComponent {
 
   static Component create(Attachment attachment, bool isActive) {
     final dropZone = _dropZones.putIfAbsent(attachment, () => _DevToolbarDropZone.internal(attachment));
-    return Component.wrapElement(classes: isActive ? 'active' : null, child: dropZone);
+    return Component.apply(classes: isActive ? 'active' : null, child: dropZone);
   }
 
   @override
