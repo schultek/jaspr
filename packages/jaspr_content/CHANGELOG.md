@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.5.4
 
 - Invalidate dependents of deleted partials while serving.
 

@@ -70,8 +70,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     );
     argParser.addFlag(
       'skip-server',
-      help:
-          'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
+      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
       negatable: false,
       defaultsTo: false,
     );
@@ -418,6 +417,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     final buildArgs = [
+      // Enable build_runner debugging
+      // '--force-jit',
+      // '--dart-jit-vm-arg=--observe',
+      // '--dart-jit-vm-arg=--pause-isolates-on-start',
+      if (verbose) '--verbose',
       if (release) '--release',
       '--delete-conflicting-outputs',
       if (managedBuildOptions) ...[
@@ -534,14 +538,18 @@ String serverEntrypoint(String import) =>
     '''
   import '$import' as m;
   import 'package:hotreloader/hotreloader.dart';
-      
+
   void main(List<String> args) async {
     final mainFunc = m.main as dynamic;
     final mainCall = mainFunc is dynamic Function(List<String>) ? () => mainFunc(args) : () => mainFunc();
 
     try {
       await HotReloader.create(
-        debounceInterval: Duration.zero,
+        // A non-zero interval is required: hotreloader falls back to polling watchers
+        // for paths that don't exist (e.g. unused bin/ or test/ dirs), and a zero
+        // pollingDelay there causes a busy loop pinning a CPU core (see #816).
+        // This matches hotreloader's own default.
+        debounceInterval: Duration(seconds: 1),
         onAfterReload: (ctx) => mainCall(),
       );
     } catch (_) {}

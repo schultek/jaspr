@@ -1,12 +1,12 @@
 name: fluttercon
 description: A new jaspr project.
-version: 0.0.13
+version: 0.0.14
 publish_to: none
 homepage: https://fluttercon.schultek.de
 issue_tracker: https://github.com/schultek/jaspr/issues
 
 environment:
-  sdk: ^3.10.0
+  sdk: ^3.13.0-0
 
 resolution: workspace
 
@@ -16,7 +16,7 @@ dependencies:
   http: ^1.2.1
   intl: ^0.20.0
   jaspr: ^0.23.0
-  jaspr_router: ^0.8.0
+  jaspr_router: ^0.9.0
   shared_preferences: ^2.2.3
 
 dev_dependencies:
@@ -28,4 +28,3 @@ dev_dependencies:
 jaspr:
   mode: static
   flutter: embedded
-

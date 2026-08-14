@@ -70,6 +70,22 @@ void main() {
       );
     });
 
+    testClient('ignores whitespace between applied class names', (tester) async {
+      window.document.body!.innerHTML = '<div>Content</div>'.toJS;
+
+      tester.pumpComponent(
+        Component.apply(
+          classes: '  outer\tselected\n ',
+          child: SlottedChildView(slots: const []),
+        ),
+      );
+
+      final element = window.document.querySelector('body > div')!;
+      expect(element.classList.contains('outer'), isTrue);
+      expect(element.classList.contains('selected'), isTrue);
+      expect(element.classList.length, 2);
+    });
+
     testClient('cleans up applied params and events on unmount', (tester) async {
       window.document.body!.innerHTML = '<div><p>Hello World</p></div>'.toJS;
 

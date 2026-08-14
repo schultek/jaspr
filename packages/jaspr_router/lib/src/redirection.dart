@@ -14,15 +14,14 @@ import 'platform/platform.dart';
 import 'route.dart';
 
 /// A GoRouter redirector function.
-typedef RouteRedirector =
-    FutureOr<RouteMatchList> Function(
-      BuildContext,
-      RouteMatchList,
-      RouteConfiguration,
-      RouteMatcher, {
-      List<RouteMatchList>? redirectHistory,
-      Object? extra,
-    });
+typedef RouteRedirector = FutureOr<RouteMatchList> Function(
+  BuildContext,
+  RouteMatchList,
+  RouteConfiguration,
+  RouteMatcher, {
+  List<RouteMatchList>? redirectHistory,
+  Object? extra,
+});
 
 /// Processes redirects by returning a new [RouteMatchList] representing the new
 /// location.

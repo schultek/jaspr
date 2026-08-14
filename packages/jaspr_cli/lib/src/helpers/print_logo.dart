@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:mason/mason.dart';
 
 import '../command_runner.dart';

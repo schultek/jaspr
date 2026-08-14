@@ -33,20 +33,21 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          # TODO: Change back to stable once Dart 3.13 is stable.
+          channel: beta
 
       - name: Bootstrap
         run: |
           flutter doctor
-          dart pub global activate melos
-          melos bootstrap
+          dart pub get
+          dart run melos bootstrap
           jaspr --disable-analytics
 
       - name: Check formatting
-        run: melos run format
+        run: dart run melos run format
 
       - name: Check linting
-        run: melos run analyze
+        run: dart run melos analyze --fatal-infos
 
   test:
     name: Test Packages
@@ -57,17 +58,18 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          # TODO: Change back to stable once Dart 3.13 is stable.
+          channel: beta
 
       - name: Bootstrap
         run: |
-          dart pub global activate melos
           dart pub global activate coverage
-          melos bootstrap --no-private
+          dart pub get
+          dart run melos bootstrap --no-private
           jaspr --disable-analytics
 
       - name: Run Unit tests
-        run: melos run coverage --no-select
+        run: dart run melos run coverage --no-select
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v3

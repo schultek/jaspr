@@ -85,13 +85,8 @@ void main() {
 ''';
 
 String fakePackageConfig() => jsonEncode({
-      'configVersion': 2,
-      'packages': [
-        {
-          'name': 'jaspr',
-          'rootUri': 'file:///fake/jaspr',
-          'packageUri': 'lib/',
-          'languageVersion': '3.0'
-        }
-      ]
-    });
+  'configVersion': 2,
+  'packages': [
+    {'name': 'jaspr', 'rootUri': 'file:///fake/jaspr', 'packageUri': 'lib/', 'languageVersion': '3.0'},
+  ],
+});

@@ -34,9 +34,15 @@ class ClientComponentAnchor extends ComponentAnchor {
 
   void Function(void Function())? _setState;
 
-  late final Map<String, Object?> params = data != null
-      ? jsonDecode(const DomValidator().unescapeMarkerText(data!)) as Map<String, Object?>
-      : {};
+  /// The decoded parameters for this client component.
+  Map<String, Object?> get _decodedParameters {
+    if (data case final rawData?) {
+      final unescapedData = const DomValidator().unescapeMarkerText(rawData);
+      return jsonDecode(unescapedData) as Map<String, Object?>;
+    }
+
+    return const {};
+  }
 
   Future<void> resolve() async {
     final (clientBuilder, _) = await (
@@ -50,15 +56,10 @@ class ClientComponentAnchor extends ComponentAnchor {
     assert(builder is ClientBuilder, 'ClientComponentAnchor was not resolved before calling build()');
     return StatefulBuilder(
       key: GlobalObjectKey(key),
-      builder: (context, setState) {
+      builder: (_, setState) {
         _setState = setState;
-        final params = ClientParams(
-          data != null
-              ? jsonDecode(const DomValidator().unescapeMarkerText(data!)) as Map<String, Object?>
-              : <String, Object?>{},
-          serverAnchors,
-        );
-        return (builder as ClientBuilder)(params);
+        final clientParameters = ClientParams(_decodedParameters, serverAnchors);
+        return (builder as ClientBuilder)(clientParameters);
       },
     );
   }

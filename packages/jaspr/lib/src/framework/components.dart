@@ -30,6 +30,19 @@ class DomComponent extends Component {
 
 typedef EventCallback = void Function(web.Event event);
 
+/// Matches one or more HTML ASCII whitespace characters that can separate class names.
+final RegExp _htmlClassWhitespace = RegExp(r'[ \t\n\f\r]+');
+
+/// Splits [classes] into individual class names, omitting empty entries.
+///
+/// Returns `null` when [classes] is `null` or contains no class names.
+List<String>? _splitClasses(String? classes) {
+  if (classes == null) return null;
+
+  final classNames = classes.split(_htmlClassWhitespace).where((className) => className.isNotEmpty).toList();
+  return classNames.isEmpty ? null : classNames;
+}
+
 class DomElement extends DomRenderObjectElement {
   DomElement(DomComponent super.component);
 
@@ -79,7 +92,7 @@ class DomElement extends DomRenderObjectElement {
     var events = component.events;
 
     if (inheritedDomParams case final inheritedDomParams?) {
-      final classesSet = classes?.split(' ').toSet() ?? {};
+      final classesSet = {...?_splitClasses(classes)};
       styles = Map.of(styles ?? {});
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
@@ -161,7 +174,7 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
       params: ApplyParams(
         target: target,
         id: id,
-        classes: classes?.split(' '),
+        classes: _splitClasses(classes),
         styles: styles?.properties,
         attributes: attributes,
         events: events,
