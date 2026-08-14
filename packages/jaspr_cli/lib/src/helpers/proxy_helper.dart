@@ -75,7 +75,7 @@ mixin ProxyHelper on BaseCommand {
         }
 
         if (res.statusCode == 404 && redirectNotFound && path.extension(req.url.path).isEmpty) {
-          return webdevHandler(
+          return await webdevHandler(
             Request(
               req.method,
               req.requestedUri.replace(path: '/'),

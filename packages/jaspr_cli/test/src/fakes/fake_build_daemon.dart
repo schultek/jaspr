@@ -32,7 +32,7 @@ extension FakeBuildDaemonIO on FakeIO {
 
       fs.file(portFilePath('/root/myapp'))
         ..createSync(recursive: true)
-        ..writeAsStringSync('1234');
+        ..writeAsStringSync('1234\nabc');
       fs.file(assetServerPortFilePath('/root/myapp'))
         ..createSync(recursive: true)
         ..writeAsStringSync('1235');

@@ -454,14 +454,18 @@ String serverEntrypoint(String import) =>
     '''
   import '$import' as m;
   import 'package:hotreloader/hotreloader.dart';
-      
+
   void main(List<String> args) async {
     final mainFunc = m.main as dynamic;
     final mainCall = mainFunc is dynamic Function(List<String>) ? () => mainFunc(args) : () => mainFunc();
 
     try {
       await HotReloader.create(
-        debounceInterval: Duration.zero,
+        // A non-zero interval is required: hotreloader falls back to polling watchers
+        // for paths that don't exist (e.g. unused bin/ or test/ dirs), and a zero
+        // pollingDelay there causes a busy loop pinning a CPU core (see #816).
+        // This matches hotreloader's own default.
+        debounceInterval: Duration(seconds: 1),
         onAfterReload: (ctx) => mainCall(),
       );
       print('[INFO] Server hot reload is enabled.');

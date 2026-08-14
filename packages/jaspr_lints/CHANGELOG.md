@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.7.2
 
 - Support `analyzer` `^12.1.0`.
 

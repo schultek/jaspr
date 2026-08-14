@@ -1,0 +1,40 @@
+name: Report Comment Pipeline
+
+on:
+  workflow_run:
+    workflows: ["Report Pipeline"]
+    types:
+      - completed
+
+jobs:
+  comment:
+    name: Comment Version Report
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: version-report
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Read PR number and report
+        id: read_report
+        run: |
+          echo "PR_NUMBER=$(cat pr_number.txt)" >> $GITHUB_ENV
+          echo 'version_report<<EOF' >> $GITHUB_OUTPUT
+          echo '## Package Version Report' >> $GITHUB_OUTPUT
+          cat output.txt >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+      - name: Create PR comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: ${{ steps.read_report.outputs.version_report }}
+          comment_tag: version_report
+          pr_number: ${{ env.PR_NUMBER }}

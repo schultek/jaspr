@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path;
 import '../models/api_models.dart';
 import 'cache.dart';
 import 'project.dart';
+import 'validation.dart';
 
 class Compiler {
   StorageCache cache;
@@ -14,6 +15,8 @@ class Compiler {
   Compiler() : cache = StorageCache();
 
   Future<CompileResponse> compile(CompileRequest request) async {
+    request.sources.keys.forEach(validateSourceFileName);
+
     var sourceHash = MapEquality().hash(request.sources);
     var hashedResult = await cache.getCachedResult(sourceHash);
 
@@ -32,7 +35,8 @@ class Compiler {
       await Directory(path.join(temp.path, 'lib')).create(recursive: true);
 
       for (var key in request.sources.keys) {
-        final file = File(path.join(temp.path, 'lib', key));
+        final name = validateSourceFileName(key);
+        final file = File(path.join(temp.path, 'lib', name));
         await file.writeAsString(request.sources[key]!);
       }
 
