@@ -1,9 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:jaspr/dom.dart' hide Position;
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 
 import '../../../adapters/html.dart';
 import '../../../models/api_models.dart';
+import '../../../providers/settings_provider.dart';
 import '../../utils/node_reader.dart';
 import 'codemirror_options.dart';
 @Import.onWeb('package:codemirror/codemirror.dart', show: [#CodeMirror, #Doc, #Position])
@@ -43,6 +45,8 @@ class EditorState extends State<Editor> {
 
   Map<String, DocOrStubbed> docs = {};
 
+  ProviderSubscription<String>? _keyMapSub;
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +54,19 @@ class EditorState extends State<Editor> {
       for (var doc in component.documents) //
         doc.key: createDoc(doc.key, doc.source, doc.mode),
     };
+
+    // Listen for keymap changes
+    _keyMapSub = context.listenManual<String>(keyMapProvider, (_, keyMap) {
+      if (kIsWeb && _editor != null) {
+        _editor!.setKeyMap(keyMap);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _keyMapSub?.close();
+    super.dispose();
   }
 
   void createEditor(ElementOrStubbed node) {
@@ -59,6 +76,15 @@ class EditorState extends State<Editor> {
     _editor?.dispose();
     _editorElement = node;
     _editor = CodeMirror.fromElement(_editorElement!, options: codeMirrorOptions);
+
+    // Apply current keymap after editor creation
+    if (kIsWeb) {
+      final keyMap = context.read(keyMapProvider);
+      if (keyMap != 'default') {
+        _editor!.setKeyMap(keyMap);
+      }
+    }
+
     if (component.activeDoc != null) {
       Future.microtask(() => _editor!.swapDoc(docs[component.activeDoc!]!));
     }
