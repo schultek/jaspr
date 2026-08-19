@@ -22,7 +22,7 @@ class ElementPropertiesTooltip extends StatelessComponent {
   Object? _propsToValue(List<DiagnosticsProperty>? properties) {
     if (properties == null) return null;
     return {
-      for (final p in properties) p.name: p.value ?? _propsToValue(p.properties),
+      for (final prop in properties) prop.name: prop.value ?? _propsToValue(prop.properties),
     };
   }
 

@@ -262,7 +262,7 @@ typedef StateSetter = void Function(VoidCallback fn);
 ///    be read by descendant components.
 ///  * [Component], for an overview of components in general.
 @optionalTypeArgs
-abstract class State<T extends StatefulComponent> {
+abstract class State<T extends StatefulComponent> extends Diagnosticable {
   /// The current configuration.
   ///
   /// A [State] object's configuration is the corresponding [StatefulComponent]
@@ -646,6 +646,14 @@ class StatefulElement extends BuildableElement {
   State get state => _state!;
 
   Future<void>? _asyncInitState;
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      ...super.debugFillProperties(),
+      DiagnosticsProperty(name: 'state', properties: state.debugFillProperties()),
+    ];
+  }
 
   @override
   void didMount() {

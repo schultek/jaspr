@@ -64,6 +64,13 @@ class CounterButtonState extends State<CounterButton> {
     ]);
   }
 
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'count', value: count),
+    ];
+  }
+
   @css
   static List<StyleRule> get styles => [css('.counter-container').styles(position: .relative())];
 }

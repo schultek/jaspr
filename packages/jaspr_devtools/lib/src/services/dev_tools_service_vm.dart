@@ -14,4 +14,7 @@ class DevToolsServiceImpl extends DevToolsService {
 
   @override
   Future<void> setSelection(String id) async {}
+
+  @override
+  Future<void> updateProperty(String id, String target, String property, dynamic value) async {}
 }

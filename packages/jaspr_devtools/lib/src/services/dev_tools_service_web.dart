@@ -135,6 +135,30 @@ class DevToolsServiceImpl extends DevToolsService {
   }
 
   @override
+  Future<void> updateProperty(String id, String target, String property, dynamic value) async {
+    final service = clientVmService;
+    if (service == null) return;
+
+    try {
+      final vm = await service.getVM();
+      final isolateId = vm.isolates?.first.id;
+
+      await service.callServiceExtension(
+        'ext.jaspr.inspector.updateProperty',
+        isolateId: isolateId,
+        args: {
+          'id': id,
+          'target': target,
+          'property': property,
+          'value': value,
+        },
+      );
+    } catch (e) {
+      print('Failed to update property: $e');
+    }
+  }
+
+  @override
   void dispose() {
     _disposeVmServices();
     super.dispose();

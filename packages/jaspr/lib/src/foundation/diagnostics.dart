@@ -56,7 +56,20 @@ class DiagnosticsProperty {
   final List<DiagnosticsProperty>? properties;
 
   List<Object?> toJsonValue() {
-    return [name, value, properties?.map((c) => c.toJsonValue()).toList()];
+    return [name, _toEncodableValue(value), properties?.map((c) => c.toJsonValue()).toList()];
+  }
+
+  static Object? _toEncodableValue(Object? val) {
+    if (val == null || val is String || val is num || val is bool) {
+      return val;
+    }
+    if (val is Map) {
+      return val.map((k, v) => MapEntry(k.toString(), _toEncodableValue(v)));
+    }
+    if (val is Iterable) {
+      return val.map(_toEncodableValue).toList();
+    }
+    return val.toString();
   }
 }
 

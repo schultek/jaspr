@@ -441,14 +441,72 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper, D
       args.add('--pause-isolates-on-start');
     }
 
+    String targetPath;
     if (useServerReload) {
       final import = entryPoint.replaceFirst('lib', 'package:${project.requirePubspecYaml['name']}');
       serverTarget.writeAsStringSync(serverEntrypoint(import));
-
-      args.add(serverTarget.path);
+      targetPath = serverTarget.path;
     } else {
-      args.add(entryPoint);
+      targetPath = entryPoint;
     }
+
+    if (!release) {
+      final dartaot = File(p.join(dartSdkDir, 'bin', Platform.isWindows ? 'dartaotruntime.exe' : 'dartaotruntime'));
+      final runner = dartaot.existsSync() ? dartaot.path : dartExecutable;
+      final snapshot = p.join(dartSdkDir, 'bin', 'snapshots', 'frontend_server_aot.dart.snapshot');
+      final platformDill = p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill');
+
+      if (File(snapshot).existsSync() && File(platformDill).existsSync()) {
+        final serverDill = File('.dart_tool/jaspr/server_target.dill').absolute;
+        if (!serverDill.parent.existsSync()) {
+          serverDill.parent.createSync(recursive: true);
+        }
+
+        String? packageConfigPath;
+        final candidate = File('.dart_tool/package_config.json').absolute;
+        if (candidate.existsSync()) {
+          packageConfigPath = candidate.path;
+        } else {
+          var dir = Directory.current.absolute;
+          while (dir.parent.path != dir.path) {
+            final f = File(p.join(dir.path, '.dart_tool', 'package_config.json'));
+            if (f.existsSync()) {
+              packageConfigPath = f.path;
+              break;
+            }
+            dir = dir.parent;
+          }
+        }
+
+        final compileArgs = [
+          snapshot,
+          '--platform',
+          platformDill,
+          if (packageConfigPath != null) ...['--packages', packageConfigPath],
+          '--track-creation-locations',
+          '--enable-asserts',
+          '-Djaspr.flags.verbose=$debug',
+          for (final define in userDefines.entries) '-D${define.key}=${define.value}',
+          '--output-dill',
+          serverDill.path,
+          targetPath,
+        ];
+
+        logger.write('Compiling server kernel with creation locations...', tag: Tag.server, level: Level.verbose);
+        final compileResult = ProcessRunner.instance.runSync(runner, compileArgs);
+        if (serverDill.existsSync()) {
+          targetPath = serverDill.path;
+        } else {
+          logger.write(
+            'Server kernel compilation failed, falling back to source: ${compileResult.stderr}',
+            tag: Tag.server,
+            level: Level.warning,
+          );
+        }
+      }
+    }
+
+    args.add(targetPath);
 
     args.addAll(argResults!.rest);
     final process = await ProcessRunner.instance.start(

@@ -6,6 +6,7 @@ import '../components/dropdown.dart';
 import '../components/split_view.dart';
 import '../components/tree_view.dart';
 import '../models/tree_state.dart';
+import '../services/dev_tools_service.dart';
 import '../services/tree_service.dart';
 import '../styles/theme.dart';
 
@@ -41,6 +42,60 @@ class TreePageState extends State<TreePage> {
     }
 
     setState(() {});
+  }
+
+  Component _buildSectionHeader(String title) {
+    return tr(classes: 'prop-section-header', [
+      td(attributes: {'colspan': '2'}, [Component.text(title)]),
+    ]);
+  }
+
+  Component _buildPropertyRow(String? elementId, String? targetScope, String name, dynamic value) {
+    final isEditable = elementId != null && targetScope != null && value != null;
+
+    Component valueWidget;
+    if (isEditable) {
+      if (value is bool) {
+        valueWidget = input<bool>(
+          type: InputType.checkbox,
+          checked: value,
+          onChange: (v) {
+            DevToolsService.instance.updateProperty(elementId, targetScope, name, v);
+          },
+        );
+      } else if (value is num) {
+        valueWidget = input<num>(
+          classes: 'prop-input',
+          type: InputType.number,
+          value: value.toString(),
+          onChange: (v) {
+            final parsed = v;
+            DevToolsService.instance.updateProperty(elementId, targetScope, name, parsed);
+          },
+        );
+      } else if (value is String) {
+        valueWidget = input<String>(
+          classes: 'prop-input',
+          type: InputType.text,
+          value: value,
+          onInput: (v) {
+            DevToolsService.instance.updateProperty(elementId, targetScope, name, v);
+          },
+          onChange: (v) {
+            DevToolsService.instance.updateProperty(elementId, targetScope, name, v);
+          },
+        );
+      } else {
+        valueWidget = Component.text(value.toString());
+      }
+    } else {
+      valueWidget = Component.text(value?.toString() ?? 'null');
+    }
+
+    return tr([
+      td(classes: 'prop-name', [Component.text(name)]),
+      td(classes: 'prop-value', [valueWidget]),
+    ]);
   }
 
   @override
@@ -106,41 +161,44 @@ class TreePageState extends State<TreePage> {
                     builder: (context, selectedElementId) {
                       final selectedNode = root?.findNodeById(selectedElementId);
                       if (selectedNode == null) {
-                        return .empty();
+                        return Component.empty();
                       }
+
+                      final props = selectedNode.properties ?? const <DiagnosticsProperty>[];
+                      final mainProps = props
+                          .where((item) => item.name != 'component' && item.name != 'state')
+                          .toList();
+                      final componentProp = props.where((item) => item.name == 'component').firstOrNull;
+                      final stateProp = props.where((item) => item.name == 'state').firstOrNull;
+
+                      final componentSubProps = componentProp?.properties ?? const <DiagnosticsProperty>[];
+                      final stateSubProps = stateProp?.properties ?? const <DiagnosticsProperty>[];
+
+                      final hasAnyProps =
+                          mainProps.isNotEmpty || componentSubProps.isNotEmpty || stateSubProps.isNotEmpty;
+
                       return div(classes: 'properties-container', [
-                        // div(classes: 'properties-header', [
-                        //   .text(
-                        //     'PROPERTIES: ${selectedNode.properties?.get('type')?.toString() ?? selectedNode.name.toUpperCase()}',
-                        //   ),
-                        // ]),
                         div(classes: 'properties-content', [
-                          if (selectedNode.properties?.isEmpty ?? true)
-                            div(classes: 'empty-msg', [.text('No properties available for this component.')])
+                          if (!hasAnyProps)
+                            div(classes: 'empty-msg', [Component.text('No properties available for this component.')])
                           else
                             table(classes: 'properties-table', [
                               tbody([
-                                if (selectedNode.properties != null)
-                                  for (final prop in selectedNode.properties!)
-                                    if (prop.name == 'component')
-                                      for (final prop2 in prop.properties ?? <DiagnosticsProperty>[])
-                                        tr([
-                                          td(classes: 'prop-name', [.text(prop2.name)]),
-                                          td(classes: 'prop-value', [
-                                            .text(
-                                              prop2.value.toString(),
-                                            ),
-                                          ]),
-                                        ])
-                                    else
-                                      tr([
-                                        td(classes: 'prop-name', [.text(prop.name)]),
-                                        td(classes: 'prop-value', [
-                                          .text(
-                                            prop.value.toString(),
-                                          ),
-                                        ]),
-                                      ]),
+                                if (mainProps.isNotEmpty) ...[
+                                  _buildSectionHeader('Element'),
+                                  for (final prop in mainProps)
+                                    _buildPropertyRow(selectedElementId, null, prop.name, prop.value),
+                                ],
+                                if (componentSubProps.isNotEmpty) ...[
+                                  _buildSectionHeader('Component'),
+                                  for (final prop in componentSubProps)
+                                    _buildPropertyRow(selectedElementId, 'component', prop.name, prop.value),
+                                ],
+                                if (stateSubProps.isNotEmpty) ...[
+                                  _buildSectionHeader('State'),
+                                  for (final prop in stateSubProps)
+                                    _buildPropertyRow(selectedElementId, 'state', prop.name, prop.value),
+                                ],
                               ]),
                             ]),
                         ]),
@@ -149,7 +207,7 @@ class TreePageState extends State<TreePage> {
                   );
                 },
               )
-            : .empty(),
+            : Component.empty(),
       ),
     ]);
   }
@@ -215,6 +273,21 @@ class TreePageState extends State<TreePage> {
         bottom: BorderSide(width: 1.px, color: ThemeColors.surfaceContainerLow),
       ),
     ),
+    css('.prop-section-header').styles(
+      border: Border.only(
+        top: BorderSide(width: 1.px, color: ThemeColors.surfaceContainerHighest),
+        bottom: BorderSide(width: 1.px, color: ThemeColors.surfaceContainerHighest),
+      ),
+      backgroundColor: ThemeColors.surfaceContainerLow,
+    ),
+    css('.prop-section-header td').styles(
+      padding: .symmetric(vertical: 6.px, horizontal: 8.px),
+      color: ThemeColors.onSurfaceVariant,
+      fontSize: 0.7.rem,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 0.05.rem,
+      raw: {'text-transform': 'uppercase'},
+    ),
     css('.prop-name').styles(
       width: 35.percent,
       padding: .symmetric(vertical: 4.px, horizontal: 8.px),
@@ -228,6 +301,15 @@ class TreePageState extends State<TreePage> {
       fontFamily: .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
       fontSize: 0.8.rem,
       raw: {'word-break': 'break-all'},
+    ),
+    css('.prop-input').styles(
+      padding: .symmetric(vertical: 2.px, horizontal: 6.px),
+      border: Border.all(width: 1.px, color: ThemeColors.surfaceContainerHighest),
+      radius: BorderRadius.circular(4.px),
+      color: ThemeColors.onSurface,
+      fontFamily: .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
+      fontSize: 0.8.rem,
+      backgroundColor: ThemeColors.surfaceContainerLow,
     ),
   ];
 }

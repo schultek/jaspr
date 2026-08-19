@@ -124,6 +124,21 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     }
   }
 
+  Timer? _clientTreeThrottleTimer;
+
+  @override
+  void didBuildFrame() {
+    super.didBuildFrame();
+    if (kDebugMode && rootElement != null) {
+      if (_clientTreeThrottleTimer?.isActive ?? false) return;
+      _clientTreeThrottleTimer = Timer(const Duration(milliseconds: 1000), () {
+        if (rootElement != null) {
+          DevToolsService.instance.sendClientTree(currentUrl, _attachTarget, rootElement!);
+        }
+      });
+    }
+  }
+
   Future<void> _sendClientTree() async {
     if (Jaspr.options.clients.isNotEmpty) {
       await Future.wait<void>([

@@ -39,6 +39,14 @@ class Icon extends StatelessComponent {
     return .fragment(children);
   }
 
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      DiagnosticsProperty(name: 'name', value: name),
+      DiagnosticsProperty(name: 'size', value: size?.value),
+    ];
+  }
+
   @css
   static List<StyleRule> get styles => [
     css('[class^=icon-custom-]').styles(

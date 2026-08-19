@@ -1,6 +1,5 @@
 import 'package:universal_web/web.dart' as web;
 
-import '../foundation/diagnostics.dart';
 import '../framework/framework.dart';
 import 'component_anchors.dart';
 import 'dom_render_object.dart';
@@ -74,16 +73,6 @@ class _ClientAppElement extends BuildableElement {
     super.didMount();
   }
 
-  ChildSlot createSlotForAnchor(ClientComponentAnchor anchor) {
-    return _AnchorChildSlot(
-      name: anchor.name,
-      start: anchor.startNode,
-      end: anchor.endNode,
-      child: anchor.build(),
-      params: anchor.decodedParameters,
-    );
-  }
-
   @override
   Component build() {
     return SlottedChildView(slots: slots);
@@ -93,41 +82,5 @@ class _ClientAppElement extends BuildableElement {
   void unmount() {
     mounted = false;
     super.unmount();
-  }
-}
-
-class _AnchorChildSlot extends ChildSlot {
-  _AnchorChildSlot({
-    required this.name,
-    required this.start,
-    required this.end,
-    required this.child,
-    required this.params,
-  });
-
-  final String name;
-  final web.Node start;
-  final web.Node end;
-  @override
-  final Component child;
-  final Map<String, Object?> params;
-
-  @override
-  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
-    return ChildSlotRenderObject.between(parent, start, end);
-  }
-
-  @override
-  bool canUpdate(ChildSlot oldComponent) {
-    return oldComponent is _AnchorChildSlot && oldComponent.start == start && oldComponent.end == end;
-  }
-
-  @override
-  List<DiagnosticsProperty> debugFillProperties() {
-    return [
-      DiagnosticsProperty(name: 'kind', value: 'client-anchor'),
-      DiagnosticsProperty(name: 'anchor-name', value: name),
-      DiagnosticsProperty(name: 'anchor-params', value: params),
-    ];
   }
 }

@@ -72,6 +72,7 @@ part 'stateless_component.dart';
 ///    be read by descendant components.
 ///  * [StatelessComponent], for components that always build the same way given a
 ///    particular configuration and ambient state.
+@pragma('track-creation-locations')
 @immutable
 abstract class Component extends Diagnosticable {
   /// Initializes [key] for subclasses.

@@ -24,7 +24,11 @@ mixin SchedulerBinding {
     _schedulerPhase = SchedulerPhase.postFrameCallbacks;
     _flushPostFrameCallbacks();
     _schedulerPhase = SchedulerPhase.idle;
+    didBuildFrame();
   }
+
+  @protected
+  void didBuildFrame() {}
 
   void _flushPostFrameCallbacks() {
     final localPostFrameCallbacks = List<VoidCallback>.of(_postFrameCallbacks);

@@ -56,17 +56,33 @@ class ClientComponentAnchor extends ComponentAnchor {
   }
 
   ChildSlot createSlot() {
-    return _AnchorChildSlot(key: UniqueKey(), start: startNode, end: endNode, child: build());
+    return _AnchorChildSlot(
+      key: UniqueKey(),
+      name: name,
+      start: startNode,
+      end: endNode,
+      child: build(),
+      params: decodedParameters,
+    );
   }
 }
 
 class _AnchorChildSlot extends ChildSlot {
-  _AnchorChildSlot({required this.start, required this.end, required this.child, super.key});
+  _AnchorChildSlot({
+    required this.name,
+    required this.start,
+    required this.end,
+    required this.child,
+    required this.params,
+    super.key,
+  });
 
+  final String name;
   final web.Node start;
   final web.Node end;
   @override
   final Component child;
+  final Map<String, Object?> params;
 
   @override
   ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
@@ -76,6 +92,13 @@ class _AnchorChildSlot extends ChildSlot {
   @override
   bool canUpdate(ChildSlot oldComponent) {
     return oldComponent is _AnchorChildSlot && oldComponent.start == start && oldComponent.end == end;
+  }
+
+  @override
+  List<DiagnosticsProperty> debugFillProperties() {
+    return [
+      for (final e in params.entries) DiagnosticsProperty(name: e.key, value: e.value),
+    ];
   }
 }
 

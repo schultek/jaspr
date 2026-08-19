@@ -90,16 +90,18 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
             assert(e is ChildSlotElement);
             final props = e.component.debugFillProperties();
             e.visitChildElements((e) {
-              boundaryElements.add(
-                HighlightedElement(
-                  LocalHighlightTarget(LocalElement(e)),
-                  HighlightStyle.boundary,
-                  showLabel: showDetails,
-                  showProperties: showDetails,
-                  showOnHover: true,
-                  properties: showDetails ? props : null,
-                ),
-              );
+              e.visitChildElements((e) {
+                boundaryElements.add(
+                  HighlightedElement(
+                    LocalHighlightTarget(LocalElement(e)),
+                    HighlightStyle.boundary,
+                    showLabel: showDetails,
+                    showProperties: showDetails,
+                    showOnHover: true,
+                    properties: showDetails ? props : null,
+                  ),
+                );
+              });
             });
           });
         });
