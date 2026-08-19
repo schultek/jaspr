@@ -183,6 +183,7 @@ void main() {
 }
 
 const buildRunnerDartArgs = [
+  '--verbose',
   '--delete-conflicting-outputs',
   '--define=build_web_compilers:ddc=generate-full-dill=true',
   '--define=build_web_compilers:entrypoint=compiler=dartdevc',
@@ -199,6 +200,7 @@ const buildRunnerDartArgs = [
 ];
 
 const buildRunnerFlutterArgs = [
+  '--verbose',
   '--delete-conflicting-outputs',
   '--define=build_web_compilers:ddc=generate-full-dill=true',
   '--define=build_web_compilers:entrypoint=compiler=dartdevc',

@@ -288,6 +288,7 @@ void main() {
               '-t',
               '.dart_tool/jaspr/flutter_target.dart',
               '--no-wasm-dry-run',
+              '--no-tree-shake-icons',
               '--output=build/flutter',
             ],
             workingDirectory: '/root/myapp',

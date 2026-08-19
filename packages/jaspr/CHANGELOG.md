@@ -11,6 +11,12 @@
 
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
+- Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with the [`listen`](https://pub.dev/packages/listen) package.
+
+## 0.23.4
+
+- Server rendering now fails with a 500 HTTP response instead of hanging indefinitely when an error occurs during the initial build, outside of a component's `build` method.
+- Worked around a Dart VM bug that caused server rendering to crash on `linux_x64` due to a `NoSuchMethodError` inside `TaskChain.then`.
 
 ## 0.23.3
 

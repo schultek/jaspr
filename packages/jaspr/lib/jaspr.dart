@@ -1,6 +1,8 @@
 /// Core Jaspr framework and component APIs.
 library;
 
+export 'package:listen/listen.dart' show ChangeNotifier, Listenable, ValueListenable, ValueNotifier;
+
 export 'package:meta/meta.dart'
     show factory, immutable, mustCallSuper, nonVirtual, optionalTypeArgs, protected, visibleForTesting;
 
@@ -12,7 +14,6 @@ export 'src/components/listenable_builder.dart';
 export 'src/foundation/annotations.dart';
 export 'src/foundation/basic_types.dart';
 export 'src/foundation/binding.dart';
-export 'src/foundation/change_notifier.dart';
 export 'src/foundation/constants.dart';
 export 'src/foundation/object.dart';
 export 'src/foundation/scheduler.dart';

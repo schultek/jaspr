@@ -36,7 +36,7 @@ class ImportsStubsBuilder implements Builder {
           final absUrl = path.join(path.dirname(id.path), entry.url);
           allEntries.add(
             ImportEntry(
-              path.relative(absUrl, from: 'lib/generated/imports/_.dart'),
+              path.relative(absUrl, from: 'lib/generated/imports'),
               entry.platform,
               entry.elements,
             ),
