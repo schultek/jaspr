@@ -121,5 +121,3 @@ final webSdkDir = (() {
   }
   return webSdkPath;
 })();
-
-final flutterVersion = flutterInfo['flutterVersion'] as String;

@@ -42,7 +42,7 @@ extension FakeProject on FakeIO {
   void stubFlutterSDK() {
     when(
       () => process.runSync('flutter', ['doctor', '--version', '--machine'], runInShell: true, stdoutEncoding: utf8),
-    ).thenAnswer((_) => ProcessResult(0, 0, '{"flutterRoot":"/fake/flutter","flutterVersion":"3.35.0"}', null));
+    ).thenAnswer((_) => ProcessResult(0, 0, '{"flutterRoot":"/fake/flutter"}', null));
     when(
       () => process.runSync('flutter', ['precache', '--web'], runInShell: true),
     ).thenAnswer((_) => ProcessResult(0, 0, null, null));

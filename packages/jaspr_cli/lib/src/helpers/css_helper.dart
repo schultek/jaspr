@@ -8,8 +8,7 @@ import 'package:frontend_server_client/frontend_server_client.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
-import 'package:pub_semver/pub_semver.dart';
-import 'package:vm_service/vm_service.dart' hide Version;
+import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
 
 import '../commands/base_command.dart';
@@ -111,24 +110,20 @@ class CssRunner {
     if (!defaultLibrariesJson.existsSync()) return;
 
     final librariesJsonStr = defaultLibrariesJson.readAsStringSync();
-    final libraries = jsonDecode(librariesJsonStr) as Map<String, dynamic>;
+    final libraries = jsonDecode(librariesJsonStr) as Map<String, Object?>;
 
-    if (libraries['vm_common'] case {'libraries': final Map<String, dynamic> libs}) {
-      final versionFile = File(p.join(dartSdkDir, 'version'));
-      final dartVersion = Version.parse(versionFile.readAsStringSync().trim().split(' ').first);
-      final isDart311OrHigher = dartVersion >= Version(3, 11, 0);
-      final supportedFlag = isDart311OrHigher ? 'support_conditional_import' : 'supported';
-
+    if (libraries['vm_common'] case {'libraries': final Map<String, Object?> libs}) {
+      const supportConditionalImportKey = 'support_conditional_import';
       if (project.modeOrNull == JasprMode.client) {
         libs['js_interop'] = {'uri': mockJSInteropUri};
         libs['js_interop_unsafe'] = {'uri': mockJSInteropUnsafeUri};
 
-        if (libs['io'] case final Map<String, dynamic> io) io[supportedFlag] = false;
-        if (libs['ffi'] case final Map<String, dynamic> ffi) ffi[supportedFlag] = false;
-        if (libs['isolate'] case final Map<String, dynamic> isolate) isolate[supportedFlag] = false;
+        if (libs['io'] case final Map<String, Object?> io) io[supportConditionalImportKey] = false;
+        if (libs['ffi'] case final Map<String, Object?> ffi) ffi[supportConditionalImportKey] = false;
+        if (libs['isolate'] case final Map<String, Object?> isolate) isolate[supportConditionalImportKey] = false;
       } else {
-        libs['js_interop'] = {'uri': mockJSInteropUri, supportedFlag: false};
-        libs['js_interop_unsafe'] = {'uri': mockJSInteropUnsafeUri, supportedFlag: false};
+        libs['js_interop'] = {'uri': mockJSInteropUri, supportConditionalImportKey: false};
+        libs['js_interop_unsafe'] = {'uri': mockJSInteropUnsafeUri, supportConditionalImportKey: false};
       }
     }
 

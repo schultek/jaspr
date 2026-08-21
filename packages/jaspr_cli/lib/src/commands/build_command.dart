@@ -487,11 +487,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     List<String> additionalFlutterBuildArgs() {
       final librariesPath = p.join(webSdkDir, 'libraries.json');
-      final sdkJsPath = p.join(
-        webSdkDir,
-        'kernel',
-        flutterVersion.compareTo('3.32.0') >= 0 ? 'amd-canvaskit' : 'amd-canvaskit-sound',
-      );
+      final sdkJsPath = p.join(webSdkDir, 'kernel', 'amd-canvaskit');
       return [
         '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
         '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
