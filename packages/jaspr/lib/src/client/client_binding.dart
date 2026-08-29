@@ -170,7 +170,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     }
 
     final responseBody = utf8.decode(response.bodyBytes);
-    final doc = web.Document.parseHTMLUnsafe(responseBody.toJS);
+    final doc = web.DOMParser().parseFromString(responseBody.toJS, "text/html");
 
     final body = doc.body;
 

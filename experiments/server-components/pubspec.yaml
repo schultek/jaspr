@@ -11,15 +11,28 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.10.4
-  build_web_compilers: ^4.4.6
+  build_web_compilers: ^4.8.9
   jaspr_builder: ^0.23.0
   lints: ^5.0.0
 
 jaspr:
   mode: server
+  styles: standalone
 
 dependency_overrides:
   jaspr:
     path: ../../packages/jaspr
   jaspr_builder:
     path: ../../packages/jaspr_builder
+  jaspr_cli:
+    path: ../../packages/jaspr_cli
+  build_web_compilers:
+    git:
+      url: https://github.com/parlough/build
+      ref: e9822aa51a79d86d3c6f4b4786be1adc4ee326bd
+      path: builder_pkgs/build_web_compilers
+  frontend_server_client:
+    git:
+      url: https://github.com/dart-lang/webdev
+      ref: 4855a315fa9ce5e06680a0230ac6fe68846a4b76
+      path: frontend_server_client

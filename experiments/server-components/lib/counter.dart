@@ -12,8 +12,7 @@ class Counter extends StatefulComponent {
   State<StatefulComponent> createState() => CounterState();
 }
 
-class CounterState extends State<Counter>
-    with SyncStateMixin<Counter, Map<String, dynamic>> {
+class CounterState extends State<Counter> with SyncStateMixin<Counter, Map<String, dynamic>> {
   int count = 0;
 
   @override
@@ -41,8 +40,8 @@ class CounterState extends State<Counter>
       ),
       if (component.child != null) ...[
         component.child!,
-        component.child!,
-        span([if (kIsWeb) component.child!]),
+        //component.child!,
+        //span([if (kIsWeb) component.child!]),
       ],
     ]);
   }
