@@ -307,8 +307,13 @@ final String dartExecutable =
       'Make sure Dart is installed and added to your PATH.',
     ));
 
-/// The path to the root directory of the SDK.
-final String dartSdkDir = path.dirname(path.dirname(dartExecutable));
+/// The path to the root directory of the Dart SDK.
+final String dartSdkDir =
+    cli_util.sdkPath ??
+    (throw Exception(
+      'Could not find Dart SDK. '
+      'Make sure Dart is installed and added to your PATH.',
+    ));
 
 final dartSdkVersion = () {
   final result = ProcessRunner.instance.runSync(dartExecutable, ['--version']);
