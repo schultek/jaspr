@@ -6,7 +6,6 @@
 
 import 'package:jaspr/server.dart';
 import 'package:server_components/counter.dart' as _counter;
-import 'package:server_components/main.server.dart' as _main$server;
 import 'package:server_components/minicounter.dart' as _minicounter;
 
 /// Default [ServerOptions] for use with your Jaspr project.
@@ -36,7 +35,7 @@ ServerOptions get defaultServerOptions => ServerOptions(
       'minicounter',
     ),
   },
-  styles: () => [..._main$server.styles],
+  stylesId: 'main.css',
 );
 
 Map<String, Object?> __counterCounter(_counter.Counter c) => {

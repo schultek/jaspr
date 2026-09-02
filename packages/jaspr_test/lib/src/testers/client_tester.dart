@@ -29,7 +29,7 @@ void testClient(
         web.window.history.replaceState(null, 'Test', location);
       }
 
-      final binding = ClientAppBinding();
+      final binding = ClientAppBinding.ensureInitialized();
       final tester = ClientTester._(binding);
 
       addTearDown(() {

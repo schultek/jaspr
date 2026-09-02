@@ -15,10 +15,10 @@ void main() {
         builder: (context) {
           var time = DateTime.now();
           return div(classes: 'server', [
-            p([.text('Server Time: $time')]),
+            p([.text('Server Time AXfsf: $time')]),
             Counter(
               step: time.second,
-              child: div([.text('Hello'), MiniCounter()]),
+              child: div(classes: 'server', [.text('Hayloy'), MiniCounter()]),
             ),
             MiniCounter(),
           ]);
@@ -36,6 +36,6 @@ List<StyleRule> get styles => [
   ),
   css('.client').styles(
     padding: Padding.all(2.px),
-    border: Border.all(color: Colors.green),
+    border: Border.all(color: Colors.yellow),
   ),
 ];
