@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'dart:js_interop_unsafe';
+
 import 'package:http/http.dart' as http;
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
@@ -117,16 +119,36 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   void _reloadStylesheets(List<String> urls) {
-    // Reload all stylesheet <link> tags.
-    for (final url in urls) {
-      final link = web.document.querySelector('link[rel="stylesheet"][href^="$url"]');
-      if (link != null) {
-        _reloadStylesheet(link, url);
+    Future<void> performReload() async {
+      final futures = <Future<void>>[];
+
+      for (final url in urls) {
+        final link = web.document.querySelector('link[rel="stylesheet"][href^="$url"]');
+        if (link != null) {
+          futures.add(_reloadStylesheet(link, url));
+        }
       }
+
+      if (futures.isEmpty) return;
+
+      await Future.wait(futures);
+
+      if (web.document.has('fonts')) {
+        try {
+          await web.document.fonts.ready.toDart.timeout(const Duration(seconds: 2));
+        } catch (_) {}
+      }
+    }
+
+    if (web.document.has('startViewTransition')) {
+      web.document.startViewTransition((() => performReload().toJS).toJS);
+    } else {
+      performReload();
     }
   }
 
-  void _reloadStylesheet(web.Element oldLink, String url, {int retries = 5}) {
+  Future<void> _reloadStylesheet(web.Element oldLink, String url, {int retries = 5}) {
+    final completer = Completer<void>();
     final newLink = web.document.createElement('link') as web.HTMLLinkElement;
     newLink.rel = 'stylesheet';
     newLink.href = '$url?v=${DateTime.now().millisecondsSinceEpoch}';
@@ -142,6 +164,9 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     loadSub = web.EventStreamProvider<web.Event>('load').forElement(newLink).listen((_) {
       cleanup();
       oldLink.remove();
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
     });
 
     errorSub = web.EventStreamProvider<web.Event>('error').forElement(newLink).listen((_) {
@@ -149,14 +174,22 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       newLink.remove();
       if (retries > 0) {
         Future.delayed(const Duration(milliseconds: 500), () {
-          _reloadStylesheet(oldLink, url, retries: retries - 1);
+          _reloadStylesheet(oldLink, url, retries: retries - 1).then((_) {
+            if (!completer.isCompleted) {
+              completer.complete();
+            }
+          });
         });
       } else {
         print('Failed to reload stylesheet $url after 5 retries.');
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
       }
     });
 
     oldLink.parentNode?.insertBefore(newLink, oldLink.nextSibling);
+    return completer.future;
   }
 
   void _reloadPage([String? path]) async {
