@@ -188,6 +188,9 @@ class TestRenderObject extends RenderObject implements RawableRenderObject {
 class TestRenderElement extends TestRenderObject implements RenderElement {
   TestRenderElement(this.tag);
 
+  @override
+  web.Element? get node => null;
+
   final String tag;
   String? id;
   String? classes;

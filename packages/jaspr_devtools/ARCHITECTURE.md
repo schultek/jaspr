@@ -84,14 +84,12 @@ The framework uses `DiagnosticsNode` to track element names, identifiers, proper
 This isolates the framework logic from transport serialization.
 
 ### Server-Side Lifecycle
-During HTML generation, the server binding constructs the element tree and generates a random `jaspr-devtools-id`.
+During HTML generation, the server binding constructs the element tree and generates a random `renderId`.
 
-It injects this ID into the DOM as a `<meta name="jaspr-devtools-id" content="[ID]"/>` tag in the document head. It then fires `postEvent('ext.jaspr.serverTree')`, allowing DevTools to immediately inspect the serialized server tree.
+It records the server tree in `DevToolsService.instance._serverTrees` and injects this ID into the DOM within a `<meta name="jaspr-debug-data" content='{"renderId": "[ID]", ...}'/>` tag in the document head.
 
 ### Client-Side Hydration
-When the browser boots Jaspr, the client binding delays diagnostic reporting until all lazy-loaded builders finalize.
-
-It then parses the `jaspr-devtools-id` meta tag to associate itself with the server render. Post-hydration, it evaluates the client component tree and fires `postEvent('ext.jaspr.clientTree')`.
+When the browser boots Jaspr, it parses the `jaspr-debug-data` meta tag to associate itself with the server render ID.
 
 ### The DevToolbar Overlay
 During development runs, `jaspr` injects a DevToolbar overlay into the application. Clicking this floating button opens the DevTools visualizer pointing to the CLI's internally hosted path.
@@ -103,14 +101,14 @@ During development runs, `jaspr` injects a DevToolbar overlay into the applicati
 To achieve deep interactivity similar to Flutter DevTools, the Jaspr framework embeds specialized inspector infrastructure directly within the running application during development.
 
 ### The `DevToolsService`
-Rather than continuously broadcasting full diagnostic trees on every rebuild, advanced inspection tasks are handled by a singleton `DevToolsService` running inside the user's application.
+Inspection tasks are handled by a singleton `DevToolsService` running inside the user's application, exposing pull-based RPC service extensions via `dart:developer`.
 
-*   **Object Caching & Identity:** The service intercepts component evaluations and caches `DiagnosticsNode` representations, identifying them with lightweight lifecycle IDs (e.g., `i-452`). This prevents garbage collection blockages and allows the DevTools UI to request subtrees by ID rather than requesting the entire DOM model.
-*   **Service Extensions:** It exposes RPC callbacks via `dart:developer` meant specifically for the UI.
-    *   `ext.jaspr.inspector.getRoot`: Returns the ID of the root node.
-    *   `ext.jaspr.inspector.getChildren`: Accepts a node ID and returns only that subset of children.
+*   **Service Extensions:**
+    *   `ext.jaspr.inspector.getClientTree`: Pulls the active client component tree on demand.
+    *   `ext.jaspr.inspector.getServerTree`: Accepts a `renderId` (`id`) parameter and returns the corresponding server component tree.
     *   `ext.jaspr.inspector.setSelection`: Directs the DevTools UI to focus on a designated ID.
-*   **Event Emitting:** Handles firing `postEvent('navigate')` payloads that seamlessly instruct modern IDE plugins to open the dart file and line number corresponding to an active selection.
+    *   `ext.jaspr.inspector.updateProperty`: Updates a property on a component or state instance.
+*   **Event Emitting:** Handles firing `ext.jaspr.inspector.selectionChanged` to synchronize selections between the in-app DevToolbar and the DevTools UI.
 
 ```dart
 // Conceptual DevToolsService Architecture
@@ -203,12 +201,14 @@ sequenceDiagram
     
     User->>Server: Navigates cleanly to /home route
     Server->>Server: Computes render. Injects ID: "8xA9"
-    Server->>UI: ext.jaspr.serverTree {id: "8xA9"} arrives
-    
     Server-->>Client: Transmits full HTML Payload
     Client->>Client: Scrapes meta tag for ID "8xA9"
     Client->>Client: Hydrates DOM nodes
-    Client->>UI: ext.jaspr.clientTree {id: "8xA9"} arrives
+    
+    UI->>Client: ext.jaspr.inspector.getClientTree()
+    Client-->>UI: Returns Client Tree & renderId: "8xA9"
+    UI->>Server: ext.jaspr.inspector.getServerTree(id: "8xA9")
+    Server-->>UI: Returns Server Tree for "8xA9"
     
     UI->>UI: Merges disjointed trees seamlessly via matching IDs
     UI-->>User: Paints interactive Component Tree

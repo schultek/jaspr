@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
@@ -21,8 +23,10 @@ class JasprDevToolbar extends StatefulComponent {
 
 class _JasprDevToolbarState extends State<JasprDevToolbar> {
   final glassKey = GlobalNodeKey();
+  StreamSubscription<void>? _keyEventSubscription;
 
   bool active = true;
+  bool isHidden = true;
   Attachment attachment = Attachment.bottom;
   bool settingsOpened = false;
   bool showPropertyTooltips = true;
@@ -47,10 +51,17 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
     attachment = Attachment.values.byName(
       web.window.sessionStorage.getItem('jaspr.dev-toolbar.attachment') ?? 'bottom',
     );
+
+    _keyEventSubscription = web.EventStreamProviders.keyDownEvent.forTarget(web.window).listen((event) {
+      if (event.keyCode == 68 && event.shiftKey && event.altKey) {
+        _toggleToolbar();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _keyEventSubscription?.cancel();
     DevToolsService.instance.selectedElement.removeListener(_onElementSelected);
     super.dispose();
   }
@@ -324,9 +335,17 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
     return Attachment.right;
   }
 
+  void _toggleToolbar() {
+    setState(() {
+      isHidden = !isHidden;
+    });
+  }
+
   void _disableToolbar() {
-    web.window.sessionStorage.setItem('jaspr.dev-toolbar.active', 'false');
-    setState(() => active = false);
+    setState(() {
+      active = false;
+      web.window.sessionStorage.setItem('jaspr.dev-toolbar.active', 'false');
+    });
   }
 
   final stylesChild = Document.head(
@@ -374,7 +393,9 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
           'data-expanded': settingsOpened.toString(),
           if (isDragging) 'data-dragging': 'true',
         },
-        styles: isDragging
+        styles: isHidden
+            ? Styles(display: .none)
+            : isDragging
             ? Styles(
                 raw: {
                   'transform': (attachment == Attachment.left || attachment == Attachment.right)
@@ -636,6 +657,15 @@ class _JasprDevToolbarState extends State<JasprDevToolbar> {
         ),
         css('button:hover').styles(
           backgroundColor: Color('#222'),
+        ),
+        css('.jaspr-dev-toolbar-shortcut').styles(
+          margin: Margin.only(left: Unit.auto),
+          padding: Padding.symmetric(horizontal: 6.px, vertical: 2.px),
+          radius: BorderRadius.circular(4.px),
+          color: Color('#888'),
+          backgroundColor: Color('#1a1a1a'),
+          fontSize: 11.px,
+          fontFamily: FontFamily('monospace'),
         ),
         css('input[type="checkbox"]', [
           css('&').styles(

@@ -13,7 +13,6 @@ class TreeService with ChangeNotifier {
   }
 
   StreamSubscription<Object?>? _clientTreeSub;
-  StreamSubscription<Object?>? _serverTreeSub;
 
   final Map<String, TreeState> _trees = {};
 
@@ -115,26 +114,47 @@ class TreeService with ChangeNotifier {
     }
   }
 
+  Future<void> fetchTrees() async {
+    final clientData = await DevToolsService.instance.getClientTree();
+    String? renderId;
+    String? pageUrl;
+
+    if (clientData != null) {
+      if (clientData case {
+        'id': final String? id,
+        'url': final String url,
+        'tree': final Map<String, Object?> treeJson,
+      }) {
+        renderId = id;
+        pageUrl = url;
+        final info = clientData['info'] as Map<String, Object?>?;
+        final attachTarget = info?['attachTarget'] as String?;
+        final title = info?['title'] as String?;
+        final timestamp = (clientData['timestamp'] as num?)?.toInt() ?? DateTime.now().millisecondsSinceEpoch;
+        updateClientTree(id ?? '', url, treeJson, attachTarget, title, timestamp);
+      }
+    }
+
+    if (renderId != null && renderId.isNotEmpty) {
+      final serverData = await DevToolsService.instance.getServerTree(renderId);
+      if (serverData != null) {
+        if (serverData case {
+          'id': final String id,
+          'tree': final Map<String, Object?> treeJson,
+        }) {
+          final url = (serverData['url'] as String?) ?? pageUrl ?? '/';
+          final timestamp = (serverData['timestamp'] as num?)?.toInt() ?? DateTime.now().millisecondsSinceEpoch;
+          updateServerTree(id, url, treeJson, timestamp);
+        }
+      }
+    }
+  }
+
   void onServiceUpdated() {
     _clientTreeSub?.cancel();
-    _serverTreeSub?.cancel();
 
     if (DevToolsService.instance.clientVmService case final clientVmService?) {
       _clientTreeSub = clientVmService.onExtensionEvent.listen((event) {
-        if (event.extensionKind == 'ext.jaspr.clientTree') {
-          if (event.extensionData?.data case {
-            'id': final String id,
-            'url': final String url,
-            'tree': final Map<String, Object?> treeJson,
-            'info': {
-              'attachTarget': final String? attachTarget,
-              'title': final String? title,
-            },
-          }) {
-            updateClientTree(id, url, treeJson, attachTarget, title, event.timestamp ?? 0);
-          }
-        }
-
         if (event.extensionKind == 'ext.jaspr.inspector.selectionChanged') {
           if (event.extensionData?.data case {
             'id': final String id,
@@ -146,19 +166,7 @@ class TreeService with ChangeNotifier {
       });
     }
 
-    if (DevToolsService.instance.serverVmService case final serverVmService?) {
-      _serverTreeSub = serverVmService.onExtensionEvent.listen((event) {
-        if (event.extensionKind == 'ext.jaspr.serverTree') {
-          if (event.extensionData?.data case {
-            'id': final String id,
-            'url': final String url,
-            'tree': final Map<String, Object?> treeJson,
-          }) {
-            updateServerTree(id, url, treeJson, event.timestamp ?? 0);
-          }
-        }
-      });
-    }
+    fetchTrees();
   }
 
   @override

@@ -90,7 +90,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       final (body: _, :head, html: _) = createDocumentStructure(root, true);
 
       if (kDebugMode) {
-        final (:renderId, :serverTree) = DevToolsService.instance.sendServerTree(
+        final (:renderId, :serverTree) = DevToolsService.instance.recordServerTree(
           currentUrl,
           rootElement,
           _adaptersToDiagnosticableMap(_adapters),

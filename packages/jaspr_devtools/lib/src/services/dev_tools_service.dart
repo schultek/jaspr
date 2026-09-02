@@ -15,6 +15,9 @@ abstract class DevToolsService with ChangeNotifier {
 
   static DevToolsService instance = DevToolsServiceImpl();
 
+  Future<Map<String, dynamic>?> getClientTree();
+  Future<Map<String, dynamic>?> getServerTree(String id);
+
   Future<void> setSelection(String id);
   Future<void> updateProperty(String id, String target, String property, dynamic value);
 }

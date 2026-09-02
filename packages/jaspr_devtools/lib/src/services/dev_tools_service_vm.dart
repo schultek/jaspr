@@ -13,6 +13,12 @@ class DevToolsServiceImpl extends DevToolsService {
   VmService? get serverVmService => null;
 
   @override
+  Future<Map<String, dynamic>?> getClientTree() async => null;
+
+  @override
+  Future<Map<String, dynamic>?> getServerTree(String id) async => null;
+
+  @override
   Future<void> setSelection(String id) async {}
 
   @override

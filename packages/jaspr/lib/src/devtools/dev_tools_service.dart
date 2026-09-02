@@ -26,7 +26,11 @@ external JSAny? _jsReflectGet(ExternalDartReference<Object> target, JSString pro
 external JSArray _jsReflectOwnKeys(ExternalDartReference<Object> target);
 
 @JS('Object.defineProperty')
-external JSObject _defineProperty(ExternalDartReference<Object> target, JSString property, _PropertyDescriptor descriptor);
+external JSObject _defineProperty(
+  ExternalDartReference<Object> target,
+  JSString property,
+  _PropertyDescriptor descriptor,
+);
 
 @JS()
 @anonymous
@@ -38,9 +42,28 @@ class DevToolsService {
   static final instance = DevToolsService._();
 
   DevToolsService._() {
-    if (kIsWeb) {
-      initServiceExtensions();
+    if (kDebugMode) {
+      if (const bool.fromEnvironment('dart.library.io')) {
+        initServerServiceExtensions();
+      } else {
+        initClientServiceExtensions();
+      }
     }
+  }
+
+  final Map<String, DiagnosticsNode> _serverTrees = {};
+  Element? _clientRootElement;
+  String? _clientUrl;
+  String? _clientAttachTarget;
+
+  void updateClientTree({
+    required Element rootElement,
+    required String url,
+    required String attachTarget,
+  }) {
+    _clientRootElement = rootElement;
+    _clientUrl = url;
+    _clientAttachTarget = attachTarget;
   }
 
   final Map<String, Object?> debugData = () {
@@ -117,7 +140,29 @@ class DevToolsService {
     }
   }
 
-  void initServiceExtensions() {
+  void initClientServiceExtensions() {
+    registerExtension('ext.jaspr.inspector.getClientTree', (method, parameters) async {
+      final rootElement = _clientRootElement;
+      if (rootElement != null) {
+        final tree = _elementToNode(rootElement);
+        return ServiceExtensionResponse.result(
+          jsonEncode({
+            'id': debugData['renderId'],
+            'url': _clientUrl ?? '/',
+            'tree': tree.toJsonMap(),
+            'info': {
+              'attachTarget': _clientAttachTarget ?? 'body',
+              'title': kIsWeb ? web.document.title : null,
+            },
+          }),
+        );
+      }
+      return ServiceExtensionResponse.error(
+        ServiceExtensionResponse.extensionError,
+        'No client tree available',
+      );
+    });
+
     registerExtension('ext.jaspr.inspector.setSelection', (method, parameters) async {
       final id = parameters['id'];
       if (id is String) {
@@ -150,11 +195,40 @@ class DevToolsService {
     });
   }
 
+  void initServerServiceExtensions() {
+    registerExtension('ext.jaspr.inspector.getServerTree', (method, parameters) async {
+      final id = parameters['id'] ?? parameters['renderId'];
+      if (id != null) {
+        final tree = _serverTrees[id];
+        if (tree != null) {
+          return ServiceExtensionResponse.result(
+            jsonEncode({
+              'id': id,
+              'tree': tree.toJsonMap(),
+            }),
+          );
+        }
+        return ServiceExtensionResponse.error(
+          ServiceExtensionResponse.invalidParams,
+          'No server tree for renderId: $id',
+        );
+      }
+      return ServiceExtensionResponse.error(
+        ServiceExtensionResponse.invalidParams,
+        'Missing "id" parameter',
+      );
+    });
+  }
+
   bool updateElementProperty(String id, String? targetScope, String propertyName, dynamic value) {
-    web.console.log('[DevTools] updateElementProperty: id=$id, scope=$targetScope, prop=$propertyName, val=$value'.toJS);
+    web.console.log(
+      '[DevTools] updateElementProperty: id=$id, scope=$targetScope, prop=$propertyName, val=$value'.toJS,
+    );
     if (LocalElement.forId(id) case final localElement?) {
       final element = localElement.element;
-      web.console.log('[DevTools] Found element: ${element.runtimeType} (isStateful: ${element is StatefulElement})'.toJS);
+      web.console.log(
+        '[DevTools] Found element: ${element.runtimeType} (isStateful: ${element is StatefulElement})'.toJS,
+      );
       bool updated = false;
 
       if (targetScope == 'state') {
@@ -274,32 +348,15 @@ class DevToolsService {
     });
   }
 
-  ({String renderId, DiagnosticsNode serverTree}) sendServerTree(
+  ({String renderId, DiagnosticsNode serverTree}) recordServerTree(
     String url,
     Element rootElement,
     Map<Element, Diagnosticable> extensions,
   ) {
     final renderId = Random().nextInt(0xffffffff).toRadixString(16);
-
     final tree = _elementToNode(rootElement, extensions);
-    postEvent('ext.jaspr.serverTree', {
-      'id': renderId,
-      'url': url,
-      'tree': tree.toJsonMap(),
-    });
+    _serverTrees[renderId] = tree;
     return (renderId: renderId, serverTree: tree);
-  }
-
-  void sendClientTree(String url, String attachTarget, Element rootElement) {
-    postEvent('ext.jaspr.clientTree', {
-      'id': debugData['renderId'],
-      'url': url,
-      'tree': _elementToNode(rootElement).toJsonMap(),
-      'info': {
-        'attachTarget': attachTarget,
-        'title': web.window.document.title,
-      },
-    });
   }
 
   DiagnosticsNode _elementToNode(Element element, [Map<Element, Diagnosticable>? extensions]) {

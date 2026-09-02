@@ -116,6 +116,49 @@ class DevToolsServiceImpl extends DevToolsService {
   }
 
   @override
+  Future<Map<String, dynamic>?> getClientTree() async {
+    final service = clientVmService;
+    if (service == null) return null;
+
+    try {
+      final vm = await service.getVM();
+      final isolateId = vm.isolates?.first.id;
+      if (isolateId == null) return null;
+
+      final response = await service.callServiceExtension(
+        'ext.jaspr.inspector.getClientTree',
+        isolateId: isolateId,
+      );
+      return response.json;
+    } catch (e) {
+      print('Failed to get client tree: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getServerTree(String id) async {
+    final service = serverVmService;
+    if (service == null) return null;
+
+    try {
+      final vm = await service.getVM();
+      final isolateId = vm.isolates?.first.id;
+      if (isolateId == null) return null;
+
+      final response = await service.callServiceExtension(
+        'ext.jaspr.inspector.getServerTree',
+        isolateId: isolateId,
+        args: {'id': id},
+      );
+      return response.json;
+    } catch (e) {
+      print('Failed to get server tree: $e');
+      return null;
+    }
+  }
+
+  @override
   Future<void> setSelection(String id) async {
     final service = clientVmService;
     if (service == null) return;

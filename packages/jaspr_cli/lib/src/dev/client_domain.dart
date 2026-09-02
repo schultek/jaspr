@@ -9,7 +9,6 @@ import 'dart:async';
 import '../daemon/daemon.dart';
 import '../daemon/domain.dart';
 import 'dev_proxy.dart';
-import 'devtools_server.dart';
 import 'util.dart';
 
 /// A collection of method and events relevant to the running application.

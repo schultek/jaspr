@@ -15,7 +15,6 @@ import '../foundation/binding.dart';
 import '../foundation/constants.dart';
 import '../framework/framework.dart';
 import 'dom_render_object.dart';
-import 'options.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
@@ -119,37 +118,25 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     (rootElement!.renderObject as DomRenderObject).finalize();
     super.completeInitialFrame();
 
-    if (kDebugMode) {
-      _sendClientTree();
+    if (kDebugMode && rootElement != null) {
+      DevToolsService.instance.updateClientTree(
+        rootElement: rootElement!,
+        url: currentUrl,
+        attachTarget: _attachTarget,
+      );
     }
   }
-
-  Timer? _clientTreeThrottleTimer;
 
   @override
   void didBuildFrame() {
     super.didBuildFrame();
     if (kDebugMode && rootElement != null) {
-      if (_clientTreeThrottleTimer?.isActive ?? false) return;
-      _clientTreeThrottleTimer = Timer(const Duration(milliseconds: 1000), () {
-        if (rootElement != null) {
-          DevToolsService.instance.sendClientTree(currentUrl, _attachTarget, rootElement!);
-        }
-      });
+      DevToolsService.instance.updateClientTree(
+        rootElement: rootElement!,
+        url: currentUrl,
+        attachTarget: _attachTarget,
+      );
     }
-  }
-
-  Future<void> _sendClientTree() async {
-    if (Jaspr.options.clients.isNotEmpty) {
-      await Future.wait<void>([
-        for (final client in Jaspr.options.clients.values)
-          if (client.loadedBuilder case final Future<Object?> loader) loader,
-      ]);
-      // Wait for the next frame.
-      await Future(() {});
-    }
-
-    DevToolsService.instance.sendClientTree(currentUrl, _attachTarget, rootElement!);
   }
 
   @override
@@ -242,7 +229,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     }
 
     final responseBody = utf8.decode(response.bodyBytes);
-    final doc = web.DOMParser().parseFromString(responseBody.toJS, "text/html");
+    final doc = web.DOMParser().parseFromString(responseBody.toJS, 'text/html');
 
     final body = doc.body;
 
