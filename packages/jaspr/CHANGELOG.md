@@ -11,6 +11,8 @@
 - Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
 - Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with the [`listen`](https://pub.dev/packages/listen) package.
 
+- Added `@Target` meta annotation to `@client`, `@encoder`, `@decoder` and `@Import` annotations to indicate where they are allowed to be used. 
+
 ## 0.23.4
 
 - Server rendering now fails with a 500 HTTP response instead of hanging indefinitely when an error occurs during the initial build, outside of a component's `build` method.
@@ -32,7 +34,6 @@
 - Exposed `basePath` parameter in `testComponents` and `handlerPath` in `ServerTester.request` to support testing under custom base paths.
 - Support `analyzer` `^12.1.0`.
 - Added a `--port` option to `jaspr build` for configuring the server port used during static generation.
-- Added `@Target` meta annotation to `@client`, `@encoder`, `@decoder` and `@Import` annotations to indicate where they are allowed to be used. 
 
 ## 0.23.1
 
