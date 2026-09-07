@@ -15,7 +15,7 @@ topics:
   - server
 
 environment:
-  sdk: ^3.13.0-0
+  sdk: ^3.13.0
 
 resolution: workspace
 
@@ -24,7 +24,7 @@ dependencies:
   html: ^0.15.0
   http: '>=0.13.0 <2.0.0'
   listen: ^1.0.1
-  meta: ^1.7.0
+  meta: ^1.18.3
   path: ^1.8.0
   shelf: ^1.2.0
   shelf_gzip: ^4.0.0

@@ -3,7 +3,7 @@ publish_to: none
 repository: https://github.com/schultek/jaspr
 
 environment:
-  sdk: ^3.13.0-0
+  sdk: ^3.13.0
 
 workspace:
   - packages/jaspr
@@ -18,7 +18,7 @@ workspace:
   - packages/jaspr_serverpod
   - packages/jaspr_test
   - apps/dart_quotes
-  - apps/dart_quotes_server
+  #- apps/dart_quotes_server
   - apps/fluttercon
   - apps/website
   - examples/backend_dart_frog
