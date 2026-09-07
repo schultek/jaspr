@@ -18,7 +18,7 @@ workspace:
   - packages/jaspr_serverpod
   - packages/jaspr_test
   - apps/dart_quotes
-  - apps/dart_quotes_server
+  #- apps/dart_quotes_server
   - apps/fluttercon
   - apps/website
   - examples/backend_dart_frog
