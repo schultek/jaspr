@@ -1,9 +1,12 @@
 import 'dart:io';
 
-import 'package:mason/mason.dart' show ExitCode;
+import 'package:io/ansi.dart';
+import 'package:mason/mason.dart' show ExitCode, green;
 
 import '../command_runner.dart';
+import '../helpers/print_logo.dart';
 import '../logging.dart';
+import '../utils.dart';
 import '../version.dart';
 import 'base_command.dart';
 
@@ -21,7 +24,10 @@ class UpdateCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
+    printLogo();
+
     logger.write('Checking for updates...', progress: ProgressState.running);
+
     late final String latestVersion;
     try {
       latestVersion = await updater.getLatestVersion(packageName);
@@ -34,7 +40,7 @@ class UpdateCommand extends BaseCommand {
 
     final isUpToDate = jasprCliVersion == latestVersion;
     if (isUpToDate) {
-      logger.write('Jaspr is already at the latest version.');
+      logger.write(wrapBox('Jaspr is already at the latest version.', borderColor: green));
       return 0;
     }
 
@@ -63,8 +69,12 @@ class UpdateCommand extends BaseCommand {
     logger.write('Updated jaspr_cli to $latestVersion.', progress: ProgressState.completed);
 
     logger.write(
-      'There might be automatic code migrations available for your project. '
-      'Run \'jaspr migrate\' to check for available migrations.',
+      wrapBox(
+        'Jaspr CLI is now at ${cyan.wrap(latestVersion)}.\n\n'
+        'There might be automatic code migrations available for your project.\n'
+        'Run ${styleItalic.wrap(cyan.wrap('jaspr migrate'))} to check for available migrations.',
+        borderColor: green,
+      ),
     );
 
     return 0;

@@ -194,4 +194,36 @@ class BuildOwner {
     }
     assert(_debugStateLockLevel >= 0);
   }
+
+  bool _isReload = false;
+
+  void performReload(Element element) {
+    assert(!isFirstBuild);
+
+    assert(_debugStateLockLevel >= 0);
+    assert(!_debugBuilding);
+
+    assert(() {
+      _debugStateLockLevel += 1;
+      _debugBuilding = true;
+      return true;
+    }());
+
+    try {
+      _isReload = true;
+      element.onReload();
+    } finally {
+      lockState(_inactiveElements._unmountAll);
+      _isReload = false;
+
+      assert(_debugBuilding);
+      assert(() {
+        _debugBuilding = false;
+        _debugStateLockLevel -= 1;
+        return true;
+      }());
+    }
+
+    assert(_debugStateLockLevel >= 0);
+  }
 }

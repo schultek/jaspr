@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:path/path.dart' as path;
+
 import 'logging.dart';
 
 class ScopeTree {
@@ -168,8 +169,12 @@ class ScopeTreeNode {
 
   NodeLocation? serverScopeLocation;
   NodeLocation? clientScopeLocation;
-  bool usesCssAnnotation = false;
-  bool usesGlobalCssAnnotation = false;
+
+  List<Element> cssFields = [];
+  List<Element> cssGlobals = [];
+
+  bool get usesCssAnnotation => cssFields.isNotEmpty || cssGlobals.isNotEmpty;
+  bool get usesGlobalCssAnnotation => cssGlobals.isNotEmpty;
 
   final List<NodeLocation> components = [];
 
@@ -212,9 +217,9 @@ class ScopeTreeNode {
       clientScopeLocation = findMainFunction();
     }
 
-    final (usesCssAnnotation, usesGlobalCssAnnotation) = findCssAnnotation();
-    this.usesCssAnnotation = usesCssAnnotation;
-    this.usesGlobalCssAnnotation = usesGlobalCssAnnotation;
+    final annotations = findCssAnnotations();
+    cssFields = annotations.fields;
+    cssGlobals = annotations.globals;
   }
 
   NodeLocation? findMainFunction() {
@@ -231,7 +236,7 @@ class ScopeTreeNode {
     );
   }
 
-  (bool, bool) findCssAnnotation() {
+  ({List<Element> fields, List<Element> globals}) findCssAnnotations() {
     final annotatedFields = library.classes
         .where((e) => !e.isPrivate)
         .expand<Element>(
@@ -254,7 +259,7 @@ class ScopeTreeNode {
         .where((element) => !element.isPrivate)
         .where((element) => element.metadata.annotations.any((a) => a.isCssAnnotation));
 
-    return (annotatedFields.isNotEmpty || annotatedGlobals.isNotEmpty, annotatedGlobals.isNotEmpty);
+    return (fields: annotatedFields.toList(), globals: annotatedGlobals.toList());
   }
 
   void analyzeChildren() {

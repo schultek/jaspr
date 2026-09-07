@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:io/ansi.dart';
@@ -90,23 +91,21 @@ class HelperVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'text' && node.target == null && isSingleOrKey(node.argumentList)) {
-      onText(SourceRange(node.methodName.offset, node.methodName.length));
-    } else if (node.methodName.name == 'fragment' && node.target == null && isSingleOrKey(node.argumentList)) {
-      onFragment(SourceRange(node.methodName.offset, node.methodName.length));
-    } else if (node.methodName.name == 'raw' && node.target == null && isSingleOrKey(node.argumentList)) {
-      onRaw(SourceRange(node.methodName.offset, node.methodName.length));
+    final onHelper = switch (node.methodName.name) {
+      'text' => onText,
+      'fragment' => onFragment,
+      'raw' => onRaw,
+      _ => null,
+    };
+    if (onHelper != null && node.target == null && _isSingleOrKey(node.argumentList)) {
+      onHelper(SourceRange(node.methodName.offset, node.methodName.length));
     }
     super.visitMethodInvocation(node);
   }
 
-  bool isSingleOrKey(ArgumentList args) {
-    if (args.arguments.isEmpty) return false;
-    if (args.arguments.length == 1) return true;
-    if (args.arguments.length == 2) {
-      final named = args.arguments.whereType<NamedExpression>().toList();
-      return named.length == 1 && named.first.name.label.name == 'key';
-    }
-    return false;
-  }
+  /// Whether [args] consists of one positional argument and an optional named 'key' argument.
+  static bool _isSingleOrKey(ArgumentList args) => switch (args.arguments) {
+    [_] || [Expression(), NamedArgument(name: Token(lexeme: 'key'))] => true,
+    _ => false,
+  };
 }

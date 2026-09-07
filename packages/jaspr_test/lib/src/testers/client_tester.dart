@@ -4,6 +4,8 @@ import 'dart:js_interop';
 import 'package:jaspr/client.dart';
 // ignore: implementation_imports
 import 'package:jaspr/src/dom/type_checks.dart';
+// ignore: implementation_imports, invalid_use_of_visible_for_testing_member
+import 'package:jaspr/src/framework/framework.dart' show GlobalComponentsBinding;
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 import 'package:universal_web/web.dart' as web;
@@ -32,6 +34,8 @@ void testClient(
 
       addTearDown(() {
         binding.detachRootComponent();
+        // ignore: invalid_use_of_visible_for_testing_member
+        GlobalComponentsBinding.clearGlobalKeys();
         web.document.body?.replaceChildren(<web.Node>[].toJS);
       });
 

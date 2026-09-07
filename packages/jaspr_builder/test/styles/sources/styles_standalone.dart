@@ -36,7 +36,7 @@ const stylesStandaloneServerOutputs = {
       'import \'package:site/globals.dart\' as _globals;\n'
       'import \'package:site/main.dart\' as _main;\n'
       '\n'
-      'void main() {\n'
+      'void run() {\n'
       '  final List<StyleRule> styles = [\n'
       '    ..._globals.styles,\n'
       '    ..._globals.styles2,\n'
@@ -46,7 +46,13 @@ const stylesStandaloneServerOutputs = {
       '    ..._button.Button.styles,\n'
       '  ];\n'
       '\n'
-      '  stdout.write(jsonEncode({\'css\': styles.render()}));\n'
+      '  stdout.writeln(\n'
+      '    jsonEncode({\n'
+      '      \'event\': \'css\',\n'
+      '      \'file\': \'main.css\',\n'
+      '      \'data\': {\'css\': styles.render()},\n'
+      '    }),\n'
+      '  );\n'
       '}\n',
 };
 
@@ -81,7 +87,7 @@ const stylesStandaloneClientOutputs = {
       'import \'package:site/globals.dart\' as _globals;\n'
       'import \'package:site/main.dart\' as _main;\n'
       '\n'
-      'void main() {\n'
+      'void run() {\n'
       '  final List<StyleRule> styles = [\n'
       '    ..._globals.styles,\n'
       '    ..._globals.styles2,\n'
@@ -91,6 +97,12 @@ const stylesStandaloneClientOutputs = {
       '    ..._button.Button.styles,\n'
       '  ];\n'
       '\n'
-      '  stdout.write(jsonEncode({\'css\': styles.render()}));\n'
+      '  stdout.writeln(\n'
+      '    jsonEncode({\n'
+      '      \'event\': \'css\',\n'
+      '      \'file\': \'main.css\',\n'
+      '      \'data\': {\'css\': styles.render()},\n'
+      '    }),\n'
+      '  );\n'
       '}\n',
 };

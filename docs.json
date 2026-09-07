@@ -155,6 +155,10 @@
           "href": "/going_further/flutter_embedding"
         },
         {
+          "title": "🖥️ Server Components",
+          "href": "/going_further/server_components"
+        },
+        {
           "title": "🪐 Custom Backend",
           "href": "/going_further/backend"
         },

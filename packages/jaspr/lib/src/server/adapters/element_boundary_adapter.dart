@@ -8,16 +8,35 @@ import '../server_binding.dart';
 export '../child_nodes.dart' show ChildListRange, ChildNodeData;
 
 abstract class ElementBoundaryAdapter extends RenderAdapter {
-  ElementBoundaryAdapter(this.element);
+  /// Priority for client component boundaries.
+  ///
+  /// This is set to an arbitrary high value so that the client component markers
+  /// always wrap other element boundaries applied to the same element.
+  static const clientComponentBoundaryPriority = 1000;
+
+  /// Priority for server component boundaries.
+  ///
+  /// This is set to an arbitrary value higher than [clientComponentBoundaryPriority]
+  /// so that the server component markers always wrap other element boundaries including
+  /// client component markers applied to the same element.
+  static const serverComponentBoundaryPriority = 2000;
+
+  ElementBoundaryAdapter(this.element, {this.priority = 0});
 
   final Element element;
+
+  /// Priority of this boundary.
+  ///
+  /// When multiple adapters are applied to the same element, higher priority adapters are
+  /// wrapping lower priority ones, independent of the order they are applied in.
+  final int priority;
 
   late ChildListRange range;
 
   @override
   FutureOr<void> prepare() {
     final parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
-    range = parent.children.wrapElement(element);
+    range = parent.children.wrapElement(element, priority);
     prepareBoundary(range);
   }
 

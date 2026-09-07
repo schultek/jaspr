@@ -30,34 +30,37 @@ final class ClientApp extends Component {
 class _ClientAppElement extends BuildableElement {
   _ClientAppElement(ClientApp super.component);
 
-  final List<ClientComponentAnchor> anchors = [];
   final List<ChildSlot> slots = [];
 
   bool mounted = true;
 
-  FutureOr<ClientBuilder> getClientByName(String name) {
-    final clients = Jaspr.options.clients;
-    assert(clients.containsKey(name), "No client component registered with name '$name'.");
-    return clients[name]!.loadedBuilder;
+  @override
+  void didMount() {
+    loadSlots();
+    super.didMount();
   }
 
   @override
-  void didMount() {
+  void onReload() {
+    slots.clear();
+    loadSlots();
+    super.onReload();
+  }
+
+  void loadSlots() {
     final parent = parentRenderObjectElement!.renderObject;
     final nodes = parent is HydratableDomRenderObject ? parent.toHydrate : <web.Node>[];
-    final anchors = extractClientAnchors(getClientByName, nodes: nodes);
+    final anchors = extractAnchors(nodes: nodes);
 
     for (final anchor in anchors) {
       if (anchor.builder is ClientBuilder) {
-        this.anchors.add(anchor);
-        slots.add(createSlotForAnchor(anchor));
+        slots.add(anchor.createSlot());
       } else {
         anchor
             .resolve()
             .then((b) {
               if (mounted) {
-                this.anchors.add(anchor);
-                slots.add(createSlotForAnchor(anchor));
+                slots.add(anchor.createSlot());
                 markNeedsBuild();
               }
             })
@@ -66,15 +69,6 @@ class _ClientAppElement extends BuildableElement {
             });
       }
     }
-    super.didMount();
-  }
-
-  ChildSlot createSlotForAnchor(ClientComponentAnchor anchor) {
-    return _AnchorChildSlot(
-      start: anchor.startNode,
-      end: anchor.endNode,
-      child: anchor.build(),
-    );
   }
 
   @override
@@ -86,24 +80,5 @@ class _ClientAppElement extends BuildableElement {
   void unmount() {
     mounted = false;
     super.unmount();
-  }
-}
-
-class _AnchorChildSlot extends ChildSlot {
-  _AnchorChildSlot({required this.start, required this.end, required this.child});
-
-  final web.Node start;
-  final web.Node end;
-  @override
-  final Component child;
-
-  @override
-  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
-    return ChildSlotRenderObject.between(parent, start, end);
-  }
-
-  @override
-  bool canUpdate(ChildSlot oldComponent) {
-    return oldComponent is _AnchorChildSlot && oldComponent.start == start && oldComponent.end == end;
   }
 }

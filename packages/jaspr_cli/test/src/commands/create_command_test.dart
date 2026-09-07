@@ -12,7 +12,7 @@ void main() {
 
     setUp(() {
       io = FakeIO();
-      runner = JasprCommandRunner();
+      runner = JasprCommandRunner(true, false);
     });
 
     test('creates project with client mode', () async {

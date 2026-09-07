@@ -53,7 +53,7 @@ extension FakeBuildDaemonIO on FakeIO {
   Future<void> runInitialBuild(FakeBuildDaemon buildDaemon) async {
     await expectLater(
       buildDaemon.messages,
-      emitsInOrder([
+      emitsInOrderWithTimeout([
         isA<BuildTargetRequest>(),
         isA<BuildRequest>(),
       ]),
@@ -72,17 +72,17 @@ extension FakeBuildDaemonIO on FakeIO {
   }
 
   Future<void> runReleaseBuild(FakeBuildDaemon buildDaemon) async {
-    expect(
+    await expectLater(
       this.stdout.queue,
-      emitsInOrder([
-        'Building web assets...',
+      emitsInOrderWithTimeout([
+        '[BUILDER] Building web assets...',
         '[BUILDER] Connecting to the build daemon...',
       ]),
     );
 
     await expectLater(
       buildDaemon.messages,
-      emitsInOrder([
+      emitsInOrderWithTimeout([
         isA<BuildTargetRequest>(),
         isA<BuildRequest>(),
       ]),
@@ -112,8 +112,8 @@ extension FakeBuildDaemonIO on FakeIO {
 
     await expectLater(
       this.stdout.queue,
-      emitsInOrder([
-        'Completed building web assets.',
+      emitsInOrderWithTimeout([
+        '[BUILDER] Completed building web assets.',
       ]),
     );
   }
@@ -127,7 +127,10 @@ extension FakeBuildDaemonIO on FakeIO {
     );
     await buildDaemon.close();
 
-    await expectLater(this.stderr.queue, emits('[BUILDER] [WARNING] Shutting down fake build daemon.'));
+    await expectLater(
+      this.stdout.queue,
+      emitsWithTimeout(emits('[BUILDER] [WARNING] Shutting down fake build daemon.')),
+    );
   }
 }
 

@@ -1,12 +1,20 @@
-## Unreleased patch
+## Unreleased breaking
 
-- Fixed server rendering hanging instead of failing when a step of the initial build throws outside of a component's
-  `build` method. Such an error left the task chain the render was waiting on uncompleted, so the HTTP response was
-  never produced and waited indefinitely. The failure is now reported through
-  `AppBinding.reportBuildError` and the render completes.
-- Worked around a Dart VM fault that crashed static rendering on `linux_x64` with
-  `NoSuchMethodError: The method '&' was called on null`, raised from `_LinkedHashSetMixin.add` while `TaskChain`
-  registered a continuation. `TaskChain` no longer hashes those callbacks.
+- Added **Server Components** to allow for more fine-grained control over the server-side rendered component trees.
+- **Breaking**: Renamed `Component.wrapElement()` to `Component.apply()` and added `ApplyTarget target` parameter used to target specific elements instead of only direct children.
+- **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
+- Added stateful server-side reload feature.
+- Require Dart 3.13 or later.
+- Update `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+
+- Added hot-reloading of generated stylesheets in `standalone` mode.
+- Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
+- Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with the [`listen`](https://pub.dev/packages/listen) package.
+
+## 0.23.4
+
+- Server rendering now fails with a 500 HTTP response instead of hanging indefinitely when an error occurs during the initial build, outside of a component's `build` method.
+- Worked around a Dart VM bug that caused server rendering to crash on `linux_x64` due to a `NoSuchMethodError` inside `TaskChain.then`.
 
 ## 0.23.3
 

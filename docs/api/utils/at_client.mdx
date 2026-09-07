@@ -42,9 +42,9 @@ Only one `@client` component per file is allowed.
 
 You can use `@client` components normally as any other component. 
 
-To have separate interactive parts of your site, simply annotate multiple components with `@client`. Only the outermost `@client` component of a nested sub-tree will be hydrated on the client, while nested client components will be safely ignored.
+To have separate interactive parts of your site, simply annotate multiple components with `@client`. If you nest a `@client` component directly inside another `@client` component, the nested one will not be hydrated separately, but instead runs as part of the outer client component. However, with Server Components, you can nest `@client` components under server components, which allows them to be hydrated independently.
 
-All `@client` components are mounted on the client as direct children of the `ClientApp` component, usually created inside `main.client.dart` entrypoint (See [Client Entrypoint](/dev/client#client-entrypoint)).
+All outer `@client` components are mounted on the client as direct children of the `ClientApp` component, usually created inside `main.client.dart` entrypoint (See [Client Entrypoint](/dev/client#client-entrypoint)).
 
 ### Sharing State
 
@@ -102,6 +102,20 @@ Learn more about how to set up serialization for custom data types using the [`@
 
 With this setup you can use any class as the parameter of a `@client` component.
 
+### Server Components (Passing Components)
+
+Parameters can also be other components (type `Component`, including `List`s and `Map`s thereof). When you pass a component as a parameter to a `@client` component, it is treated as a **Server Component**:
+
+- It is rendered **only on the server**.
+- Its Dart code is **not** compiled to JavaScript and **never** executes on the client.
+- Its pre-rendered HTML structure is embedded directly into the `@client` component's output and is automatically mounted on the client during hydration.
+
+This is extremely useful when building layout components (like modals, sidebars, or tabs) that wrap large parts of your website that don't need client-side interactivity, thereby keeping your client bundle small.
+
+<Info>
+  For a detailed explanation of this design pattern, including advanced examples like Tab bars and component scope transitions, see the [Server Components Guide](/going_further/server_components).
+</Info>
+
 ## How it works
 
 The following happens when you use a `@client` component:
@@ -114,11 +128,10 @@ The following happens when you use a `@client` component:
 
 2. The component is built and pre-rendered normally.
 3. Jaspr adds a html marker (`<!--$<name> data=<serialized-parameters>-->`) around your components output.
-4. Jaspr adds the components js target as a `<script>` tag to the documents `<head>`.
 
 *on the client:*
 
-5. The browser loads the pre-rendered html and compiled js scripts.
-6. The used component is located based on the html marker.
-7. The parameters are deserialized and the component is mounted to the target element.
+4. The browser loads the pre-rendered html and compiled js scripts.
+5. The used component is located based on the html marker.
+6. The parameters are deserialized and the component is mounted to the target element.
 

@@ -69,9 +69,9 @@ class ComponentFactoryMigration implements Migration {
     }
 
     if (wrapDomComponents.isNotEmpty) {
-      context.reporter.createMigration('Replaced DomComponent.wrap() with Component.wrapElement()', (builder) {
+      context.reporter.createMigration('Replaced DomComponent.wrap() with Component.apply()', (builder) {
         for (final node in wrapDomComponents) {
-          builder.replace(node.offset, node.length, 'Component.wrapElement');
+          builder.replace(node.offset, node.length, 'Component.apply');
         }
       });
     }
@@ -80,13 +80,12 @@ class ComponentFactoryMigration implements Migration {
       context.reporter.createMigration('Replaced Fragment() with Component.fragment()', (builder) {
         for (final (node, arguments) in fragments) {
           builder.replace(node.offset, node.length, 'Component.fragment');
-          final childrenArg =
-              arguments.arguments
-                      .where((arg) => arg is NamedExpression && arg.name.label.name == 'children')
-                      .firstOrNull
-                  as NamedExpression?;
+          final childrenArg = arguments.arguments
+              .whereType<NamedArgument>()
+              .where((arg) => arg.name.lexeme == 'children')
+              .firstOrNull;
           if (childrenArg != null) {
-            final end = childrenArg.expression.offset;
+            final end = childrenArg.argumentExpression.offset;
             builder.delete(childrenArg.name.offset, end - childrenArg.name.offset);
           }
         }

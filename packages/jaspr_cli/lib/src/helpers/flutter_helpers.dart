@@ -54,6 +54,7 @@ mixin FlutterHelper on BaseCommand {
         '-t',
         '.dart_tool/jaspr/flutter_target.dart',
         if (wasm) '--wasm' else '--no-wasm-dry-run',
+        '--no-tree-shake-icons',
         '--output=build/flutter',
       ],
       runInShell: true,

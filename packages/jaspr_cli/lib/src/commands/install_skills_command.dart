@@ -1,12 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:io/io.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
-import '../dev/util.dart';
 import '../logging.dart';
+import '../utils.dart';
 import 'base_command.dart';
 
 const _agents = {
@@ -44,36 +43,15 @@ class InstallSkillsCommand extends BaseCommand {
 
   @override
   Future<int> runCommand() async {
-    final packageConfigPath = findPackageConfigFilePath();
-    if (packageConfigPath == null) {
-      logger.write(
-        'Could not find package_config.json. Make sure to run "dart pub get" first.',
-        level: Level.error,
-      );
+    final (packageConfigPath, packageConfig) = getPackagesFile(logger: logger);
+    if (packageConfigPath == null || packageConfig == null) {
+      return 1;
+    }
+    final jasprPath = getJasprPackagePath(packageConfigPath, packageConfig, logger: logger);
+    if (jasprPath == null) {
       return 1;
     }
 
-    final packageConfigFile = File(packageConfigPath);
-    final config = jsonDecode(packageConfigFile.readAsStringSync());
-    String? jasprPackageUri;
-    if (config case {'packages': final List<Object?> configPackages}) {
-      final jasprEntry = configPackages
-          .whereType<Map<String, dynamic>>()
-          .where((p) => p['name'] == 'jaspr')
-          .firstOrNull;
-      if (jasprEntry != null) {
-        jasprPackageUri = jasprEntry['rootUri'] as String?;
-      }
-    }
-
-    if (jasprPackageUri == null) {
-      logger.write('Could not find "jaspr" package in package_config.json.', level: Level.error);
-      return 1;
-    }
-
-    final jasprPath = p.isAbsolute(jasprPackageUri) || jasprPackageUri.startsWith('file://')
-        ? p.fromUri(jasprPackageUri)
-        : p.join(p.dirname(packageConfigFile.absolute.path), jasprPackageUri);
     final skillsSourceDir = Directory(p.join(jasprPath, 'skills'));
 
     if (!skillsSourceDir.existsSync()) {

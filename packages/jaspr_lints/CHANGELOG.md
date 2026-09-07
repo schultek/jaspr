@@ -1,3 +1,9 @@
+## Unreleased minor
+
+- Require Dart 3.13 or later.
+- Update `unsafe_imports` rule to properly handle standalone style mode.
+- Update `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+
 ## 0.7.2
 
 - Support `analyzer` `^12.1.0`.

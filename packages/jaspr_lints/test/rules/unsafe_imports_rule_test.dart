@@ -16,6 +16,7 @@ void main() {
     defineReflectiveTests(UnsafeImportsComponentTest);
     defineReflectiveTests(UnsafeImportsStylesClientTest);
     defineReflectiveTests(UnsafeImportsStylesServerTest);
+    defineReflectiveTests(UnsafeImportsStylesStandaloneTest);
     defineReflectiveTests(ScopesTest);
   });
 }
@@ -62,7 +63,7 @@ class UnsafeImportsServerTest extends UnsafeImportsBaseTest {
     final bFile = newFile('$testPackageLibPath/b.dart', "import 'a.dart';\nimport 'package:jaspr/client.dart';");
 
     final message =
-        "Unsafe import: 'b.dart' imports other unsafe libraries which are not available on the server. See below for details.";
+        "Unsafe import: 'b.dart' imports libraries which are not available on the server. See below for details.";
     final contextMessageText =
         "Unsafe import 'dart:js_interop'. Try using 'package:universal_web/js_interop.dart' instead.";
     final contextMessageText2 =
@@ -119,7 +120,7 @@ class UnsafeImportsClientTest extends UnsafeImportsBaseTest {
     final bFile = newFile('$testPackageLibPath/b.dart', "import 'a.dart';\nimport 'package:jaspr/server.dart';");
 
     final message =
-        "Unsafe import: 'b.dart' imports other unsafe libraries which are not available on the client. See below for details.";
+        "Unsafe import: 'b.dart' imports libraries which are not available on the client. See below for details.";
     final contextMessageText =
         "Unsafe import 'dart:io'. Try moving this out of the client scope or use a conditional import.";
     final contextMessageText2 =
@@ -179,7 +180,7 @@ class UnsafeImportsComponentTest extends UnsafeImportsBaseTest {
     final bFile = newFile('$testPackageLibPath/b.dart', "import 'a.dart';\nimport 'package:jaspr/server.dart';");
 
     final message =
-        "Unsafe import: 'b.dart' imports other unsafe libraries which are not available on the client. See below for details.";
+        "Unsafe import: 'b.dart' imports libraries which are not available on the client. See below for details.";
     final contextMessageText =
         "Unsafe import 'dart:io'. Try moving this out of the client scope or use a conditional import.";
     final contextMessageText2 =
@@ -227,11 +228,11 @@ class UnsafeImportsStylesServerTest extends UnsafeImportsBaseTest {
 
   void test_global_styles_import_client_fails() async {
     final message =
-        'Unsafe @css usage: Importing client-only libraries is not allowed when using @css. See below for details.';
-    final contextMessageText =
-        "Unsafe import 'package:jaspr/client.dart'. Try using 'package:jaspr/jaspr.dart' instead.";
-    final contextMessageText2 =
-        "Unsafe import 'dart:js_interop'. Try using 'package:universal_web/js_interop.dart' instead.";
+        "Unsafe import: 'package:jaspr/client.dart' is not available when using @css.\n"
+        "Try using 'package:jaspr/jaspr.dart' instead.";
+    final message2 =
+        "Unsafe import: 'dart:js_interop' is not available when using @css.\n"
+        "Try using 'package:universal_web/js_interop.dart' instead.";
 
     await assertDiagnostics(
       '// ignore_for_file: unused_import\n'
@@ -243,12 +244,19 @@ class UnsafeImportsStylesServerTest extends UnsafeImportsBaseTest {
       'List<StyleRule> get styles => [];',
       [
         lint(
-          165,
-          4,
+          102,
+          35,
           messageContainsAll: [message],
           contextMessages: [
-            contextMessage(testFile, 109, 27, textContains: [contextMessageText]),
-            contextMessage(testFile, 145, 17, textContains: [contextMessageText2]),
+            contextMessage(testFile, 190, 6, textContains: ['@css used here.']),
+          ],
+        ),
+        lint(
+          138,
+          25,
+          messageContainsAll: [message2],
+          contextMessages: [
+            contextMessage(testFile, 190, 6, textContains: ['@css used here.']),
           ],
         ),
       ],
@@ -264,15 +272,14 @@ class UnsafeImportsStylesClientTest extends UnsafeImportsBaseTest {
   @override
   String get mode => 'client';
 
-  void test_styles_import_client_fails() async {
-    final message =
-        'Unsafe @css usage: Importing client-only libraries is not allowed when using @css. See below for details.';
-    final contextMessageText =
-        "Unsafe import 'package:jaspr/client.dart'. Try using 'package:jaspr/jaspr.dart' instead.";
-    final contextMessageText2 =
-        "Unsafe import 'dart:js_interop'. Try using 'package:universal_web/js_interop.dart' instead.";
+  @override
+  void setUp() {
+    newPackage('flutter').addFile('lib/material.dart', 'class MaterialApp {}');
+    super.setUp();
+  }
 
-    await assertDiagnostics(
+  void test_styles_import_client_ok() async {
+    await assertNoDiagnostics(
       '// ignore_for_file: unused_import\n'
       "import 'package:jaspr/jaspr.dart';\n"
       "import 'package:jaspr/dom.dart';\n"
@@ -282,32 +289,14 @@ class UnsafeImportsStylesClientTest extends UnsafeImportsBaseTest {
       '  @css\n'
       '  static List<StyleRule> get styles => [];\n'
       '}',
-      [
-        lint(
-          205,
-          4,
-          messageContainsAll: [message],
-          contextMessages: [
-            contextMessage(testFile, 109, 27, textContains: [contextMessageText]),
-            contextMessage(testFile, 145, 17, textContains: [contextMessageText2]),
-          ],
-        ),
-      ],
     );
   }
 
-  void test_styles_import_client_transitive_fails() async {
-    final aFile = newFile('$testPackageLibPath/a.dart', "import 'package:jaspr/client.dart';");
-    final bFile = newFile('$testPackageLibPath/b.dart', "import 'a.dart';\nimport 'dart:js_interop';");
+  void test_styles_import_client_transitive_ok() async {
+    newFile('$testPackageLibPath/a.dart', "import 'package:jaspr/client.dart';");
+    newFile('$testPackageLibPath/b.dart', "import 'a.dart';\nimport 'dart:js_interop';");
 
-    final message =
-        'Unsafe @css usage: Importing client-only libraries is not allowed when using @css. See below for details.';
-    final contextMessageText =
-        "Unsafe import 'package:jaspr/client.dart'. Try using 'package:jaspr/jaspr.dart' instead.";
-    final contextMessageText2 =
-        "Unsafe import 'dart:js_interop'. Try using 'package:universal_web/js_interop.dart' instead.";
-
-    await assertDiagnostics(
+    await assertNoDiagnostics(
       '// ignore_for_file: unused_import\n'
       "import 'package:jaspr/jaspr.dart';\n"
       "import 'package:jaspr/dom.dart';\n"
@@ -316,14 +305,82 @@ class UnsafeImportsStylesClientTest extends UnsafeImportsBaseTest {
       '  @css\n'
       '  static List<StyleRule> get styles => [];\n'
       '}',
+    );
+  }
+
+  void test_styles_import_flutter_fails() async {
+    await assertDiagnostics(
+      '// ignore_for_file: unused_import\n'
+      "import 'package:jaspr/jaspr.dart';\n"
+      "import 'package:jaspr/dom.dart';\n"
+      "import 'package:flutter/material.dart';\n\n"
+      'class MyComponent extends Component {\n'
+      '  @css\n'
+      '  static List<StyleRule> get styles => [];\n'
+      '}',
       [
         lint(
-          160,
-          4,
-          messageContainsAll: [message],
-          contextMessages: [
-            contextMessage(aFile, 7, 27, textContains: [contextMessageText]),
-            contextMessage(bFile, 24, 17, textContains: [contextMessageText2]),
+          102,
+          39,
+          messageContainsAll: [
+            "Unsafe import: 'package:flutter/material.dart' is not available when using @css.\n"
+                'Try using a conditional import.',
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+@reflectiveTest
+class UnsafeImportsStylesStandaloneTest extends UnsafeImportsBaseTest {
+  @override
+  String get testFileName => 'component.dart';
+
+  @override
+  void setUp() {
+    newPackage('flutter').addFile('lib/material.dart', 'class MaterialApp {}');
+    super.setUp();
+
+    final pubspecFile = getFile(testPackagePubspecPath);
+    if (pubspecFile.exists) {
+      pubspecFile.writeAsStringSync('${pubspecFile.readAsStringSync()}\n  styles: standalone');
+    }
+  }
+
+  void test_standalone_styles_no_warning_for_client_and_server() async {
+    await assertNoDiagnostics(
+      '// ignore_for_file: unused_import\n'
+      "import 'package:jaspr/jaspr.dart';\n"
+      "import 'package:jaspr/dom.dart';\n"
+      "import 'package:jaspr/client.dart';\n"
+      "import 'package:jaspr/server.dart';\n"
+      "import 'dart:js_interop';\n"
+      "import 'dart:io';\n\n"
+      'class MyComponent extends Component {\n'
+      '  @css\n'
+      '  static List<StyleRule> get styles => [];\n'
+      '}',
+    );
+  }
+
+  void test_standalone_styles_warning_for_flutter() async {
+    await assertDiagnostics(
+      '// ignore_for_file: unused_import\n'
+      "import 'package:jaspr/jaspr.dart';\n"
+      "import 'package:jaspr/dom.dart';\n"
+      "import 'package:flutter/material.dart';\n\n"
+      'class MyComponent extends Component {\n'
+      '  @css\n'
+      '  static List<StyleRule> get styles => [];\n'
+      '}',
+      [
+        lint(
+          102,
+          39,
+          messageContainsAll: [
+            "Unsafe import: 'package:flutter/material.dart' is not available when using @css.\n"
+                'Try using a conditional import.',
           ],
         ),
       ],

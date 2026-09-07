@@ -8,3 +8,4 @@ export 'src/client/client_binding.dart';
 export 'src/client/dom_render_object.dart';
 export 'src/client/options.dart';
 export 'src/client/run_app.dart';
+export 'src/client/slotted_child_view.dart';
