@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:build/build.dart';
 
-import '../styles/styles_bundle_builder.dart';
 import '../utils.dart';
+import 'styles_bundle_builder.dart';
 
 /// Builds the standalone runner file for Jaspr projects.
 class StylesStandaloneBuilder implements Builder {

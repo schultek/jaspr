@@ -352,7 +352,7 @@ class AttachAdapter extends RenderAdapter {
 
     String? keyFor(MarkupRenderObject n) {
       return switch (n) {
-        MarkupRenderElement(id: final String id) when id.isNotEmpty => id,
+        MarkupRenderElement(:final String id) when id.isNotEmpty => id,
         MarkupRenderElement(tag: 'title' || 'base') => '__${n.tag}',
         MarkupRenderElement(tag: 'meta', attributes: {'name': final String name}) => '__meta:$name',
         _ => null,
