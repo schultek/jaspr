@@ -269,7 +269,7 @@ class AttachAdapter {
   String? keyFor(web.Node node) {
     if (!node.isElement) return null;
     return switch (node as web.Element) {
-      web.Element(id: final String id) when id.isNotEmpty => id,
+      web.Element(:final String id) when id.isNotEmpty => id,
       web.Element(tagName: 'TITLE' || 'BASE') => '__${node.tagName}',
       web.Element(tagName: 'META') => switch (node.attributes.getNamedItem('name')) {
         final web.Attr name => '__meta:${name.value}',

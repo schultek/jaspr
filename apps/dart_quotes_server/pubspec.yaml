@@ -4,9 +4,9 @@ version: 0.1.13
 publish_to: none
 
 environment:
-  sdk: ^3.13.0-0
+  sdk: ^3.13.0
 
-resolution: workspace
+#resolution: workspace
 
 dependencies:
   dart_quotes_client:
