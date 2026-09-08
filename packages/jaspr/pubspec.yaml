@@ -40,6 +40,7 @@ dev_dependencies:
   dart_style: ^3.1.2
   jaspr_test: 0.23.4
   mocktail: ^1.0.4
+  stream_channel: ^2.1.4
   test: ^1.25.8
 
 screenshots:

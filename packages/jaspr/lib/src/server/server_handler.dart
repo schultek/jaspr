@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
@@ -19,17 +19,32 @@ import 'server_app.dart';
 final String? jasprProxyPort = Platform.environment['JASPR_PROXY_PORT'];
 const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 
-final String webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
+/// The directory that static web assets are served from.
+///
+/// Defaults to the `web` directory of the root project,
+/// unless overridden with the `jaspr.dev.web` environment declaration.
+final String webDir = kDevWeb.isNotEmpty ? kDevWeb : path.join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
-  final executableDir = dirname(Platform.script.toFilePath());
-  final workingDir = Directory.current.path;
+  final script = Platform.script;
+  // The script has no file path when it's not a file,
+  // such as the data uri of a hybrid isolate spawned by `package:test`.
+  final scriptPath = script.scheme.isEmpty || script.isScheme('file') ? script.toFilePath() : null;
 
-  if (Platform.resolvedExecutable == Platform.script.toFilePath()) {
-    return executableDir;
+  // When running as a compiled executable,
+  // the script is the executable itself,
+  // so its directory is the project directory.
+  if (scriptPath != null && Platform.resolvedExecutable == scriptPath) {
+    return path.dirname(scriptPath);
   }
 
-  final foundDir = _tryFindRootProjectDir(executableDir) ?? _tryFindRootProjectDir(workingDir);
+  // Otherwise search upwards for a `pubspec.yaml`,
+  // starting from the script's directory when it has one,
+  // then fall back to looking from the current working directory.
+  final workingDir = Directory.current.path;
+  final foundDir = scriptPath != null
+      ? _tryFindRootProjectDir(path.dirname(scriptPath)) ?? _tryFindRootProjectDir(workingDir)
+      : _tryFindRootProjectDir(workingDir);
 
   if (foundDir == null) {
     throw Exception('Could not resolve project directory containing pubspec.yaml');
@@ -39,11 +54,11 @@ String _findRootProjectDir() {
 }
 
 String? _tryFindRootProjectDir(String startingDir) {
-  if (File(join(startingDir, 'pubspec.yaml')).existsSync()) {
+  if (File(path.join(startingDir, 'pubspec.yaml')).existsSync()) {
     return startingDir;
   }
 
-  final parentDir = dirname(startingDir);
+  final parentDir = path.dirname(startingDir);
   if (startingDir == parentDir) {
     return null;
   }
