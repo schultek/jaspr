@@ -508,7 +508,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final client = await startBuildDaemon(Directory.current.path, [
       '--release',
       '--verbose',
-      '--delete-conflicting-outputs',
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
         '--define=build_web_compilers:entrypoint=${compiler}_args=${jsonEncode(args)}',

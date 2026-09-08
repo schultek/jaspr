@@ -503,7 +503,6 @@ void main() {
 const buildRunnerBuildArgs = [
   '--release',
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:entrypoint=compiler=dart2js',
   '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O2"]',
 ];
@@ -511,7 +510,6 @@ const buildRunnerBuildArgs = [
 const buildRunnerFlutterBuildArgs = [
   '--release',
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:entrypoint=compiler=dart2js',
   '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O2","-Ddart.vm.product=true","-DFLUTTER_WEB_USE_SKWASM=false","-DFLUTTER_WEB_USE_SKIA=true"]',
   '--define=build_web_compilers:entrypoint=use-ui-libraries=true',

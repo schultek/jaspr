@@ -60,9 +60,6 @@ class DevProxy {
   void _listenToBuildResults() async {
     await for (final buildResult in buildResults) {
       if (buildResult.status == BuildStatus.succeeded) {
-        for (final callback in _preReloadCallbacks) {
-          await callback();
-        }
         if (reload == ReloadConfiguration.hotReload) {
           for (final clientConnection in _clientConnections.values) {
             await clientConnection.performHotReload();
@@ -79,12 +76,7 @@ class DevProxy {
     }
   }
 
-  final List<FutureOr<void> Function()> _preReloadCallbacks = [];
   final List<FutureOr<void> Function()> _postReloadCallbacks = [];
-
-  void registerPreReloadCallback(FutureOr<void> Function() callback) {
-    _preReloadCallbacks.add(callback);
-  }
 
   void registerPostReloadCallback(FutureOr<void> Function() callback) {
     _postReloadCallbacks.add(callback);
@@ -102,6 +94,23 @@ class DevProxy {
   Iterable<ClientConnection> getClientConnections() {
     return _clientConnections.values;
   }
+
+  Future<void> reloadClients() async {
+    for (final clientConnection in _clientConnections.values) {
+      await clientConnection.performHotReload();
+    }
+    for (final callback in _postReloadCallbacks) {
+      await callback();
+    }
+  }
+
+  Future<void> restartClients() async {
+    for (final clientConnection in _clientConnections.values) {
+      await clientConnection.restart();
+    }
+  }
+
+  String? get clientDevToolsUri => _clientConnections.values.firstOrNull?.devToolsUri;
 
   static Future<DevProxy> start(
     int daemonPort,
@@ -338,6 +347,7 @@ class ClientConnection {
   StreamSubscription<vm.Event>? _vmServiceSub;
 
   bool _isDisposed = false;
+  String? devToolsUri;
 
   vm.VmService? get vmService => _debugConnection?.vmService;
 
@@ -347,6 +357,10 @@ class ClientConnection {
     try {
       final debugConnection = _debugConnection = await dwds.debugConnection(appConnection);
       final debugUri = debugConnection.ddsUri ?? debugConnection.uri;
+      final wsUri = debugUri.startsWith('http') ? '${debugUri.replaceFirst('http', 'ws')}ws' : debugUri;
+      final httpUri = debugUri.startsWith('ws') ? 'http${debugUri.substring(2).replaceAll('/ws', '/')}' : debugUri;
+      final normalizedHttp = httpUri.endsWith('/') ? httpUri : '$httpUri/';
+      devToolsUri = '${normalizedHttp}devtools/?uri=$wsUri';
       final vmService = await vmServiceConnectUri(debugUri);
 
       if (_isDisposed) return;
@@ -493,6 +507,7 @@ class ClientConnection {
   void dispose() {
     if (_isDisposed) return;
     _isDisposed = true;
+    devToolsUri = null;
 
     _stdOutSub?.cancel();
     _resultSub?.cancel();
