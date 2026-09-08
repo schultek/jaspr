@@ -12,7 +12,6 @@ void main() {
       title: 'flutter_multi_view',
       head: [
         link(rel: 'manifest', href: 'manifest.json'),
-        script(src: "flutter_bootstrap.js", async: true),
       ],
       styles: [
         css.import('https://fonts.googleapis.com/css?family=Roboto'),

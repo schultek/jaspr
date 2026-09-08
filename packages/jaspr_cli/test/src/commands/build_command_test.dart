@@ -295,9 +295,6 @@ void main() {
             runInShell: true,
           ),
         ).thenAnswer((_) async {
-          io.fs.file('/root/myapp/build/flutter/flutter_bootstrap.js')
-            ..createSync(recursive: true)
-            ..writeAsStringSync('FAKE FLUTTER BOOTSTRAP');
           io.fs.file('/root/myapp/build/flutter/canvaskit/canvaskit.js')
             ..createSync(recursive: true)
             ..writeAsStringSync('FAKE FLUTTER CANVASKIT');
@@ -308,11 +305,6 @@ void main() {
 
         await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
 
-        expect(io.fs.file('/root/myapp/build/jaspr/flutter_bootstrap.js').existsSync(), isTrue);
-        expect(
-          io.fs.file('/root/myapp/build/jaspr/flutter_bootstrap.js').readAsStringSync(),
-          equals('FAKE FLUTTER BOOTSTRAP'),
-        );
         expect(io.fs.file('/root/myapp/build/jaspr/canvaskit/canvaskit.js').existsSync(), isTrue);
         expect(
           io.fs.file('/root/myapp/build/jaspr/canvaskit/canvaskit.js').readAsStringSync(),

@@ -6,6 +6,7 @@
 
 import 'package:jaspr/client.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'dart:ui_web' as ui_web;
 import 'package:firebase_core_web/firebase_core_web.dart' as _firebase_core_web;
 import 'package:flutter_embedding_demo/components/app.dart' deferred as _app;
 
@@ -27,6 +28,7 @@ import 'package:flutter_embedding_demo/components/app.dart' deferred as _app;
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
   initialize: () {
+    ui_web.initializeAssetManager();
     final Registrar registrar = webPluginRegistrar;
     _firebase_core_web.FirebaseCoreWeb.registerWith(registrar);
     registrar.registerMessageHandler();
