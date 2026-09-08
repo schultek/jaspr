@@ -58,6 +58,11 @@ dev_dependencies:
   test: ^1.22.0
 
 dependency_overrides:
+  build_web_compilers:
+    git:
+      url: https://github.com/parlough/build
+      ref: 23c7e101928e7dec22fb7f345fb5537413d88012
+      path: builder_pkgs/build_web_compilers
   frontend_server_client:
     git:
       url: https://github.com/schultek/webdev.git

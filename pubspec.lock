@@ -186,13 +186,14 @@ packages:
     source: hosted
     version: "3.5.19"
   build_web_compilers:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: build_web_compilers
-      sha256: "4db806793ebe5ce9679fb6c7bb102790a2b2e76d1ba1c5fff98d098442d85c7e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.8.9"
+      path: "builder_pkgs/build_web_compilers"
+      ref: "23c7e101928e7dec22fb7f345fb5537413d88012"
+      resolved-ref: "23c7e101928e7dec22fb7f345fb5537413d88012"
+      url: "https://github.com/parlough/build"
+    source: git
+    version: "4.8.11-wip"
   built_collection:
     dependency: transitive
     description:
@@ -2062,5 +2063,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.13.0-107.0.dev <3.14.0-z"
+  dart: ">=3.13.0-107.0.dev <4.0.0"
   flutter: ">=3.44.0 <4.0.0"

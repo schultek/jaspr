@@ -238,8 +238,14 @@ class FakeStdin extends Stream<List<int>> implements io.Stdin {
   @override
   bool lineMode = true;
 
+  void addBytes(List<int> bytes) {
+    _controller.add(bytes);
+  }
+
+  bool hasTerminalOverride = false;
+
   @override
-  bool get hasTerminal => false;
+  bool get hasTerminal => hasTerminalOverride;
 
   @override
   StreamSubscription<List<int>> listen(
