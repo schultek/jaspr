@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cli_util/cli_util.dart' as cli_util;
 import 'package:file/file.dart' hide FileSystemEntity;
 import 'package:file/local.dart';
 import 'package:path/path.dart' as path;
@@ -298,52 +299,21 @@ const defaultServePort = '8080';
 const serverProxyPort = '5567';
 const flutterProxyPort = '5678';
 
-// The path to the Dart executable in either the Dart or Flutter SDK.
-final dartExecutable = () {
-  String? executable;
-  if (Platform.isWindows) {
-    // Use 'where.exe' to support powershell as well
-    final result = (ProcessRunner.instance.runSync('where.exe', ['dart.bat', 'dart.exe'])).stdout.toString();
-    executable = result.split(RegExp('(\r\n|\r|\n)')).where((s) => !s.contains('Could not find')).firstOrNull?.trim();
-  } else {
-    executable = (ProcessRunner.instance.runSync('which', ['dart'])).stdout.toString().trim();
-  }
+/// The path to the Dart executable in either the Dart or Flutter SDK.
+final String dartExecutable =
+    cli_util.dartExecutable ??
+    (throw Exception(
+      'Could not find Dart executable. '
+      'Make sure Dart is installed and added to your PATH.',
+    ));
 
-  if (executable == null || executable.isEmpty) {
-    throw Exception('Could not find Dart executable. Make sure Dart is installed and added to your PATH.');
-  }
-
-  executable = path.canonicalize(executable);
-
-  bool isSdkExecutable(String executable) {
-    final maybeSdkDir = path.dirname(path.dirname(executable));
-    return FileSystemEntity.isFileSync(path.join(maybeSdkDir, 'version')) &&
-        path.basename(path.dirname(executable)) == 'bin';
-  }
-
-  if (isSdkExecutable(executable)) {
-    return executable;
-  }
-
-  final maybeFlutterDartExecutable = path.join(
-    path.dirname(executable),
-    'cache',
-    'dart-sdk',
-    'bin',
-    Platform.isWindows ? 'dart.exe' : 'dart',
-  );
-  if (isSdkExecutable(maybeFlutterDartExecutable)) {
-    return maybeFlutterDartExecutable;
-  }
-
-  throw Exception(
-    'Found Dart executable at "$executable", but failed to verify the surrounding Dart SDK.\n'
-    'Make sure "${Platform.isWindows ? 'where.exe dart.bat dart.exe' : 'which dart'}" resolves to the Dart executable inside the Dart or Flutter SDK directory.',
-  );
-}();
-
-/// The path to the root directory of the SDK.
-final String dartSdkDir = path.dirname(path.dirname(dartExecutable));
+/// The path to the root directory of the Dart SDK.
+final String dartSdkDir =
+    cli_util.sdkPath ??
+    (throw Exception(
+      'Could not find Dart SDK. '
+      'Make sure Dart is installed and added to your PATH.',
+    ));
 
 final dartSdkVersion = () {
   final result = ProcessRunner.instance.runSync(dartExecutable, ['--version']);

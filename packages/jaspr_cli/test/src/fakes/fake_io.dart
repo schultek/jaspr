@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:async/async.dart';
+import 'package:cli_util/cli_util.dart' as cli_util;
 import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:jaspr_cli/src/process_runner.dart';
@@ -41,7 +42,13 @@ class FakeIO {
 
   T runZoned<T>(T Function() body) {
     return io.IOOverrides.runZoned(
-      () => ProcessRunner.runZoned(body, process),
+      () => Zone.current
+          .fork(
+            zoneValues: {
+              cli_util.environmentOverridesKey: {'DART_SDK': '/fake'},
+            },
+          )
+          .run(() => ProcessRunner.runZoned(body, process)),
       getCurrentDirectory: () => fs.currentDirectory,
       setCurrentDirectory: (path) => fs.currentDirectory = path,
       createFile: fs.file,
