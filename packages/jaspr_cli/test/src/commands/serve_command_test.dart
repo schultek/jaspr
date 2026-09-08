@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:jaspr_cli/src/command_runner.dart';
@@ -65,7 +66,81 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             'Stopping web compilers...',
-            'Terminating CSS runner...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('handles keyboard shortcuts (r, R, d)', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        // Press 'r' for reload
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[LOG] Reloading...',
+            '[LOG] Reload complete.',
+          ]),
+        );
+
+        // Press 'R' for restart
+        io.stdin.addBytes([utf8.encode('R').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[LOG] Restarting...',
+            '[LOG] Restart complete.',
+          ]),
+        );
+
+        // Press 'd' for devtools
+        io.stdin.addBytes([utf8.encode('d').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[LOG] DevTools not available yet.'),
+        );
+
+        await io.shutdownBuildDaemon(buildDaemon);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
           ]),
         );
 
@@ -110,7 +185,6 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             'Stopping web compilers...',
-            'Terminating CSS runner...',
           ]),
         );
 
@@ -171,7 +245,6 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             'Stopping web compilers...',
-            'Terminating CSS runner...',
             'Terminating flutter run...',
           ]),
         );
@@ -184,7 +257,6 @@ void main() {
 
 const buildRunnerDartArgs = [
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:ddc=generate-full-dill=true',
   '--define=build_web_compilers:entrypoint=compiler=dartdevc',
   '--define=build_web_compilers:ddc=ddc-library-bundle=true',
@@ -201,7 +273,6 @@ const buildRunnerDartArgs = [
 
 const buildRunnerFlutterArgs = [
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:ddc=generate-full-dill=true',
   '--define=build_web_compilers:entrypoint=compiler=dartdevc',
   '--define=build_web_compilers:ddc=ddc-library-bundle=true',
