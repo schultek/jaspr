@@ -30,7 +30,7 @@ workspace:
   - examples/package_riverpod
 
 dev_dependencies:
-  melos: ^8.2.2
+  melos: ^8.6.0
 
 melos:
   command:
