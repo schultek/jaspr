@@ -258,7 +258,7 @@ packages:
     source: hosted
     version: "0.3.3+2"
   cli_util:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: cli_util
       sha256: "89b8801ba49f8b593fbf2d3e59efd0f566c46cd4ba6837ae2610c72b52a0f899"
@@ -397,10 +397,10 @@ packages:
     dependency: transitive
     description:
       name: dart_data_home
-      sha256: "2b310fd3eb8ca9e2e56a22ce2095d343ead75e9e65da69b847fc85d88746f18b"
+      sha256: "61b80017c4131cd3d52e8e89ecba4208c2f625cb80307c8d468d23680bc572be"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0"
+    version: "0.1.1"
   dart_firebase_admin:
     dependency: transitive
     description:
@@ -941,10 +941,10 @@ packages:
     dependency: "direct dev"
     description:
       name: melos
-      sha256: f8f6110bdac663034301c56dec02381de08f81b593175fee4c5714874d3d6dcd
+      sha256: f1fc649d6dc4d17a2f1573654446495b9758b926372d54bf219cd7b586877a02
       url: "https://pub.dev"
     source: hosted
-    version: "8.6.0"
+    version: "8.7.0"
   meta:
     dependency: transitive
     description:
@@ -1053,10 +1053,10 @@ packages:
     dependency: transitive
     description:
       name: platform
-      sha256: a36d119c13416516a7b5913fbe8af8531e11633d784c550b2125f76c758524ec
+      sha256: "5d6b1b0036a5f331ebc77c850ebc8506cbc1e9416c27e59b439f917a902a4984"
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.0"
+    version: "3.1.6"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -1133,10 +1133,10 @@ packages:
     dependency: transitive
     description:
       name: pub_updater
-      sha256: "739a0161d73a6974c0675b864fb0cf5147305f7b077b7f03a58fa7a9ab3e7e7d"
+      sha256: "3aadeb8c68d15ef9d117b36474ddcc543b48ae1e64f7dd71407da26df66bf7c8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.6.0"
   pubspec_parse:
     dependency: transitive
     description:
