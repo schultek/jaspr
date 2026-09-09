@@ -336,11 +336,11 @@ void main() {
 
         io.inUsePorts.add(3000);
 
-        final serveResult = runner.run(['serve', '--port', '3000', '--verbose']);
+        final serveResult = runner.run(['serve', '--port', '3000']);
 
         await expectLater(
           stderr,
-          emitsThrough(contains('Port 3000 is already in use.')),
+          emitsThrough('[LOG] [ERROR] Port 3000 is already in use.'),
         );
 
         expect(await serveResult, equals(1));
@@ -434,7 +434,6 @@ extension FakeServerIO on FakeIO {
     );
 
     expect(fs.file('.dart_tool/jaspr/server_target.dart').existsSync(), isTrue);
-    expect(fs.file('.dart_tool/jaspr/server.pid').existsSync(), isTrue);
 
     await expectLater(this.stdout.queue, emits('[SERVER] Server started and listening on http://localhost:$port'));
 

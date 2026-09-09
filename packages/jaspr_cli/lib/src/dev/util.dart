@@ -4,7 +4,6 @@ import 'package:build_daemon/client.dart';
 import 'package:build_daemon/constants.dart';
 import 'package:path/path.dart' as p;
 
-import '../helpers/process_tracker.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
@@ -15,12 +14,7 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
   final args = [dartExecutable, 'run', 'build_runner', 'daemon', ...buildOptions];
   if (ProcessRunner.isDefault) {
     try {
-      final client = await BuildDaemonClient.connect(workingDirectory, args, logHandler: logger.writeServerLog);
-      final daemonPid = await ProcessTracker.instance.findDaemonPid(workingDirectory);
-      if (daemonPid != null) {
-        ProcessTracker.instance.track(daemonPid);
-      }
-      return client;
+      return await BuildDaemonClient.connect(workingDirectory, args, logHandler: logger.writeServerLog);
     } on OptionsSkew catch (e) {
       logger.write(
         'Incompatible options with current running build daemon: ${e.details}\n\n'
@@ -59,8 +53,7 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
       return null;
     }
   } else {
-    final proc = await ProcessRunner.instance.start(args.first, args.sublist(1), workingDirectory: workingDirectory);
-    ProcessTracker.instance.track(proc.pid);
+    await ProcessRunner.instance.start(args.first, args.sublist(1), workingDirectory: workingDirectory);
     return await BuildDaemonClient.connectUnchecked(workingDirectory, logHandler: logger.writeServerLog);
   }
 }

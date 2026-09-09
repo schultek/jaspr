@@ -101,16 +101,13 @@ class MockSockets extends Mock {
 }
 
 class FakeProcess extends Mock implements io.Process {
-  FakeProcess([this.pid = 1000]);
+  FakeProcess();
 
-  FakeProcess.sync({int exitCode = 0, String stdout = '', String stderr = '', this.pid = 1000}) {
+  FakeProcess.sync({int exitCode = 0, String stdout = '', String stderr = ''}) {
     _exitCode.complete(exitCode);
     _stdout.add(stdout);
     _stderr.add(stderr);
   }
-
-  @override
-  final int pid;
 
   final Completer<int> _exitCode = Completer<int>();
   final _stdout = StreamController<String>();
@@ -137,8 +134,14 @@ class FakeProcess extends Mock implements io.Process {
   @override
   IOSink get stdin => IOSink(StreamController<List<int>>().sink);
 
+  bool killed = false;
+
+  @override
+  int get pid => 12345;
+
   @override
   bool kill([io.ProcessSignal signal = io.ProcessSignal.sigterm]) {
+    killed = true;
     if (!_exitCode.isCompleted) _exitCode.complete(1);
     return true;
   }

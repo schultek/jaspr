@@ -75,8 +75,7 @@ void main() {
       });
     });
   });
-
-  group('BaseCommand error handling', () {
+  group('error handling and cleanup', () {
     late FakeIO io;
 
     setUp(() {
@@ -84,17 +83,51 @@ void main() {
       io.setupFakeProject('myapp');
     });
 
-    test('catches unhandled async errors, cleans up guards, and returns 1', () async {
+    test('cleans up guards and watched processes when uncaught async error occurs', () async {
       await io.runZoned(() async {
-        var guardExecuted = false;
-        final cmd = _AsyncErrorCommand(
-          onGuard: () => guardExecuted = true,
+        bool guardExecuted = false;
+        final fakeProcess = FakeProcess();
+
+        final command = _ErrorCommand(
+          onRun: (cmd) {
+            cmd.guardResource(() {
+              guardExecuted = true;
+            });
+            cmd.watchProcess('fake', fakeProcess);
+
+            // Trigger an uncaught asynchronous error in the zone
+            scheduleMicrotask(() {
+              throw StateError('Simulated uncaught async crash');
+            });
+          },
         );
 
-        final result = await cmd.run();
-
-        expect(result, equals(1));
+        await expectLater(command.run(), throwsA(isA<StateError>()));
         expect(guardExecuted, isTrue);
+        expect(fakeProcess.killed, isTrue);
+      });
+    });
+
+    test('cleans up guards and watched processes when runCommand throws synchronously/asynchronously', () async {
+      await io.runZoned(() async {
+        bool guardExecuted = false;
+        final fakeProcess = FakeProcess();
+
+        final command = _ErrorCommand(
+          onRun: (cmd) {
+            cmd.guardResource(() {
+              guardExecuted = true;
+            });
+            cmd.watchProcess('fake', fakeProcess);
+            throw Exception('Sync command failure');
+          },
+        );
+
+        expect(command.run(), throwsA(isA<Exception>()));
+        await pumpEventQueue();
+
+        expect(guardExecuted, isTrue);
+        expect(fakeProcess.killed, isTrue);
       });
     });
   });
@@ -115,29 +148,21 @@ class _TestCommand extends BaseCommand {
   }
 }
 
-class _AsyncErrorCommand extends BaseCommand {
-  _AsyncErrorCommand({required this.onGuard});
+class _ErrorCommand extends BaseCommand {
+  _ErrorCommand({required this.onRun});
 
-  final void Function() onGuard;
+  final FutureOr<void> Function(_ErrorCommand) onRun;
 
   @override
-  String get description => 'Async error command';
+  String get description => 'Error test command';
 
   @override
   String get name => 'error_test';
 
   @override
   Future<int> runCommand() async {
-    guardResource(() {
-      onGuard();
-    });
-
-    // Fire an unhandled error inside the zone
-    Future.delayed(Duration(milliseconds: 10), () {
-      throw StateError('Simulated unhandled async crash');
-    });
-
-    // Wait forever until killed/interrupted by zone error
+    await onRun(this);
+    // Completer to keep command running if waiting for async error
     final completer = Completer<int>();
     return completer.future;
   }

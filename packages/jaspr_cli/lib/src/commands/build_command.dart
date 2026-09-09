@@ -284,12 +284,6 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         },
       );
 
-      final serverPid = File('.dart_tool/jaspr/server.pid').absolute;
-      if (!serverPid.existsSync()) {
-        serverPid.createSync(recursive: true);
-      }
-      serverPid.writeAsStringSync('');
-
       final process = await ProcessRunner.instance.start(
         dartExecutable,
         [
@@ -544,6 +538,10 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (client == null) {
       return 1;
     }
+
+    guardResource(() async {
+      await client.close();
+    });
 
     final OutputLocation outputLocation = OutputLocation(
       (b) => b

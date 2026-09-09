@@ -10,7 +10,6 @@ import 'package:path/path.dart' as p;
 import 'package:pub_updater/pub_updater.dart';
 
 import '../helpers/analytics.dart';
-import '../helpers/process_tracker.dart';
 import '../logging.dart';
 import '../project.dart';
 import '../utils.dart';
@@ -52,9 +51,8 @@ abstract class BaseCommand extends Command<int> {
           shutdown();
         });
 
-    await ProcessTracker.instance.killOrphans(logger: logger);
-
     final completer = Completer<int>();
+
     runZonedGuarded(
       () async {
         try {
@@ -69,12 +67,12 @@ abstract class BaseCommand extends Command<int> {
         }
       },
       (error, stackTrace) {
-        logger.write('Uncaught error: $error', tag: Tag.cli, level: Level.error);
+        logger.write('Uncaught error: $error', tag: Tag.cli, level: Level.critical);
         if (verbose) {
-          logger.write('$stackTrace', tag: Tag.cli, level: Level.verbose);
+          logger.write(stackTrace.toString(), tag: Tag.cli, level: Level.critical);
         }
         if (!completer.isCompleted) {
-          completer.complete(1);
+          completer.completeError(error, stackTrace);
         }
       },
     );
@@ -92,7 +90,6 @@ abstract class BaseCommand extends Command<int> {
 
   Future<void> stop() async {
     logger.clearFooter();
-    ProcessTracker.instance.dispose();
     final gs = [...guards];
     guards.clear();
     for (final g in gs) {
@@ -108,8 +105,10 @@ abstract class BaseCommand extends Command<int> {
     _shutdownFuture = Future<Never>.sync(() async {
       logger.complete(false);
 
-      logger.write('\nShutting down...');
-      await stop();
+      if (guards.isNotEmpty) {
+        logger.write('\nShutting down...');
+        await stop();
+      }
 
       exit(1);
     });
@@ -232,12 +231,9 @@ abstract class BaseCommand extends Command<int> {
       }
     });
 
-    ProcessTracker.instance.track(process.pid);
-
     int? exitCode;
     bool wasKilled = false;
     guardResource(() async {
-      ProcessTracker.instance.untrack(process.pid);
       if (exitCode == null) {
         logger.write('Terminating $name...', level: Level.debug);
         process.kill();
@@ -249,7 +245,6 @@ abstract class BaseCommand extends Command<int> {
     });
 
     exitCode = await process.exitCode.then<int>((c) => Future.delayed(Duration(seconds: 1), () => c));
-    ProcessTracker.instance.untrack(process.pid);
 
     if (wasKilled) {
       return exitCode;

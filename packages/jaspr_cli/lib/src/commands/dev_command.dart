@@ -420,12 +420,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       serverTarget.createSync(recursive: true);
     }
 
-    final serverPid = File('.dart_tool/jaspr/server.pid').absolute;
-    if (!serverPid.existsSync()) {
-      serverPid.createSync(recursive: true);
-    }
-    serverPid.writeAsStringSync('');
-
     final userDefines = getServerDartDefines();
 
     final args = [
@@ -818,8 +812,11 @@ String serverEntrypoint(String import) =>
     '''
   import '$import' as m;
   import 'dart:developer';
+  import 'dart:io';
       
   void main(List<String> args) async {
+    stdin.listen(null, onDone: () => exit(0));
+
     final mainFunc = m.main as dynamic;
     final mainCall = mainFunc is dynamic Function(List<String>) ? () => mainFunc(args) : () => mainFunc();
 
