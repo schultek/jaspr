@@ -45,12 +45,12 @@ void main() {
         fileHandler: mockProxyHandler,
       );
 
-      final response = await handler(Request('GET', Uri.parse('http://localhost/about')));
+      final response = await handler(Request('GET', Uri.http('localhost', '/about')));
       expect(response.statusCode, equals(200));
       expect(await response.readAsString(), equals('rendered page'));
 
       // Wait a tick to allow microtasks to finish.
-      await Future<void>.delayed(Duration(milliseconds: 50));
+      await Future.pause(Duration(milliseconds: 50));
 
       expect(streamListened, isTrue, reason: 'The 404 response body stream must be listened to');
       expect(streamDrained, isTrue, reason: 'The 404 response body stream must be drained');
@@ -73,7 +73,7 @@ void main() {
 
       // Make multiple requests through the handler
       for (var i = 0; i < 5; i++) {
-        final response = await handler(Request('GET', Uri.parse('http://localhost/about')));
+        final response = await handler(Request('GET', Uri.http('localhost', '/about')));
         expect(response.statusCode, equals(200));
         expect(await response.readAsString(), equals('rendered page'));
       }
@@ -102,12 +102,12 @@ void main() {
         return Response.notFound(controller.stream);
       }
 
-      final loader = proxyFileLoader(Request('GET', Uri.parse('http://localhost/about')), mockProxyHandler);
+      final loader = proxyFileLoader(Request('GET', Uri.http('localhost', '/about')), mockProxyHandler);
       final result = await loader('index.html');
 
       expect(result, isNull);
 
-      await Future<void>.delayed(Duration(milliseconds: 50));
+      await Future.pause(Duration(milliseconds: 50));
       expect(streamListened, isTrue, reason: 'proxyFileLoader must listen to 404 body stream');
       expect(streamDrained, isTrue, reason: 'proxyFileLoader must drain 404 body stream');
     });

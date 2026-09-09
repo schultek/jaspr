@@ -29,7 +29,7 @@ mixin ProxyHelper on BaseCommand {
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
     final webdevHandler = devProxy?.handler ?? (req) => Response.notFound(null);
 
-    Future<Response> handleRequest(Request req, [Stream<List<int>>? body, bool isRetry = false]) async {
+    Future<Response> handleRequest(Request req, {Stream<List<int>>? body, bool isRetry = false}) async {
       // Each proxyHandler will read the body, so we have to duplicate the stream beforehand,
       // or else this will throw.
       body ??= req.read().asBroadcastStream();
@@ -92,7 +92,7 @@ mixin ProxyHelper on BaseCommand {
         if (isConnectionError && !isRetry && (req.method == 'GET' || req.method == 'HEAD')) {
           // The backend connection may have been closed due to keep-alive idle timeout.
           // Retry once on a fresh connection.
-          return await handleRequest(req, body, true);
+          return await handleRequest(req, body: body, isRetry: true);
         }
         if (isConnectionError) {
           logger.write('Proxy connection to backend failed: $e', tag: Tag.cli, level: Level.verbose);

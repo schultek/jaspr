@@ -143,7 +143,7 @@ Handler createProxyHandler(http.Client? client) {
 Handler _drainingHandler(Handler handler) {
   return (request) async {
     final response = await handler(request);
-    if (response.statusCode == 404 || response.statusCode == 405) {
+    if (response.statusCode case 404 || 405) {
       await response.read().drain<void>().catchError((_) {});
       return response.change(body: '');
     }
