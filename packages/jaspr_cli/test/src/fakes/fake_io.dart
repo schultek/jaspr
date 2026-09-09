@@ -29,12 +29,18 @@ class FakeIO {
   final MockProcessRunner process;
   final MockSockets sockets;
 
+  final Set<int> inUsePorts = {};
+
   final _serverSocketsController = StreamController<FakeServerSocket>();
   // Filter port 0, which is used internally by DWDS/DDS so to not interfere
   // with test server bindings.
   late final StreamQueue<FakeServerSocket> serverSockets = StreamQueue(
     _serverSocketsController.stream.where((s) => s.port != 0),
   );
+
+  void notifyServerSocket(FakeServerSocket socket) {
+    _serverSocketsController.add(socket);
+  }
 
   final FakeStdin stdin;
   final FakeIOSink stdout;
@@ -62,8 +68,10 @@ class FakeIO {
       socketStartConnect: (host, port, {sourceAddress, sourcePort = 0, timeout}) async =>
           io.ConnectionTask.fromSocket(sockets.connect(host, port), () {}),
       serverSocketBind: (host, port, {backlog = 0, shared = false, v6Only = false}) async {
+        if (inUsePorts.contains(port)) {
+          throw io.SocketException('Address already in use');
+        }
         final socket = FakeServerSocket(await _lookupAddress(host), port, this);
-        _serverSocketsController.add(socket);
         return socket;
       },
       stdin: () => stdin,
@@ -93,13 +101,16 @@ class MockSockets extends Mock {
 }
 
 class FakeProcess extends Mock implements io.Process {
-  FakeProcess();
+  FakeProcess([this.pid = 1000]);
 
-  FakeProcess.sync({int exitCode = 0, String stdout = '', String stderr = ''}) {
+  FakeProcess.sync({int exitCode = 0, String stdout = '', String stderr = '', this.pid = 1000}) {
     _exitCode.complete(exitCode);
     _stdout.add(stdout);
     _stderr.add(stderr);
   }
+
+  @override
+  final int pid;
 
   final Completer<int> _exitCode = Completer<int>();
   final _stdout = StreamController<String>();

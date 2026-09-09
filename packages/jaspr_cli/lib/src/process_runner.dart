@@ -89,4 +89,9 @@ class ProcessRunner {
       stderrEncoding: stderrEncoding,
     );
   }
+
+  /// Kills a process by its process id.
+  bool killPid(int pid, [ProcessSignal signal = ProcessSignal.sigterm]) {
+    return Process.killPid(pid, signal);
+  }
 }

@@ -15,6 +15,7 @@ import '../dev/util.dart';
 import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
+import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
@@ -238,10 +239,32 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       final List<String> queuedRoutes = [];
 
       final serverStartedCompleter = Completer<void>();
-      final serverPort = argResults!.option('port') ?? project.port ?? defaultServePort;
+      final explicitPort = argResults?.option('port');
+      final int parsedServerPort;
+      if (explicitPort != null) {
+        final parsed = int.tryParse(explicitPort);
+        if (parsed == null) {
+          logger.write('Invalid port "$explicitPort". Must be a number.', tag: Tag.cli, level: Level.error);
+          return 1;
+        }
+        if (!await isPortAvailable(parsed)) {
+          logger.write(
+            'Port $explicitPort is already in use.\nPlease quit the running process or choose a different port.',
+            tag: Tag.cli,
+            level: Level.error,
+          );
+          return 1;
+        }
+        parsedServerPort = parsed;
+      } else {
+        final defaultPort = int.tryParse(project.port ?? defaultServePort) ?? 8080;
+        parsedServerPort = await findAvailablePort(defaultPort);
+      }
+      final serverPort = '$parsedServerPort';
+      final proxyPort = '${await findAvailablePort(int.parse(serverProxyPort), exclude: [parsedServerPort])}';
 
       await startProxy(
-        serverProxyPort,
+        proxyPort,
         serverPort: serverPort,
         onMessage: (message) {
           if (message case {'route': final String route}) {
@@ -280,7 +303,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
           entryPoint!,
         ],
-        environment: {'PORT': serverPort, 'JASPR_PROXY_PORT': serverProxyPort},
+        environment: {'PORT': serverPort, 'JASPR_PROXY_PORT': proxyPort},
         workingDirectory: Directory.current.path,
       );
 

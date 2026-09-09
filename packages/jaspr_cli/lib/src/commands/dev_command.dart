@@ -17,6 +17,7 @@ import '../dev/client_workflow.dart';
 import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
+import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
 import '../logging.dart';
@@ -53,14 +54,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           'Specify a port to run the dev server on. '
           'Defaults to {jaspr.port} from pubspec.yaml or "$defaultServePort".',
     );
-    argParser.addOption(
-      'web-port',
-      help: 'Specify a port for the webdev server. Defaults to "5467". Change this to run multiple projects.',
-    );
-    argParser.addOption(
-      'proxy-port',
-      help: 'Specify a port for the proxy server. Defaults to "5567". Change this to run multiple projects.',
-    );
     argParser.addFlag('debug', abbr: 'd', help: 'Serves the app in debug mode.', negatable: false);
     argParser.addFlag('release', abbr: 'r', help: 'Serves the app in release mode.', negatable: false);
     argParser.addFlag('experimental-wasm', help: 'Compile to wasm', negatable: false);
@@ -89,8 +82,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final debug = argResults!.flag('debug');
   late final release = argResults!.flag('release');
   late final mode = argResults!.option('mode')!;
-  late final port = argResults!.option('port') ?? project.port ?? defaultServePort;
-  late final customProxyPort = argResults!.option('proxy-port') ?? serverProxyPort;
   late final useWasm = argResults!.flag('experimental-wasm');
   late final moduleFormat = argResults!.option('module-format');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
@@ -111,6 +102,39 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await ensureInProject();
     printLogo();
 
+    final String port;
+
+    final explicitPort = argResults?.option('port');
+    if (explicitPort != null) {
+      final parsed = int.tryParse(explicitPort);
+      if (parsed == null) {
+        logger.write('Invalid port "$explicitPort". Must be a number.', tag: Tag.cli, level: Level.error);
+        return 1;
+      }
+      if (!await isPortAvailable(parsed)) {
+        logger.write(
+          'Port $explicitPort is already in use.\nPlease quit the running process or choose a different port.',
+          tag: Tag.cli,
+          level: Level.error,
+        );
+        return 1;
+      }
+      port = explicitPort;
+    } else {
+      final defaultPort = int.tryParse(project.port ?? defaultServePort) ?? 8080;
+      final resolvedPort = await findAvailablePort(defaultPort);
+      port = '$resolvedPort';
+    }
+
+    final parsedPort = int.parse(port);
+    final proxyPort = project.requireMode == JasprMode.client
+        ? port
+        : '${await findAvailablePort(int.parse(serverProxyPort), exclude: [parsedPort])}';
+
+    final flutterPort = project.flutterMode == FlutterMode.embedded
+        ? '${await findAvailablePort(int.parse(flutterProxyPort), exclude: [parsedPort, int.parse(proxyPort)])}'
+        : null;
+
     logger.write('Starting ${cyan.wrap(project.name)} in ${cyan.wrap(project.requireMode.name)} rendering mode.');
     if (!verbose) {
       logger.write('Showing reduced log output. Pass --verbose to see all output.', level: Level.debug);
@@ -118,8 +142,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     logger.write('\n');
 
     final entryPoint = await getServerEntryPoint(input);
-
-    final proxyPort = project.requireMode == JasprMode.client ? port : customProxyPort;
 
     final workflow = await _runClient(proxyPort);
     if (workflow == null) {
@@ -133,7 +155,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     Process? flutterProcess;
     if (project.flutterMode == FlutterMode.embedded) {
-      flutterProcess = await serveFlutter(useWasm);
+      flutterProcess = await serveFlutter(useWasm, port: flutterPort!);
 
       workflow.devProxy.registerPostReloadCallback(() {
         flutterProcess?.stdin.writeln('r');
@@ -144,7 +166,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       proxyPort,
       devProxy: workflow.devProxy,
       serverPort: port,
-      flutterPort: project.flutterMode == FlutterMode.embedded ? flutterProxyPort : null,
+      flutterPort: flutterPort,
       redirectNotFound: project.requireMode == JasprMode.client,
       onMessage: (message) async {
         if (message case {'reload': final Object reload}) {
@@ -166,7 +188,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     if (project.requireMode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
 
-      await _runChrome();
+      await _runChrome(port);
     } else if (skipServer) {
       logger.write(
         'Skipping server as per --skip-server flag.\n'
@@ -175,23 +197,26 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         level: Level.warning,
       );
     } else {
-      final started = await _startServer(entryPoint!, proxyPort, workflow);
+      final started = await _startServer(entryPoint!, port, proxyPort, workflow);
       if (started) {
-        await _runChrome();
+        await _runChrome(port);
       }
     }
 
-    updateFooter(DevStatus.ready);
+    updateFooter(DevStatus.ready, port);
 
     _setupKeyHandler(workflow, flutterProcess);
 
     return await workflow.done;
   }
 
-  void updateFooter(DevStatus status) {
+  String? _port;
+
+  void updateFooter(DevStatus status, [String? port]) {
+    if (port != null) _port = port;
     _currentStatus = status;
     final width = stdout.hasTerminal ? stdout.terminalColumns : 80;
-    final leftText = ' Serving on http://localhost:$port';
+    final leftText = ' Serving on http://localhost:$_port';
     final rightText = switch (status) {
       DevStatus.ready => 'All ready ',
       DevStatus.rebuilding => 'Rebuilding... ',
@@ -375,7 +400,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
   }
 
-  Future<bool> _startServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
+  Future<bool> _startServer(String entryPoint, String port, String proxyPort, ClientWorkflow workflow) async {
     logger.write('Starting server...', tag: Tag.server, progress: ProgressState.running);
 
     logger.write('Using server entry point: $entryPoint', tag: Tag.server, level: Level.verbose);
@@ -386,22 +411,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         tag: Tag.server,
         level: Level.warning,
       );
-    }
-
-    final parsedPort = int.tryParse(port);
-    if (parsedPort != null && IOOverrides.current == null) {
-      try {
-        final socket = await ServerSocket.bind(InternetAddress.anyIPv4, parsedPort);
-        await socket.close();
-      } on SocketException catch (_) {
-        logger.complete(false);
-        logger.write(
-          'Port $port is already in use.\nPlease quit the running process or choose a different port.',
-          tag: Tag.server,
-          level: Level.error,
-        );
-        await shutdown();
-      }
     }
 
     final useServerReload = entryPoint.startsWith('lib/') && !release;
@@ -567,7 +576,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     return true;
   }
 
-  Future<void> _runChrome() async {
+  Future<void> _runChrome(String port) async {
     if (!launchInChrome) return;
 
     var chrome = await startChrome(int.parse(port), logger);

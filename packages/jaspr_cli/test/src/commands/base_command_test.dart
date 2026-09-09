@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:file/memory.dart';
 import 'package:jaspr_cli/src/commands/base_command.dart';
 import 'package:test/test.dart';
@@ -73,6 +75,29 @@ void main() {
       });
     });
   });
+
+  group('BaseCommand error handling', () {
+    late FakeIO io;
+
+    setUp(() {
+      io = FakeIO();
+      io.setupFakeProject('myapp');
+    });
+
+    test('catches unhandled async errors, cleans up guards, and returns 1', () async {
+      await io.runZoned(() async {
+        var guardExecuted = false;
+        final cmd = _AsyncErrorCommand(
+          onGuard: () => guardExecuted = true,
+        );
+
+        final result = await cmd.run();
+
+        expect(result, equals(1));
+        expect(guardExecuted, isTrue);
+      });
+    });
+  });
 }
 
 class _TestCommand extends BaseCommand {
@@ -87,5 +112,33 @@ class _TestCommand extends BaseCommand {
 
   Future<void> copy(String from, [List<String> targets = const ['']]) {
     return copyToBuildDir(from, targets);
+  }
+}
+
+class _AsyncErrorCommand extends BaseCommand {
+  _AsyncErrorCommand({required this.onGuard});
+
+  final void Function() onGuard;
+
+  @override
+  String get description => 'Async error command';
+
+  @override
+  String get name => 'error_test';
+
+  @override
+  Future<int> runCommand() async {
+    guardResource(() {
+      onGuard();
+    });
+
+    // Fire an unhandled error inside the zone
+    Future.delayed(Duration(milliseconds: 10), () {
+      throw StateError('Simulated unhandled async crash');
+    });
+
+    // Wait forever until killed/interrupted by zone error
+    final completer = Completer<int>();
+    return completer.future;
   }
 }

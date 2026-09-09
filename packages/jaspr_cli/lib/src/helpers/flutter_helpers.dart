@@ -20,7 +20,7 @@ mixin FlutterHelper on BaseCommand {
     return flutterDefines;
   }
 
-  Future<Process> serveFlutter(bool wasm) async {
+  Future<Process> serveFlutter(bool wasm, {String port = flutterProxyPort}) async {
     await _ensureTarget();
 
     final flutterProcess = await ProcessRunner.instance.start(
@@ -30,7 +30,7 @@ mixin FlutterHelper on BaseCommand {
         '--device-id=web-server',
         '-t',
         '.dart_tool/jaspr/flutter_target.dart',
-        '--web-port=$flutterProxyPort',
+        '--web-port=$port',
         if (wasm) '--wasm',
         if (argResults!.flag('release')) '--release',
       ],
