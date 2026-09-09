@@ -199,12 +199,6 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    updateRenderObject(renderObject as SlottedDomRenderObject);
-  }
-
-  @override
   RenderObject createRenderObject() {
     final parent = parentRenderObjectElement!.renderObject;
     final renderObject = SlottedDomRenderObject.fromNodes(component.nodes, parent as DomRenderObject);

@@ -55,12 +55,6 @@ class DomElement extends DomRenderObjectElement {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    updateRenderObject(renderObject as RenderElement);
-  }
-
-  @override
   void update(DomComponent newComponent) {
     assert(component.tag == newComponent.tag, 'Cannot update a DomComponent with a different tag.');
     super.update(newComponent);
@@ -146,6 +140,7 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
     this.attributes,
     this.events,
     required this.child,
+    super.key,
   });
 
   final ApplyTarget target;
@@ -229,15 +224,19 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
 
   @override
   void _updateInheritance() {
+    final oldInheritedDomElement = _inheritedDomElement;
     super._updateInheritance();
     _inheritedDomElement = _inheritedElements?[_InheritedDomComponent];
+    if (oldInheritedDomElement != _inheritedDomElement) {
+      markNeedsRender();
+    }
   }
 
   @protected
   DomParamsResolver? get inheritedDomResolver {
     if (_inheritedDomElement case final inheritedDomElement?) {
       final inheritedDomComponent = dependOnInheritedElement(inheritedDomElement) as _InheritedDomComponent;
-      return inheritedDomComponent.getParams;
+      return inheritedDomComponent.resolveParams;
     }
     return null;
   }
@@ -259,7 +258,11 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
     required DomParamsResolver getParams,
     required Component child,
   }) {
-    return _InheritedDomComponent(getParams: getParams, child: child);
+    return _InheritedDomComponent(
+      key: child.key == null ? null : ValueKey(child.key),
+      resolveParams: getParams,
+      child: child,
+    );
   }
 
   List<Component> buildOwnChildren();
@@ -307,18 +310,18 @@ bool _isDirectDomChild(RenderObject target, RenderObject? applyParent) {
 }
 
 class _InheritedDomComponent extends InheritedComponent {
-  const _InheritedDomComponent({required this.getParams, required super.child});
+  const _InheritedDomComponent({super.key, required this.resolveParams, required super.child});
 
-  final DomParamsResolver getParams;
+  final DomParamsResolver resolveParams;
 
   factory _InheritedDomComponent.merge(
     BuildContext context, {
     required ApplyParams params,
     required Component child,
   }) {
-    final parentResolver = context.dependOnInheritedComponentOfExactType<_InheritedDomComponent>()?.getParams;
+    final parentResolver = context.dependOnInheritedComponentOfExactType<_InheritedDomComponent>()?.resolveParams;
 
-    List<ApplyParams> getParams(RenderObject target) {
+    List<ApplyParams> resolveParams(RenderObject target) {
       final parentParams = parentResolver?.call(target) ?? const [];
       final applyParent = (context as Element)._parentRenderObjectElement?.renderObject;
 
@@ -333,7 +336,7 @@ class _InheritedDomComponent extends InheritedComponent {
       return [...parentParams, params];
     }
 
-    return _InheritedDomComponent(getParams: getParams, child: child);
+    return _InheritedDomComponent(resolveParams: resolveParams, child: child);
   }
 
   @override

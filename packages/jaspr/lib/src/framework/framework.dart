@@ -150,6 +150,7 @@ abstract class Component {
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
     required Component child,
+    Key? key,
   }) = _ApplyDomComponent;
 
   /// Creates a component which renders a list of child components without any wrapping element.
