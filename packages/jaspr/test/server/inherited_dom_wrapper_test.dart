@@ -344,7 +344,9 @@ void main() {
       expect(renderObject, isA<TestRenderElement>().having((e) => e.attributes, 'attributes', {'data': 'test-2'}));
     });
 
-    testComponents('preserves child state across reordering when wrapped with wrapWithInheritedDomComponent', (tester) async {
+    testComponents('preserves child state across reordering when wrapped with wrapWithInheritedDomComponent', (
+      tester,
+    ) async {
       final keyA = UniqueKey();
       final keyB = UniqueKey();
 
