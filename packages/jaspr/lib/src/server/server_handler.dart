@@ -100,7 +100,7 @@ Handler createHandler(
 
   // We skip static file handling in generate mode to always generate fresh content on the server.
   if (!kGenerateMode) {
-    cascade = cascade.add(gzipMiddleware(staticHandler));
+    cascade = cascade.add(gzipMiddleware(_drainingHandler(staticHandler)));
   }
 
   cascade = cascade.add((request) async {
@@ -139,7 +139,11 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
       protocolVersion: req.protocolVersion,
     );
     final response = await proxyHandler(indexRequest);
-    return response.statusCode == 200 ? response.readAsString() : null;
+    if (response.statusCode == 200) {
+      return response.readAsString();
+    }
+    await response.read().drain<void>().catchError((_) {});
+    return null;
   };
 }
 
@@ -147,6 +151,19 @@ Handler createProxyHandler(http.Client? client) {
   final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: client);
   // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
   return (req) => handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
+}
+
+/// Drains the response body for cascading status codes (404/405) before
+/// [Cascade] drops the response, preventing connection leaks when proxying.
+Handler _drainingHandler(Handler handler) {
+  return (request) async {
+    final response = await handler(request);
+    if (response.statusCode case 404 || 405) {
+      await response.read().drain<void>().catchError((_) {});
+      return response.change(body: '');
+    }
+    return response;
+  };
 }
 
 // coverage:ignore-start
