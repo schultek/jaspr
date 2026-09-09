@@ -98,6 +98,7 @@ List<StyleRule> get root => [
   css('html').styles(
     fontFamily: .list([FontFamilies.uiSansSerif, FontFamilies.systemUi, FontFamilies.sansSerif]),
     backgroundColor: background,
+    raw: {'scroll-behavior': 'smooth'},
   ),
 
   // Theme

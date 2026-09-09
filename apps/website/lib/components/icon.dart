@@ -28,6 +28,33 @@ class Icon extends StatelessComponent {
         ),
       );
       return .fragment(children);
+    } else if (name == 'caret-down' || name == 'chevron-down') {
+      children.add(
+        i(
+          classes: 'icon-custom-caret-down',
+          styles: Styles(fontSize: size ?? 1.2.em),
+          [],
+        ),
+      );
+      return .fragment(children);
+    } else if (name == 'external-link') {
+      children.add(
+        i(
+          classes: 'icon-custom-external-link',
+          styles: Styles(fontSize: size ?? 1.2.em),
+          [],
+        ),
+      );
+      return .fragment(children);
+    } else if (name == 'plus') {
+      children.add(
+        i(
+          classes: 'icon-custom-plus',
+          styles: Styles(fontSize: size ?? 1.2.em),
+          [],
+        ),
+      );
+      return .fragment(children);
     }
     children.add(
       i(
@@ -42,22 +69,36 @@ class Icon extends StatelessComponent {
   @css
   static List<StyleRule> get styles => [
     css('[class^=icon-custom-]').styles(
+      display: .inlineBlock,
       width: 1.em,
       height: 1.em,
       color: .inherit,
       raw: {
-        '-webkit-mask': 'var(--icon) no-repeat',
-        'mask': 'var(--icon) no-repeat',
-        '-webkit-mask-size': '100% 100%',
-        'mask-size': '100% 100%',
+        'vertical-align': 'middle',
+        '-webkit-mask': 'var(--icon) no-repeat center',
+        'mask': 'var(--icon) no-repeat center',
+        '-webkit-mask-size': 'contain',
+        'mask-size': 'contain',
         'background-color': 'currentColor',
       },
     ),
     css('.icon-custom-discord').styles(raw: {'--icon': 'url("$discordIcon")'}),
     css('.icon-custom-github').styles(raw: {'--icon': 'url("$githubIcon")'}),
     css('.icon-custom-jaspr').styles(raw: {'--icon': 'url("$jasprIcon")'}),
+    css('.icon-custom-caret-down').styles(raw: {'--icon': 'url("$caretDownIcon")'}),
+    css('.icon-custom-external-link').styles(raw: {'--icon': 'url("$externalLinkIcon")'}),
+    css('.icon-custom-plus').styles(raw: {'--icon': 'url("$plusIcon")'}),
   ];
 }
+
+const plusIcon =
+    r"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E";
+
+const caretDownIcon =
+    r"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E";
+
+const externalLinkIcon =
+    r"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E";
 
 const githubIcon =
     r"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E";

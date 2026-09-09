@@ -52,14 +52,15 @@ class Community extends StatelessComponent {
           div(classes: 'actions', [
             LinkButton.outlined(icon: 'custom-discord', label: 'Join Discord', to: 'https://discord.gg/XGXrGEk4c6'),
           ]),
-          h4([.text('Enterprise Support')]),
+          h4([.text('Enterprise Consulting & Services')]),
           p([
             .text(
-              'Are you a startup or enterprise looking for paid support, consulting, or custom development? Don\'t hesitate to contact me.',
+              'Are you a company, startup, or agency looking to build with Jaspr, migrate from Flutter to the web, or need architectural consulting? Partner directly with Kilian Schulte, creator of Jaspr.',
             ),
           ]),
           div(classes: 'actions', [
-            LinkButton.outlined(icon: 'send', label: 'Get Support', to: 'mailto:kilian@schultek.dev'),
+            LinkButton.filled(icon: 'arrow-right', label: 'Explore Consulting Services', to: '/consulting'),
+            LinkButton.outlined(icon: 'send', label: 'Get in Touch', to: 'mailto:kilian@schultek.dev'),
           ]),
         ]),
       ]),

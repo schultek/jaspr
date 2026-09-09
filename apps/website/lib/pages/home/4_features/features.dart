@@ -70,7 +70,7 @@ class Features extends StatelessComponent {
     css('#features', [
       css('&').styles(
         display: .flex,
-        padding: .only(top: sectionPadding),
+        padding: .only(top: sectionPadding, bottom: .expression('calc(${sectionPadding.value} - 4rem)')),
         flexDirection: .column,
         alignItems: .center,
         textAlign: .center,

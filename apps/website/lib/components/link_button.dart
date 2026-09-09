@@ -22,12 +22,12 @@ class LinkButton extends StatelessComponent {
   final Target? target;
   final String? ariaLabel;
 
-  factory LinkButton.filled({required String label, String? icon, required String to}) {
-    return LinkButton._(label: label, icon: icon, to: to, style: 'filled');
+  factory LinkButton.filled({required String label, String? icon, required String to, Target? target}) {
+    return LinkButton._(label: label, icon: icon, to: to, style: 'filled', target: target);
   }
 
-  factory LinkButton.outlined({required String label, String? icon, required String to}) {
-    return LinkButton._(label: label, icon: icon, to: to, style: 'outlined');
+  factory LinkButton.outlined({required String label, String? icon, required String to, Target? target}) {
+    return LinkButton._(label: label, icon: icon, to: to, style: 'outlined', target: target);
   }
 
   factory LinkButton.icon({required String icon, required String to, Target? target, String? ariaLabel}) {

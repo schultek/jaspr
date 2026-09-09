@@ -12,14 +12,14 @@ class HeroPill extends StatelessComponent {
   Component build(BuildContext context) {
     return a(
       classes: 'hero-pill',
-      href: "https://marketplace.visualstudio.com/items?itemName=schultek.jaspr-code",
-      target: .blank,
+      href: "/case-studies/flutter-dart",
       [
         GradientBorder(
           radius: 17,
           fixed: true,
           child: div(classes: 'pill-content', [
-            .text("Check out the official Jaspr VSCode Extension!"),
+            span(classes: 'text-gradient', [.text("Case Study:")]),
+            .text(" How Flutter & Dart rebuilt their websites with Jaspr"),
             Icon('arrow-right'),
           ]),
         ),

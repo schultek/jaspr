@@ -45,7 +45,7 @@ class Meet extends StatelessComponent {
         div([
           CodeWindow(
             name: 'app.dart',
-            inactiveName: 'button.dart',
+
             selectable: true,
             source: '''
           import 'package:jaspr/jaspr.dart';
@@ -97,7 +97,6 @@ class Meet extends StatelessComponent {
         div([
           CodeWindow(
             name: 'pubspec.yaml',
-            inactiveName: 'main.dart',
             source:
                 '''
           name: my_awesome_website
@@ -154,7 +153,7 @@ class Meet extends StatelessComponent {
       css('&').styles(
         display: .flex,
         minHeight: 100.vh,
-        padding: .only(top: 2.rem, left: contentPadding, right: contentPadding),
+        padding: .only(top: sectionPadding, left: contentPadding, right: contentPadding),
         flexDirection: .column,
         alignItems: .center,
         gap: .row(sectionPadding),

@@ -10,4 +10,4 @@ og:
 layout: home
 ---
 
-Home
+<Home />

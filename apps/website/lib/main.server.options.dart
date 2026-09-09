@@ -10,11 +10,11 @@ import 'package:website/pages/home/0_hero/components/install_command.dart'
     as _install_command;
 import 'package:website/pages/home/0_hero/components/meet_jaspr_button.dart'
     as _meet_jaspr_button;
-import 'package:website/pages/home/1_meet/components/modes_animation.dart'
+import 'package:website/pages/home/2_meet/components/modes_animation.dart'
     as _modes_animation;
-import 'package:website/pages/home/2_devex/components/counter_button.dart'
+import 'package:website/pages/home/3_devex/components/counter_button.dart'
     as _counter_button;
-import 'package:website/pages/home/5_community/components/sponsors_list.dart'
+import 'package:website/pages/home/8_community/components/sponsors_list.dart'
     as _sponsors_list;
 
 /// Default [ServerOptions] for use with your Jaspr project.

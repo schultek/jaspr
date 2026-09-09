@@ -31,11 +31,28 @@ class Footer extends StatelessComponent {
           ),
         ]),
         div([
-          h5([.text('Navigation')]),
+          h5([.text('Framework')]),
           ul([
             li([
               a(href: '/', classes: 'animated-underline', [.text('Home')]),
             ]),
+            li([
+              a(href: '/case-studies/flutter-dart', classes: 'animated-underline', [.text('Case Study')]),
+            ]),
+            li([
+              a(href: '/jaspr-content', classes: 'animated-underline', [.text('jaspr_content')]),
+            ]),
+            li([
+              a(href: '/showcase', classes: 'animated-underline', [.text('Showcase')]),
+            ]),
+            li([
+              a(href: '/consulting', classes: 'animated-underline', [.text('Consulting')]),
+            ]),
+          ]),
+        ]),
+        div([
+          h5([.text('Resources')]),
+          ul([
             li([
               a(href: 'https://docs.jaspr.site', classes: 'animated-underline', [.text('Docs')]),
             ]),
@@ -43,7 +60,7 @@ class Footer extends StatelessComponent {
               a(href: 'https://playground.jaspr.site', classes: 'animated-underline', [.text('Playground')]),
             ]),
             li([
-              a(href: 'https://github.com/schultek/jaspr', classes: 'animated-underline', [.text('Github')]),
+              a(href: 'https://github.com/schultek/jaspr', classes: 'animated-underline', [.text('GitHub')]),
             ]),
           ]),
         ]),
@@ -83,7 +100,7 @@ class Footer extends StatelessComponent {
         ]),
       ]),
       div(classes: 'footer-banner', [
-        .text('Copyright © 2025 Jaspr | '),
+        .text('Copyright © 2026 Jaspr | '),
         a(href: 'https://github.com/schultek/jaspr/blob/main/LICENSE', classes: 'animated-underline', [
           RawText('MIT&nbsp;License'),
         ]),
