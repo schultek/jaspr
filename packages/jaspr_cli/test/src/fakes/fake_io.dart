@@ -30,12 +30,18 @@ class FakeIO {
   final MockProcessRunner process;
   final MockSockets sockets;
 
+  final Set<int> inUsePorts = {};
+
   final _serverSocketsController = StreamController<FakeServerSocket>();
   // Filter port 0, which is used internally by DWDS/DDS so to not interfere
   // with test server bindings.
   late final StreamQueue<FakeServerSocket> serverSockets = StreamQueue(
     _serverSocketsController.stream.where((s) => s.port != 0),
   );
+
+  void notifyServerSocket(FakeServerSocket socket) {
+    _serverSocketsController.add(socket);
+  }
 
   final FakeStdin stdin;
   final FakeIOSink stdout;
@@ -69,8 +75,10 @@ class FakeIO {
       socketStartConnect: (host, port, {sourceAddress, sourcePort = 0, timeout}) async =>
           io.ConnectionTask.fromSocket(sockets.connect(host, port), () {}),
       serverSocketBind: (host, port, {backlog = 0, shared = false, v6Only = false}) async {
+        if (inUsePorts.contains(port)) {
+          throw io.SocketException('Address already in use');
+        }
         final socket = FakeServerSocket(await _lookupAddress(host), port, this);
-        _serverSocketsController.add(socket);
         return socket;
       },
       stdin: () => stdin,
@@ -133,8 +141,14 @@ class FakeProcess extends Mock implements io.Process {
   @override
   IOSink get stdin => IOSink(StreamController<List<int>>().sink);
 
+  bool killed = false;
+
+  @override
+  int get pid => 12345;
+
   @override
   bool kill([io.ProcessSignal signal = io.ProcessSignal.sigterm]) {
+    killed = true;
     if (!_exitCode.isCompleted) _exitCode.complete(1);
     return true;
   }

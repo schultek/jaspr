@@ -15,10 +15,9 @@ import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
   Future<HttpServer> startProxy(
-    String port, {
+    int port, {
     DevProxy? devProxy,
-    required String serverPort,
-    String? flutterPort,
+    int? flutterPort,
     bool redirectNotFound = false,
     void Function(Object?)? onMessage,
   }) async {
@@ -116,7 +115,7 @@ mixin ProxyHelper on BaseCommand {
     runZonedGuarded(
       () async {
         try {
-          final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
+          final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, port);
           completer.complete(server);
         } catch (e, st) {
           completer.completeError(e, st);

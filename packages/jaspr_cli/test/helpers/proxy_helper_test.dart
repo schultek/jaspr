@@ -40,9 +40,8 @@ void main() {
 
       final command = TestCommand();
       server = await command.startProxy(
-        '0',
+        0,
         devProxy: mockDevProxy,
-        serverPort: '0',
         redirectNotFound: true,
       );
     });

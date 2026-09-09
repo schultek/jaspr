@@ -20,7 +20,7 @@ import 'util.dart';
 /// the DevTools.
 class ClientWorkflow {
   static Future<ClientWorkflow?> start(
-    String proxyPort,
+    int proxyPort,
     List<String> buildOptions,
     Logger logger,
     void Function(FutureOr<void> Function()) guard, {
@@ -55,7 +55,7 @@ class ClientWorkflow {
 
         final devProxy = await DevProxy.start(
           daemonPort(workingDirectory),
-          int.parse(proxyPort),
+          proxyPort,
           client.buildResults,
           enableDebugging: enableDebugging,
           useDwdsWebSocketConnection: useDwdsWebSocketConnection,
