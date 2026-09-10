@@ -60,6 +60,18 @@ mixin RenderObjectElement on Element {
 
   bool _dirtyRender = false;
 
+  @protected
+  void markNeedsRender() {
+    _dirtyRender = true;
+  }
+
+  @override
+  @mustCallSuper
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    markNeedsRender();
+  }
+
   bool shouldRerender(covariant Component newComponent) {
     return true;
   }
@@ -70,6 +82,10 @@ mixin RenderObjectElement on Element {
 
     if (!_attached) {
       attachRenderObject();
+    }
+    if (_dirtyRender) {
+      _dirtyRender = false;
+      updateRenderObject(renderObject);
     }
   }
 
@@ -83,11 +99,14 @@ mixin RenderObjectElement on Element {
 
   @override
   void didUpdate(Component oldComponent) {
+    super.didUpdate(oldComponent);
     if (_dirtyRender) {
       _dirtyRender = false;
+      if (!_attached) {
+        attachRenderObject();
+      }
       updateRenderObject(renderObject);
     }
-    super.didUpdate(oldComponent);
   }
 
   bool _attached = false;

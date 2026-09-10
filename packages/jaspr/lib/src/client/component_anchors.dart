@@ -74,31 +74,12 @@ class ClientComponentAnchor extends ComponentAnchor {
   }
 
   ChildSlot createSlot() {
-    return _AnchorChildSlot(
+    return ChildSlot.between(
       key: UniqueKey(),
       start: startNode,
       end: endNode,
       child: build(),
     );
-  }
-}
-
-class _AnchorChildSlot extends ChildSlot {
-  _AnchorChildSlot({required this.start, required this.end, required this.child, super.key});
-
-  final web.Node start;
-  final web.Node end;
-  @override
-  final Component child;
-
-  @override
-  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
-    return ChildSlotRenderObject.between(parent, start, end);
-  }
-
-  @override
-  bool canUpdate(ChildSlot oldComponent) {
-    return oldComponent is _AnchorChildSlot && oldComponent.start == start && oldComponent.end == end;
   }
 }
 
