@@ -1,0 +1,7 @@
+name: new_flutter_embedded_view
+description: A jaspr_cli brick to add a FlutterEmbeddedView
+
+version: 0.1.0
+
+environment:
+  mason: ">=0.1.0-dev.52 <0.1.0"

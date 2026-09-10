@@ -27,7 +27,7 @@ jaspr convert-html --file some/path/to/file.html
 jaspr convert-html --url https://example.com
 ```
 
-The resulting Jaspr code is printed directly to the console. You can then copy this code directly into your component's `build` method.
+The resulting Jaspr code is printed directly to the console. You can then copy this code directly into your component's `build` method. If you do not have a component to paste it into yet, create one first with `jaspr new component MyComponent`, then replace the body of its `build` method with the converted output
 
 ### Selecting Specific Elements
 

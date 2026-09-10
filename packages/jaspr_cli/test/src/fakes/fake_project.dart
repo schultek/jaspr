@@ -13,6 +13,7 @@ extension FakeProject on FakeIO {
       ..createSync()
       ..writeAsStringSync(fakePubspec(name, mode, flutterEmbedding));
     fs.directory('/root/$name/lib').createSync();
+    fs.directory('/root/$name/web').createSync();
     fs.file('/root/$name/lib/main.client.dart')
       ..createSync()
       ..writeAsStringSync(fakeMainClientDart());
@@ -82,6 +83,16 @@ void main() {
 }
 ''';
 
+String fakeIndexHtml() => '''
+<!DOCTYPE html>
+<html>
+    <head>
+        <script defer src="main.client.dart.js"></script>
+    </head>
+    <body>
+    </body>
+</html>
+''';
 String fakePackageConfig() => jsonEncode({
   'configVersion': 2,
   'packages': [

@@ -10,6 +10,7 @@
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
 - Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with the [`listen`](https://pub.dev/packages/listen) package.
+- Added `jaspr new component` command to generate new components and `jaspr new page` to generate new `jaspr_content` pages inside existing projects (Also supported by VSCode extension).
 
 - Added `@Target` meta annotation to `@client`, `@encoder`, `@decoder` and `@Import` annotations to indicate where they are allowed to be used. 
 

@@ -1,0 +1,20 @@
+{{#frontmatter}}---
+title: {{title}}
+{{#description}}description: {{description}}
+{{/description}}{{#layout}}layout: {{layout}}
+{{/layout}}{{#meta}}meta:
+  # TODO: Change these sample values
+  - name: author
+    content: John Doe
+  - property: og:site_name
+    content: Jaspr Blog
+{{/meta}}{{#sitemap}}sitemap:
+  lastmod: {{date}}
+  changefreq: monthly
+{{/sitemap}}{{#sitemap-exclude}}sitemap: false
+{{/sitemap-exclude}}---
+
+{{/frontmatter}}{{#isMd}}# {{title}}{{/isMd}}{{#isHtml}}
+<div>
+  <h1>{{title}}</h1>
+</div>{{/isHtml}}
