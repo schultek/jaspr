@@ -707,7 +707,82 @@ void main() {
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
     });
+
+    // The ancestor boundary has the lowest priority,
+    // the high boundary wraps the descendant with a higher priority,
+    // and the low-a and low-b boundaries wrap the descendant with equal priorities.
+    for (final order in _permutations(['ancestor', 'low-a', 'high', 'low-b'])) {
+      test('nests boundaries by ancestry and priority for capture order ${order.join(', ')}', () async {
+        late Element ancestor;
+        late Element descendant;
+        final r = await renderServerApp(
+          Builder(
+            builder: (context) {
+              ancestor = context as Element;
+              return Builder(
+                builder: (context) {
+                  descendant = context as Element;
+                  return .element(tag: 'body', children: []);
+                },
+              );
+            },
+          ),
+        );
+
+        final root = r.renderObject as MarkupRenderObject;
+        final ranges = {
+          for (final name in order)
+            name: root.children.wrapElement(
+              name == 'ancestor' ? ancestor : descendant,
+              name == 'high' ? 10 : 0,
+            ),
+        };
+
+        // Like render adapters, markers are inserted after all boundaries are captured and in reverse order.
+        for (final name in order.reversed) {
+          final range = ranges[name]!;
+          range.start.insertNext(ChildNodeData(MarkupRenderText('<!--$name-->', true)));
+          range.end.insertPrev(ChildNodeData(MarkupRenderText('<!--/$name-->', true)));
+        }
+
+        // Ancestry takes precedence over priority,
+        // and the later of two equal-priority captures wraps the earlier one.
+        final nesting = order.indexOf('low-a') < order.indexOf('low-b')
+            ? ['ancestor', 'high', 'low-b', 'low-a']
+            : ['ancestor', 'high', 'low-a', 'low-b'];
+        final expected = [
+          for (final name in nesting) '<!--$name-->',
+          '<body></body>',
+          for (final name in nesting.reversed) '<!--/$name-->',
+        ];
+        expect(root.children.map((node) => node.renderToHtml()), expected);
+
+        final destination = MarkupRenderFragment();
+        destination.children.insertNodeBefore(ranges['ancestor']!);
+        expect(root.children, isEmpty);
+        expect(destination.children.map((node) => node.renderToHtml()), expected);
+        for (final (depth, name) in nesting.indexed) {
+          expect(
+            ranges[name]!.map((node) => node.renderToHtml()),
+            expected.sublist(depth, expected.length - depth),
+            reason: 'Boundary $name must retain exactly its own contents after the move.',
+          );
+        }
+      });
+    }
   });
 }
 
 Matcher hasTag(String tag) => isA<MarkupRenderElement>().having((e) => e.tag, 'tag', tag);
+
+Iterable<List<T>> _permutations<T>(List<T> values) sync* {
+  if (values.isEmpty) {
+    yield [];
+    return;
+  }
+  for (final value in values) {
+    for (final rest in _permutations(values.where((v) => v != value).toList())) {
+      yield [value, ...rest];
+    }
+  }
+}
