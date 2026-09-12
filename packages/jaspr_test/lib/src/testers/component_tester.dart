@@ -142,7 +142,7 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   }
 }
 
-class TestRenderObject extends RenderObject implements RawableRenderObject {
+class TestRenderObject implements RawableRenderObject {
   List<TestRenderObject> children = [];
 
   @override

@@ -3,13 +3,13 @@ import 'package:meta/meta.dart';
 import '../framework/framework.dart';
 import 'markup_render_object.dart';
 
-class ChildNodeData extends BaseChildNode {
+final class ChildNodeData extends BaseChildNode {
   ChildNodeData(this.node);
 
   final MarkupRenderObject node;
 }
 
-class ChildNodeBoundary extends BaseChildNode {
+final class ChildNodeBoundary extends BaseChildNode {
   ChildNodeBoundary(this.element, [this.priority = 0]);
 
   final Element element;
@@ -17,7 +17,7 @@ class ChildNodeBoundary extends BaseChildNode {
   late final ChildListRange range;
 }
 
-class BaseChildNode extends ChildNode {
+final class BaseChildNode extends ChildNode {
   @override
   ChildNode? _prev;
   @override
@@ -58,7 +58,7 @@ sealed class ChildNode {
   }
 }
 
-class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
+final class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
   ChildListRange(this.start, this.end) {
     if (start case final ChildNodeBoundary s) s.range = this;
     if (end case final ChildNodeBoundary e) e.range = this;
@@ -83,7 +83,7 @@ class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
   ChildNode get _end => end;
 
   @override
-  Iterator<MarkupRenderObject> get iterator => ChildListIterator(start, end.next);
+  Iterator<MarkupRenderObject> get iterator => _ChildListIterator(start, end.next);
 
   Iterable<ChildNode> get nodes sync* {
     ChildNode? curr = start;
@@ -97,7 +97,7 @@ class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
   }
 }
 
-class ChildList with Iterable<MarkupRenderObject> {
+final class ChildList with Iterable<MarkupRenderObject> {
   ChildList(this.parent) {
     _first.insertNext(_last);
   }
@@ -152,7 +152,7 @@ class ChildList with Iterable<MarkupRenderObject> {
   }
 
   @override
-  Iterator<MarkupRenderObject> get iterator => ChildListIterator(_first);
+  Iterator<MarkupRenderObject> get iterator => _ChildListIterator(_first);
 
   ChildListRange range({ChildNode? startAfter, ChildNode? endBefore}) {
     final start = BaseChildNode();
@@ -249,8 +249,8 @@ class ChildList with Iterable<MarkupRenderObject> {
   }
 }
 
-class ChildListIterator implements Iterator<MarkupRenderObject> {
-  ChildListIterator(ChildNode? first, [this._end]) : _current = first;
+final class _ChildListIterator implements Iterator<MarkupRenderObject> {
+  _ChildListIterator(ChildNode? first, [this._end]) : _current = first;
 
   ChildNode? _current;
   final ChildNode? _end;

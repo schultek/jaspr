@@ -1,17 +1,67 @@
 ## Unreleased breaking
 
-- Added **Server Components** to allow for more fine-grained control over the server-side rendered component trees.
-- **Breaking**: Renamed `Component.wrapElement()` to `Component.apply()` and added `ApplyTarget target` parameter used to target specific elements instead of only direct children.
-- **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
-- Added stateful server-side reload feature.
-- Require Dart 3.13 or later.
-- Update `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+### New features
 
+- Added **Server Components** to allow for more fine-grained control over
+  server-side rendered component trees.
+- Added support for stateful server-side reload.
 - Added hot-reloading of generated stylesheets in `standalone` mode.
-- Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
-- Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with the [`listen`](https://pub.dev/packages/listen) package.
+- Added an `ApplyTarget target` parameter to `Component.apply` (previously `Component.wrapElement`)
+  to target specific elements instead of only direct children.
 
-- Added `@Target` meta annotation to `@client`, `@encoder`, `@decoder` and `@Import` annotations to indicate where they are allowed to be used. 
+### Breaking changes
+
+- Require Dart 3.13 or later.
+- Renamed `Component.wrapElement` to `Component.apply`.
+- Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
+- The following classes can no longer be extended,
+  but can still be implemented:
+
+  - `RenderObject`
+  - `RenderElement`
+  - `RenderText`
+  - `RenderFragment`,
+  - `RawableRenderObject`
+  - `RawableRenderText`
+
+- The following classes no longer be implemented,
+  but can still be extended:
+
+  - `RenderAdapter`
+  - `ElementBoundaryAdapter`
+  - `HeadScopeAdapter`
+
+  Their subclasses must be declared `base`, `final`, or `sealed`.
+- The following classes can no longer be extended or implemented:
+
+  - `MarkupRenderObject`
+  - `MarkupRenderElement`
+  - `MarkupRenderText`
+  - `MarkupRenderFragment`,
+  - `RootMarkupRenderObject`
+  - `ChildListRange`
+  - `ChildNodeData`
+
+  To customize server rendering, instead use render adapters.
+- The following classes are no longer public:
+
+  - `AttachAdapter`, previously exported by `package:jaspr/server.dart`.
+  - `TemplateDocumentAdapter`, previously exported by `package:jaspr/server.dart`.
+
+### Behavior changes
+
+- Replaced Jaspr's implementation of
+  `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with
+  types from the [`listen`](https://pub.dev/packages/listen) package.
+- Added `@Target` meta annotation to
+  `@client`, `@encoder`, `@decoder`, and `@Import` annotations to
+  indicate where they are allowed to be used.
+- Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+
+### Bug fixes
+
+- Fixed style generation in `standalone` mode when
+  importing web libraries like `package:web` or `dart:js_interop`.
 
 ## 0.23.4
 
