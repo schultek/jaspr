@@ -113,6 +113,34 @@ void main() {
       _expectList(target, [children[3]]);
     });
 
+    test('preserves nested range handles when an enclosing range is detached', () {
+      final source = MarkupRenderFragment().children;
+      final target = MarkupRenderFragment().children;
+      final children = List.generate(5, (i) => MarkupRenderText('$i', false));
+      for (final child in children) {
+        source.insertBefore(child);
+      }
+      final outer = source.range(startAfter: source.find(children[0]), endBefore: source.find(children[4]));
+      final inner = source.range(startAfter: source.find(children[1]), endBefore: source.find(children[3]));
+      target.insertNodeAfter(outer);
+      _expectList(source, [children[0], children[4]]);
+      _expectList(target, children.sublist(1, 4));
+
+      outer.remove();
+      _expectList(target, []);
+      final marker = ChildNodeData(MarkupRenderText('<!--detached-->', true));
+      inner.start.insertNext(marker);
+      expect(inner.toList(), [marker.node, children[2]]);
+      expect(outer.toList(), [children[1], marker.node, children[2], children[3]]);
+      expect(source.find(marker.node), isNull);
+      expect(target.find(marker.node), isNull);
+
+      target.insertNodeBefore(outer);
+      _expectList(source, [children[0], children[4]]);
+      _expectList(target, [children[1], marker.node, children[2], children[3]]);
+      expect(target.find(marker.node), same(marker));
+    });
+
     test('moves ranges within a list', () {
       final list = MarkupRenderFragment().children;
       final children = List.generate(4, (i) => MarkupRenderText('$i', false));
@@ -158,6 +186,28 @@ void main() {
       expect(target.find(b.node), same(b));
       _expectList(source, [a.node]);
       _expectList(target, [b.node]);
+    });
+
+    test('supports inserting into an empty range after transfer and detachment', () {
+      final source = MarkupRenderFragment().children;
+      final target = MarkupRenderFragment().children;
+      final range = source.range();
+      target.insertNodeAfter(range);
+      _expectList(source, []);
+      _expectList(target, []);
+
+      range.remove();
+      _expectList(target, []);
+      final child = ChildNodeData(MarkupRenderText('detached', false));
+      range.end.insertPrev(child);
+      expect(range.toList(), [child.node]);
+      expect(source.find(child.node), isNull);
+      expect(target.find(child.node), isNull);
+
+      source.insertNodeBefore(range);
+      _expectList(source, [child.node]);
+      _expectList(target, []);
+      expect(source.find(child.node), same(child));
     });
 
     test('find remains shallow while findWhere visits fragments', () {
