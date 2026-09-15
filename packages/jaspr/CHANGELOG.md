@@ -12,6 +12,7 @@
 ### Breaking changes
 
 - Require Dart 3.13 or later.
+- Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`.
 - Renamed `Component.wrapElement` to `Component.apply`.
 - Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
 - The following classes can no longer be extended,

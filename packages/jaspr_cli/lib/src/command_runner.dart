@@ -12,7 +12,6 @@ import 'commands/convert_html_command.dart';
 import 'commands/create_command.dart';
 import 'commands/daemon_command.dart';
 import 'commands/doctor_command.dart';
-import 'commands/install_skills_command.dart';
 import 'commands/migrate_command.dart';
 import 'commands/serve_command.dart';
 import 'commands/update_command.dart';
@@ -42,7 +41,6 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     addCommand(UpdateCommand());
     addCommand(DoctorCommand());
     addCommand(MigrateCommand());
-    addCommand(InstallSkillsCommand());
     addCommand(ConvertHtmlCommand());
   }
 
