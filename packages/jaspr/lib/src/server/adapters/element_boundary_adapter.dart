@@ -7,7 +7,7 @@ import '../server_binding.dart';
 
 export '../child_nodes.dart' show ChildListRange, ChildNodeData;
 
-abstract class ElementBoundaryAdapter extends RenderAdapter {
+abstract base class ElementBoundaryAdapter extends RenderAdapter {
   /// Priority for client component boundaries.
   ///
   /// This is set to an arbitrary high value so that the client component markers

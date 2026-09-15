@@ -190,14 +190,14 @@ class _TemplateDocumentElement extends StatelessElement {
 
   @override
   Component build() {
-    (binding as ServerAppBinding).addRenderAdapter(TemplateDocumentAdapter(this));
+    (binding as ServerAppBinding).addRenderAdapter(_TemplateDocumentAdapter(this));
     _templateFuture ??= (binding as ServerAppBinding).loadFile('${(component as TemplateDocument).name}.template.html');
     return super.build();
   }
 }
 
-class TemplateDocumentAdapter extends ElementBoundaryAdapter {
-  TemplateDocumentAdapter(super.element);
+final class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
+  _TemplateDocumentAdapter(super.element);
 
   late String template;
 
@@ -316,14 +316,14 @@ class AttachDocument extends StatelessComponent implements Document {
 
   @override
   Component build(BuildContext context) {
-    AttachAdapter.register(context, this);
+    _AttachAdapter.register(context, this);
     return Component.fragment(children ?? []);
   }
 }
 
-final Expando<AttachAdapter> _attach = Expando();
+final Expando<_AttachAdapter> _attach = Expando();
 
-class AttachAdapter extends RenderAdapter {
+final class _AttachAdapter extends RenderAdapter {
   static void register(BuildContext context, AttachDocument item) {
     final binding = context.binding;
     if (binding is! ServerAppBinding) {
@@ -331,7 +331,7 @@ class AttachAdapter extends RenderAdapter {
       return;
     }
 
-    final adapter = _attach[binding] ??= AttachAdapter();
+    final adapter = _attach[binding] ??= _AttachAdapter();
     binding.addRenderAdapter(adapter);
 
     final entry = adapter.targetElements[item.target] ??= (attributes: {}, children: []);
@@ -417,10 +417,10 @@ class AttachAdapter extends RenderAdapter {
   }
 }
 
-class _AttachChildrenAdapter extends ElementBoundaryAdapter {
+final class _AttachChildrenAdapter extends ElementBoundaryAdapter {
   _AttachChildrenAdapter(this.adapter, this.target, super.element);
 
-  final AttachAdapter adapter;
+  final _AttachAdapter adapter;
   final String target;
 
   @override

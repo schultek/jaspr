@@ -1,7 +1,7 @@
 import '../../../server.dart';
 import '../../dom/styles/rules.dart' show StyleRulesRender;
 
-class GlobalStylesAdapter extends HeadScopeAdapter {
+final class GlobalStylesAdapter extends HeadScopeAdapter {
   @override
   bool applyHead(MarkupRenderObject head) {
     var stylesId = binding.options.stylesId;
