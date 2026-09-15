@@ -36,18 +36,18 @@ sealed class ChildNode {
   ChildNode get _start => this;
   ChildNode get _end => this;
 
-  void insertNext(ChildNode? node) {
-    node?._prev = this;
-    node?._next = next;
-    next?._prev = node?._end;
-    _next = node?._start;
+  void insertNext(ChildNode node) {
+    node._prev = this;
+    node._next = next;
+    next?._prev = node._end;
+    _next = node._start;
   }
 
-  void insertPrev(ChildNode? node) {
-    node?._next = this;
-    node?._prev = prev;
-    prev?._next = node?._start;
-    _prev = node?._end;
+  void insertPrev(ChildNode node) {
+    node._next = this;
+    node._prev = prev;
+    prev?._next = node._start;
+    _prev = node._end;
   }
 
   void remove() {
