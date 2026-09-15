@@ -96,6 +96,9 @@ class DevProxy {
   }
 
   Future<void> reloadClients() async {
+    if (reload != ReloadConfiguration.hotReload) {
+      throw StateError('Cannot reload clients in ${reload.name} mode.');
+    }
     for (final clientConnection in _clientConnections.values) {
       await clientConnection.performHotReload();
     }

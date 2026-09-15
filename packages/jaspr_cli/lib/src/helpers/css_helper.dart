@@ -28,7 +28,7 @@ extension CssHelper on BaseCommand {
     workflow.devProxy.registerPostReloadCallback(runner.reload);
 
     guardResource(() {
-      if (runner.files.isNotEmpty) {
+      if (runner.stylesFiles.isNotEmpty) {
         logger.write('Terminating CSS runner...', level: Level.debug);
       }
       workflow.devProxy.unregisterPostReloadCallback(runner.reload);
@@ -54,7 +54,8 @@ class CssRunner {
   final Project project;
   final Logger logger;
 
-  List<String> files = [];
+  // Tracks the *.styles.dart files generated from `@css` declarations.
+  List<String> stylesFiles = [];
 
   final librariesFile = File('.dart_tool/jaspr/css/libraries.json').absolute;
   final runnerFile = File('.dart_tool/jaspr/css/css_runner.dart').absolute;
@@ -146,7 +147,7 @@ class CssRunner {
     assert(client == null);
     assert(process == null);
 
-    final cssFiles = files = await _generateRunner(watch: true);
+    final cssFiles = stylesFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
 
     final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
@@ -237,7 +238,7 @@ class CssRunner {
   }
 
   Future<void> restart() async {
-    if (files.isNotEmpty) {
+    if (stylesFiles.isNotEmpty) {
       logger.write('Restarting CSS runner...', tag: Tag.css);
     }
     _restarting = true;
@@ -259,7 +260,7 @@ class CssRunner {
   }
 
   Future<void> reload() async {
-    final cssFiles = files = await _generateRunner(watch: true);
+    final cssFiles = stylesFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
 
     logger.write('Regenerating CSS files...', tag: Tag.css);
@@ -300,7 +301,7 @@ class CssRunner {
   }
 
   Future<int> build() async {
-    final cssFiles = files = await _generateRunner(watch: false);
+    final cssFiles = stylesFiles = await _generateRunner(watch: false);
     if (cssFiles.isEmpty) return 0;
 
     String stdoutOutput;

@@ -96,13 +96,16 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final managedBuildOptions = argResults!.flag('managed-build-options');
   late final skipServer = argResults!.flag('skip-server');
 
-  String? vmServiceUri;
+  bool get launchInChrome;
+
+  DevStatus _currentStatus = DevStatus.ready;
+
+  late final ClientWorkflow workflow;
+  late final CssRunner cssRunner;
+
+  String? serverVmServiceUri;
   String? serverDevToolsUri;
   vm.VmService? serverVmService;
-  DevStatus _currentStatus = DevStatus.ready;
-  late final CssRunner _cssRunner;
-
-  bool get launchInChrome;
 
   void handleClientWorkflow(ClientWorkflow workflow) {}
 
@@ -127,9 +130,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       return 1;
     }
 
+    this.workflow = workflow;
     handleClientWorkflow(workflow);
 
-    final cssRunner = _cssRunner = await watchCss(workflow);
+    cssRunner = await watchCss(workflow);
 
     Process? flutterProcess;
     if (project.flutterMode == FlutterMode.embedded) {
@@ -175,7 +179,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         level: Level.warning,
       );
     } else {
-      final started = await _startServer(entryPoint!, proxyPort, workflow);
+      final started = await _startServer(entryPoint!, proxyPort);
       if (started) {
         await _runChrome();
       }
@@ -183,7 +187,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     updateFooter(DevStatus.ready);
 
-    _setupKeyHandler(workflow, flutterProcess);
+    _setupKeyHandler(flutterProcess);
 
     return await workflow.done;
   }
@@ -209,13 +213,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final dot = '  ·  ';
     final keys = [
-      '${styleBold.wrap('[r]')}: Reload',
+      if (workflow.devProxy.reload == ReloadConfiguration.hotReload) '${styleBold.wrap('[r]')}: Reload',
       '${styleBold.wrap('[R]')}: Restart',
       '${styleBold.wrap('[d]')}: DevTools',
       '${styleBold.wrap('[q]')}: Quit',
     ];
     final rawKeys = [
-      '[r]: Reload',
+      if (workflow.devProxy.reload == ReloadConfiguration.hotReload) '[r]: Reload',
       '[R]: Restart',
       '[d]: DevTools',
       '[q]: Quit',
@@ -233,7 +237,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     ]);
   }
 
-  void _setupKeyHandler(ClientWorkflow workflow, [Process? flutterProcess]) {
+  void _setupKeyHandler([Process? flutterProcess]) {
     if (!stdin.hasTerminal || logger is DaemonLogger) {
       return;
     }
@@ -291,7 +295,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         }
 
         final char = String.fromCharCode(byte);
-        await _handleKey(char, workflow, flutterProcess);
+        await _handleKey(char, flutterProcess);
       }
     });
 
@@ -300,9 +304,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     });
   }
 
-  Future<void> _handleKey(String key, ClientWorkflow workflow, Process? flutterProcess) async {
+  Future<void> _handleKey(String key, Process? flutterProcess) async {
     switch (key) {
-      case 'r':
+      case 'r' when workflow.devProxy.reload == ReloadConfiguration.hotReload:
         logger.write('Reloading...', tag: Tag.client);
         try {
           await workflow.devProxy.reloadClients();
@@ -315,7 +319,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           await workflow.devProxy.restartClients();
           flutterProcess?.stdin.writeln('R');
           await _reloadServer();
-          await _cssRunner.restart();
+          await cssRunner.restart();
         } catch (e) {
           logger.write('Failed to restart: $e', tag: Tag.cli, level: Level.warning);
         }
@@ -323,8 +327,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         final clientUri = workflow.devProxy.clientDevToolsUri;
         final serverUri =
             serverDevToolsUri ??
-            (vmServiceUri != null
-                ? '${vmServiceUri!}devtools/?uri=${vmServiceUri!.replaceFirst('http', 'ws')}ws'
+            (serverVmServiceUri != null
+                ? '${serverVmServiceUri!}devtools/?uri=${serverVmServiceUri!.replaceFirst('http', 'ws')}ws'
                 : null);
 
         if (clientUri == null && serverUri == null) {
@@ -375,7 +379,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
   }
 
-  Future<bool> _startServer(String entryPoint, String proxyPort, ClientWorkflow workflow) async {
+  Future<bool> _startServer(String entryPoint, String proxyPort) async {
     logger.write('Starting server...', tag: Tag.server, progress: ProgressState.running);
 
     logger.write('Using server entry point: $entryPoint', tag: Tag.server, level: Level.verbose);
@@ -452,9 +456,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     vm.VmService? vmService;
 
     Future<void> connectToVmService([int retries = 2]) async {
-      if (vmServiceUri == null) return;
+      if (serverVmServiceUri == null) return;
       try {
-        final wsUri = '${vmServiceUri!.replaceFirst('http', 'ws')}ws';
+        final wsUri = '${serverVmServiceUri!.replaceFirst('http', 'ws')}ws';
         final currentVmService = vmService = serverVmService = await vmServiceConnectUri(wsUri);
 
         currentVmService.onDone.then((_) {
@@ -490,10 +494,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             serverDevToolsUri = match.group(1)!;
           }
         }
-        if (mode != 'none' && vmServiceUri == null) {
+        if (mode != 'none' && serverVmServiceUri == null) {
           final match = RegExp(r'The Dart VM service is listening on (http://[a-zA-Z0-9:/_=\-\.\?]+)').firstMatch(log);
           if (match != null) {
-            vmServiceUri = match.group(1)!;
+            serverVmServiceUri = match.group(1)!;
             connectToVmService();
           }
         }
