@@ -142,13 +142,13 @@ class _AttachElement extends MultiChildRenderObjectElement {
   void detachRenderObject() {
     super.detachRenderObject();
     final renderObject = this.renderObject as AttachRenderObject;
-    AttachAdapter.instanceFor(renderObject._target).unregister(renderObject);
+    _AttachAdapter.instanceFor(renderObject._target).unregister(renderObject);
   }
 }
 
 class AttachRenderObject extends DomRenderText {
   AttachRenderObject(this._target, this._depth) : super('', null) {
-    AttachAdapter.instanceFor(_target).register(this);
+    _AttachAdapter.instanceFor(_target).register(this);
   }
 
   final List<web.Node> children = [];
@@ -156,17 +156,17 @@ class AttachRenderObject extends DomRenderText {
   AttachTarget _target;
   set target(AttachTarget target) {
     if (_target == target) return;
-    AttachAdapter.instanceFor(_target).unregister(this);
+    _AttachAdapter.instanceFor(_target).unregister(this);
     _target = target;
-    AttachAdapter.instanceFor(_target).register(this);
-    AttachAdapter.instanceFor(_target).update();
+    _AttachAdapter.instanceFor(_target).register(this);
+    _AttachAdapter.instanceFor(_target).update();
   }
 
   Map<String, String>? _attributes;
   set attributes(Map<String, String>? attrs) {
     if (_attributes == attrs) return;
     _attributes = attrs;
-    AttachAdapter.instanceFor(_target).update();
+    _AttachAdapter.instanceFor(_target).update();
   }
 
   int _depth;
@@ -174,7 +174,7 @@ class AttachRenderObject extends DomRenderText {
   set depth(int depth) {
     if (_depth == depth) return;
     _depth = depth;
-    AttachAdapter.instanceFor(_target).update(needsResorting: true);
+    _AttachAdapter.instanceFor(_target).update(needsResorting: true);
   }
 
   @override
@@ -197,7 +197,7 @@ class AttachRenderObject extends DomRenderText {
       children.remove(childNode);
       children.insert(afterNode != null ? children.indexOf(afterNode) + 1 : 0, childNode);
 
-      AttachAdapter.instanceFor(_target).update();
+      _AttachAdapter.instanceFor(_target).update();
     } finally {
       child.finalize();
     }
@@ -208,18 +208,18 @@ class AttachRenderObject extends DomRenderText {
     children.remove(child.node);
     child.parent = null;
 
-    AttachAdapter.instanceFor(_target).update();
+    _AttachAdapter.instanceFor(_target).update();
   }
 }
 
-class AttachAdapter {
-  AttachAdapter(this.target);
+final class _AttachAdapter {
+  _AttachAdapter(this.target);
 
-  static AttachAdapter instanceFor(AttachTarget target) {
-    return _instances[target] ??= AttachAdapter(target);
+  static _AttachAdapter instanceFor(AttachTarget target) {
+    return _instances[target] ??= _AttachAdapter(target);
   }
 
-  static final Map<AttachTarget, AttachAdapter> _instances = {};
+  static final Map<AttachTarget, _AttachAdapter> _instances = {};
 
   final AttachTarget target;
 

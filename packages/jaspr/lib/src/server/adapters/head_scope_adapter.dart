@@ -1,7 +1,7 @@
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 
-abstract class HeadScopeAdapter extends RenderAdapter {
+abstract base class HeadScopeAdapter extends RenderAdapter {
   @override
   void prepare() {}
 
