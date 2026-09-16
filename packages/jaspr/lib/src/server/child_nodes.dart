@@ -197,25 +197,31 @@ final class ChildList with Iterable<MarkupRenderObject> {
 
     /// Whether the new range should enclose the adjacent existing [boundary].
     bool encloses(ChildNodeBoundary boundary) {
+      // When wrapping the same element, higher priority wraps lower priority.
       if (boundary.element == element) return priority >= boundary.priority;
       assert(boundary.element.depth != element.depth);
+      // Outer elements wrap inner elements.
       return element.depth <= boundary.element.depth;
     }
 
     // Walk backward past adjacent range starts to find where the new range should open.
     ChildNode startBefore = node!;
     while (true) {
-      final prev = startBefore.prev;
-      if (prev is! ChildNodeBoundary || prev.range.start != prev || !encloses(prev)) break;
-      startBefore = prev;
+      if (startBefore.prev case final ChildNodeBoundary prev when prev.range.start == prev && encloses(prev)) {
+        startBefore = prev;
+        continue;
+      }
+      break;
     }
 
     // Walk forward past adjacent range ends to find where the new range should close.
     ChildNode endAfter = node;
     while (true) {
-      final next = endAfter.next;
-      if (next is! ChildNodeBoundary || next.range.end != next || !encloses(next)) break;
-      endAfter = next;
+      if (endAfter.next case final ChildNodeBoundary next when next.range.end == next && encloses(next)) {
+        endAfter = next;
+        continue;
+      }
+      break;
     }
 
     final start = ChildNodeBoundary(element, priority);
