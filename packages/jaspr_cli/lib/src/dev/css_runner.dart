@@ -16,10 +16,13 @@ import '../project.dart';
 import '../utils.dart';
 
 class CssRunner {
-  CssRunner(this.project, this.logger);
+  CssRunner(this.project, this.logger, {this.experiments = const []});
 
   final Project project;
   final Logger logger;
+
+  /// The Dart language experiments the styles are compiled with.
+  final List<String> experiments;
 
   // Tracks the *.styles.dart files generated from `@css` declarations.
   List<String> stylesFiles = [];
@@ -49,8 +52,9 @@ class CssRunner {
   static Future<CssRunner> watch({
     required Project project,
     required Logger logger,
+    List<String> experiments = const [],
   }) async {
-    final runner = CssRunner(project, logger)..prepare();
+    final runner = CssRunner(project, logger, experiments: experiments)..prepare();
     await runner.start();
     return runner;
   }
@@ -59,8 +63,9 @@ class CssRunner {
   static Future<int> build({
     required Project project,
     required Logger logger,
+    List<String> experiments = const [],
   }) async {
-    final runner = CssRunner(project, logger)..prepare();
+    final runner = CssRunner(project, logger, experiments: experiments)..prepare();
     return await runner._build();
   }
 
@@ -153,6 +158,7 @@ class CssRunner {
         sdkRoot: dartSdkDir,
         librariesSpec: librariesFile.uri.toString(),
         packagesJson: packageConfigFile.uri.toString(),
+        enabledExperiments: experiments,
         printIncrementalDependencies: true,
       );
 
@@ -340,7 +346,11 @@ class CssRunner {
     if (!ProcessRunner.isDefault) {
       // In unit/command tests, we cannot run FrontendServerClient because the SDK root is fake.
       // We run the generated runner file directly using ProcessRunner.
-      final result = await ProcessRunner.instance.run(dartExecutable, ['run', runnerFile.path]);
+      final result = await ProcessRunner.instance.run(dartExecutable, [
+        'run',
+        for (final experiment in experiments) '--enable-experiment=$experiment',
+        runnerFile.path,
+      ]);
       exitCode = result.exitCode;
       stdoutOutput = result.stdout.toString();
       stderrOutput = result.stderr.toString();
@@ -355,6 +365,7 @@ class CssRunner {
         sdkRoot: dartSdkDir,
         librariesSpec: librariesFile.uri.toString(),
         packagesJson: packageConfigFile.uri.toString(),
+        enabledExperiments: experiments,
         printIncrementalDependencies: false,
       );
       final compilerResult = await client.compile();

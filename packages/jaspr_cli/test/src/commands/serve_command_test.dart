@@ -469,6 +469,52 @@ void main() {
       });
     });
 
+    test('passes --enable-experiment on to build_runner and the server', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [...buildRunnerDartArgs, '--enable-experiment=primary-constructors'],
+        );
+        final server = io.stubFakeServer(experiments: ['primary-constructors']);
+
+        final serveResult = runner.run(['serve', '--verbose', '--enable-experiment=primary-constructors']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        expect(io.stdout.queue, emits('[BUILDER] Done building web assets.'));
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', int.parse(serverProxyPort))),
+        );
+
+        await io.expectServerStarted(server);
+
+        server.exit(0);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
     test('serves project with flutter embedding', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'server', flutterEmbedding: true);
@@ -694,7 +740,11 @@ const buildRunnerFlutterArgs = [
 ];
 
 extension FakeServerIO on FakeIO {
-  FakeProcess stubFakeServer({String port = '8080', String proxyPort = '5567'}) {
+  FakeProcess stubFakeServer({
+    String port = '8080',
+    String proxyPort = '5567',
+    List<String> experiments = const [],
+  }) {
     final serverProcess = FakeProcess();
 
     when(
@@ -705,6 +755,7 @@ extension FakeServerIO on FakeIO {
           '--enable-vm-service',
           '--enable-asserts',
           '-Djaspr.flags.verbose=false',
+          for (final experiment in experiments) '--enable-experiment=$experiment',
           '/root/myapp/.dart_tool/jaspr/server_target.dart',
         ],
         workingDirectory: '/root/myapp',

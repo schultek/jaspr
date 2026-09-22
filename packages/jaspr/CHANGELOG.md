@@ -72,6 +72,7 @@
 - Require Dart 3.13 or later.
 - Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
 - Added `@Target` meta annotation to `@client`, `@encoder`, `@decoder`, and `@Import` annotations to indicate where they are allowed to be used.
+- Added `--enable-experiment` to `jaspr build` and `jaspr serve` for Dart language experiments. It is passed on to `build_runner`, the server and the stylesheet generation.
 - Fixed DOM nodes sometimes staying in place after their component is removed, keeping the component's event listeners, which could make handlers fire more than once.
 - Fixed style generation in `standalone` mode when importing web libraries like `package:web` or `dart:js_interop`.
 - Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.
