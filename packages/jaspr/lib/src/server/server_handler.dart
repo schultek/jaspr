@@ -73,7 +73,7 @@ Handler createHandler(
 
   // We skip static file handling in generate mode to always generate fresh content on the server.
   if (!kGenerateMode) {
-    cascade = cascade.add(gzipMiddleware(staticHandler));
+    cascade = cascade.add(_dropSkippedBody(gzipMiddleware(staticHandler)));
   }
 
   cascade = cascade.add((request) async {
@@ -101,6 +101,31 @@ Handler createHandler(
   return cascade.handler;
 }
 
+/// The status codes a [Cascade] moves past, from its default `statusCodes`.
+const _skippedStatusCodes = {404, 405};
+
+/// Reads and drops the body of a response the [Cascade] is going to skip.
+///
+/// `Cascade` discards the response of a handler it moves past without reading
+/// it, and a response body nobody listens to holds on to whatever it is riding
+/// on: `HttpClient` releases a connection once its stream is done, not when the
+/// response is dropped. In development the file handler proxies to the webdev
+/// server, so every request that falls through to rendering — every page view —
+/// left one connection to that proxy behind for the lifetime of the server.
+///
+/// The status is passed on so the cascade keeps deciding what it decided
+/// before; only the body is gone, and by then nothing is going to ask for it.
+Handler _dropSkippedBody(Handler handler) {
+  return (Request request) async {
+    final response = await handler(request);
+    if (!_skippedStatusCodes.contains(response.statusCode)) {
+      return response;
+    }
+    await response.read().drain<void>();
+    return Response(response.statusCode);
+  };
+}
+
 Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandler) {
   return (name) async {
     final indexRequest = Request(
@@ -112,7 +137,13 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
       protocolVersion: req.protocolVersion,
     );
     final response = await proxyHandler(indexRequest);
-    return response.statusCode == 200 ? response.readAsString() : null;
+    if (response.statusCode != 200) {
+      // Same reason as in [_dropSkippedBody]: the body is not wanted, and it
+      // holds its connection until something reads it.
+      await response.read().drain<void>();
+      return null;
+    }
+    return response.readAsString();
   };
 }
 

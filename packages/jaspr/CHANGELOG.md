@@ -1,3 +1,12 @@
+## Unreleased patch
+
+- Fixed the development server leaking one connection to the webdev proxy per request that is not an asset — one per
+  page view, for the lifetime of the server. `Cascade` discards the response of a handler it moves past without
+  reading it, and a response body nobody listens to keeps its connection open, so every request that fell through to
+  rendering left one behind. The same was true of a file the render step asked the proxy for and did not get.
+  Measured with a proxy standing in for webdev: 200 page views held 200 connections before, and one after. It also
+  cost about 15 ms per page view, since each request paid for a new connection instead of reusing one.
+
 ## 0.23.4
 
 - Server rendering now fails with a 500 HTTP response instead of hanging indefinitely when an error occurs during the initial build, outside of a component's `build` method.
