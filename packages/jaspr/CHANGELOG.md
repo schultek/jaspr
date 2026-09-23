@@ -57,6 +57,12 @@
   `@client`, `@encoder`, `@decoder`, and `@Import` annotations to
   indicate where they are allowed to be used.
 - Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+- `css()` now renders its definitions as
+  [nested css](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting) rather than flattening
+  them into one selector per rule. A child whose selector is just `&` writes into its parent's block,
+  and a rule with neither properties nor children renders nothing. The output is equivalent for a
+  single parent selector; a parent that is a selector list differs, since a nested selector resolves
+  through `:is()` and takes the specificity of its most specific argument.
 
 ### Bug fixes
 
