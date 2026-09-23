@@ -79,6 +79,12 @@
 - `jaspr dev` and `jaspr build` now automatically select the next available port
   when default ports are already in use, and validate explicitly specified `--port` values.
 - Improved CLI error handling for uncaught asynchronous errors during command execution.
+- `css()` now renders its definitions as
+  [nested css](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting) rather than flattening
+  them into one selector per rule. A child whose selector is just `&` writes into its parent's block,
+  and a rule with neither properties nor children renders nothing. The output is equivalent for a
+  single parent selector; a parent that is a selector list differs, since a nested selector resolves
+  through `:is()` and takes the specificity of its most specific argument.
 
 ### Bug fixes
 
