@@ -25,7 +25,12 @@ mixin ProxyHelper on BaseCommand {
     final client = devProxy?.client ?? http.Client();
     final flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
     Directory('.dart_tool/jaspr/generated').createSync(recursive: true);
-    final generatedHandler = createStaticHandler('.dart_tool/jaspr/generated');
+    // `createStaticHandler` reads `If-Modified-Since` through
+    // `Request.ifModifiedSince`, which throws on a value it cannot parse and
+    // takes the request down with a 500 — over a header the client sent. RFC
+    // 9110 says such a value must be ignored, so it is dropped here and the
+    // file is served as if it had not been there.
+    final generatedHandler = _dropUnparsableConditional(createStaticHandler('.dart_tool/jaspr/generated'));
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
     final webdevHandler = devProxy?.handler ?? (req) => Response.notFound(null);
 
@@ -107,4 +112,15 @@ mixin ProxyHelper on BaseCommand {
 
     return server;
   }
+}
+
+Handler _dropUnparsableConditional(Handler handler) {
+  return (Request request) {
+    try {
+      request.ifModifiedSince;
+    } on FormatException {
+      return handler(request.change(headers: {'if-modified-since': null}));
+    }
+    return handler(request);
+  };
 }

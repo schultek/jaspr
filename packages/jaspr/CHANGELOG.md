@@ -1,3 +1,13 @@
+## Unreleased patch
+
+- Fixed a request failing with a 500 when the client sends an `If-Modified-Since` header that is not a valid date.
+  `shelf_static` reads it through `Request.ifModifiedSince`, which throws on anything it cannot parse, so the
+  development server answered `GET /main.css` with an error dump instead of the file — reported with
+  `Thu,27 Aug 2026 20:33:22 GMT`, a date missing the space after the weekday. RFC 9110 says a recipient must ignore
+  an `If-Modified-Since` value that is not a valid date, so it is now dropped and the file is served as if it had not
+  been sent. Both the framework's static handler and the development proxy that serves the generated styles are
+  covered.
+
 ## 0.23.4
 
 - Server rendering now fails with a 500 HTTP response instead of hanging indefinitely when an error occurs during the initial build, outside of a component's `build` method.
