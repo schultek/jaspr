@@ -17,7 +17,7 @@ Handler staticHandlerLike(void Function(DateTime?) onDate) {
 Request get(String path, {String? ifModifiedSince}) => Request(
   'GET',
   Uri.parse('http://localhost$path'),
-  headers: {if (ifModifiedSince != null) 'if-modified-since': ifModifiedSince},
+  headers: {'if-modified-since': ?ifModifiedSince},
 );
 
 void main() {
