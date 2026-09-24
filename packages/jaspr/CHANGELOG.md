@@ -1,3 +1,11 @@
+## Unreleased patch
+
+- Fixed `RawText` (`raw()`) putting its nodes in the xhtml namespace, which made svg markup render as nothing.
+  The markup was parsed by assigning `innerHTML` on a `<template>`, where the html parser has no element to parse
+  against, so `<circle>` came out as an unknown html element rather than an svg one — visible in server-rendered
+  output and gone as soon as the component hydrated. It is now parsed against the element the nodes are inserted
+  into, which also covers markup that is only valid inside a specific parent, such as a `<td>` in a `<tr>`.
+
 ## 0.23.4
 
 - Server rendering now fails with a 500 HTTP response instead of hanging indefinitely when an error occurs during the initial build, outside of a component's `build` method.
