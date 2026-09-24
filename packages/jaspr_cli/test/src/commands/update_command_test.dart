@@ -42,7 +42,7 @@ void main() {
           io.stdout.queue,
           emitsInOrder([
             emitsThrough(contains('Boost your development with Jaspr AI Skills!')),
-            emitsThrough(contains('dart run skills@ get jaspr')),
+            emitsThrough(contains('dart run skills@ get -p jaspr -a')),
           ]),
         );
       });
@@ -140,7 +140,7 @@ void main() {
         when(
           () => io.process.start(
             '/fake/bin/dart',
-            ['run', 'skills@', 'get', 'jaspr'],
+            ['run', 'skills@', 'get', '-p', 'jaspr', '-a'],
             workingDirectory: '/test_dir',
             mode: any(named: 'mode'),
           ),
@@ -151,7 +151,7 @@ void main() {
         verify(
           () => io.process.start(
             '/fake/bin/dart',
-            ['run', 'skills@', 'get', 'jaspr'],
+            ['run', 'skills@', 'get', '-p', 'jaspr', '-a'],
             workingDirectory: '/test_dir',
             mode: any(named: 'mode'),
           ),

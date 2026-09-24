@@ -147,7 +147,7 @@ void main() {
         when(
           () => io.process.start(
             '/fake/bin/dart',
-            ['run', 'skills@', 'get', 'jaspr'],
+            ['run', 'skills@', 'get', '-p', 'jaspr', '-a'],
             workingDirectory: '/root/myapp',
             mode: any(named: 'mode'),
           ),
@@ -159,7 +159,7 @@ void main() {
         verify(
           () => io.process.start(
             '/fake/bin/dart',
-            ['run', 'skills@', 'get', 'jaspr'],
+            ['run', 'skills@', 'get', '-p', 'jaspr', '-a'],
             workingDirectory: '/root/myapp',
             mode: any(named: 'mode'),
           ),
@@ -180,7 +180,7 @@ void main() {
         verifyNever(
           () => io.process.start(
             '/fake/bin/dart',
-            ['run', 'skills@', 'get', 'jaspr'],
+            ['run', 'skills@', 'get', '-p', 'jaspr', '-a'],
             workingDirectory: any(named: 'workingDirectory'),
             mode: any(named: 'mode'),
           ),
