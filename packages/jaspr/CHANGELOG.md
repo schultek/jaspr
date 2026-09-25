@@ -1,5 +1,10 @@
 ## Unreleased patch
 
+- Fixed `RawText` (`raw()`) putting its nodes in the xhtml namespace, which made svg markup render as nothing.
+  The markup was parsed by assigning `innerHTML` on a `<template>`, where the html parser has no element to parse
+  against, so `<circle>` came out as an unknown html element rather than an svg one — visible in server-rendered
+  output and gone as soon as the component hydrated. It is now parsed against the element the nodes are inserted
+  into, which also covers markup that is only valid inside a specific parent, such as a `<td>` in a `<tr>`.
 - Fixed a request failing with a 500 when the client sends an `If-Modified-Since` header that is not a valid date.
   `shelf_static` reads it through `Request.ifModifiedSince`, which throws on anything it cannot parse, so the
   development server answered `GET /main.css` with an error dump instead of the file — reported with
