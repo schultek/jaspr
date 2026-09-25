@@ -331,8 +331,14 @@ final class _AttachAdapter extends RenderAdapter {
       return;
     }
 
-    final adapter = _attach[binding] ??= _AttachAdapter();
-    binding.addRenderAdapter(adapter);
+    final _AttachAdapter adapter;
+    if (_attach[binding] case final existingAdapter?) {
+      adapter = existingAdapter;
+    } else {
+      adapter = _AttachAdapter();
+      _attach[binding] = adapter;
+      binding.addRenderAdapter(adapter);
+    }
 
     final entry = adapter.targetElements[item.target] ??= (attributes: {}, children: []);
     if (item.attributes case final itemAttributes?) {
