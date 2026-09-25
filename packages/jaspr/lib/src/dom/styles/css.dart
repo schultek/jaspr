@@ -36,6 +36,18 @@ import 'styles.dart';
 ///   ])
 ///   ```
 ///
+///   Nested rules are rendered as [nested css](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting),
+///   which is what the definition already looks like:
+///
+///   ```css
+///   .someclass {
+///     width: 100px;
+///     &:hover {
+///       background-color: blue;
+///     }
+///   }
+///   ```
+///
 /// - Use special rule variants:
 ///   ```dart
 ///   css.import('/some/external/styles.css');
@@ -124,13 +136,35 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
 
   @override
   String toCss([String indent = '']) {
-    final rules = <String>[];
+    final contents = _contentsCss(indent + cssBlockInset);
 
-    for (final rule in resolve('')) {
-      rules.add(rule.toCss(indent));
+    // A rule that says nothing about itself and has nothing nested under it
+    // renders as nothing, rather than as an empty block.
+    if (contents.isEmpty) return '';
+
+    return '$indent${_selector.selector} {$cssPropSpace$contents$indent}';
+  }
+
+  /// The properties and nested rules of this rule, rendered at [indent].
+  String _contentsCss(String indent) {
+    final contents = StringBuffer();
+
+    for (final entry in _styles.properties.entries) {
+      contents.write('$indent${entry.key}: ${entry.value};$cssPropSpace');
     }
 
-    return rules.join(cssPropSpace);
+    for (final child in _children) {
+      // A child whose selector is just `&` is the parent, so what it holds
+      // belongs in the parent's block rather than in one of its own.
+      if (child is NestedStyleRule && child._selector.selector == '&') {
+        contents.write(child._contentsCss(indent));
+        continue;
+      }
+      final css = child.toCss(indent);
+      if (css.isNotEmpty) contents.write(css + cssPropSpace);
+    }
+
+    return contents.toString();
   }
 }
 
