@@ -128,6 +128,25 @@ void main() {
       );
     });
 
+    for (final insertAtStart in [false, true]) {
+      test('keeps ranges nested with content at the ${insertAtStart ? 'start' : 'end'} boundary', () async {
+        final r = await renderServerApp(.element(tag: 'div', children: []));
+        final root = r.renderObject as MarkupRenderObject;
+        final element = findTag(r, 'div')!;
+        final inner = root.children.wrapElement(element);
+        final marker = ChildNodeData(MarkupRenderText('marker', false));
+        if (insertAtStart) {
+          inner.start.insertNext(marker);
+        } else {
+          inner.end.insertPrev(marker);
+        }
+
+        final outer = root.children.wrapElement(element, 1);
+        expect(outer.start.next, same(inner.start));
+        expect(outer.end.prev, same(inner.end));
+      });
+    }
+
     test('wraps render element', () async {
       final r = await renderServerApp(
         Component.element(

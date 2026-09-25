@@ -187,10 +187,12 @@ final class ChildList with Iterable<MarkupRenderObject> {
   /// The output must already be a direct child of this list,
   /// not nested in a fragment.
   ///
-  /// Ranges around the same output nest by element depth,
+  /// Adjacent ranges around the same output nest by element depth,
   /// so ancestor ranges enclose descendant ranges.
   /// For the same element, higher [priority] ranges enclose lower ones,
   /// and at equal priority the newest range is outermost.
+  /// Nodes inserted next to the output, such as markers,
+  /// can hide ranges from this ordering, so wrap before inserting them.
   ChildListRange wrapElement(Element element, [int priority = 0]) {
     final node = find(element.slot.target!.renderObject as MarkupRenderObject);
     assert(node != null, 'Element not found in child list');
@@ -204,23 +206,23 @@ final class ChildList with Iterable<MarkupRenderObject> {
       return element.depth <= boundary.element.depth;
     }
 
-    // Walk backward past adjacent range starts to find where the new range should open.
+    // Expand both endpoints together to keep complete ranges enclosed,
+    // even when extra contents make only one of their boundaries adjacent.
     ChildNode startBefore = node!;
+    ChildNode endAfter = node;
     while (true) {
       if (startBefore.prev case final ChildNodeBoundary prev when prev.range.start == prev && encloses(prev)) {
         startBefore = prev;
+        endAfter = prev.range.end;
         continue;
       }
-      break;
-    }
 
-    // Walk forward past adjacent range ends to find where the new range should close.
-    ChildNode endAfter = node;
-    while (true) {
       if (endAfter.next case final ChildNodeBoundary next when next.range.end == next && encloses(next)) {
+        startBefore = next.range.start;
         endAfter = next;
         continue;
       }
+
       break;
     }
 
