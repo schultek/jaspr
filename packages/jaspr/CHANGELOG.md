@@ -1,4 +1,4 @@
-## Unreleased patch
+## 0.23.5
 
 - Fixed a dependency resolution problem when creating a new project by setting `build_web_compilers` to `4.8.5`.
 - Fixed `RawText` (`raw()`) putting its nodes in the xhtml namespace, which made svg markup render as nothing. It is now parsed against the element the nodes are inserted into, which also covers markup that is only valid inside a specific parent, such as a `<td>` in a `<tr>`.
