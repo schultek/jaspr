@@ -1,5 +1,6 @@
 ## Unreleased patch
 
+- Fixed a dependency resolution problem when creating a new project by setting `build_web_compilers` to `4.8.5`.
 - Fixed `RawText` (`raw()`) putting its nodes in the xhtml namespace, which made svg markup render as nothing.
   The markup was parsed by assigning `innerHTML` on a `<template>`, where the html parser has no element to parse
   against, so `<circle>` came out as an unknown html element rather than an svg one — visible in server-rendered
