@@ -64,6 +64,12 @@
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
 
+## 0.23.5
+
+- Fixed a dependency resolution problem when creating a new project by setting `build_web_compilers` to `4.8.5`.
+- Fixed `RawText` (`raw()`) putting its nodes in the xhtml namespace, which made svg markup render as nothing. It is now parsed against the element the nodes are inserted into, which also covers markup that is only valid inside a specific parent, such as a `<td>` in a `<tr>`.
+- Fixed a request failing with a 500 when the client sends an invalid `If-Modified-Since` header. The header is now dropped if it fails to parse, instead of throwing an error. Affects both the development proxy and the framework's server handler.
+
 ## 0.23.4
 
 - Server rendering now fails with a 500 HTTP response instead of hanging indefinitely when an error occurs during the initial build, outside of a component's `build` method.

@@ -100,7 +100,7 @@ Handler createHandler(
 
   // We skip static file handling in generate mode to always generate fresh content on the server.
   if (!kGenerateMode) {
-    cascade = cascade.add(gzipMiddleware(_drainingHandler(staticHandler)));
+    cascade = cascade.add(gzipMiddleware(_drainingHandler(_dropUnparsableConditional(staticHandler))));
   }
 
   cascade = cascade.add((request) async {
@@ -126,6 +126,25 @@ Handler createHandler(
   });
 
   return cascade.handler;
+}
+
+/// Drops an `If-Modified-Since` header that is not a date.
+///
+/// `shelf_static` reads the header through `Request.ifModifiedSince`, which
+/// throws a `FormatException` on anything it cannot parse, and the request
+/// then fails with a 500 — over a header the client sent. RFC 9110 says a
+/// recipient must ignore an `If-Modified-Since` field value that is not a
+/// valid date, so it is dropped and the file is served as if it had not been
+/// there.
+Handler _dropUnparsableConditional(Handler handler) {
+  return (Request request) {
+    try {
+      request.ifModifiedSince;
+    } on FormatException {
+      return handler(request.change(headers: {'if-modified-since': null}));
+    }
+    return handler(request);
+  };
 }
 
 Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandler) {

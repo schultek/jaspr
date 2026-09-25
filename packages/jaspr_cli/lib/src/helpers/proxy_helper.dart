@@ -149,6 +149,16 @@ mixin ProxyHelper on BaseCommand {
 
 Handler noCachingHandler(Handler handler) {
   return (request) async {
+    // `Request.ifModifiedSince` throws on a value it cannot parse and
+    // takes the request down with a 500 — over a header the client sent. RFC
+    // 9110 says such a value must be ignored, so it is dropped here and the
+    // file is served as if it had not been there.
+    try {
+      request.ifModifiedSince;
+    } on FormatException {
+      request = request.change(headers: {'if-modified-since': null});
+    }
+
     final res = await handler(request);
     if (res.statusCode == 200) {
       final newHeaders = Map<String, String>.from(res.headers)
