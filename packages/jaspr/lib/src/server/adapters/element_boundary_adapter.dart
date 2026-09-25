@@ -45,6 +45,11 @@ abstract base class ElementBoundaryAdapter extends RenderAdapter {
     return applyBoundary(range);
   }
 
+  /// Called once [range] wraps [element], before any adapter is applied.
+  ///
+  /// Don't insert nodes into the child list here,
+  /// as that can break the nesting of boundaries wrapped afterward.
+  /// Insert them in [applyBoundary].
   void prepareBoundary(ChildListRange range) {}
   void applyBoundary(ChildListRange range) {}
 }
