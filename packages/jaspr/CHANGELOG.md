@@ -1,18 +1,8 @@
 ## Unreleased patch
 
 - Fixed a dependency resolution problem when creating a new project by setting `build_web_compilers` to `4.8.5`.
-- Fixed `RawText` (`raw()`) putting its nodes in the xhtml namespace, which made svg markup render as nothing.
-  The markup was parsed by assigning `innerHTML` on a `<template>`, where the html parser has no element to parse
-  against, so `<circle>` came out as an unknown html element rather than an svg one — visible in server-rendered
-  output and gone as soon as the component hydrated. It is now parsed against the element the nodes are inserted
-  into, which also covers markup that is only valid inside a specific parent, such as a `<td>` in a `<tr>`.
-- Fixed a request failing with a 500 when the client sends an `If-Modified-Since` header that is not a valid date.
-  `shelf_static` reads it through `Request.ifModifiedSince`, which throws on anything it cannot parse, so the
-  development server answered `GET /main.css` with an error dump instead of the file — reported with
-  `Thu,27 Aug 2026 20:33:22 GMT`, a date missing the space after the weekday. RFC 9110 says a recipient must ignore
-  an `If-Modified-Since` value that is not a valid date, so it is now dropped and the file is served as if it had not
-  been sent. Both the framework's static handler and the development proxy that serves the generated styles are
-  covered.
+- Fixed `RawText` (`raw()`) putting its nodes in the xhtml namespace, which made svg markup render as nothing. It is now parsed against the element the nodes are inserted into, which also covers markup that is only valid inside a specific parent, such as a `<td>` in a `<tr>`.
+- Fixed a request failing with a 500 when the client sends an invalid `If-Modified-Since` header. The header is now dropped if it fails to parse, instead of throwing an error. Affects both the development proxy and the framework's server handler.
 
 ## 0.23.4
 
