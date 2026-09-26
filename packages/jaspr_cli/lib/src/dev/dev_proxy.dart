@@ -4,6 +4,7 @@ import 'package:build_daemon/data/build_status.dart' as daemon;
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/dwds.dart';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
@@ -11,6 +12,22 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import '../project.dart';
 import 'chrome.dart';
 import 'util.dart';
+
+typedef PreReloadCallback = Future<void> Function(BuildResult result);
+
+/// Forwards build results, holding back a successful one until every callback
+/// in [callbacks] completed.
+@visibleForTesting
+Stream<BuildResult> gateBuildResults(Stream<BuildResult> results, List<PreReloadCallback> callbacks) {
+  return results.asyncMap((result) async {
+    if (result.status == BuildStatus.succeeded) {
+      for (final callback in callbacks) {
+        await callback(result);
+      }
+    }
+    return result;
+  });
+}
 
 class DevProxy {
   final http.Client client;
@@ -25,7 +42,8 @@ class DevProxy {
     this.client,
     this.handler,
     this.buildResults,
-    bool autoRun, {
+    bool autoRun,
+    this._preReloadCallbacks, {
     this.dwds,
     this.ddcService,
   }) {
@@ -34,28 +52,20 @@ class DevProxy {
         connection.runMain();
       });
     }
-    _listenToBuildResults();
   }
 
-  void _listenToBuildResults() async {
-    await for (final buildResult in buildResults) {
-      if (buildResult.status == BuildStatus.succeeded) {
-        for (final callback in _postReloadCallbacks) {
-          // ignore: avoid_dynamic_calls
-          callback(buildResult);
-        }
-      }
-    }
+  final List<PreReloadCallback> _preReloadCallbacks;
+
+  /// Registers a callback to run before a successful build reaches the client.
+  ///
+  /// Callbacks registered here get to finish first, so files generated from the
+  /// build output are on disk before the browser reloads.
+  void registerPreReloadCallback(PreReloadCallback callback) {
+    _preReloadCallbacks.add(callback);
   }
 
-  final List<void Function(BuildResult result)> _postReloadCallbacks = [];
-
-  void registerPostReloadCallback(void Function(BuildResult result) callback) {
-    _postReloadCallbacks.add(callback);
-  }
-
-  void unregisterPostReloadCallback(void Function(BuildResult result) callback) {
-    _postReloadCallbacks.remove(callback);
+  void unregisterPreReloadCallback(PreReloadCallback callback) {
+    _preReloadCallbacks.remove(callback);
   }
 
   static Future<DevProxy> start(
@@ -83,6 +93,12 @@ class DevProxy {
       }
       return result;
     });
+
+    // Anything registered here writes files from the build output, so the
+    // result is only passed on once those are done and the client reloads
+    // against the assets that belong to the build it is reloading for.
+    final preReloadCallbacks = <PreReloadCallback>[];
+    final gatedBuildResults = gateBuildResults(filteredBuildResults, preReloadCallbacks);
 
     var cascade = Cascade();
 
@@ -143,7 +159,7 @@ class DevProxy {
       dwds = await Dwds.start(
         toolConfiguration: toolConfiguration,
         assetReader: assetReader,
-        buildResults: filteredBuildResults,
+        buildResults: gatedBuildResults,
         chromeConnection: () async => (await Chrome.connectedInstance).chrome.chromeConnection,
       );
       pipeline = pipeline.addMiddleware(dwds.middleware);
@@ -156,8 +172,9 @@ class DevProxy {
     return DevProxy._(
       client,
       pipeline.addHandler(cascade.handler),
-      filteredBuildResults,
+      gatedBuildResults,
       !enableDebugging,
+      preReloadCallbacks,
       dwds: dwds,
       ddcService: ddcService,
     );

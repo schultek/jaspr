@@ -63,6 +63,8 @@
 
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
+- Fixed the browser reloading before the regenerated stylesheets were written in
+  `standalone` mode, which showed the previous styles until a second refresh.
 
 ## 0.23.5
 

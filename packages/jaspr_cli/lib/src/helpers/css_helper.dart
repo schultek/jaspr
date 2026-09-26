@@ -23,11 +23,11 @@ extension CssHelper on BaseCommand {
     final runner = CssRunner(workflow, project, logger)..prepare();
     await runner.start();
 
-    workflow.devProxy.registerPostReloadCallback(runner.reload);
+    workflow.devProxy.registerPreReloadCallback(runner.reload);
 
     guardResource(() {
       logger.write('Terminating CSS runner...', level: Level.debug);
-      workflow.devProxy.unregisterPostReloadCallback(runner.reload);
+      workflow.devProxy.unregisterPreReloadCallback(runner.reload);
       runner.dispose();
     });
 
@@ -61,8 +61,26 @@ class CssRunner {
   VmService? vmService;
   String? isolateId;
 
-  final Completer<void> _initialGenerationCompleter = Completer<void>();
-  Future<void> get initialGenerationComplete => process != null ? _initialGenerationCompleter.future : Future.value();
+  Completer<void>? _generationCompleter;
+
+  /// Completes when the runner has written the css files of the pass that is
+  /// currently running, or right away when there is none.
+  Future<void> get generationComplete => _generationCompleter?.future ?? Future.value();
+
+  /// Marks the start of a generation pass, so [generationComplete] waits for
+  /// the files it is about to write.
+  void _startGeneration() {
+    if (_generationCompleter?.isCompleted ?? true) {
+      _generationCompleter = Completer<void>();
+    }
+  }
+
+  void _completeGeneration() {
+    final completer = _generationCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete();
+    }
+  }
 
   bool _disposed = false;
 
@@ -171,6 +189,7 @@ class CssRunner {
   }
 
   Future<void> _startProcess(List<String> cssFiles) async {
+    _startGeneration();
     process = await Process.start(dartExecutable, [
       'run',
       '--enable-vm-service=0',
@@ -194,9 +213,7 @@ class CssRunner {
           }
         },
         onDone: () {
-          if (!_initialGenerationCompleter.isCompleted) {
-            _initialGenerationCompleter.complete();
-          }
+          _completeGeneration();
           // if (workflow?.devProxy.reload == ReloadConfiguration.hotReload) {
           //   for (final connection in workflow!.devProxy.getClientConnections()) {
           //     _reloadStylesheets(connection, cssFiles);
@@ -218,9 +235,7 @@ class CssRunner {
       process = null;
       vmService = null;
       isolateId = null;
-      if (!_initialGenerationCompleter.isCompleted) {
-        _initialGenerationCompleter.complete();
-      }
+      _completeGeneration();
     });
   }
 
@@ -232,6 +247,7 @@ class CssRunner {
 
     if (client == null) {
       await start();
+      await _awaitGeneration();
       return;
     }
 
@@ -253,6 +269,7 @@ class CssRunner {
         if (process == null) {
           await _startProcess(cssFiles);
         } else if (vmService != null && isolateId != null) {
+          _startGeneration();
           await vmService!.reloadSources(
             isolateId!,
             rootLibUri: Uri.file(p.absolute(compilerResult.dillOutput!)).toString(),
@@ -262,7 +279,24 @@ class CssRunner {
       }
     } catch (e) {
       logger.write('Failed to hot-reload CSS runner: $e', tag: Tag.css, level: Level.warning);
+      _completeGeneration();
     }
+
+    await _awaitGeneration();
+  }
+
+  /// Waits for the current pass to write its files, so the client is not
+  /// reloaded against the stylesheets of the previous build.
+  ///
+  /// The pass also completes when the runner dies, but keep a timeout for the
+  /// case where it stops answering, as a late reload beats no reload at all.
+  Future<void> _awaitGeneration() {
+    return generationComplete.timeout(
+      const Duration(seconds: 30),
+      onTimeout: () {
+        logger.write('CSS generation did not finish in time, reloading anyway.', tag: Tag.css, level: Level.warning);
+      },
+    );
   }
 
   Future<int> build() async {
@@ -449,9 +483,7 @@ class CssRunner {
     client?.kill();
     process?.kill();
     vmService?.dispose();
-    if (!_initialGenerationCompleter.isCompleted) {
-      _initialGenerationCompleter.complete();
-    }
+    _completeGeneration();
   }
 }
 

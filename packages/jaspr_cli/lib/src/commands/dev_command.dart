@@ -136,7 +136,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       redirectNotFound: project.requireMode == JasprMode.client,
     );
 
-    await cssRunner.initialGenerationComplete;
+    await cssRunner.generationComplete;
 
     if (project.requireMode == JasprMode.client) {
       logger.write('Serving at http://localhost:$proxyPort', tag: Tag.cli);
