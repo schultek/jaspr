@@ -13,6 +13,7 @@ void main() {
   Jaspr.initializeApp(
     options: defaultClientOptions,
   );
+  print(1);
 
   // Starts the app.
   //

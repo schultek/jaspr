@@ -27,8 +27,6 @@ void main() {
 
         link(rel: 'manifest', href: 'manifest.json'),
         link(rel: 'stylesheet', href: 'css/style.css', type: 'text/css'),
-
-        script(src: "flutter_bootstrap.js", async: true),
       ],
       body: App(),
     ),
