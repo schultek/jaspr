@@ -63,6 +63,8 @@
 
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
+- Fixed the server output of a client component that
+  renders `<head>` when the document has no `<body>`.
 
 ## 0.23.5
 
