@@ -240,14 +240,8 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   /// The params this view applied to the elements it owns.
-  final Map<web.HTMLElement, _AppliedParams> _appliedParams = {};
+  final Map<web.HTMLElement, _AppliedParams> _appliedParams = nodeMap();
 
-  /// Applies the inherited params to the elements owned by this view.
-  ///
-  /// This view owns all elements outside of its attached slots, at any depth.
-  /// Elements inside a slot are owned by the slot's child,
-  /// which applies the inherited params to its own elements,
-  /// so this view never modifies them.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -267,6 +261,12 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     }
   }
 
+  /// Applies the inherited params to the elements owned by this view.
+  ///
+  /// This view owns all elements outside of its attached slots, at any depth.
+  /// Elements inside a slot are owned by the slot's child,
+  /// which applies the inherited params to its own elements,
+  /// so this view never modifies them.
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
     _paramsChanged = false;
@@ -299,8 +299,8 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     required bool descendants,
   }) {
     // The start and end nodes of range slots, and the elements whose children are slotted.
-    final slotRanges = <web.Node, web.Node>{};
-    final slottedParents = <web.Node>{};
+    final slotRanges = nodeMap<web.Node, web.Node>();
+    final slottedParents = nodeSet<web.Node>();
     for (final slot in renderObject._slots) {
       if (slot._range case (:final start, :final end)) {
         slotRanges[start] = end;
@@ -347,13 +347,20 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   /// Reset and forget them before the slot's child hydrates,
   /// so a nested view doesn't treat inherited values as original DOM values.
   void _releaseParams(List<web.Node> nodes) {
-    if (nodes.isEmpty) return;
+    if (nodes.isEmpty || _appliedParams.isEmpty) return;
 
-    _appliedParams.removeWhere((element, params) {
-      if (!nodes.any((node) => node.contains(element))) return false;
-      _resetElementParams(element, params);
-      return true;
-    });
+    void release(web.Node node) {
+      if (node.isElement) {
+        if (_appliedParams.remove(node) case final params?) {
+          _resetElementParams(node as web.HTMLElement, params);
+        }
+      }
+      for (var child = node.firstChild; child != null; child = child.nextSibling) {
+        release(child);
+      }
+    }
+
+    nodes.forEach(release);
   }
 
   void _resetAppliedParams() {
