@@ -110,6 +110,8 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
       'ChildSlot must be used as a direct child of SlottedChildView.',
     );
     final view = parent as SlottedChildViewElement;
+    // Apply any changed inherited params first, so a query can match them.
+    view._applyPendingParams();
     final renderObject = slot.createRenderObject(view.renderObject as SlottedDomRenderObject);
     // Resolve the target before removing any values its query could match.
     // Release only the nodes being handed over, before the child hydrates them.
@@ -119,6 +121,27 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
 
   @override
   void updateRenderObject(RenderObject renderObject) {}
+
+  @override
+  void unmount() {
+    super.unmount();
+    // The slot's DOM stays in place, so remove the listeners its child added.
+    // Otherwise they would keep firing alongside any params the view applies to
+    // the leftover elements after this slot is removed.
+    _clearEventListeners(this);
+  }
+}
+
+/// Removes the event listeners of all DOM render objects in the subtree of [e].
+void _clearEventListeners(Element e) {
+  if (e case RenderObjectElement(renderObject: final DomRenderElement r)) {
+    r.events?.forEach((type, binding) {
+      binding.clear();
+    });
+    r.events = null;
+  }
+
+  e.visitChildren(_clearEventListeners);
 }
 
 /// Component that renders its children into specified DOM nodes (slots).
@@ -226,11 +249,31 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   /// which applies the inherited params to its own elements,
   /// so this view never modifies them.
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _paramsChanged = true;
+  }
+
+  /// Whether the inherited params changed since they were last applied.
+  bool _paramsChanged = false;
+
+  /// Applies the inherited params now if they changed since they were last applied.
+  ///
+  /// The view normally applies them after rebuilding its slots,
+  /// but a new slot might need to resolve its target against them.
+  void _applyPendingParams() {
+    if (_paramsChanged) {
+      updateRenderObject(renderObject as SlottedDomRenderObject);
+    }
+  }
+
+  @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
+    _paramsChanged = false;
     _resetAppliedParams();
 
-    final params = inheritedDomParamsFor(renderObject)?.reversed.toList(growable: false) ?? const [];
-    if (params.isEmpty) return;
+    final params = inheritedDomParamsFor(renderObject)?.reversed.toList(growable: false);
+    if (params == null || params.isEmpty) return;
 
     _visitOwnedElements(
       renderObject,
@@ -272,6 +315,8 @@ class SlottedChildViewElement extends DomRenderObjectElement {
           if (current == last) break;
           // Skip the nodes owned by the slot.
           current = slotEnd;
+          // The end of this slot can be the start of an adjacent slot.
+          if (slotRanges.containsKey(current)) continue;
         } else if (current.isElement) {
           visit(current as web.HTMLElement, isRoot);
           if (descendants && !slottedParents.contains(current)) {
@@ -317,19 +362,27 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   void _resetElementParams(web.HTMLElement element, _AppliedParams params) {
+    // Remove attributes left empty, rather than leaving behind attributes
+    // such as `id=""` that the element didn't have before.
     if (params.id != null && element.id == params.id) {
-      element.id = '';
+      element.removeAttribute('id');
     }
 
-    if (params.classes case final appliedClasses?) {
+    if (params.classes case final appliedClasses? when appliedClasses.isNotEmpty) {
       for (final c in appliedClasses) {
         element.classList.remove(c);
       }
+      if (element.classList.length == 0) {
+        element.removeAttribute('class');
+      }
     }
 
-    if (params.styles case final appliedStyles?) {
+    if (params.styles case final appliedStyles? when appliedStyles.isNotEmpty) {
       for (final e in appliedStyles.entries) {
         element.style.removeProperty(e.key);
+      }
+      if (element.style.length == 0) {
+        element.removeAttribute('style');
       }
     }
 
@@ -409,20 +462,9 @@ class SlottedChildViewElement extends DomRenderObjectElement {
 
   @override
   void unmount() {
+    // Each slot clears the listeners of its own subtree when it unmounts.
     _resetAppliedParams();
     super.unmount();
-    _clearEventListeners(this);
-  }
-
-  static void _clearEventListeners(Element e) {
-    if (e case RenderObjectElement(renderObject: final DomRenderElement r)) {
-      r.events?.forEach((type, binding) {
-        binding.clear();
-      });
-      r.events = null;
-    }
-
-    e.visitChildren(_clearEventListeners);
   }
 }
 

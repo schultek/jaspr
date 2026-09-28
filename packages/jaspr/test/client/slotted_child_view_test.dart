@@ -355,6 +355,120 @@ void main() {
       });
     }
 
+    testClient('resolves a new query slot using params changed in the same build', (tester) async {
+      window.document.body!.innerHTML = '<section><main>Fallback</main></section>'.toJS;
+      final mainElement = window.document.querySelector('main')!;
+      var enabled = false;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: const .descendantWith(tag: 'main'),
+              classes: enabled ? 'mount-target' : null,
+              child: SlottedChildView(
+                slots: [
+                  if (enabled) ChildSlot.fromQuery('.mount-target', child: span([.text('Hydrated')])),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(mainElement.hasAttribute('class'), isFalse);
+
+      setState(() => enabled = true);
+      await pumpEventQueue();
+
+      expect(window.document.querySelector('main'), same(mainElement));
+      expect(mainElement.className, 'mount-target');
+      expect(mainElement.textContent, 'Hydrated');
+    });
+
+    testClient('removes the listeners of a removed slot', (tester) async {
+      window.document.body!.innerHTML = '<!--start--><button>Static</button><!--end-->'.toJS;
+      final start = window.document.body!.firstChild!;
+      final end = window.document.body!.lastChild!;
+      var slotted = true;
+      late void Function(void Function() cb) setState;
+      var clicks = 0;
+
+      tester.pumpComponent(
+        .apply(
+          target: const .descendantWith(tag: 'button'),
+          events: {'click': (_) => clicks++},
+          child: StatefulBuilder(
+            builder: (context, set) {
+              setState = set;
+              return SlottedChildView(
+                slots: [
+                  if (slotted)
+                    ChildSlot.between(
+                      start: start,
+                      end: end,
+                      child: button([.text('Hydrated')]),
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      btn.click();
+      expect(clicks, 1);
+
+      setState(() => slotted = false);
+      await pumpEventQueue();
+
+      // The view now owns the leftover button, so its handler fires only once.
+      expect(window.document.querySelector('button'), same(btn));
+      btn.click();
+      expect(clicks, 2);
+
+      tester.binding.detachRootComponent();
+      btn.click();
+      expect(clicks, 2);
+    });
+
+    testClient('does not apply params to adjacent range slots that share an anchor', (tester) async {
+      window.document.body!.innerHTML = '<!--a--><button>First</button><!--b--><button>Second</button><!--c-->'.toJS;
+      final anchors = window.document.body!.childNodes;
+      var clicks = 0;
+
+      tester.pumpComponent(
+        .apply(
+          target: const .descendantWith(tag: 'button'),
+          events: {'click': (_) => clicks++},
+          child: SlottedChildView(
+            slots: [
+              ChildSlot.between(
+                start: anchors.item(0)!,
+                end: anchors.item(2)!,
+                child: button([.text('First')]),
+              ),
+              ChildSlot.between(
+                start: anchors.item(2)!,
+                end: anchors.item(4)!,
+                child: button([.text('Second')]),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final buttons = window.document.querySelectorAll('button');
+      expect(buttons.length, 2);
+      for (var i = 0; i < buttons.length; i++) {
+        (buttons.item(i)! as HTMLElement).click();
+      }
+      expect(clicks, 2);
+    });
+
     for (final deferred in [false, true]) {
       testClient('resolves inherited selectors in ${deferred ? 'a deferred' : 'an initial'} nested view', (
         tester,
@@ -402,7 +516,7 @@ void main() {
         expect(mainElement.className, 'mount-target');
 
         tester.binding.detachRootComponent();
-        expect(mainElement.className, isEmpty);
+        expect(mainElement.hasAttribute('class'), isFalse);
       });
     }
 
@@ -464,7 +578,7 @@ void main() {
         );
 
         void expectOriginalParams() {
-          expect(btn.id, isEmpty);
+          expect(btn.hasAttribute('id'), isFalse);
           expect(btn.className, 'original');
           expect(btn.style.color, isEmpty);
           expect(btn.style.backgroundColor, 'black');
@@ -635,8 +749,10 @@ void main() {
       btn.click();
       expect(clicks, 1);
 
-      // The slot owns the button, so unmounting the view must not reset its params.
+      // The slot owns the button, so unmounting the view must not reset its params,
+      // and only the slot's child removes its listener.
       tester.binding.detachRootComponent();
+      expect(btn.classList.contains('applied'), isTrue);
       btn.click();
       expect(clicks, 1);
     });
