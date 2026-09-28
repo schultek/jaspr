@@ -629,6 +629,64 @@ void main() {
       });
     }
 
+    testClient('hands applied params on many elements to a nested view', (tester) async {
+      window.document.body!.innerHTML =
+          '<!--start--><section>${List.generate(40, (i) => '<button>Item $i</button>').join()}</section><!--end-->'
+              .toJS;
+      final start = window.document.body!.firstChild!;
+      final end = window.document.body!.lastChild!;
+      final buttonNodes = window.document.querySelectorAll('button');
+      final buttons = [for (var i = 0; i < buttonNodes.length; i++) buttonNodes.item(i)! as HTMLElement];
+      var slotted = false;
+      var clicks = 0;
+      late void Function(void Function() cb) setSlot;
+
+      tester.pumpComponent(
+        .apply(
+          target: const .descendantWith(tag: 'button'),
+          classes: 'applied',
+          events: {'click': (_) => clicks++},
+          child: StatefulBuilder(
+            builder: (context, set) {
+              setSlot = set;
+              return SlottedChildView(
+                slots: [
+                  if (slotted)
+                    ChildSlot.between(
+                      start: start,
+                      end: end,
+                      child: SlottedChildView(slots: const []),
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+
+      for (final button in buttons) {
+        expect(button.className, 'applied');
+        button.click();
+      }
+      expect(clicks, 40);
+
+      setSlot(() => slotted = true);
+      await pumpEventQueue();
+
+      for (final button in buttons) {
+        expect(button.className, 'applied');
+        button.click();
+      }
+      expect(clicks, 80);
+
+      tester.binding.detachRootComponent();
+      for (final button in buttons) {
+        expect(button.hasAttribute('class'), isFalse);
+        button.click();
+      }
+      expect(clicks, 80);
+    });
+
     testClient('applies inner params when adding a slot with a nested view', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Static</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;

@@ -115,7 +115,7 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
     final renderObject = slot.createRenderObject(view.renderObject as SlottedDomRenderObject);
     // Resolve the target before removing any values its query could match.
     // Release only the nodes being handed over, before the child hydrates them.
-    view._releaseParams(renderObject.toHydrate);
+    view._releaseParams(renderObject);
     return renderObject;
   }
 
@@ -342,25 +342,31 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     return true;
   }
 
-  /// Releases our params on [nodes] and their descendants to a new slot.
+  /// Releases our params on the elements owned by [slot] to its child.
   ///
   /// Reset and forget them before the slot's child hydrates,
   /// so a nested view doesn't treat inherited values as original DOM values.
-  void _releaseParams(List<web.Node> nodes) {
-    if (nodes.isEmpty || _appliedParams.isEmpty) return;
+  void _releaseParams(ChildSlotRenderObject slot) {
+    if (slot.toHydrate.isEmpty || _appliedParams.isEmpty) return;
 
-    void release(web.Node node) {
-      if (node.isElement) {
-        if (_appliedParams.remove(node) case final params?) {
-          _resetElementParams(node as web.HTMLElement, params);
+    final parent = slot.node;
+    // A range slot owns only some of the parent's children,
+    // so also check which of them each element is in.
+    final slotted = slot._range == null ? null : (nodeSet<web.Node>()..addAll(slot.toHydrate));
+
+    _appliedParams.removeWhere((element, params) {
+      // Skip elements outside the parent with a single native check.
+      if (element == parent || !parent.contains(element)) return false;
+      if (slotted != null) {
+        web.Node child = element;
+        while (child.parentNode != parent) {
+          child = child.parentNode!;
         }
+        if (!slotted.contains(child)) return false;
       }
-      for (var child = node.firstChild; child != null; child = child.nextSibling) {
-        release(child);
-      }
-    }
-
-    nodes.forEach(release);
+      _resetElementParams(element, params);
+      return true;
+    });
   }
 
   void _resetAppliedParams() {
