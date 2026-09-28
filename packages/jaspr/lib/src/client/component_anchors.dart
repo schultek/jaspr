@@ -15,16 +15,6 @@ sealed class ComponentAnchor {
   late final web.Node endNode;
 }
 
-final Expando<ClientComponentAnchor> _clientAnchorExpando = Expando();
-
-extension ClientAnchorExtension on web.Node {
-  ClientComponentAnchor? get clientAnchor => _clientAnchorExpando[this];
-
-  set clientAnchor(ClientComponentAnchor? anchor) {
-    _clientAnchorExpando[this] = anchor;
-  }
-}
-
 class ClientComponentAnchor extends ComponentAnchor {
   ClientComponentAnchor._(super.name, super.key, super.startNode, this.data);
 
@@ -225,7 +215,6 @@ List<ClientComponentAnchor> extractAnchors({
         // Remove the data string.
         start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
 
-        start.clientAnchor = comp;
         if (anchors.isEmpty) {
           clientAnchors.add(comp);
         } else {
