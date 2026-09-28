@@ -631,7 +631,7 @@ void main() {
 
     testClient('hands applied params on many elements to a nested view', (tester) async {
       window.document.body!.innerHTML =
-          '<!--start--><section>${List.generate(40, (i) => '<button>Item $i</button>').join()}</section><!--end-->'
+          '<!--start--><section>${List.generate(40, (index) => '<button>Item $index</button>').join()}</section><!--end-->'
               .toJS;
       final start = window.document.body!.firstChild!;
       final end = window.document.body!.lastChild!;
@@ -779,6 +779,37 @@ void main() {
       await pumpEventQueue();
 
       expectAppliedOnce();
+    });
+
+    testClient('resolves a query slot using applied values after a reload', (tester) async {
+      const html = '<section><main>Server</main></section>';
+      window.document.body!.innerHTML = html.toJS;
+
+      tester.pumpComponent(
+        .apply(
+          target: const .descendantWith(tag: 'main'),
+          classes: 'mount-target',
+          child: SlottedChildView(
+            slots: [
+              ChildSlot.fromQuery('.mount-target', child: span([.text('Hydrated')])),
+            ],
+          ),
+        ),
+      );
+
+      expect(window.document.querySelector('main')!.textContent, 'Hydrated');
+
+      final newBody = window.document.createElement('body') as HTMLBodyElement;
+      newBody.innerHTML = html.toJS;
+      final rootElement = tester.binding.rootElement!;
+      (rootElement.renderObject as RootDomRenderObject).setRootNode(newBody);
+      rootElement.owner.performReload(rootElement);
+      window.document.body!.replaceWith(newBody);
+      await pumpEventQueue();
+
+      final mainElement = window.document.querySelector('main')!;
+      expect(mainElement.textContent, 'Hydrated');
+      expect(mainElement.className, 'mount-target');
     });
 
     testClient('does not apply params to elements owned by a slot nested in a static element', (tester) async {

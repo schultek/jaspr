@@ -103,20 +103,12 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
 
   @override
   ChildSlotRenderObject createRenderObject() {
-    final slot = component as ChildSlot;
-    final parent = parentRenderObjectElement!;
+    final parent = parentRenderObjectElement;
     assert(
       parent is SlottedChildViewElement,
       'ChildSlot must be used as a direct child of SlottedChildView.',
     );
-    final view = parent as SlottedChildViewElement;
-    // Apply any changed inherited params first, so a query can match them.
-    view._applyPendingParams();
-    final renderObject = slot.createRenderObject(view.renderObject as SlottedDomRenderObject);
-    // Resolve the target before removing any values its query could match.
-    // Release only the nodes being handed over, before the child hydrates them.
-    view._releaseParams(renderObject);
-    return renderObject;
+    return (parent as SlottedChildViewElement)._createSlotRenderObject(component as ChildSlot);
   }
 
   @override
@@ -233,32 +225,37 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   RenderObject createRenderObject() {
     final parent = parentRenderObjectElement!.renderObject;
     final renderObject = SlottedDomRenderObject.fromNodes(component.nodes, parent as DomRenderObject);
-    // Make inherited values available to query slots, including nested views.
-    // Each slot releases them from its nodes before its child hydrates.
-    updateRenderObject(renderObject);
+    // The new nodes, such as on mount or reload, don't have the params applied yet.
+    markNeedsRender();
     return renderObject;
   }
 
   /// The params this view applied to the elements it owns.
   final Map<web.HTMLElement, _AppliedParams> _appliedParams = nodeMap();
 
+  /// Whether the inherited params changed since they were last applied.
+  ///
+  /// This is also set when a new render object is created, before its slots are.
+  bool _paramsChanged = false;
+
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void markNeedsRender() {
+    super.markNeedsRender();
     _paramsChanged = true;
   }
 
-  /// Whether the inherited params changed since they were last applied.
-  bool _paramsChanged = false;
-
-  /// Applies the inherited params now if they changed since they were last applied.
-  ///
-  /// The view normally applies them after rebuilding its slots,
-  /// but a new slot might need to resolve its target against them.
-  void _applyPendingParams() {
-    if (_paramsChanged) {
+  /// Creates the render object of [slot] and hands it the elements it owns.
+  ChildSlotRenderObject _createSlotRenderObject(ChildSlot slot) {
+    // The view normally applies changed params after rebuilding its slots,
+    // but a query must be able to match them, so apply them first.
+    if (_paramsChanged && slot is! RangeChildSlot) {
       updateRenderObject(renderObject as SlottedDomRenderObject);
     }
+    final slotRenderObject = slot.createRenderObject(renderObject as SlottedDomRenderObject);
+    // Resolve the target before removing any values its query could match.
+    // Release only the nodes being handed over, before the child hydrates them.
+    _releaseParams(slotRenderObject);
+    return slotRenderObject;
   }
 
   /// Applies the inherited params to the elements owned by this view.
@@ -280,8 +277,8 @@ class SlottedChildViewElement extends DomRenderObjectElement {
       descendants: params.any((p) => !p.target.onlyChildren),
       (element, isRoot) {
         for (final param in params) {
-          if ((isRoot || !param.target.onlyChildren) && isMatchingElement(param.target, element)) {
-            updateElementParams(element, param);
+          if ((isRoot || !param.target.onlyChildren) && _isMatchingElement(param.target, element)) {
+            _updateElementParams(element, param);
           }
         }
       },
@@ -309,9 +306,14 @@ class SlottedChildViewElement extends DomRenderObjectElement {
       }
     }
 
+    // Lookups hash the node even if a collection is empty, so skip those.
+    final hasSlotRanges = slotRanges.isNotEmpty;
+    final hasSlottedParents = slottedParents.isNotEmpty;
+
     void visitSiblings(web.Node? current, web.Node? last, {required bool isRoot}) {
       while (current != null) {
-        if (slotRanges[current] case final slotEnd?) {
+        final slotEnd = hasSlotRanges ? slotRanges[current] : null;
+        if (slotEnd != null) {
           if (current == last) break;
           // Skip the nodes owned by the slot.
           current = slotEnd;
@@ -319,7 +321,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
           if (slotRanges.containsKey(current)) continue;
         } else if (current.isElement) {
           visit(current as web.HTMLElement, isRoot);
-          if (descendants && !slottedParents.contains(current)) {
+          if (descendants && !(hasSlottedParents && slottedParents.contains(current))) {
             visitSiblings(current.firstChild, null, isRoot: false);
           }
         }
@@ -332,7 +334,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     visitSiblings(renderObject.firstChildNode, renderObject.lastChildNode, isRoot: true);
   }
 
-  bool isMatchingElement(ApplyTarget target, web.Element element) {
+  bool _isMatchingElement(ApplyTarget target, web.Element element) {
     if (target.tag case final expectedTag? when element.localName != expectedTag) return false;
     if (target.id case final expectedId? when element.id != expectedId) return false;
     if (target.classes case final expectedClasses? when !expectedClasses.every((c) => element.classList.contains(c))) {
@@ -349,21 +351,8 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   void _releaseParams(ChildSlotRenderObject slot) {
     if (slot.toHydrate.isEmpty || _appliedParams.isEmpty) return;
 
-    final parent = slot.node;
-    // A range slot owns only some of the parent's children,
-    // so also check which of them each element is in.
-    final slotted = slot._range == null ? null : (nodeSet<web.Node>()..addAll(slot.toHydrate));
-
     _appliedParams.removeWhere((element, params) {
-      // Skip elements outside the parent with a single native check.
-      if (element == parent || !parent.contains(element)) return false;
-      if (slotted != null) {
-        web.Node child = element;
-        while (child.parentNode != parent) {
-          child = child.parentNode!;
-        }
-        if (!slotted.contains(child)) return false;
-      }
+      if (!slot._owns(element)) return false;
       _resetElementParams(element, params);
       return true;
     });
@@ -405,10 +394,14 @@ class SlottedChildViewElement extends DomRenderObjectElement {
       }
     }
 
-    params._clearEvents();
+    if (params.eventBindings case final appliedEvents?) {
+      for (final binding in appliedEvents.values) {
+        binding.clear();
+      }
+    }
   }
 
-  void updateElementParams(web.HTMLElement element, ApplyParams newParams) {
+  void _updateElementParams(web.HTMLElement element, ApplyParams newParams) {
     final params = _appliedParams[element];
 
     String? appliedId = params?.id;
@@ -492,17 +485,6 @@ class _AppliedParams extends ApplyParams {
   }) : eventBindings = events;
 
   final Map<String, EventBinding>? eventBindings;
-
-  /// Removes the event listeners in [eventBindings] from their element.
-  ///
-  /// Doesn't reset the other applied values, such as classes or attributes.
-  void _clearEvents() {
-    if (eventBindings case final bindings?) {
-      for (final binding in bindings.values) {
-        binding.clear();
-      }
-    }
-  }
 }
 
 class SlottedDomRenderObject extends DomRenderFragment {
@@ -610,6 +592,18 @@ class ChildSlotRenderObject extends DomRenderObject
   /// The node after which the children of this slot are placed,
   /// or `null` to place them at the start of [node].
   web.Node? get beforeStart => _range?.start;
+
+  /// Whether [other] is one of the nodes owned by this slot, or inside one of them.
+  bool _owns(web.Node other) {
+    if (_range case (:final start, :final end)) {
+      const following = web.Node.DOCUMENT_POSITION_FOLLOWING;
+      const containedBy = web.Node.DOCUMENT_POSITION_CONTAINED_BY;
+      // Ancestors of the range precede start, and nodes inside start are outside the range.
+      return (start.compareDocumentPosition(other) & (following | containedBy)) == following &&
+          (end.compareDocumentPosition(other) & web.Node.DOCUMENT_POSITION_PRECEDING) != 0;
+    }
+    return other != node && node.contains(other);
+  }
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
