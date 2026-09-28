@@ -336,12 +336,12 @@ void main() {
           ),
         );
 
-        expect(window.document.querySelector(query), same(mainElement));
+        expect(window.document.querySelector(query), equals(mainElement));
 
         setSlot(() => slotted = true);
         await pumpEventQueue();
         expect(mainElement.textContent, 'Hydrated');
-        expect(window.document.querySelector(query), same(mainElement));
+        expect(window.document.querySelector(query), equals(mainElement));
 
         // An existing slot keeps its target even when its selector stops matching.
         setParams(() => enabled = false);
@@ -350,7 +350,7 @@ void main() {
 
         setSlot(() => text = 'Updated');
         await pumpEventQueue();
-        expect(window.document.querySelector('main'), same(mainElement));
+        expect(window.document.querySelector('main'), equals(mainElement));
         expect(mainElement.textContent, 'Updated');
       });
     }
@@ -383,7 +383,7 @@ void main() {
       setState(() => enabled = true);
       await pumpEventQueue();
 
-      expect(window.document.querySelector('main'), same(mainElement));
+      expect(window.document.querySelector('main'), equals(mainElement));
       expect(mainElement.className, 'mount-target');
       expect(mainElement.textContent, 'Hydrated');
     });
@@ -426,7 +426,7 @@ void main() {
       await pumpEventQueue();
 
       // The view now owns the leftover button, so its handler fires only once.
-      expect(window.document.querySelector('button'), same(btn));
+      expect(window.document.querySelector('button'), equals(btn));
       btn.click();
       expect(clicks, 2);
 
@@ -511,7 +511,7 @@ void main() {
           await pumpEventQueue();
         }
 
-        expect(window.document.querySelector('main'), same(mainElement));
+        expect(window.document.querySelector('main'), equals(mainElement));
         expect(mainElement.textContent, 'Hydrated');
         expect(mainElement.className, 'mount-target');
 
@@ -592,7 +592,7 @@ void main() {
         setSlot(() => slotted = true);
         await pumpEventQueue();
 
-        expect(mainElement.querySelector('button'), same(btn));
+        expect(mainElement.querySelector('button'), equals(btn));
         expect(btn.id, 'initial-id');
         expect(btn.className, 'original initial');
         expect(btn.style.color, 'red');
@@ -726,7 +726,7 @@ void main() {
       setSlot(() => slotted = true);
       await pumpEventQueue();
 
-      expect(window.document.querySelector('button'), same(btn));
+      expect(window.document.querySelector('button'), equals(btn));
       expect(btn.style.color, 'blue');
     });
 

@@ -505,7 +505,7 @@ void main() {
       loaded.complete();
       await pumpEventQueue();
 
-      expect(window.document.getElementById('deferred'), same(buttonElement));
+      expect(window.document.getElementById('deferred'), equals(buttonElement));
       expect(buttonElement.textContent, 'Hydrated');
       expect(buttonElement.classList.contains('applied'), isTrue);
       expect(buttonElement.getAttribute('data-applied'), 'true');
@@ -560,7 +560,7 @@ void main() {
       loaded.complete();
       await pumpEventQueue();
 
-      expect(window.document.querySelector('button'), same(buttonElement));
+      expect(window.document.querySelector('button'), equals(buttonElement));
       expect(buttonElement.className, 'original applied');
       expect(buttonElement.style.color, 'red');
       buttonElement.click();

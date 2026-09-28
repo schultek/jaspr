@@ -42,7 +42,7 @@ void main() {
 
     await _hydrate(tester, keys: {0: counterKey, 1: movingCounterKey});
 
-    expect(_button('counter-0'), same(initialButton));
+    expect(_button('counter-0'), equals(initialButton));
     expect(initialButton.textContent, '0:10:0');
     final nestedButton = _button('counter-100');
     await _clickAndExpectText(nestedButton, '100:110:1');
