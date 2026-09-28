@@ -1,6 +1,7 @@
 @TestOn('browser')
 library;
 
+import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
@@ -465,6 +466,116 @@ void main() {
         (divElement.innerHTML as JSString).toDart.replaceAll(RegExp(r'\s+'), ''),
         contains('<span>SecondElement</span>'),
       );
+    });
+
+    testClient('should hand applied params over to a deferred client once it hydrates', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      final loaded = Completer<void>();
+      var clicks = 0;
+      window.document.body!.innerHTML =
+          '<!--${marker}app--><button id="deferred">Fallback</button><!--/${marker}app-->'.toJS;
+      final buttonElement = window.document.getElementById('deferred')! as HTMLElement;
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader(
+              (_) => button(id: 'deferred', [.text('Hydrated')]),
+              loader: () => loaded.future,
+            ),
+          },
+        ),
+      );
+
+      tester.pumpComponent(
+        .apply(
+          target: const ApplyTarget.descendantWith(tag: 'button'),
+          classes: 'applied',
+          attributes: const {'data-applied': 'true'},
+          events: {'click': (_) => clicks++},
+          child: const ClientApp(),
+        ),
+      );
+
+      // The client app applies the params while the client component loads.
+      expect(buttonElement.classList.contains('applied'), isTrue);
+      buttonElement.click();
+      expect(clicks, 1);
+
+      loaded.complete();
+      await pumpEventQueue();
+
+      expect(window.document.getElementById('deferred'), same(buttonElement));
+      expect(buttonElement.textContent, 'Hydrated');
+      expect(buttonElement.classList.contains('applied'), isTrue);
+      expect(buttonElement.getAttribute('data-applied'), 'true');
+      buttonElement.click();
+      expect(clicks, 2);
+    });
+
+    testClient('should update applied params on server content after a deferred client hydrates', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      final loaded = Completer<void>();
+      var updated = false;
+      var enabled = true;
+      var clicks = 0;
+      late void Function(void Function() cb) setParams;
+      window.document.body!.innerHTML =
+          '<!--${marker}app data={"child":"s${marker}1"}--><div>'
+                  '<!--s${marker}1--><button class="original">Server</button><!--/s${marker}1-->'
+                  '</div><!--/${marker}app-->'
+              .toJS;
+      final buttonElement = window.document.querySelector('button')! as HTMLElement;
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader(
+              (params) => div([params.mount(params.get<String>('child'))]),
+              loader: () => loaded.future,
+            ),
+          },
+        ),
+      );
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setParams = set;
+            return .apply(
+              target: const .descendantWith(tag: 'button'),
+              classes: enabled ? 'applied' : null,
+              styles: enabled ? Styles(color: updated ? Colors.blue : Colors.red) : null,
+              events: enabled ? {'click': (_) => clicks++} : null,
+              child: const ClientApp(),
+            );
+          },
+        ),
+      );
+
+      expect(buttonElement.style.color, 'red');
+      buttonElement.click();
+      expect(clicks, 1);
+
+      loaded.complete();
+      await pumpEventQueue();
+
+      expect(window.document.querySelector('button'), same(buttonElement));
+      expect(buttonElement.className, 'original applied');
+      expect(buttonElement.style.color, 'red');
+      buttonElement.click();
+      expect(clicks, 2);
+
+      setParams(() => updated = true);
+      await pumpEventQueue();
+      expect(buttonElement.style.color, 'blue');
+
+      setParams(() => enabled = false);
+      await pumpEventQueue();
+      expect(buttonElement.className, 'original');
+      expect(buttonElement.style.color, isEmpty);
+      buttonElement.click();
+      expect(clicks, 2);
     });
   });
 }

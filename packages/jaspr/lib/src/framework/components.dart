@@ -202,18 +202,6 @@ final class ApplyTarget {
   final String? tag;
   final String? id;
   final Set<String>? classes;
-
-  String get query => [
-    if (onlyChildren) '> ',
-    if (tag == null && id == null && classes == null)
-      '*'
-    else ...[
-      ?tag,
-      if (id != null) '#$id',
-      if (classes case final classes?)
-        for (final c in classes) '.$c',
-    ],
-  ].join();
 }
 
 @protected
