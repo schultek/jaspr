@@ -384,6 +384,9 @@ class SlottedChildViewElement extends DomRenderObjectElement {
         element.style.removeProperty(e.key);
       }
       if (element.style.length == 0) {
+        // Read the attribute first, so the browser syncs the pending style changes into it.
+        // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
+        element.getAttribute('style');
         element.removeAttribute('style');
       }
     }

@@ -164,7 +164,7 @@ void main() {
               target: descendants ? .descendantWith(tag: 'button') : .childWith(tag: 'button'),
               id: 'applied-id',
               classes: 'applied',
-              styles: Styles(color: Colors.red),
+              styles: const Styles(color: Colors.red),
               attributes: const {'data-applied': 'true'},
               events: {'click': (_) => clicks++},
               child: SlottedChildView(slots: const []),
@@ -181,12 +181,14 @@ void main() {
       btn.click();
       expect(clicks, 1);
 
+      // The button isn't a direct child of the view, so it no longer matches.
       setState(() => descendants = false);
       await pumpEventQueue();
 
-      expect(btn.id, isEmpty);
+      // Attributes that the params added are removed rather than left empty.
+      expect(btn.hasAttribute('id'), isFalse);
       expect(btn.className, 'original');
-      expect(btn.style.color, isEmpty);
+      expect(btn.hasAttribute('style'), isFalse);
       expect(btn.hasAttribute('data-applied'), isFalse);
       btn.click();
       expect(clicks, 1);
@@ -269,7 +271,7 @@ void main() {
 
       tester.pumpComponent(
         .apply(
-          target: ApplyTarget.descendantWith(tag: 'button'),
+          target: const .descendantWith(tag: 'button'),
           classes: 'applied',
           attributes: const {'data-applied': 'true'},
           events: {'click': (_) => clicks++},
@@ -294,6 +296,8 @@ void main() {
       setState(() => slotted = true);
       await pumpEventQueue();
 
+      // The slot's child hydrates the same button and now applies the params instead of the view,
+      // so the handler still fires only once per click.
       expect(window.document.querySelector('button'), equals(btn));
       expect(btn.textContent, 'Hydrated');
       expect(btn.classList.contains('applied'), isTrue);
@@ -303,7 +307,7 @@ void main() {
     });
 
     for (final query in ['#mount-target', '.mount-target', '[data-target="true"]']) {
-      testClient('resolves a new query slot using applied values in $query', (tester) async {
+      testClient('resolves a new query slot for $query using applied values', (tester) async {
         window.document.body!.innerHTML = '<section><main>Fallback</main></section>'.toJS;
         final mainElement = window.document.querySelector('main')!;
         var slotted = false;
@@ -336,14 +340,16 @@ void main() {
           ),
         );
 
+        // Only the view's applied values make the query match.
         expect(window.document.querySelector(query), equals(mainElement));
 
         setSlot(() => slotted = true);
         await pumpEventQueue();
         expect(mainElement.textContent, 'Hydrated');
+        // The slot owns the children of `main`, not `main` itself, so the view keeps its values.
         expect(window.document.querySelector(query), equals(mainElement));
 
-        // An existing slot keeps its target even when its selector stops matching.
+        // An existing slot keeps its target even when its query stops matching.
         setParams(() => enabled = false);
         await pumpEventQueue();
         expect(window.document.querySelector(query), isNull);
@@ -380,6 +386,8 @@ void main() {
 
       expect(mainElement.hasAttribute('class'), isFalse);
 
+      // The class and the slot whose query depends on it are added together,
+      // so the view must apply the new params before it resolves the query.
       setState(() => enabled = true);
       await pumpEventQueue();
 
@@ -388,7 +396,7 @@ void main() {
       expect(mainElement.textContent, 'Hydrated');
     });
 
-    testClient('removes the listeners of a removed slot', (tester) async {
+    testClient('removes the listeners added by the child of a removed slot', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Static</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;
       final end = window.document.body!.lastChild!;
@@ -425,7 +433,8 @@ void main() {
       setState(() => slotted = false);
       await pumpEventQueue();
 
-      // The view now owns the leftover button, so its handler fires only once.
+      // The removed slot's DOM stays in place and the view now owns the leftover button,
+      // so only the view's listener remains and the handler fires once.
       expect(window.document.querySelector('button'), equals(btn));
       btn.click();
       expect(clicks, 2);
@@ -435,7 +444,7 @@ void main() {
       expect(clicks, 2);
     });
 
-    testClient('does not apply params to adjacent range slots that share an anchor', (tester) async {
+    testClient('does not own the elements of adjacent range slots that share an anchor', (tester) async {
       window.document.body!.innerHTML = '<!--a--><button>First</button><!--b--><button>Second</button><!--c-->'.toJS;
       final anchors = window.document.body!.childNodes;
       var clicks = 0;
@@ -461,16 +470,18 @@ void main() {
         ),
       );
 
+      // Each slot's child applies the params to its own button.
+      // If the view also applied them to the second button, it would fire twice.
       final buttons = window.document.querySelectorAll('button');
       expect(buttons.length, 2);
-      for (var i = 0; i < buttons.length; i++) {
-        (buttons.item(i)! as HTMLElement).click();
-      }
+      (buttons.item(0)! as HTMLElement).click();
+      expect(clicks, 1);
+      (buttons.item(1)! as HTMLElement).click();
       expect(clicks, 2);
     });
 
     for (final deferred in [false, true]) {
-      testClient('resolves inherited selectors in ${deferred ? 'a deferred' : 'an initial'} nested view', (
+      testClient('resolves a query using inherited params in ${deferred ? 'a deferred' : 'an initial'} nested view', (
         tester,
       ) async {
         window.document.body!.innerHTML = '<!--start--><section><main>Fallback</main></section><!--end-->'.toJS;
@@ -511,6 +522,7 @@ void main() {
           await pumpEventQueue();
         }
 
+        // The nested view owns `main` and applied its class before resolving the query.
         expect(window.document.querySelector('main'), equals(mainElement));
         expect(mainElement.textContent, 'Hydrated');
         expect(mainElement.className, 'mount-target');
@@ -542,6 +554,8 @@ void main() {
           StatefulBuilder(
             builder: (context, set) {
               setParams = set;
+              // The `original` class, background color, and `data-original` attribute
+              // are already on the button, so they must never be overwritten or removed.
               return .apply(
                 target: const .descendantWith(tag: 'button'),
                 id: enabled ? (updated ? 'updated-id' : 'initial-id') : null,
@@ -591,6 +605,8 @@ void main() {
         btn.click();
         expect(initialClicks, 1);
 
+        // The outer view releases the button before the nested view hydrates it,
+        // so only the nested view applies the params, and the handler fires once.
         setSlot(() => slotted = true);
         await pumpEventQueue();
 
@@ -632,68 +648,87 @@ void main() {
       });
     }
 
-    testClient('hands applied params on many elements to a nested view', (tester) async {
-      window.document.body!.innerHTML =
-          '<!--start--><section>${List.generate(40, (index) => '<button>Item $index</button>').join()}</section><!--end-->'
-              .toJS;
-      final start = window.document.body!.firstChild!;
-      final end = window.document.body!.lastChild!;
-      final buttonNodes = window.document.querySelectorAll('button');
-      final buttons = [for (var i = 0; i < buttonNodes.length; i++) buttonNodes.item(i)! as HTMLElement];
-      const nestedViewKey = ValueKey('nested-view');
-      var slotted = false;
-      var clicks = 0;
-      late void Function(void Function() cb) setSlot;
+    for (final querySlot in [false, true]) {
+      testClient('releases only the elements in a new ${querySlot ? 'query' : 'range'} slot to a nested view', (
+        tester,
+      ) async {
+        window.document.body!.innerHTML =
+            '<section id="section" class="target"><p id="before" class="target">Before</p><!--start-->'
+                    '<div id="container" class="target">'
+                    '<button id="first" class="target">First</button><button id="second" class="target">Second</button>'
+                    '</div><!--end--><p id="after" class="target">After</p></section>'
+                .toJS;
+        final container = window.document.getElementById('container')!;
+        const nestedViewKey = ValueKey('nested-view');
+        var slotted = false;
+        late void Function(void Function() cb) setSlot;
+        // Count a non-bubbling event per element, so each count reflects only that element's listeners.
+        final pings = <String, int>{};
 
-      tester.pumpComponent(
-        .apply(
-          target: const .descendantWith(tag: 'button'),
-          classes: 'applied',
-          events: {'click': (_) => clicks++},
-          child: StatefulBuilder(
-            builder: (context, set) {
-              setSlot = set;
-              return SlottedChildView(
-                slots: [
-                  if (slotted)
-                    ChildSlot.between(
-                      start: start,
-                      end: end,
-                      child: SlottedChildView(key: nestedViewKey, slots: const []),
-                    ),
-                ],
-              );
+        tester.pumpComponent(
+          .apply(
+            target: const .descendantWith(classes: {'target'}),
+            classes: 'applied',
+            events: {
+              'ping': (e) => pings.update((e.currentTarget! as HTMLElement).id, (c) => c + 1, ifAbsent: () => 1),
             },
+            child: StatefulBuilder(
+              builder: (context, set) {
+                setSlot = set;
+                final nestedView = SlottedChildView(key: nestedViewKey, slots: const []);
+                return SlottedChildView(
+                  slots: [
+                    if (slotted)
+                      if (querySlot)
+                        // Owns the buttons, but not the container itself.
+                        ChildSlot.fromQuery('#container', child: nestedView)
+                      else
+                        // Owns the container and the buttons inside it.
+                        ChildSlot.between(
+                          start: container.previousSibling!,
+                          end: container.nextSibling!,
+                          child: nestedView,
+                        ),
+                  ],
+                );
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byKey(nestedViewKey), findsNothing);
-      for (final button in buttons) {
-        expect(button.className, 'applied');
-        button.click();
-      }
-      expect(clicks, 40);
+        const ids = ['section', 'before', 'container', 'first', 'second', 'after'];
 
-      setSlot(() => slotted = true);
-      await pumpEventQueue();
+        void expectAppliedOnce() {
+          for (final id in ids) {
+            final element = window.document.getElementById(id)!;
+            expect(element.className, 'target applied', reason: id);
+            element.dispatchEvent(Event('ping'));
+          }
+          expect(pings, {for (final id in ids) id: 1});
+          pings.clear();
+        }
 
-      expect(find.byKey(nestedViewKey), findsOneComponent);
-      for (final button in buttons) {
-        expect(button.className, 'applied');
-        button.click();
-      }
-      expect(clicks, 80);
+        expectAppliedOnce();
 
-      tester.binding.detachRootComponent();
-      for (final button in buttons) {
-        expect(button.hasAttribute('class'), isFalse);
-        button.click();
-      }
-      expect(clicks, 80);
-    });
+        setSlot(() => slotted = true);
+        await pumpEventQueue();
 
-    testClient('applies inner params when adding a slot with a nested view', (tester) async {
+        // Each element still has the params applied by exactly one owner,
+        // whether that's the outer view or the nested view in the slot.
+        expect(find.byKey(nestedViewKey), findsOneComponent);
+        expectAppliedOnce();
+
+        tester.binding.detachRootComponent();
+        for (final id in ids) {
+          final element = window.document.getElementById(id)!;
+          expect(element.className, 'target', reason: id);
+          element.dispatchEvent(Event('ping'));
+        }
+        expect(pings, isEmpty);
+      });
+    }
+
+    testClient('prefers inner params over released outer params when adding a slot with a nested view', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Static</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;
       final end = window.document.body!.lastChild!;
@@ -729,6 +764,9 @@ void main() {
       final btn = window.document.querySelector('button')! as HTMLElement;
       expect(btn.style.color, 'red');
 
+      // Params never overwrite existing values,
+      // so the outer view must remove its color before
+      // the nested view applies the closer, inner color.
       setSlot(() => slotted = true);
       await pumpEventQueue();
 
@@ -767,22 +805,18 @@ void main() {
         expect(btn.className, 'target applied');
         expect(btn.textContent, 'Hydrated');
 
-        final before = {...clicks};
         staticElement.click();
         btn.click();
-        expect(clicks['p'], (before['p'] ?? 0) + 1);
-        expect(clicks['button'], (before['button'] ?? 0) + 1);
+        expect(clicks, {'p': 1, 'button': 1});
+        clicks.clear();
       }
 
       expectAppliedOnce();
 
-      final newBody = window.document.createElement('body') as HTMLBodyElement;
-      newBody.innerHTML = html.toJS;
-      final rootElement = tester.binding.rootElement!;
-      (rootElement.renderObject as RootDomRenderObject).setRootNode(newBody);
-      rootElement.owner.performReload(rootElement);
-      window.document.body!.replaceWith(newBody);
-      await pumpEventQueue();
+      // The reload replaces the nodes,
+      // so the view must apply its params to the new static nodes
+      // and again leave the button to the slot's child.
+      await _reload(tester, html);
 
       expectAppliedOnce();
     });
@@ -805,82 +839,61 @@ void main() {
 
       expect(window.document.querySelector('main')!.textContent, 'Hydrated');
 
-      final newBody = window.document.createElement('body') as HTMLBodyElement;
-      newBody.innerHTML = html.toJS;
-      final rootElement = tester.binding.rootElement!;
-      (rootElement.renderObject as RootDomRenderObject).setRootNode(newBody);
-      rootElement.owner.performReload(rootElement);
-      window.document.body!.replaceWith(newBody);
-      await pumpEventQueue();
+      await _reload(tester, html);
 
       final mainElement = window.document.querySelector('main')!;
       expect(mainElement.textContent, 'Hydrated');
       expect(mainElement.className, 'mount-target');
     });
 
-    testClient('does not apply params to elements owned by a slot nested in a static element', (tester) async {
-      window.document.body!.innerHTML = '<section><!--start--><button>Static</button><!--end--></section>'.toJS;
-      final section = window.document.body!.firstChild!;
-      final start = section.firstChild!;
-      final end = section.lastChild!;
-      var clicks = 0;
+    for (final querySlot in [false, true]) {
+      testClient(
+        'leaves the elements of a '
+        'nested ${querySlot ? 'query' : 'range'} slot to the slot\'s child',
+        (tester) async {
+          window.document.body!.innerHTML =
+              '<section><main><!--start--><button>Static</button><!--end--></main></section>'.toJS;
+          final mainElement = window.document.querySelector('main')!;
+          var clicks = 0;
 
-      tester.pumpComponent(
-        .apply(
-          target: ApplyTarget.descendantWith(tag: 'button'),
-          classes: 'applied',
-          events: {'click': (_) => clicks++},
-          child: SlottedChildView(
-            slots: [
-              ChildSlot.between(start: start, end: end, child: button([.text('Hydrated')])),
-            ],
-          ),
-        ),
+          tester.pumpComponent(
+            .apply(
+              target: const .descendantWith(tag: 'button'),
+              classes: 'applied',
+              events: {'click': (_) => clicks++},
+              child: SlottedChildView(
+                slots: [
+                  if (querySlot)
+                    ChildSlot.fromQuery('main', child: button([.text('Hydrated')]))
+                  else
+                    ChildSlot.between(
+                      start: mainElement.firstChild!,
+                      end: mainElement.lastChild!,
+                      child: button([.text('Hydrated')]),
+                    ),
+                ],
+              ),
+            ),
+          );
+
+          // The slot's child applies the params to its button, and the view doesn't add them again.
+          final btn = window.document.querySelector('button')! as HTMLElement;
+          expect(btn.textContent, 'Hydrated');
+          expect(btn.className, 'applied');
+          btn.click();
+          expect(clicks, 1);
+
+          // Unmounting leaves the DOM of a hydrated child in place, so the class remains.
+          // If the view had owned the button, it would have removed the class here.
+          tester.binding.detachRootComponent();
+          expect(btn.className, 'applied');
+          btn.click();
+          expect(clicks, 1);
+        },
       );
+    }
 
-      final btn = window.document.querySelector('button')! as HTMLElement;
-      expect(btn.textContent, 'Hydrated');
-      expect(btn.classList.contains('applied'), isTrue);
-      btn.click();
-      expect(clicks, 1);
-
-      // The slot owns the button, so unmounting the view must not reset its params,
-      // and only the slot's child removes its listener.
-      tester.binding.detachRootComponent();
-      expect(btn.classList.contains('applied'), isTrue);
-      btn.click();
-      expect(clicks, 1);
-    });
-
-    testClient('does not apply params to elements owned by a query slot', (tester) async {
-      window.document.body!.innerHTML = '<section><main><button>Static</button></main></section>'.toJS;
-      var clicks = 0;
-
-      tester.pumpComponent(
-        .apply(
-          target: ApplyTarget.descendantWith(tag: 'button'),
-          classes: 'applied',
-          events: {'click': (_) => clicks++},
-          child: SlottedChildView(
-            slots: [
-              ChildSlot.fromQuery('main', child: button([.text('Hydrated')])),
-            ],
-          ),
-        ),
-      );
-
-      final btn = window.document.querySelector('button')! as HTMLElement;
-      expect(btn.textContent, 'Hydrated');
-      expect(btn.classList.contains('applied'), isTrue);
-      btn.click();
-      expect(clicks, 1);
-
-      tester.binding.detachRootComponent();
-      btn.click();
-      expect(clicks, 1);
-    });
-
-    testClient('still applies params to static elements around nested slots', (tester) async {
+    testClient('applies params to the static elements around a nested range slot', (tester) async {
       window.document.body!.innerHTML =
           '<section><p>Static</p><!--start--><p>Slotted</p><!--end--></section><p id="after">After</p>'.toJS;
       final section = window.document.body!.firstChild!;
@@ -889,7 +902,7 @@ void main() {
 
       tester.pumpComponent(
         .apply(
-          target: ApplyTarget.descendantWith(tag: 'p'),
+          target: const .descendantWith(tag: 'p'),
           classes: 'applied',
           child: SlottedChildView(
             slots: [
@@ -903,12 +916,25 @@ void main() {
         ),
       );
 
+      // The view applies the params to the paragraphs before and after the slot,
+      // while the slot's child applies them to its own paragraph.
       final paragraphs = window.document.querySelectorAll('p');
-      expect(paragraphs.length, 3);
-      for (var i = 0; i < paragraphs.length; i++) {
-        expect((paragraphs.item(i)! as HTMLElement).classList.contains('applied'), isTrue);
-      }
-      expect((paragraphs.item(1)! as HTMLElement).className, 'own applied');
+      expect(
+        [for (var i = 0; i < paragraphs.length; i++) (paragraphs.item(i)! as HTMLElement).className],
+        ['applied', 'own applied', 'applied'],
+      );
     });
   });
+}
+
+/// Reloads the app with fresh server-rendered [html],
+/// following the same sequence as the client's reload handler.
+Future<void> _reload(ClientTester tester, String html) async {
+  final newBody = window.document.createElement('body') as HTMLBodyElement;
+  newBody.innerHTML = html.toJS;
+  final rootElement = tester.binding.rootElement!;
+  (rootElement.renderObject as RootDomRenderObject).setRootNode(newBody);
+  rootElement.owner.performReload(rootElement);
+  window.document.body!.replaceWith(newBody);
+  await pumpEventQueue();
 }
