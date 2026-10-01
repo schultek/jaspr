@@ -5,15 +5,19 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:shelf/shelf.dart';
-// ignore: implementation_imports
-import 'package:shelf/src/headers.dart';
 
 import 'options.dart';
 import 'run_app.dart';
 import 'server_app.dart';
 import 'server_binding.dart';
 
-typedef RequestLike = ({String url, String basePath, Headers headers});
+/// A request as Jaspr renders it.
+///
+/// `url` is the path and query of the page relative to `basePath`, starting with a `/`.
+/// `basePath` is the path the app is mounted at, starting and ending with a `/`, and
+/// `headers` are the request headers, keyed by name in any case. Jaspr builds one for a
+/// shelf request. Any other host builds its own.
+typedef RequestLike = ({String url, String basePath, Map<String, List<String>> headers});
 
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
@@ -24,11 +28,7 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
     url = '/$url';
   }
 
-  final RequestLike r = (
-    url: url,
-    basePath: request.handlerPath,
-    headers: Headers.from(request.headersAll),
-  );
+  final RequestLike r = (url: url, basePath: request.handlerPath, headers: request.headersAll);
 
   if (!Jaspr.useIsolates) {
     final binding = ServerAppBinding(r, loadFile: loadFile);

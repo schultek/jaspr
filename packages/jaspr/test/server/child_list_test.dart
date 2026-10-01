@@ -7,9 +7,6 @@ import 'package:jaspr/server.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:jaspr_test/server_test.dart';
 
-// ignore: implementation_imports
-import 'package:shelf/src/headers.dart';
-
 import 'child_list_helpers.dart';
 
 void main() {
@@ -18,7 +15,7 @@ void main() {
       final binding = ServerAppBinding((
         url: '/',
         basePath: '/',
-        headers: Headers.empty(),
+        headers: const {},
       ), loadFile: (_) async => null);
       binding.initializeOptions(ServerOptions());
       binding.attachRootComponent(app);

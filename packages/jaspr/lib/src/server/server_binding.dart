@@ -5,6 +5,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
+// ignore: implementation_imports
+import 'package:shelf/src/headers.dart';
 
 import '../../jaspr.dart';
 import 'adapters/document_structure_helper.dart';
@@ -26,6 +28,10 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   final RequestLike request;
   final FileLoader _fileLoader;
 
+  /// The headers of the [request], looked up without regard to case.
+  @internal
+  late final Headers headers = Headers.from(request.headers);
+
   @override
   bool get isClient => false;
 
@@ -37,7 +43,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   /// Unmodifiable view of the cookies sent with the [request].
   late final Map<String, String> cookies = () {
-    if (request.headers[HttpHeaders.cookieHeader]?.expand((h) => h.split(';')) case final cookies?) {
+    if (headers[HttpHeaders.cookieHeader]?.expand((h) => h.split(';')) case final cookies?) {
       return UnmodifiableMapView({
         for (final cookie in cookies.map((cookie) => Cookie.fromSetCookieValue(cookie.trim())))
           cookie.name: cookie.value,
@@ -90,7 +96,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       return override;
     }
 
-    if (document != null && request.headers.singleValues['X-Jaspr-Reload'] == 'true') {
+    if (document != null && headers.singleValues['X-Jaspr-Reload'] == 'true') {
       return utf8.encode(document.body.renderToHtml());
     }
 

@@ -376,7 +376,7 @@ Future<String> _render(Component component, {bool standalone = false, Map<String
   final binding = ServerAppBinding((
     url: '/',
     basePath: '/',
-    headers: .empty(),
+    headers: const {},
   ), loadFile: (name) async => files[name]);
   addTearDown(binding.detachRootComponent);
   binding.initializeOptions(const ServerOptions());
