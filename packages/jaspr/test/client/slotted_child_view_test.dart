@@ -529,6 +529,7 @@ void main() {
                 .toJS;
         final mainElement = window.document.querySelector('main')!;
         final btn = mainElement.querySelector('button')! as HTMLElement;
+        const nestedViewKey = ValueKey('nested-view');
         var slotted = false;
         var updated = false;
         var enabled = true;
@@ -555,7 +556,7 @@ void main() {
                 child: StatefulBuilder(
                   builder: (context, set) {
                     setSlot = set;
-                    final nestedView = SlottedChildView(slots: const []);
+                    final nestedView = SlottedChildView(key: nestedViewKey, slots: const []);
                     return SlottedChildView(
                       slots: [
                         if (slotted)
@@ -586,12 +587,14 @@ void main() {
           expect(btn.hasAttribute('data-applied'), isFalse);
         }
 
+        expect(find.byKey(nestedViewKey), findsNothing);
         btn.click();
         expect(initialClicks, 1);
 
         setSlot(() => slotted = true);
         await pumpEventQueue();
 
+        expect(find.byKey(nestedViewKey), findsOneComponent);
         expect(mainElement.querySelector('button'), equals(btn));
         expect(btn.id, 'initial-id');
         expect(btn.className, 'original initial');
@@ -637,6 +640,7 @@ void main() {
       final end = window.document.body!.lastChild!;
       final buttonNodes = window.document.querySelectorAll('button');
       final buttons = [for (var i = 0; i < buttonNodes.length; i++) buttonNodes.item(i)! as HTMLElement];
+      const nestedViewKey = ValueKey('nested-view');
       var slotted = false;
       var clicks = 0;
       late void Function(void Function() cb) setSlot;
@@ -655,7 +659,7 @@ void main() {
                     ChildSlot.between(
                       start: start,
                       end: end,
-                      child: SlottedChildView(slots: const []),
+                      child: SlottedChildView(key: nestedViewKey, slots: const []),
                     ),
                 ],
               );
@@ -664,6 +668,7 @@ void main() {
         ),
       );
 
+      expect(find.byKey(nestedViewKey), findsNothing);
       for (final button in buttons) {
         expect(button.className, 'applied');
         button.click();
@@ -673,6 +678,7 @@ void main() {
       setSlot(() => slotted = true);
       await pumpEventQueue();
 
+      expect(find.byKey(nestedViewKey), findsOneComponent);
       for (final button in buttons) {
         expect(button.className, 'applied');
         button.click();

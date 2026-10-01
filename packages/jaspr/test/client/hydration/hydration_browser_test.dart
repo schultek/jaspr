@@ -525,13 +525,17 @@ void main() {
                   '<!--s${marker}1--><button class="original">Server</button><!--/s${marker}1-->'
                   '</div><!--/${marker}app-->'
               .toJS;
+      final clientElement = window.document.querySelector('div')!;
       final buttonElement = window.document.querySelector('button')! as HTMLElement;
 
       Jaspr.initializeApp(
         options: ClientOptions(
           clients: {
             'app': ClientLoader(
-              (params) => div([params.mount(params.get<String>('child'))]),
+              (params) => div(
+                attributes: const {'data-hydrated': 'true'},
+                [params.mount(params.get<String>('child'))],
+              ),
               loader: () => loaded.future,
             ),
           },
@@ -553,6 +557,7 @@ void main() {
         ),
       );
 
+      expect(clientElement.hasAttribute('data-hydrated'), isFalse);
       expect(buttonElement.style.color, 'red');
       buttonElement.click();
       expect(clicks, 1);
@@ -560,6 +565,8 @@ void main() {
       loaded.complete();
       await pumpEventQueue();
 
+      // Prove the client hydrated before checking the inherited params on its server content.
+      expect(clientElement.getAttribute('data-hydrated'), 'true');
       expect(window.document.querySelector('button'), equals(buttonElement));
       expect(buttonElement.className, 'original applied');
       expect(buttonElement.style.color, 'red');
