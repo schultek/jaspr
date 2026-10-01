@@ -16,7 +16,7 @@ dependencies:{{#flutter}}
 
 dev_dependencies:
   build_runner: ^2.15.1
-  build_web_compilers: ^4.8.5{{#flutter}}
+  build_web_compilers: ^4.8.11{{#flutter}}
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter{{/flutter}}

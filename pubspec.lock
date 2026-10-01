@@ -189,10 +189,10 @@ packages:
     dependency: transitive
     description:
       name: build_web_compilers
-      sha256: f8e2a2b3c45b0754fccb284e6f5d890b9d7ff3bed758293e55d29bcdc2821b78
+      sha256: f8136b4d19e55917711f134a5f4cf2fded7dfe97e4accf0c9a47b5d0fea4e296
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.10"
+    version: "4.8.11"
   built_collection:
     dependency: transitive
     description:
@@ -1655,5 +1655,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.13.0 <3.14.0-z"
+  dart: ">=3.13.0 <3.15.0-z"
   flutter: ">=3.44.0 <4.0.0"
