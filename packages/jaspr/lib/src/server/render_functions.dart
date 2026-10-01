@@ -16,20 +16,26 @@ import 'server_binding.dart';
 /// `url` is the path and query of the page relative to `basePath`, starting with a `/`.
 /// `basePath` is the path the app is mounted at, starting and ending with a `/`, and
 /// `headers` are the request headers, keyed by name in any case. Jaspr builds one for a
-/// shelf request. Any other host builds its own.
+/// shelf request. Any other host builds its own and passes it to [renderRequest].
 typedef RequestLike = ({String url, String basePath, Map<String, List<String>> headers});
 
 /// Performs the rendering process and provides the created [AppBinding] to [setup].
 ///
 /// If [Jaspr.useIsolates] is `true`, this spawns an isolate for each render.
-Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loadFile, bool standalone) async {
+Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loadFile, bool standalone) {
   var url = request.url.normalizePath().toString();
   if (!url.startsWith('/')) {
     url = '/$url';
   }
 
   final RequestLike r = (url: url, basePath: request.handlerPath, headers: request.headersAll);
+  return renderRequestLike(setup, r, loadFile, standalone);
+}
 
+/// Performs the rendering process for [r] and provides the created [AppBinding] to [setup].
+///
+/// If [Jaspr.useIsolates] is `true`, this spawns an isolate for each render.
+Future<ResponseLike> renderRequestLike(SetupFunction setup, RequestLike r, FileLoader loadFile, bool standalone) async {
   if (!Jaspr.useIsolates) {
     final binding = ServerAppBinding(r, loadFile: loadFile);
     setup(binding);

@@ -8,6 +8,7 @@ import '../framework/framework.dart';
 import 'options.dart';
 import 'render_functions.dart';
 import 'server_app.dart';
+import 'server_binding.dart';
 import 'server_handler.dart';
 
 /// Main entry point on the server.
@@ -44,6 +45,27 @@ Future<ResponseLike> renderComponent(Component app, {Request? request, bool stan
   return render(_createSetup(app), request, fileLoader, standalone);
 }
 
+/// Renders [app] for [request] and returns the response, without any shelf types.
+///
+/// This is the entry point for a server that is not built on shelf, or that hosts several
+/// Jaspr apps in one isolate. The host builds the [RequestLike], see there.
+///
+/// - [loadFile] loads files such as `Document.template`. Defaults to finding no file.
+/// - [options] are the generated server options for this app. They apply to this render only
+///   and do not change [Jaspr.options]. Defaults to [Jaspr.options], in which case
+///   [Jaspr.initializeApp] must have been called.
+/// - When [standalone] is false (default), the html output will have a full document structure (html, head, body).
+Future<ResponseLike> renderRequest(
+  Component app,
+  RequestLike request, {
+  FileLoader? loadFile,
+  ServerOptions? options,
+  bool standalone = false,
+}) async {
+  if (options == null) _checkInitialized('renderRequest');
+  return renderRequestLike(_createSetup(app, options: options), request, loadFile ?? (_) async => null, standalone);
+}
+
 void _checkInitialized(String method) {
   if (!Jaspr.isInitialized) {
     stderr.write('Error: Jaspr was not initialized. Call Jaspr.initializeApp() before calling $method()');
@@ -51,10 +73,10 @@ void _checkInitialized(String method) {
   }
 }
 
-SetupFunction _createSetup(Component app) {
-  final options = Jaspr.options;
+SetupFunction _createSetup(Component app, {ServerOptions? options}) {
+  final resolvedOptions = options ?? Jaspr.options;
   return (binding) {
-    binding.initializeOptions(options);
+    binding.initializeOptions(resolvedOptions);
     binding.attachRootComponent(app);
   };
 }

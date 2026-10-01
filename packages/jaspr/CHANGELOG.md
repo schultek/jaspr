@@ -3,6 +3,9 @@
 - Fixed issue with hot-reload in client mode.
 - `RequestLike` is exported from `package:jaspr/server.dart`, and its `headers` are a `Map<String, List<String>>`
   instead of shelf's internal `Headers` class.
+- Added `renderRequest()` to render a component for a `RequestLike` the host builds, without shelf types.
+  The function takes the generated `ServerOptions` per call, so a server can host several Jaspr apps in one
+  isolate without calling `Jaspr.initializeApp()`.
 
 ## 0.24.0-beta.0
 
