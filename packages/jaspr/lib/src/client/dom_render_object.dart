@@ -195,12 +195,22 @@ class DomRenderElement extends DomRenderObject
         dataEvents.remove(type)?.clear();
       }
     } else {
-      if (this.events case final existingEvents?) {
-        for (final binding in existingEvents.values) {
-          binding.clear();
-        }
-        this.events = null;
+      _clearEvents();
+    }
+  }
+
+  @override
+  void release({String? id, Iterable<String>? classes, Iterable<String>? styles, Iterable<String>? attributes}) {
+    (node as web.HTMLElement).removeValues(id: id, classes: classes, styles: styles, attributes: attributes);
+    _clearEvents();
+  }
+
+  void _clearEvents() {
+    if (events case final existingEvents?) {
+      for (final binding in existingEvents.values) {
+        binding.clear();
       }
+      events = null;
     }
   }
 

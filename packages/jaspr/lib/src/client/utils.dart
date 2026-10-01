@@ -40,6 +40,45 @@ int _nodeHashCode(web.Node node) {
   return hashCode;
 }
 
+extension RemoveValues on web.HTMLElement {
+  /// Removes the given values, as well as the `class` and `style` attributes if they're left empty,
+  /// rather than leaving behind attributes that the element didn't have before.
+  ///
+  /// The [id] is only removed if the element still has it.
+  void removeValues({String? id, Iterable<String>? classes, Iterable<String>? styles, Iterable<String>? attributes}) {
+    if (id != null && this.id == id) {
+      removeAttribute('id');
+    }
+
+    if (classes != null && classes.isNotEmpty) {
+      for (final c in classes) {
+        classList.remove(c);
+      }
+      if (classList.length == 0) {
+        removeAttribute('class');
+      }
+    }
+
+    if (styles != null && styles.isNotEmpty) {
+      for (final name in styles) {
+        style.removeProperty(name);
+      }
+      if (style.length == 0) {
+        // Read the attribute first, so the browser syncs the pending style changes into it.
+        // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
+        getAttribute('style');
+        removeAttribute('style');
+      }
+    }
+
+    if (attributes != null) {
+      for (final name in attributes) {
+        removeAttribute(name);
+      }
+    }
+  }
+}
+
 extension NodeListIterable on web.NodeList {
   Iterable<web.Node> toIterable() sync* {
     for (var i = 0; i < length; i++) {

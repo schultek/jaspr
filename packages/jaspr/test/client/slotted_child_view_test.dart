@@ -396,6 +396,468 @@ void main() {
       expect(mainElement.textContent, 'Hydrated');
     });
 
+    for (final querySlot in [false, true]) {
+      for (final nestedView in [false, true]) {
+        testClient(
+          'takes over the elements of a removed ${querySlot ? 'query' : 'range'} slot '
+          'from ${nestedView ? 'a nested view' : 'a hydrated child'}',
+          (tester) async {
+            window.document.body!.innerHTML =
+                '<section><main><!--start-->'
+                        '<button class="original" data-own="true">Static</button>'
+                        '<!--end--></main></section>'
+                    .toJS;
+            final mainElement = window.document.querySelector('main')!;
+            final btn = mainElement.querySelector('button')! as HTMLElement;
+            var slotted = true;
+            var enabled = true;
+            var clicks = 0;
+            late void Function(void Function() cb) setParams;
+            late void Function(void Function() cb) setSlot;
+
+            tester.pumpComponent(
+              StatefulBuilder(
+                builder: (context, set) {
+                  setParams = set;
+                  return .apply(
+                    target: const .descendantWith(tag: 'button'),
+                    classes: enabled ? 'applied' : null,
+                    styles: enabled ? const Styles(color: Colors.red) : null,
+                    attributes: enabled ? const {'data-applied': 'true'} : null,
+                    events: enabled ? {'click': (_) => clicks++} : null,
+                    child: StatefulBuilder(
+                      builder: (context, set) {
+                        setSlot = set;
+                        final child = nestedView
+                            ? SlottedChildView(slots: const [])
+                            : button(classes: 'original', attributes: const {'data-own': 'true'}, [.text('Hydrated')]);
+                        return SlottedChildView(
+                          slots: [
+                            if (slotted)
+                              if (querySlot)
+                                ChildSlot.fromQuery('main', child: child)
+                              else
+                                ChildSlot.between(
+                                  start: mainElement.firstChild!,
+                                  end: mainElement.lastChild!,
+                                  child: child,
+                                ),
+                          ],
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            );
+
+            void expectApplied() {
+              expect(btn.className, 'original applied');
+              expect(btn.style.color, 'red');
+              expect(btn.getAttribute('data-applied'), 'true');
+              expect(btn.getAttribute('data-own'), 'true');
+              final before = clicks;
+              btn.click();
+              expect(clicks, before + 1);
+            }
+
+            void expectOriginal() {
+              expect(btn.className, 'original');
+              expect(btn.hasAttribute('style'), isFalse);
+              expect(btn.hasAttribute('data-applied'), isFalse);
+              expect(btn.getAttribute('data-own'), 'true');
+              final before = clicks;
+              btn.click();
+              expect(clicks, before);
+            }
+
+            expectApplied();
+
+            // The slot's DOM stays in place, and the view applies the params to it instead.
+            setSlot(() => slotted = false);
+            await pumpEventQueue();
+            expect(mainElement.querySelector('button'), equals(btn));
+            expectApplied();
+
+            // The view only removes values it applied itself,
+            // so this verifies it took over the values from the slot's child.
+            setParams(() => enabled = false);
+            await pumpEventQueue();
+            expectOriginal();
+
+            setParams(() => enabled = true);
+            await pumpEventQueue();
+            expectApplied();
+
+            tester.binding.detachRootComponent();
+            expectOriginal();
+          },
+        );
+      }
+    }
+
+    testClient('takes over the elements of a slot nested in a removed slot', (tester) async {
+      window.document.body!.innerHTML =
+          '<section><main><article><div><button>Static</button></div></article></main></section>'.toJS;
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      var slotted = true;
+      var enabled = true;
+      var clicks = 0;
+      late void Function(void Function() cb) setParams;
+      late void Function(void Function() cb) setSlot;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setParams = set;
+            return .apply(
+              target: const .descendantWith(tag: 'button'),
+              classes: enabled ? 'applied' : null,
+              events: enabled ? {'click': (_) => clicks++} : null,
+              child: StatefulBuilder(
+                builder: (context, set) {
+                  setSlot = set;
+                  return SlottedChildView(
+                    slots: [
+                      if (slotted)
+                        ChildSlot.fromQuery(
+                          'main',
+                          child: SlottedChildView(
+                            slots: [
+                              ChildSlot.fromQuery('div', child: button([.text('Hydrated')])),
+                            ],
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(btn.className, 'applied');
+      btn.click();
+      expect(clicks, 1);
+
+      // Removing the outer slot also unmounts the nested slot, which releases the button,
+      // and the outer view takes it over once both have unmounted.
+      setSlot(() => slotted = false);
+      await pumpEventQueue();
+      expect(btn.textContent, 'Hydrated');
+      expect(btn.className, 'applied');
+      btn.click();
+      expect(clicks, 2);
+
+      setParams(() => enabled = false);
+      await pumpEventQueue();
+      expect(btn.hasAttribute('class'), isFalse);
+      btn.click();
+      expect(clicks, 2);
+    });
+
+    for (final nestedView in [false, true]) {
+      for (final afterRemovedSlot in [false, true]) {
+        testClient(
+          'hands the elements of a replaced slot to ${nestedView ? 'a nested view' : 'a hydrated child'} '
+          'of the new slot${afterRemovedSlot ? ' after another removed slot' : ''}',
+          (tester) async {
+            window.document.body!.innerHTML =
+                '<section><aside><b>Aside</b></aside><main><button>Static</button></main></section>'.toJS;
+            final btn = window.document.querySelector('button')! as HTMLElement;
+            var version = 1;
+            var enabled = true;
+            var clicks = 0;
+            late void Function(void Function() cb) setParams;
+            late void Function(void Function() cb) setSlot;
+
+            tester.pumpComponent(
+              StatefulBuilder(
+                builder: (context, set) {
+                  setParams = set;
+                  return .apply(
+                    target: const .descendantWith(tag: 'button'),
+                    classes: enabled ? 'applied' : null,
+                    events: enabled ? {'click': (_) => clicks++} : null,
+                    child: StatefulBuilder(
+                      builder: (context, set) {
+                        setSlot = set;
+                        return SlottedChildView(
+                          slots: [
+                            // Removing a slot before the replaced one means the new slot isn't
+                            // in the same position as the slot it replaces.
+                            if (afterRemovedSlot && version == 1)
+                              ChildSlot.fromQuery('aside', key: const ValueKey('aside'), child: b([.text('Aside')])),
+                            // A new key replaces the slot with one that hydrates the same nodes.
+                            // Its query matches an inherited class, which the replaced slot's child
+                            // released, so the view must apply it again before resolving the query.
+                            ChildSlot.fromQuery(
+                              'main:has(button.applied)',
+                              key: ValueKey(version),
+                              child: version == 2 && nestedView
+                                  ? SlottedChildView(slots: const [])
+                                  : button([.text('Version $version')]),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            );
+
+            expect(btn.className, 'applied');
+
+            setSlot(() => version = 2);
+            await pumpEventQueue();
+
+            // The replaced slot's child released the button before the new slot took it over.
+            expect(window.document.querySelector('button'), equals(btn));
+            expect(btn.textContent, nestedView ? 'Version 1' : 'Version 2');
+            expect(btn.className, 'applied');
+            btn.click();
+            expect(clicks, 1);
+
+            // The new slot's child owns the values on the button,
+            // rather than treating the values the replaced child added as original ones.
+            setParams(() => enabled = false);
+            await pumpEventQueue();
+            expect(btn.hasAttribute('class'), isFalse);
+            btn.click();
+            expect(clicks, 1);
+          },
+        );
+      }
+    }
+
+    testClient('keeps the params of an element moved out of a removed slot with a global key', (tester) async {
+      window.document.body!.innerHTML = '<section><main><button>Static</button></main></section>'.toJS;
+      final buttonKey = GlobalKey();
+      var moved = false;
+      var ownEvents = 0;
+      var outerClicks = 0;
+      var movedClicks = 0;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            final movable = button(key: buttonKey, events: {'own': (_) => ownEvents++}, [.text('Hydrated')]);
+            // The slot comes first, so it's deactivated before the button is moved out of it.
+            return Component.fragment([
+              .apply(
+                target: const .descendantWith(tag: 'button'),
+                classes: 'outer',
+                events: {'click': (_) => outerClicks++},
+                child: SlottedChildView(
+                  slots: [
+                    if (!moved) ChildSlot.fromQuery('main', child: movable),
+                  ],
+                ),
+              ),
+              .apply(
+                target: const .descendantWith(tag: 'button'),
+                classes: 'moved',
+                events: {'click': (_) => movedClicks++},
+                child: div(id: 'destination', [if (moved) movable]),
+              ),
+            ]);
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.className, 'outer');
+
+      setState(() => moved = true);
+      await pumpEventQueue();
+
+      // The button released its values and listeners when its slot was removed,
+      // and renders them again for its new parent. The view only takes over
+      // the slot's remaining nodes once the slot unmounts, after the button moved.
+      expect(window.document.querySelector('#destination > button'), equals(btn));
+      expect(btn.className, 'moved');
+      btn.click();
+      btn.dispatchEvent(Event('own'));
+      expect(ownEvents, 1);
+      expect(movedClicks, 1);
+      expect(outerClicks, 0);
+    });
+
+    testClient('keeps the state of form elements in a removed slot', (tester) async {
+      window.document.body!.innerHTML = '<section><main><input value="Initial"></main></section>'.toJS;
+      final field = window.document.querySelector('input')! as HTMLInputElement;
+      var slotted = true;
+      var inputs = 0;
+      late void Function(void Function() cb) setSlot;
+
+      tester.pumpComponent(
+        .apply(
+          target: const .descendantWith(tag: 'input'),
+          classes: 'applied',
+          child: StatefulBuilder(
+            builder: (context, set) {
+              setSlot = set;
+              return SlottedChildView(
+                slots: [
+                  if (slotted)
+                    ChildSlot.fromQuery(
+                      'main',
+                      child: input<String>(value: 'Initial', onInput: (_) => inputs++),
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+
+      field.value = 'Edited';
+      field.dispatchEvent(Event('input'));
+      expect(inputs, 1);
+
+      setSlot(() => slotted = false);
+      await pumpEventQueue();
+
+      // Releasing the field removes the listener and inherited values of its child,
+      // but not the value entered into it.
+      expect(window.document.querySelector('input'), equals(field));
+      expect(field.value, 'Edited');
+      expect(field.className, 'applied');
+      field.dispatchEvent(Event('input'));
+      expect(inputs, 1);
+    });
+
+    testClient('keeps the state of a form element moved out of a removed slot with a global key', (tester) async {
+      window.document.body!.innerHTML = '<section><main><input value="Initial"></main></section>'.toJS;
+      final field = window.document.querySelector('input')! as HTMLInputElement;
+      var moved = false;
+      var inputs = 0;
+      late void Function(void Function() cb) setState;
+      // The same component is moved, so the field doesn't need to render again for its new parent.
+      final movable = input<String>(key: GlobalKey(), value: 'Initial', onInput: (_) => inputs++);
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return Component.fragment([
+              SlottedChildView(
+                slots: [
+                  if (!moved) ChildSlot.fromQuery('main', child: movable),
+                ],
+              ),
+              div(id: 'destination', [if (moved) movable]),
+            ]);
+          },
+        ),
+      );
+
+      field.value = 'Edited';
+      setState(() => moved = true);
+      await pumpEventQueue();
+
+      expect(window.document.querySelector('#destination > input'), equals(field));
+      expect(field.value, 'Edited');
+      field.dispatchEvent(Event('input'));
+      expect(inputs, 1);
+    });
+
+    testClient('applies params after being moved into them with a global key', (tester) async {
+      window.document.body!.innerHTML = '<div id="source"><p class="static">Static</p></div>'.toJS;
+      final paragraph = window.document.querySelector('p')!;
+      var moved = false;
+      late void Function(void Function() cb) setState;
+      final movable = SlottedChildView.withNodes(key: GlobalKey(), nodes: [paragraph], slots: const []);
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return Component.fragment([
+              div(id: 'source', [if (!moved) movable]),
+              .apply(
+                target: const .descendantWith(tag: 'p'),
+                classes: 'applied',
+                child: div(id: 'destination', [if (moved) movable]),
+              ),
+            ]);
+          },
+        ),
+      );
+
+      expect(paragraph.className, 'static');
+
+      // The view had no inherited params before, so only the new ones make it render again.
+      setState(() => moved = true);
+      await pumpEventQueue();
+      expect(window.document.querySelector('#destination > p'), equals(paragraph));
+      expect(paragraph.className, 'static applied');
+    });
+
+    testClient('releases the elements of a slot removed while detached from the document', (tester) async {
+      window.document.body!.innerHTML = '<section><main><button>Static</button></main></section>'.toJS;
+      final section = window.document.querySelector('section')!;
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      var slotted = true;
+      var enabled = true;
+      var ownEvents = 0;
+      var clicks = 0;
+      late void Function(void Function() cb) setParams;
+      late void Function(void Function() cb) setSlot;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setParams = set;
+            return .apply(
+              target: const .descendantWith(tag: 'button'),
+              classes: enabled ? 'applied' : null,
+              events: enabled ? {'click': (_) => clicks++} : null,
+              child: StatefulBuilder(
+                builder: (context, set) {
+                  setSlot = set;
+                  return SlottedChildView(
+                    slots: [
+                      if (slotted)
+                        ChildSlot.fromQuery(
+                          'main',
+                          child: button(events: {'own': (_) => ownEvents++}, [.text('Hydrated')]),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      );
+
+      // Remove the slot while the view's DOM is detached, then attach it again.
+      section.remove();
+      setSlot(() => slotted = false);
+      await pumpEventQueue();
+      window.document.body!.append(section);
+
+      // The listeners of the removed child don't fire anymore,
+      // and the view applies its params in place of the child's.
+      expect(btn.className, 'applied');
+      btn.dispatchEvent(Event('own'));
+      expect(ownEvents, 0);
+      btn.click();
+      expect(clicks, 1);
+
+      // The view owns the inherited values, rather than treating them as original values.
+      setParams(() => enabled = false);
+      await pumpEventQueue();
+      expect(btn.hasAttribute('class'), isFalse);
+      btn.click();
+      expect(clicks, 1);
+    });
+
     testClient('removes the listeners added by the child of a removed slot', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Static</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;
@@ -883,10 +1345,11 @@ void main() {
           btn.click();
           expect(clicks, 1);
 
-          // Unmounting leaves the DOM of a hydrated child in place, so the class remains.
-          // If the view had owned the button, it would have removed the class here.
+          // The slot's child leaves its DOM in place when it unmounts,
+          // but without the values and listeners it added for the params.
           tester.binding.detachRootComponent();
-          expect(btn.className, 'applied');
+          expect(btn.textContent, 'Hydrated');
+          expect(btn.hasAttribute('class'), isFalse);
           btn.click();
           expect(clicks, 1);
         },

@@ -116,24 +116,11 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
 
   @override
   void unmount() {
+    final view = parentRenderObjectElement as SlottedChildViewElement;
+    final renderObject = this.renderObject as ChildSlotRenderObject;
     super.unmount();
-    // The slot's DOM stays in place, so remove the listeners its child added.
-    // Otherwise they would keep firing alongside any params the view applies to
-    // the leftover elements after this slot is removed.
-    _clearEventListeners(this);
+    view._reclaimSlot(renderObject);
   }
-}
-
-/// Removes the event listeners of all DOM render objects in the subtree of [e].
-void _clearEventListeners(Element e) {
-  if (e case RenderObjectElement(renderObject: final DomRenderElement r)) {
-    r.events?.forEach((type, binding) {
-      binding.clear();
-    });
-    r.events = null;
-  }
-
-  e.visitChildren(_clearEventListeners);
 }
 
 /// Component that renders its children into specified DOM nodes (slots).
@@ -141,6 +128,10 @@ void _clearEventListeners(Element e) {
 /// Child components are mounted as direct children of this component, but may target
 /// specific nested DOM nodes within the component's DOM subtree. This allows for hydrating
 /// only specific parts of the DOM tree while having a single coherent component tree.
+///
+/// When a slot is removed, its DOM nodes stay in place as static content, without the
+/// listeners or inherited params its child added. Like other static content in this view,
+/// they then receive the inherited params from this view instead.
 class SlottedChildView extends Component {
   SlottedChildView({required this.slots, super.key}) : nodes = null;
 
@@ -246,26 +237,42 @@ class SlottedChildViewElement extends DomRenderObjectElement {
 
   /// Creates the render object of [slot] and hands it the elements it owns.
   ChildSlotRenderObject _createSlotRenderObject(ChildSlot slot) {
+    final renderObject = this.renderObject as SlottedDomRenderObject;
+
     // The view normally applies changed params after rebuilding its slots,
     // but a query must be able to match them, so apply them first.
-    if (_paramsChanged && slot is! RangeChildSlot) {
-      updateRenderObject(renderObject as SlottedDomRenderObject);
+    // That includes the elements of removed slots, which released their params when deactivated.
+    final queriedRemovedSlots = slot is RangeChildSlot ? const <ChildSlotRenderObject>{} : renderObject._removedSlots;
+    if (slot is! RangeChildSlot && (_paramsChanged || queriedRemovedSlots.isNotEmpty)) {
+      _applyParams(renderObject, includeRemovedSlots: queriedRemovedSlots.isNotEmpty);
     }
-    final slotRenderObject = slot.createRenderObject(renderObject as SlottedDomRenderObject);
+    final slotRenderObject = slot.createRenderObject(renderObject);
+
     // Resolve the target before removing any values its query could match.
-    // Release only the nodes being handed over, before the child hydrates them.
-    _releaseParams(slotRenderObject);
+    // Then release the nodes being handed over, before the child hydrates them,
+    // and the nodes of removed slots, which this view only takes over once they unmount.
+    _releaseParams([
+      if (slotRenderObject.toHydrate.isNotEmpty) slotRenderObject,
+      ...queriedRemovedSlots,
+    ]);
     return slotRenderObject;
   }
 
   /// Applies the inherited params to the elements owned by this view.
   ///
-  /// This view owns all elements outside of its attached slots, at any depth.
+  /// This view owns all elements outside of its slots, at any depth.
   /// Elements inside a slot are owned by the slot's child,
   /// which applies the inherited params to its own elements,
   /// so this view never modifies them.
+  /// A removed slot keeps its elements until it unmounts.
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
+    _applyParams(renderObject);
+  }
+
+  /// Applies the inherited params to the elements owned by this view,
+  /// as well as to the elements of removed slots if [includeRemovedSlots] is `true`.
+  void _applyParams(SlottedDomRenderObject renderObject, {bool includeRemovedSlots = false}) {
     _paramsChanged = false;
     _resetAppliedParams();
 
@@ -275,6 +282,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     _visitOwnedElements(
       renderObject,
       descendants: params.any((p) => !p.target.onlyChildren),
+      includeRemovedSlots: includeRemovedSlots,
       (element, isRoot) {
         for (final param in params) {
           if ((isRoot || !param.target.onlyChildren) && _isMatchingElement(param.target, element)) {
@@ -290,15 +298,20 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   /// The callback's `isRoot` argument is `true` for
   /// elements that are direct children of the view.
   /// Their descendants are only visited if [descendants] is `true`.
+  /// The elements of removed slots are only visited if [includeRemovedSlots] is `true`.
   void _visitOwnedElements(
     SlottedDomRenderObject renderObject,
     void Function(web.HTMLElement element, bool isRoot) visit, {
     required bool descendants,
+    required bool includeRemovedSlots,
   }) {
     // The start and end nodes of range slots, and the elements whose children are slotted.
     final slotRanges = nodeMap<web.Node, web.Node>();
     final slottedParents = nodeSet<web.Node>();
-    for (final slot in renderObject._slots) {
+    final skippedSlots = includeRemovedSlots
+        ? renderObject._slots
+        : renderObject._slots.followedBy(renderObject._removedSlots);
+    for (final slot in skippedSlots) {
       if (slot._range case (:final start, :final end)) {
         slotRanges[start] = end;
       } else {
@@ -344,15 +357,15 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     return true;
   }
 
-  /// Releases our params on the elements owned by [slot] to its child.
+  /// Releases our params on the elements owned by [slots].
   ///
-  /// Reset and forget them before the slot's child hydrates,
+  /// Reset and forget them before a slot's child hydrates the elements,
   /// so a nested view doesn't treat inherited values as original DOM values.
-  void _releaseParams(ChildSlotRenderObject slot) {
-    if (slot.toHydrate.isEmpty || _appliedParams.isEmpty) return;
+  void _releaseParams(List<ChildSlotRenderObject> slots) {
+    if (slots.isEmpty || _appliedParams.isEmpty) return;
 
     _appliedParams.removeWhere((element, params) {
-      if (!slot._owns(element)) return false;
+      if (!slots.any((slot) => slot._owns(element))) return false;
       _resetElementParams(element, params);
       return true;
     });
@@ -364,38 +377,12 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   void _resetElementParams(web.HTMLElement element, _AppliedParams params) {
-    // Remove attributes left empty, rather than leaving behind attributes
-    // such as `id=""` that the element didn't have before.
-    if (params.id != null && element.id == params.id) {
-      element.removeAttribute('id');
-    }
-
-    if (params.classes case final appliedClasses? when appliedClasses.isNotEmpty) {
-      for (final c in appliedClasses) {
-        element.classList.remove(c);
-      }
-      if (element.classList.length == 0) {
-        element.removeAttribute('class');
-      }
-    }
-
-    if (params.styles case final appliedStyles? when appliedStyles.isNotEmpty) {
-      for (final e in appliedStyles.entries) {
-        element.style.removeProperty(e.key);
-      }
-      if (element.style.length == 0) {
-        // Read the attribute first, so the browser syncs the pending style changes into it.
-        // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
-        element.getAttribute('style');
-        element.removeAttribute('style');
-      }
-    }
-
-    if (params.attributes case final appliedAttributes?) {
-      for (final e in appliedAttributes.entries) {
-        element.removeAttribute(e.key);
-      }
-    }
+    element.removeValues(
+      id: params.id,
+      classes: params.classes,
+      styles: params.styles?.keys,
+      attributes: params.attributes?.keys,
+    );
 
     if (params.eventBindings case final appliedEvents?) {
       for (final binding in appliedEvents.values) {
@@ -469,11 +456,29 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     );
   }
 
+  /// Takes over the nodes of a removed [slot] once it unmounted.
+  ///
+  /// Its descendants already released the values they rendered when they were deactivated,
+  /// so apply the params once every slot removed in this build has unmounted.
+  void _reclaimSlot(ChildSlotRenderObject slot) {
+    final renderObject = this.renderObject as SlottedDomRenderObject;
+    if (renderObject._removedSlots.remove(slot) && renderObject._removedSlots.isEmpty) {
+      updateRenderObject(renderObject);
+    }
+  }
+
+  /// Resets the values this view applied, since its DOM can stay in place,
+  /// such as when it's in a removed slot of another view, or the root component is detached.
+  ///
+  /// Whatever takes over the DOM next would otherwise treat them as original values.
+  /// If this view is reactivated instead, such as when moved with a global key,
+  /// its dependency on the inherited params makes it apply them again.
   @override
-  void unmount() {
-    // Each slot clears the listeners of its own subtree when it unmounts.
+  void deactivate() {
     _resetAppliedParams();
-    super.unmount();
+    // Its slots unmount along with it, so it doesn't take over their nodes.
+    (renderObject as SlottedDomRenderObject)._removedSlots.clear();
+    super.deactivate();
   }
 }
 
@@ -530,6 +535,12 @@ class SlottedDomRenderObject extends DomRenderFragment {
   /// The currently attached slots, which own the nodes they contain.
   final Set<ChildSlotRenderObject> _slots = {};
 
+  /// The slots removed during the current build, which still own the nodes they contained.
+  ///
+  /// The view takes over their nodes once they unmount, after any element
+  /// moved out of them with a global key has left.
+  final Set<ChildSlotRenderObject> _removedSlots = {};
+
   @override
   void attach(covariant RenderObject child, {covariant RenderObject? after}) {
     if (child is ChildSlotRenderObject) {
@@ -540,6 +551,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
       child.parent = this;
       child.finalize();
       _slots.add(child);
+      _removedSlots.remove(child);
       return;
     }
     throw UnsupportedError('SlottedDomRenderObject cannot have children attached to them.');
@@ -549,6 +561,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
   void remove(covariant RenderObject child) {
     if (child is ChildSlotRenderObject) {
       _slots.remove(child);
+      _removedSlots.add(child);
       child.parent = null;
       return;
     }
