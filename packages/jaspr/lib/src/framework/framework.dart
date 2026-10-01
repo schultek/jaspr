@@ -494,14 +494,13 @@ abstract class Element implements BuildContext {
     //    from beginning to end.
     // At this point we narrowed the old and new lists to the point
     // where the nodes no longer match.
-    // 3. Walk the narrowed part of the old list to get the list of
-    //    keys and sync null with non-keyed items.
+    // 3. Walk the narrowed part of the new list to get the list of keys,
+    //    then sync null with the items in the narrowed part of the old list
+    //    that aren't reused, so they're deactivated before any new item mounts.
     // 4. Walk the narrowed part of the new list forwards:
     //     * Sync non-keyed items with null
     //     * Sync keyed items with the source if it exists, else with null.
     // 5. Walk the bottom of the list again, syncing the nodes.
-    // 6. Sync null with any items in the list of keys that are still
-    //    mounted.
 
     if (oldChildren.length <= 1 && newComponents.length <= 1) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
@@ -573,18 +572,20 @@ abstract class Element implements BuildContext {
       }
     }
 
-    while (newChildrenTop <= newChildrenBottom) {
-      if (oldChildrenTop <= oldChildrenBottom) {
-        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
-        if (oldChild != null) {
-          final Key? key = oldChild.component.key;
-          if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
-            deactivateChild(oldChild);
-          }
+    // Deactivate the old children that aren't reused before updating the new ones,
+    // so a new child never mounts while an old child it replaces is still active.
+    while (oldChildrenTop <= oldChildrenBottom) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+      if (oldChild != null) {
+        final Key? key = oldChild.component.key;
+        if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
+          deactivateChild(oldChild);
         }
-        oldChildrenTop += 1;
       }
+      oldChildrenTop += 1;
+    }
 
+    while (newChildrenTop <= newChildrenBottom) {
       Element? oldChild;
       final Component newComponent = newComponents[newChildrenTop];
       final Key? key = newComponent.key;
@@ -596,17 +597,6 @@ abstract class Element implements BuildContext {
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
-    }
-
-    while (oldChildrenTop <= oldChildrenBottom) {
-      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
-      if (oldChild != null) {
-        final Key? key = oldChild.component.key;
-        if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
-          deactivateChild(oldChild);
-        }
-      }
-      oldChildrenTop += 1;
     }
 
     // We've scanned the whole list.
