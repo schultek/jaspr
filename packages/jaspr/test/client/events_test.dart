@@ -1,8 +1,10 @@
 @TestOn('browser')
 library;
 
+import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr_test/client_test.dart';
+import 'package:universal_web/web.dart';
 
 void main() {
   group('events', () {
@@ -96,6 +98,70 @@ void main() {
 
       await tester.change(find.tag('textarea'), value: 'World');
       expect(textChange, equals('World'));
+    });
+
+    testClient('removes listeners and inherited values from elements left in place', (tester) async {
+      var ownEvents = 0;
+      var appliedEvents = 0;
+
+      tester.pumpComponent(
+        .apply(
+          classes: 'applied',
+          events: {'applied': (_) => appliedEvents++},
+          child: button(classes: 'own', events: {'own': (_) => ownEvents++}, []),
+        ),
+      );
+
+      final btn = window.document.querySelector('button')!;
+      void dispatchEvents() {
+        btn.dispatchEvent(Event('own'));
+        btn.dispatchEvent(Event('applied'));
+      }
+
+      expect(btn.className, 'own applied');
+      dispatchEvents();
+      expect(ownEvents, 1);
+      expect(appliedEvents, 1);
+
+      // Detaching the root component leaves its DOM in place,
+      // but without the values and listeners that its components added.
+      tester.binding.detachRootComponent();
+      expect(btn.isConnected, isTrue);
+      expect(btn.className, 'own');
+      dispatchEvents();
+      expect(ownEvents, 1);
+      expect(appliedEvents, 1);
+    });
+
+    testClient('adds inherited values to an element moved into them with a global key', (tester) async {
+      var moved = false;
+      late void Function(void Function() cb) setState;
+      final movable = button(key: GlobalKey(), classes: 'own', []);
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return Component.fragment([
+              div(id: 'source', [if (!moved) movable]),
+              .apply(
+                target: const .descendantWith(tag: 'button'),
+                classes: 'applied',
+                child: div(id: 'destination', [if (moved) movable]),
+              ),
+            ]);
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')!;
+      expect(btn.className, 'own');
+
+      // The same component is moved, so only the new inherited params make it render again.
+      setState(() => moved = true);
+      await pumpEventQueue();
+      expect(window.document.querySelector('#destination > button'), equals(btn));
+      expect(btn.className, 'own applied');
     });
   });
 }
