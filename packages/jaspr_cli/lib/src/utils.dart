@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 
 import 'dev/util.dart';
 import 'logging.dart';
+import 'process_runner.dart';
 
 /// Gets the base url for pub mirror with respect to the value of `PUB_HOSTED_URL` enviroment variable.
 ///
@@ -137,4 +138,17 @@ String? getJasprPackagePath(String packageConfigPath, Map<String, Object?> packa
       : p.normalize(p.join(p.dirname(p.absolute(packageConfigPath)), jasprPackageUri));
 
   return jasprPath;
+}
+
+/// Kills [process], together with the processes it started on Windows.
+///
+/// `dart run` there launches the program in a child `dartvm.exe` instead of
+/// replacing the launcher, and killing the launcher leaves that child alive
+/// holding whatever ports it bound, so the tree is taken down with taskkill.
+Future<void> killProcessTree(Process process) async {
+  if (Platform.isWindows) {
+    await ProcessRunner.instance.run('taskkill', ['/pid', '${process.pid}', '/T', '/F']);
+  } else {
+    process.kill();
+  }
 }

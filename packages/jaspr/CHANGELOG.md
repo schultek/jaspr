@@ -81,6 +81,8 @@
 
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
+- Fixed `jaspr serve` leaving the server process running after Ctrl+C,
+  which kept its ports bound until it was killed by hand.
 - Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.
 - Fixed the server output of a client component that
   renders `<head>` when the document has no `<body>`.

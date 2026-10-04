@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:file/memory.dart';
 import 'package:jaspr_cli/src/commands/base_command.dart';
 import 'package:test/test.dart';
@@ -70,6 +72,67 @@ void main() {
         await command.copy('generated', ['assets', 'assets/nested']);
 
         expectFilesCopiedOnce(files);
+      });
+    });
+  });
+
+  group('stop', () {
+    late FakeIO io;
+
+    setUp(() {
+      io = FakeIO();
+      io.setupFakeProject('myapp');
+    });
+
+    tearDown(() {
+      io.tearDown();
+    });
+
+    test('waits for the guards when it is called again while they are running', () async {
+      await io.runZoned(() async {
+        final command = _TestCommand();
+        final calls = <String>[];
+        final blocked = Completer<void>();
+
+        command.guardResource(() async {
+          calls.add('first started');
+          await blocked.future;
+          calls.add('first done');
+        });
+        command.guardResource(() async {
+          calls.add('second');
+        });
+
+        final first = command.stop();
+        await pumpEventQueue();
+        expect(calls, ['first started']);
+
+        // The signal handler and the command's `finally` both get here.
+        var secondDone = false;
+        final second = command.stop().then((_) => secondDone = true);
+        await pumpEventQueue();
+
+        expect(secondDone, isFalse, reason: 'returned while the guards were still running');
+
+        blocked.complete();
+        await Future.wait([first, second]);
+
+        expect(calls, ['first started', 'first done', 'second']);
+      });
+    });
+
+    test('runs guards registered after it finished', () async {
+      await io.runZoned(() async {
+        final command = _TestCommand();
+        final calls = <String>[];
+
+        command.guardResource(() => calls.add('first'));
+        await command.stop();
+
+        command.guardResource(() => calls.add('second'));
+        await command.stop();
+
+        expect(calls, ['first', 'second']);
       });
     });
   });
