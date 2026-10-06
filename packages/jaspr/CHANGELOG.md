@@ -63,6 +63,7 @@
 
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
+- Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.
 
 ## 0.23.5
 
