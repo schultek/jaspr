@@ -1,7 +1,6 @@
 @TestOn('browser')
 library;
 
-import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr_test/client_test.dart';
 
