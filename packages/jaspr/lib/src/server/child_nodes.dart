@@ -234,6 +234,24 @@ final class ChildList with Iterable<MarkupRenderObject> {
 
     return ChildListRange(start, end);
   }
+
+  /// Returns [child]'s node together with the element boundaries around it.
+  ///
+  /// This is the outermost range created by [wrapElement] around [child],
+  /// or [child]'s own node if it has no boundaries.
+  /// Returns `null` if [child] isn't a direct child of this list.
+  ChildNode? findWithBoundaries(MarkupRenderObject child) {
+    final node = find(child);
+    if (node == null) return null;
+
+    ChildNode outermost = node;
+    for (var curr = node.prev; curr != null; curr = curr.prev) {
+      if (curr case final ChildNodeBoundary boundary when boundary.element.slot.target?.renderObject == child) {
+        outermost = boundary.range;
+      }
+    }
+    return outermost;
+  }
 }
 
 final class _ChildListIterator implements Iterator<MarkupRenderObject> {
