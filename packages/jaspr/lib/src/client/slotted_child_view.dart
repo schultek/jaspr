@@ -211,7 +211,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
     for (final element in _appliedParams.keys) {
-      resetElementParams(element);
+      _resetElementParams(element);
     }
     _appliedParams.clear();
 
@@ -276,23 +276,34 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     return true;
   }
 
-  void resetElementParams(web.HTMLElement element) {
+  /// Removes the params this view applied to [element],
+  /// without leaving behind empty attributes that it didn't have before.
+  void _resetElementParams(web.HTMLElement element) {
     final params = _appliedParams[element];
     if (params == null) return;
 
     if (params.id != null && element.id == params.id) {
-      element.id = '';
+      element.removeAttribute('id');
     }
 
-    if (params.classes case final appliedClasses?) {
+    if (params.classes case final appliedClasses? when appliedClasses.isNotEmpty) {
       for (final c in appliedClasses) {
         element.classList.remove(c);
       }
+      if (element.classList.length == 0) {
+        element.removeAttribute('class');
+      }
     }
 
-    if (params.styles case final appliedStyles?) {
+    if (params.styles case final appliedStyles? when appliedStyles.isNotEmpty) {
       for (final e in appliedStyles.entries) {
         element.style.removeProperty(e.key);
+      }
+      if (element.style.length == 0) {
+        // Read the attribute first, so the browser syncs the pending style changes into it.
+        // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
+        element.getAttribute('style');
+        element.removeAttribute('style');
       }
     }
 
@@ -377,7 +388,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   @override
   void unmount() {
     for (final element in _appliedParams.keys) {
-      resetElementParams(element);
+      _resetElementParams(element);
     }
     _appliedParams.clear();
     super.unmount();
