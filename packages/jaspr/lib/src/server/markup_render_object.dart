@@ -180,6 +180,11 @@ final class MarkupRenderElement extends MarkupRenderObject implements RenderElem
   }
 
   @override
+  void release({String? id, Iterable<String>? classes, Iterable<String>? styles, Iterable<String>? attributes}) {
+    // Markup doesn't stay in place after its element is removed, so there's nothing to release.
+  }
+
+  @override
   (String, bool, bool) _renderAndFormat([
     bool strictFormatting = false,
     bool strictWhitespace = false,
