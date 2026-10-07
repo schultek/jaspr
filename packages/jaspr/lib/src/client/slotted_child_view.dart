@@ -206,7 +206,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     return renderObject;
   }
 
-  final Map<web.HTMLElement, _AppliedParams> _appliedParams = {};
+  final Map<web.HTMLElement, _AppliedParams> _appliedParams = nodeMap();
 
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
