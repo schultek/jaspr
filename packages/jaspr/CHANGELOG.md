@@ -48,6 +48,14 @@
 
   - `AttachAdapter`, previously exported by `package:jaspr/server.dart`.
   - `TemplateDocumentAdapter`, previously exported by `package:jaspr/server.dart`.
+  - `BaseDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.new` instead.
+  - `TemplateDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.template` instead.
+  - `HeadDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.head` instead.
+  - `AttachDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.body` instead.
 
 ### Behavior changes
 

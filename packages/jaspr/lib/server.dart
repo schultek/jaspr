@@ -4,7 +4,7 @@ library;
 export 'package:shelf/shelf.dart' show Handler, Request, Response;
 
 export 'jaspr.dart' hide runApp, AppContext, Document;
-export 'src/components/document/document_server.dart';
+export 'src/components/document/document_server.dart' show Document, TemplateNotFoundError;
 export 'src/server/adapters/element_boundary_adapter.dart';
 export 'src/server/adapters/head_scope_adapter.dart';
 export 'src/server/app_context.dart';
