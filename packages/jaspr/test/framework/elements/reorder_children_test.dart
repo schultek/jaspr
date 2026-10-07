@@ -105,15 +105,15 @@ void main() {
       final log = <String>[];
       final component = FakeComponent(
         child: div([
-          LifecycleComponent('a', log, key: const ValueKey('a')),
-          LifecycleComponent('b', log, key: const ValueKey('b')),
+          _LifecycleComponent('a', log, key: const ValueKey('a')),
+          _LifecycleComponent('b', log, key: const ValueKey('b')),
         ]),
       );
       tester.pumpComponent(component);
       log.clear();
 
       // The new child takes the position of the first removed child, ahead of the second one.
-      component.updateChild(div([LifecycleComponent('c', log, key: const ValueKey('c'))]));
+      component.updateChild(div([_LifecycleComponent('c', log, key: const ValueKey('c'))]));
       await tester.pump();
 
       expect(log, equals(['deactivate a', 'deactivate b', 'mount c']));
@@ -121,21 +121,21 @@ void main() {
   });
 }
 
-class LifecycleComponent extends Component {
-  const LifecycleComponent(this.name, this.log, {super.key});
+class _LifecycleComponent extends Component {
+  const _LifecycleComponent(this.name, this.log, {super.key});
 
   final String name;
   final List<String> log;
 
   @override
-  Element createElement() => LifecycleElement(this);
+  Element createElement() => _LifecycleElement(this);
 }
 
-class LifecycleElement extends BuildableElement {
-  LifecycleElement(LifecycleComponent super.component);
+class _LifecycleElement extends BuildableElement {
+  _LifecycleElement(_LifecycleComponent super.component);
 
   @override
-  LifecycleComponent get component => super.component as LifecycleComponent;
+  _LifecycleComponent get component => super.component as _LifecycleComponent;
 
   @override
   void mount(Element? parent, ElementSlot newSlot) {
@@ -150,5 +150,5 @@ class LifecycleElement extends BuildableElement {
   }
 
   @override
-  Component build() => Component.text(component.name);
+  Component build() => .text(component.name);
 }

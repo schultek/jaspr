@@ -789,6 +789,56 @@ void main() {
         }
       });
     }
+
+    test('finds render objects with their outermost boundaries', () async {
+      late Element aside;
+      late Element outer;
+      late Element inner;
+      final r = await renderServerApp(
+        .element(
+          tag: 'html',
+          children: [
+            Builder(
+              builder: (context) {
+                aside = context as Element;
+                return .element(tag: 'aside', children: []);
+              },
+            ),
+            Builder(
+              builder: (context) {
+                outer = context as Element;
+                return Builder(
+                  builder: (context) {
+                    inner = context as Element;
+                    return .element(tag: 'head', children: []);
+                  },
+                );
+              },
+            ),
+            .element(tag: 'main', children: []),
+          ],
+        ),
+      );
+
+      final root = r.renderObject as MarkupRenderObject;
+      final children = root.children.first.children;
+      final asideRange = children.wrapElement(aside);
+      final innerRange = children.wrapElement(inner);
+      final outerRange = children.wrapElement(outer);
+
+      // Like render adapters, markers are inserted inside the boundaries.
+      for (final range in [outerRange, innerRange, asideRange]) {
+        range.start.insertNext(ChildNodeData(MarkupRenderText('<!--marker-->', true)));
+        range.end.insertPrev(ChildNodeData(MarkupRenderText('<!--/marker-->', true)));
+      }
+
+      MarkupRenderObject renderObjectOf(String tag) => findTag(r, tag)!.renderObject as MarkupRenderObject;
+
+      expect(children.findWithBoundaries(renderObjectOf('aside')), same(asideRange));
+      expect(children.findWithBoundaries(renderObjectOf('head')), same(outerRange));
+      expect(children.findWithBoundaries(renderObjectOf('main')), same(children.find(renderObjectOf('main'))));
+      expect(children.findWithBoundaries(MarkupRenderText('missing', false)), isNull);
+    });
   });
 }
 

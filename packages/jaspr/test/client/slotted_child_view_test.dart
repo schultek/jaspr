@@ -139,10 +139,11 @@ void main() {
       // Now unmount the component tree to test cleanup
       tester.binding.detachRootComponent();
 
-      // Check that the target element parameters are reset!
-      expect(pElement.id, isEmpty);
-      expect(pElement.classList.contains('box'), isFalse);
-      expect(pElement.style.color, isEmpty);
+      // Check that the target element parameters are reset,
+      // without leaving behind attributes that the element didn't have before.
+      expect(pElement.hasAttribute('id'), isFalse);
+      expect(pElement.hasAttribute('class'), isFalse);
+      expect(pElement.hasAttribute('style'), isFalse);
       expect(pElement.hasAttribute('data-test'), isFalse);
 
       // Trigger click again - should not increment clicked

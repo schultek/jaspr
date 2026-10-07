@@ -265,7 +265,8 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
   @override
   void activate() {
     super.activate();
-    // Render again if reactivated where the inherited params differ, such as when moved with a global key.
+    // Render again if reactivated where the inherited params differ,
+    // such as when moved with a global key.
     if (_dirtyRender) markNeedsBuild();
   }
 
