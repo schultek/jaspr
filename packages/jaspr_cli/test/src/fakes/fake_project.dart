@@ -56,7 +56,7 @@ dependencies:
   jaspr: ^$jasprCoreVersion
 
 dev_dependencies:
-  build_web_compilers: ^4.7.0
+  build_web_compilers: ^4.8.12
   jaspr_builder: ^$jasprBuilderVersion
 
 jaspr:

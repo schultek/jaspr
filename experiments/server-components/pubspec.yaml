@@ -26,13 +26,3 @@ dependency_overrides:
     path: ../../packages/jaspr_builder
   jaspr_cli:
     path: ../../packages/jaspr_cli
-  build_web_compilers:
-    git:
-      url: https://github.com/parlough/build
-      ref: e9822aa51a79d86d3c6f4b4786be1adc4ee326bd
-      path: builder_pkgs/build_web_compilers
-  frontend_server_client:
-    git:
-      url: https://github.com/dart-lang/webdev
-      ref: 4855a315fa9ce5e06680a0230ac6fe68846a4b76
-      path: frontend_server_client
