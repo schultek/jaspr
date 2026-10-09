@@ -1,6 +1,7 @@
 ## Unreleased minor
 
 - Require Dart 3.13 or later.
+- Fix an issue with sync overrides when hot-reloading a component using `ProviderScope`.
 
 ## 0.4.6
 

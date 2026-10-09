@@ -37,6 +37,7 @@ class ModesAnimationState extends State<ModesAnimation> {
 
   Future<void> runAnimation() async {
     while (true) {
+      if (!mounted) break;
       await animateOut();
       index = (index + 1) % texts.length;
       await Future.delayed(const Duration(milliseconds: 300));
@@ -52,6 +53,7 @@ class ModesAnimationState extends State<ModesAnimation> {
 
   Future<void> animateOut() async {
     while (characters > 0) {
+      if (!mounted) break;
       setState(() {
         characters--;
       });
@@ -62,6 +64,7 @@ class ModesAnimationState extends State<ModesAnimation> {
 
   Future<void> animateIn() async {
     while (characters < texts[index].$1.length) {
+      if (!mounted) break;
       setState(() {
         characters++;
       });

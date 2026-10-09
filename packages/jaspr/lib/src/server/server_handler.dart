@@ -4,12 +4,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http/retry.dart' as retry;
 import 'package:path/path.dart' as path;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
-import 'package:sse/server/sse_handler.dart';
 
 import '../foundation/constants.dart';
 import 'options.dart';
@@ -84,16 +84,6 @@ Handler createHandler(
 
   var cascade = Cascade();
 
-  if (kDebugMode) {
-    final sseHandler = SseHandler(Uri(path: r'/$jasprEventsHandler'));
-    sseHandler.connections.rest.listen(
-      (connection) => ClientConnection._initialize(connection),
-      onDone: () {},
-    );
-
-    cascade = cascade.add(sseHandler.handler);
-  }
-
   if (jasprProxyPort != null) {
     cascade = cascade.add(_sseProxyHandler(client, jasprProxyPort!));
   }
@@ -107,7 +97,12 @@ Handler createHandler(
     var isAllowedPath = false;
     final segment = request.url.pathSegments.lastOrNull ?? '';
     if (!segment.contains('.')) {
-      isAllowedPath = true;
+      if (kDebugMode) {
+        isAllowedPath =
+            !request.url.path.contains('dwds') && !request.url.path.startsWith(r'$') && request.url.path != 'null';
+      } else {
+        isAllowedPath = true;
+      }
     } else {
       final suffix = segment.split('.').last;
       if (Jaspr.allowedPathSuffixes.contains(suffix)) {
@@ -167,9 +162,17 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
 }
 
 Handler createProxyHandler(http.Client? client) {
-  final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: client);
-  // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
-  return (req) => handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
+  final c = retry.RetryClient(client ?? http.Client(), whenError: (e, _) => e is http.ClientException);
+  final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: c);
+  return (req) async {
+    try {
+      return await handler(req);
+    } on http.ClientException {
+      return Response(503, headers: {'Retry-After': '1'});
+    } on SocketException {
+      return Response(503, headers: {'Retry-After': '1'});
+    }
+  };
 }
 
 /// Drains the response body for cascading status codes (404/405) before
@@ -247,34 +250,3 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
 }
 
 // coverage:ignore-end
-
-class ClientConnection {
-  ClientConnection._(this._connection) {
-    _connection.stream.listen(
-      (event) {
-        final message = jsonDecode(event);
-        if (message case ['RouteInfo', final String route]) {
-          currentRoute = route;
-        }
-      },
-      onDone: () {
-        _connections.remove(this);
-      },
-    );
-  }
-
-  final SseConnection _connection;
-  String? currentRoute;
-
-  static void _initialize(SseConnection connection) {
-    final client = ClientConnection._(connection);
-    _connections.add(client);
-  }
-
-  static List<ClientConnection> get connections => UnmodifiableListView(_connections);
-  static final List<ClientConnection> _connections = [];
-
-  void reload() {
-    _connection.sink.add(jsonEncode(['ReloadRequest']));
-  }
-}

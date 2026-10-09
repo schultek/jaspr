@@ -2,6 +2,9 @@
 
 ### New features
 
+- Added hot-reload support.
+- **Breaking**: `ClientAppBinding` is now a singleton and can be accessed via `ClientAppBinding.ensureInitialized()`.
+
 - Added **Server Components** to allow for more fine-grained control over
   server-side rendered component trees.
 - Added support for stateful server-side reload.
