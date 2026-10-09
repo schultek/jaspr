@@ -62,7 +62,23 @@ abstract class BaseCommand extends Command<int> {
 
   Future<int> runCommand();
 
-  Future<void> stop() async {
+  Future<void>? _stopFuture;
+
+  /// Runs the registered cleanup.
+  ///
+  /// A call that arrives while another one is still working on the guards
+  /// awaits that one instead of returning right away. Both callers are real:
+  /// the signal handler starts shutting down, and the command returning runs
+  /// [stop] from its `finally`. Whoever got there second used to find an
+  /// empty list, return, and let the process exit while the first call was
+  /// still halfway down the list, which left the server process running.
+  Future<void> stop() {
+    final running = _stopFuture;
+    if (running != null) return running;
+    return _stopFuture = _stop().whenComplete(() => _stopFuture = null);
+  }
+
+  Future<void> _stop() async {
     logger.clearFooter();
     final gs = [...guards];
     guards.clear();
@@ -210,7 +226,7 @@ abstract class BaseCommand extends Command<int> {
     guardResource(() async {
       if (exitCode == null) {
         logger.write('Terminating $name...', level: Level.debug);
-        process.kill();
+        await killProcessTree(process);
         wasKilled = true;
         await errSub.cancel();
         await outSub.cancel();
