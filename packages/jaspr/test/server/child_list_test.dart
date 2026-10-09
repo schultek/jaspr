@@ -4,7 +4,6 @@ library;
 import 'dart:async';
 
 import 'package:jaspr/server.dart';
-import 'package:jaspr/src/server/child_nodes.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:jaspr_test/server_test.dart';
 
@@ -187,22 +186,17 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>().having((n) => n.element, 'element', element).having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>().having((n) => n.element, 'element', element).having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
+
+      // Check the lookup returns the outermost range
+      expect(children.findWithBoundaries(element.renderObject as MarkupRenderObject), same(range));
     });
 
     test('wraps buildable element', () async {
@@ -249,19 +243,11 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>().having((n) => n.element, 'element', element).having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>().having((n) => n.element, 'element', element).having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
@@ -314,23 +300,11 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', builderElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', builderElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
@@ -347,42 +321,21 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', builderElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
-      expect(node, equals(range2.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range2),
-      );
+      expect(node, same(range2.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range2.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range2),
-      );
+      expect(node, same(range2.end));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', builderElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
+
+      // Check the lookup returns the outermost range
+      expect(children.findWithBoundaries(bodyElement.renderObject as MarkupRenderObject), same(range));
     });
 
     test('wraps element multiple times (high then low)', () async {
@@ -432,23 +385,11 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
@@ -465,42 +406,21 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range2.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', builderElement)
-            .having((n) => n.range, 'range', range2),
-      );
+      expect(node, same(range2.start));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
-      expect(node, equals(range2.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', builderElement)
-            .having((n) => n.range, 'range', range2),
-      );
+      expect(node, same(range2.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
+
+      // Check the lookup returns the outermost range
+      expect(children.findWithBoundaries(bodyElement.renderObject as MarkupRenderObject), same(range2));
     });
 
     test('wraps same element multiple times with default priority', () async {
@@ -544,23 +464,11 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
@@ -577,42 +485,21 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range2.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range2),
-      );
+      expect(node, same(range2.start));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
-      expect(node, equals(range2.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range2),
-      );
+      expect(node, same(range2.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
+
+      // Check the lookup returns the outermost range
+      expect(children.findWithBoundaries(bodyElement.renderObject as MarkupRenderObject), same(range2));
     });
 
     test('wraps same element multiple times with out-of-order priority', () async {
@@ -656,23 +543,11 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
@@ -689,42 +564,21 @@ void main() {
       node = node.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('head')));
       node = node?.next;
-      expect(node, equals(range.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.start));
       node = node?.next;
-      expect(node, equals(range2.start));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range2),
-      );
+      expect(node, same(range2.start));
       node = node?.next;
       expect(node, isA<ChildNodeData>().having((n) => n.node, 'node', hasTag('body')));
       node = node?.next;
-      expect(node, equals(range2.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range2),
-      );
+      expect(node, same(range2.end));
       node = node?.next;
-      expect(node, equals(range.end));
-      expect(
-        node,
-        isA<ChildNodeBoundary>()
-            .having((n) => n.element, 'element', bodyElement)
-            .having((n) => n.range, 'range', range),
-      );
+      expect(node, same(range.end));
       node = node?.next;
       expect(node, equals(children.lastNode));
       expect(node, isA<ChildNode>().having((n) => n.next, 'next', isNull));
+
+      // Check the lookup returns the outermost range
+      expect(children.findWithBoundaries(bodyElement.renderObject as MarkupRenderObject), same(range));
     });
 
     // The ancestor boundary has the lowest priority,

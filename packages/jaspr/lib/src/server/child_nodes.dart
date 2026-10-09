@@ -3,27 +3,31 @@ import 'package:meta/meta.dart';
 import '../framework/framework.dart';
 import 'markup_render_object.dart';
 
-final class ChildNodeData extends BaseChildNode {
+/// A child-list node containing a render object.
+final class ChildNodeData extends _BaseChildNode {
   ChildNodeData(this.node);
 
   final MarkupRenderObject node;
 }
 
-final class ChildNodeBoundary extends BaseChildNode {
-  ChildNodeBoundary(this.element, [this.priority = 0]);
+final class _ChildNodeBoundary extends _BaseChildNode {
+  _ChildNodeBoundary(this.element, this.priority);
 
   final Element element;
   final int priority;
   late final ChildListRange range;
 }
 
-final class BaseChildNode extends ChildNode {
+final class _BaseChildNode extends ChildNode {
   @override
   ChildNode? _prev;
   @override
   ChildNode? _next;
 }
 
+/// A node or contiguous range in a server render object's child list.
+///
+/// Child-list mutations do not update [MarkupRenderObject.parent].
 sealed class ChildNode {
   ChildNode? get _prev;
   set _prev(ChildNode? prev);
@@ -58,13 +62,20 @@ sealed class ChildNode {
   }
 }
 
+/// A range of child nodes that can be moved or removed together.
+///
+/// Created by [ChildList.range] or [ChildList.wrapElement].
+/// Iteration yields render objects and skips boundary nodes.
 final class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
-  ChildListRange(this.start, this.end) {
-    if (start case final ChildNodeBoundary s) s.range = this;
-    if (end case final ChildNodeBoundary e) e.range = this;
+  ChildListRange._(this.start, this.end) {
+    if (start case final _ChildNodeBoundary s) s.range = this;
+    if (end case final _ChildNodeBoundary e) e.range = this;
   }
 
+  /// The start boundary. Use [ChildNode.insertNext] to insert inside the range.
   final ChildNode start;
+
+  /// The end boundary. Use [ChildNode.insertPrev] to insert inside the range.
   final ChildNode end;
 
   @override
@@ -84,33 +95,21 @@ final class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
 
   @override
   Iterator<MarkupRenderObject> get iterator => _ChildListIterator(start, end.next);
-
-  Iterable<ChildNode> get nodes sync* {
-    ChildNode? curr = start;
-
-    while (curr != null && curr != end) {
-      yield curr;
-      curr = curr.next;
-    }
-
-    yield end;
-  }
 }
 
 final class ChildList with Iterable<MarkupRenderObject> {
-  ChildList(this.parent) {
+  @internal
+  ChildList() {
     _first.insertNext(_last);
   }
-
-  final MarkupRenderObject parent;
 
   @visibleForTesting
   ChildNode get firstNode => _first;
   @visibleForTesting
   ChildNode get lastNode => _last;
 
-  final ChildNode _first = BaseChildNode();
-  final ChildNode _last = BaseChildNode();
+  final ChildNode _first = _BaseChildNode();
+  final ChildNode _last = _BaseChildNode();
 
   void insertAfter(MarkupRenderObject child, {MarkupRenderObject? after}) {
     insertNodeAfter(find(child) ?? ChildNodeData(child), after: after);
@@ -155,13 +154,13 @@ final class ChildList with Iterable<MarkupRenderObject> {
   Iterator<MarkupRenderObject> get iterator => _ChildListIterator(_first);
 
   ChildListRange range({ChildNode? startAfter, ChildNode? endBefore}) {
-    final start = BaseChildNode();
-    final end = BaseChildNode();
+    final start = _BaseChildNode();
+    final end = _BaseChildNode();
 
     (startAfter ?? _first).insertNext(start);
     (endBefore ?? _last).insertPrev(end);
 
-    return ChildListRange(start, end);
+    return ChildListRange._(start, end);
   }
 
   ChildNodeData? findWhere<T extends MarkupRenderObject>(bool Function(T) fn, {bool visitFragments = true}) {
@@ -193,12 +192,13 @@ final class ChildList with Iterable<MarkupRenderObject> {
   /// and at equal priority the newest range is outermost.
   /// Nodes inserted next to the output, such as markers,
   /// can hide ranges from this ordering, so wrap before inserting them.
+  @internal
   ChildListRange wrapElement(Element element, [int priority = 0]) {
     final node = find(element.slot.target!.renderObject as MarkupRenderObject);
     assert(node != null, 'Element not found in child list');
 
     /// Whether the new range should enclose the adjacent existing [boundary].
-    bool encloses(ChildNodeBoundary boundary) {
+    bool encloses(_ChildNodeBoundary boundary) {
       // When wrapping the same element, higher priority wraps lower priority.
       if (boundary.element == element) return priority >= boundary.priority;
       assert(boundary.element.depth != element.depth);
@@ -211,13 +211,13 @@ final class ChildList with Iterable<MarkupRenderObject> {
     ChildNode startBefore = node!;
     ChildNode endAfter = node;
     while (true) {
-      if (startBefore.prev case final ChildNodeBoundary prev when prev.range.start == prev && encloses(prev)) {
+      if (startBefore.prev case final _ChildNodeBoundary prev when prev.range.start == prev && encloses(prev)) {
         startBefore = prev;
         endAfter = prev.range.end;
         continue;
       }
 
-      if (endAfter.next case final ChildNodeBoundary next when next.range.end == next && encloses(next)) {
+      if (endAfter.next case final _ChildNodeBoundary next when next.range.end == next && encloses(next)) {
         startBefore = next.range.start;
         endAfter = next;
         continue;
@@ -226,13 +226,13 @@ final class ChildList with Iterable<MarkupRenderObject> {
       break;
     }
 
-    final start = ChildNodeBoundary(element, priority);
-    final end = ChildNodeBoundary(element, priority);
+    final start = _ChildNodeBoundary(element, priority);
+    final end = _ChildNodeBoundary(element, priority);
 
     startBefore.insertPrev(start);
     endAfter.insertNext(end);
 
-    return ChildListRange(start, end);
+    return ChildListRange._(start, end);
   }
 
   /// Returns [child]'s node together with the element boundaries around it.
@@ -246,7 +246,7 @@ final class ChildList with Iterable<MarkupRenderObject> {
 
     ChildNode outermost = node;
     for (var curr = node.prev; curr != null; curr = curr.prev) {
-      if (curr case final ChildNodeBoundary boundary when boundary.element.slot.target?.renderObject == child) {
+      if (curr case final _ChildNodeBoundary boundary when boundary.element.slot.target?.renderObject == child) {
         outermost = boundary.range;
       }
     }
