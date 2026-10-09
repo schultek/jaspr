@@ -5,9 +5,9 @@ import '../child_nodes.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 
-export '../child_nodes.dart' show ChildListRange, ChildNodeData;
+export '../child_nodes.dart' show ChildList, ChildListRange, ChildNode, ChildNodeData;
 
-abstract class ElementBoundaryAdapter extends RenderAdapter {
+abstract base class ElementBoundaryAdapter extends RenderAdapter {
   /// Priority for client component boundaries.
   ///
   /// This is set to an arbitrary high value so that the client component markers
@@ -45,6 +45,11 @@ abstract class ElementBoundaryAdapter extends RenderAdapter {
     return applyBoundary(range);
   }
 
+  /// Called once [range] wraps [element], before any adapter is applied.
+  ///
+  /// Don't insert nodes into the child list here,
+  /// as that can break the nesting of boundaries wrapped afterward.
+  /// Insert them in [applyBoundary].
   void prepareBoundary(ChildListRange range) {}
   void applyBoundary(ChildListRange range) {}
 }

@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Require Dart 3.13 or later.
+
 ## 0.5.4
 
 - Invalidate dependents of deleted partials while serving.

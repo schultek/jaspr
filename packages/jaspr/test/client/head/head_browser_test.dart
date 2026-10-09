@@ -1,17 +1,18 @@
 @TestOn('browser')
 library;
 
-import 'package:jaspr/src/components/document/document_client.dart';
 import 'package:jaspr_test/client_test.dart';
+import 'package:universal_web/web.dart' as web;
 
 import 'head_app.dart';
 
 void main() {
   group('head browser test', () {
     testClient('should serve component', (tester) async {
+      final initialNodes = _headElements().toSet();
       tester.pumpComponent(App());
 
-      var nodes = AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
+      var nodes = _headElements().where((node) => !initialNodes.contains(node)).toList();
 
       expect(nodes, [
         hasOuterHtml('<title>c</title>'),
@@ -21,7 +22,7 @@ void main() {
 
       await tester.click(find.tag('button'));
 
-      nodes = AttachAdapter.instanceFor(AttachTarget.head).liveNodes.toList();
+      nodes = _headElements().where((node) => !initialNodes.contains(node)).toList();
 
       expect(nodes, [
         hasOuterHtml('<title>d</title>'),
@@ -30,4 +31,9 @@ void main() {
       ]);
     });
   });
+}
+
+List<web.Element> _headElements() {
+  final children = web.document.head!.children;
+  return [for (var i = 0; i < children.length; i++) children.item(i)!];
 }

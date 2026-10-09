@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:analyzer/source/line_info.dart';
 import 'package:file/local.dart';
 import 'package:io/ansi.dart';
@@ -16,6 +14,7 @@ import '../migrations/dom_import_migration.dart';
 import '../migrations/entrypoint_migration.dart';
 import '../migrations/html_helper_migration.dart';
 import '../migrations/migration_models.dart';
+import '../project.dart';
 import '../utils.dart';
 import 'base_command.dart';
 
@@ -41,6 +40,7 @@ class MigrateCommand extends BaseCommand {
       help: 'Specify which language features to use during migration (can be used multiple times).',
       allowed: ['dot-shorthands'],
       allowedHelp: {'dot-shorthands': 'Use dot shorthands where possible.'},
+      defaultsTo: ['dot-shorthands'],
     );
   }
 
@@ -147,35 +147,7 @@ class MigrateCommand extends BaseCommand {
     }
 
     if (apply) {
-      final pubspecMap = project.pubspecYaml;
-
-      if (pubspecMap != null) {
-        logger.write('Updating Jaspr dependencies to $targetJasprVersion...', level: Level.info);
-        try {
-          final pubspecContent = project.pubspecFile.readAsStringSync();
-          final builder = EditBuilder(LineInfo.fromContent(pubspecContent));
-
-          if (pubspecMap.nodes['dependencies'] case final YamlMap dependencies) {
-            if (dependencies.nodes['jaspr'] case final YamlScalar jasprNode when jasprNode.value != null) {
-              builder.replace(jasprNode.span.start.offset, jasprNode.span.length, '^$targetJasprVersion');
-            }
-          }
-          if (pubspecMap.nodes['dev_dependencies'] case final YamlMap devDependencies) {
-            if (devDependencies.nodes['jaspr_builder'] case final YamlScalar builderNode
-                when builderNode.value != null) {
-              builder.replace(builderNode.span.start.offset, builderNode.span.length, '^$targetJasprVersion');
-            }
-            if (devDependencies.nodes['jaspr_test'] case final YamlScalar testNode when testNode.value != null) {
-              builder.replace(testNode.span.start.offset, testNode.span.length, '^$targetJasprVersion');
-            }
-          }
-
-          project.pubspecFile.writeAsStringSync(builder.apply(pubspecContent));
-        } catch (e) {
-          logger.write('Failed to update pubspec.yaml: $e', level: Level.error);
-        }
-      }
-
+      updatePubspecDependencies(project, logger, targetJasprVersion);
       logger.write('Applying migrations...', level: Level.info);
     } else {
       logger.write('Previewing migrations (dry run)...', level: Level.info);
@@ -185,6 +157,42 @@ class MigrateCommand extends BaseCommand {
       logger.write('Error processing ${file.path}: $e\n$st', level: Level.error);
     }, features: features);
 
+    printMigrationResults(logger, results);
+
+    return 0;
+  }
+
+  static void updatePubspecDependencies(Project project, Logger logger, String targetJasprVersion) {
+    final pubspecMap = project.pubspecYaml;
+
+    if (pubspecMap != null) {
+      try {
+        final pubspecContent = project.pubspecFile.readAsStringSync();
+        final builder = EditBuilder(LineInfo.fromContent(pubspecContent));
+
+        if (pubspecMap.nodes['dependencies'] case final YamlMap dependencies) {
+          if (dependencies.nodes['jaspr'] case final YamlScalar jasprNode when jasprNode.value != null) {
+            builder.replace(jasprNode.span.start.offset, jasprNode.span.length, '^$targetJasprVersion');
+          }
+        }
+        if (pubspecMap.nodes['dev_dependencies'] case final YamlMap devDependencies) {
+          if (devDependencies.nodes['jaspr_builder'] case final YamlScalar builderNode when builderNode.value != null) {
+            builder.replace(builderNode.span.start.offset, builderNode.span.length, '^$targetJasprVersion');
+          }
+          if (devDependencies.nodes['jaspr_test'] case final YamlScalar testNode when testNode.value != null) {
+            builder.replace(testNode.span.start.offset, testNode.span.length, '^$targetJasprVersion');
+          }
+        }
+
+        project.pubspecFile.writeAsStringSync(builder.apply(pubspecContent));
+        logger.write('Updated Jaspr dependencies to $targetJasprVersion', level: Level.info);
+      } catch (e) {
+        logger.write('Failed to update pubspec.yaml: $e', level: Level.error);
+      }
+    }
+  }
+
+  static void printMigrationResults(Logger logger, List<MigrationResult> results) {
     logger.write('');
 
     final check = green.wrap(styleBold.wrap('✓'));
@@ -201,7 +209,7 @@ class MigrateCommand extends BaseCommand {
         output.write('  $check ${migration.migration.name} · ${migration.description}\n');
       }
 
-      stdout.write('$output\n');
+      logger.write('$output');
     }
 
     for (final result in results) {
@@ -215,7 +223,7 @@ class MigrateCommand extends BaseCommand {
         output.write('  $warn ${warning.migration.name} · ${warning.message}\n');
       }
 
-      stdout.write('$output\n');
+      logger.write('$output');
     }
 
     final successCount = results.fold<int>(0, (sum, result) => sum + result.migrations.length);
@@ -224,7 +232,7 @@ class MigrateCommand extends BaseCommand {
     if (successCount == 0 && warningCount == 0) {
       logger.write('');
       logger.write(wrapBox('No migration changes found. All done.', borderColor: green));
-      return 0;
+      return;
     }
 
     if (warningCount > 0) {
@@ -244,7 +252,5 @@ class MigrateCommand extends BaseCommand {
         level: Level.info,
       );
     }
-
-    return 0;
   }
 }

@@ -29,16 +29,10 @@ mixin ProxyHelper on BaseCommand {
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
     final webdevHandler = devProxy?.handler ?? (req) => Response.notFound(null);
 
-    final cascade = Cascade().add(generatedHandler).add((req) async {
-      if (req.url.path == r'$jasprMessageHandler') {
-        onMessage?.call(jsonDecode(await req.readAsString()));
-        return Response.ok(null);
-      }
-
+    Future<Response> handleRequest(Request req, {Stream<List<int>>? body, bool isRetry = false}) async {
       // Each proxyHandler will read the body, so we have to duplicate the stream beforehand,
       // or else this will throw.
-      // This is also the reason why Cascade() won't work here.
-      final body = req.read().asBroadcastStream();
+      body ??= req.read().asBroadcastStream();
 
       if (flutterHandler != null && req.url.path == 'flutter_bootstrap.js') {
         return await flutterHandler(req.change(body: body));
@@ -60,6 +54,7 @@ mixin ProxyHelper on BaseCommand {
 
         // Second try to load the resource from the flutter process.
         if (flutterHandler != null && res.statusCode == 404 && allowedFlutterPaths.hasMatch(req.url.path)) {
+          await res.read().drain<void>().catchError((_) {});
           res = await flutterHandler(req.change(body: body));
         }
 
@@ -68,6 +63,7 @@ mixin ProxyHelper on BaseCommand {
             path.extension(req.url.path).isEmpty &&
             !req.url.path.contains('dwds') &&
             !req.url.path.startsWith(r'$')) {
+          await res.read().drain<void>().catchError((_) {});
           return await webdevHandler(
             Request(
               req.method,
@@ -85,10 +81,12 @@ mixin ProxyHelper on BaseCommand {
         if (e is HijackException) {
           rethrow;
         }
-        final isConnectionError =
-            e is SocketException ||
-            (e is http.ClientException &&
-                (e.message.contains('Connection closed') || e.message.contains('Connection refused')));
+        final isConnectionError = e is SocketException || e is http.ClientException;
+        if (isConnectionError && !isRetry && (req.method == 'GET' || req.method == 'HEAD')) {
+          // The backend connection may have been closed due to keep-alive idle timeout.
+          // Retry once on a fresh connection.
+          return await handleRequest(req, body: body, isRetry: true);
+        }
         if (isConnectionError) {
           logger.write('Proxy connection to backend failed: $e', tag: Tag.cli, level: Level.verbose);
           return Response(
@@ -100,9 +98,18 @@ mixin ProxyHelper on BaseCommand {
         } else {
           logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
           logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
-          return Response.internalServerError();
+          return Response.internalServerError(body: 'Failed to proxy request: $e');
         }
       }
+    }
+
+    final cascade = Cascade().add(generatedHandler).add((req) async {
+      if (req.url.path == r'$jasprMessageHandler') {
+        onMessage?.call(jsonDecode(await req.readAsString()));
+        return Response.ok(null);
+      }
+
+      return await handleRequest(req);
     });
 
     final Completer<HttpServer> completer = Completer<HttpServer>();
@@ -135,6 +142,16 @@ mixin ProxyHelper on BaseCommand {
 
 Handler noCachingHandler(Handler handler) {
   return (request) async {
+    // `Request.ifModifiedSince` throws on a value it cannot parse and
+    // takes the request down with a 500 — over a header the client sent. RFC
+    // 9110 says such a value must be ignored, so it is dropped here and the
+    // file is served as if it had not been there.
+    try {
+      request.ifModifiedSince;
+    } on FormatException {
+      request = request.change(headers: {'if-modified-since': null});
+    }
+
     final res = await handler(request);
     if (res.statusCode == 200) {
       final newHeaders = Map<String, String>.from(res.headers)

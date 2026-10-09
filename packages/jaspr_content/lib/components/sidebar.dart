@@ -1,8 +1,8 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-import '../../theme.dart';
 import '../jaspr_content.dart';
+import '../theme.dart';
 import '_internal/icon.dart';
 import 'sidebar_toggle_button.dart';
 

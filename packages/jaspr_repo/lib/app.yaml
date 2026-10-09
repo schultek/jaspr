@@ -12,10 +12,9 @@ linter:
   rules:
     directives_ordering: true
     prefer_relative_imports: true
+    simple_directive_paths: true
+    simplify_variable_pattern: true
     sort_pub_dependencies: true
-    strict_top_level_inference: true
-    unnecessary_underscores: true
-    use_null_aware_elements: true
 
 formatter:
   page_width: 120

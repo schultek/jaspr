@@ -120,15 +120,83 @@ void main() {
       // Now unmount the component tree to test cleanup
       tester.binding.detachRootComponent();
 
-      // Check that the target element parameters are reset!
-      expect(pElement.id, isEmpty);
-      expect(pElement.classList.contains('box'), isFalse);
-      expect(pElement.style.color, isEmpty);
+      // Check that the target element parameters are reset,
+      // without leaving behind attributes that the element didn't have before.
+      expect(pElement.hasAttribute('id'), isFalse);
+      expect(pElement.hasAttribute('class'), isFalse);
+      expect(pElement.hasAttribute('style'), isFalse);
       expect(pElement.hasAttribute('data-test'), isFalse);
 
       // Trigger click again - should not increment clicked
       pElement.click();
       expect(clicked, 1);
+    });
+
+    testClient('applies direct child params to root range slot', (tester) async {
+      window.document.body!.innerHTML = '<!--start--><button>Click me</button><!--end-->'.toJS;
+      final start = window.document.body!.firstChild!;
+      final end = window.document.body!.lastChild!;
+
+      tester.pumpComponent(
+        Component.apply(
+          classes: 'highlighted',
+          attributes: const {'data-outer': 'true'},
+          child: SlottedChildView(
+            slots: [
+              ChildSlot.between(
+                start: start,
+                end: end,
+                child: button([Component.text('Click me')]),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final btn = window.document.querySelector('button')!;
+      expect(btn.classList.contains('highlighted'), isTrue);
+      expect(btn.getAttribute('data-outer'), 'true');
+    });
+
+    testClient('preserves selector isolation with multiple apply components', (tester) async {
+      window.document.body!.innerHTML =
+          '<!--start-btn--><button>Btn</button><!--end-btn--><!--start-a--><a href="#">Link</a><!--end-a-->'.toJS;
+      final startBtn = window.document.body!.childNodes.item(0)!;
+      final endBtn = window.document.body!.childNodes.item(2)!;
+      final startA = window.document.body!.childNodes.item(3)!;
+      final endA = window.document.body!.childNodes.item(5)!;
+
+      tester.pumpComponent(
+        Component.apply(
+          target: ApplyTarget.childWith(tag: 'button'),
+          classes: 'btn-class',
+          child: Component.apply(
+            target: ApplyTarget.childWith(tag: 'a'),
+            classes: 'link-class',
+            child: SlottedChildView(
+              slots: [
+                ChildSlot.between(
+                  start: startBtn,
+                  end: endBtn,
+                  child: button([Component.text('Btn')]),
+                ),
+                ChildSlot.between(
+                  start: startA,
+                  end: endA,
+                  child: a(href: '#', [Component.text('Link')]),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      final btn = window.document.querySelector('button')!;
+      final link = window.document.querySelector('a')!;
+      expect(btn.classList.contains('btn-class'), isTrue);
+      expect(btn.classList.contains('link-class'), isFalse);
+      expect(link.classList.contains('link-class'), isTrue);
+      expect(link.classList.contains('btn-class'), isFalse);
     });
   });
 }

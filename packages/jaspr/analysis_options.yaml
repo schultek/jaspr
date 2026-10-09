@@ -2,6 +2,7 @@ include: package:jaspr_repo/core.yaml
 
 analyzer:
   exclude:
+    - build/**
     - lib/src/stub/web/**
 
 linter:

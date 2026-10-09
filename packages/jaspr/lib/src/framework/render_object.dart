@@ -1,6 +1,6 @@
 part of 'framework.dart';
 
-abstract class RenderObject {
+abstract interface class RenderObject {
   RenderObject? get parent;
   web.Node? get node;
 
@@ -13,7 +13,7 @@ abstract class RenderObject {
   void remove(covariant RenderObject child);
 }
 
-abstract class RenderElement implements RenderObject {
+abstract interface class RenderElement implements RenderObject {
   void update(
     String? id,
     String? classes,
@@ -23,21 +23,21 @@ abstract class RenderElement implements RenderObject {
   );
 }
 
-abstract class RenderText implements RenderObject {
+abstract interface class RenderText implements RenderObject {
   void update(String text);
 }
 
-abstract class RawableRenderObject implements RenderObject {
+abstract interface class RawableRenderObject implements RenderObject {
   @override
   RenderText createChildRenderText(String text, [bool rawHtml = false]);
 }
 
-abstract class RawableRenderText implements RenderText {
+abstract interface class RawableRenderText implements RenderText {
   @override
   void update(String text, [bool rawHtml = false]);
 }
 
-abstract class RenderFragment implements RenderObject {}
+abstract interface class RenderFragment implements RenderObject {}
 
 abstract class MultiChildRenderObjectElement = MultiChildElement with RenderObjectElement;
 abstract class LeafRenderObjectElement = LeafElement with RenderObjectElement;
@@ -60,6 +60,18 @@ mixin RenderObjectElement on Element {
 
   bool _dirtyRender = false;
 
+  @protected
+  void markNeedsRender() {
+    _dirtyRender = true;
+  }
+
+  @override
+  @mustCallSuper
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    markNeedsRender();
+  }
+
   bool shouldRerender(covariant Component newComponent) {
     return true;
   }
@@ -70,6 +82,10 @@ mixin RenderObjectElement on Element {
 
     if (!_attached) {
       attachRenderObject();
+    }
+    if (_dirtyRender) {
+      _dirtyRender = false;
+      updateRenderObject(renderObject);
     }
   }
 
@@ -83,11 +99,14 @@ mixin RenderObjectElement on Element {
 
   @override
   void didUpdate(Component oldComponent) {
+    super.didUpdate(oldComponent);
     if (_dirtyRender) {
       _dirtyRender = false;
+      if (!_attached) {
+        attachRenderObject();
+      }
       updateRenderObject(renderObject);
     }
-    super.didUpdate(oldComponent);
   }
 
   bool _attached = false;

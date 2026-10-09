@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Require Dart 3.13 or later.
+
 ## 0.6.1
 
 - `jaspr` upgraded to `0.23.0`

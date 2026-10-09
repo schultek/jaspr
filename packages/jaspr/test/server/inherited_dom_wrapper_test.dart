@@ -5,7 +5,10 @@ import 'dart:convert';
 
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
+import 'package:jaspr/src/framework/framework.dart';
 import 'package:jaspr_test/server_test.dart';
+
+import '../utils/test_component.dart';
 
 void main() {
   group('Component.apply', () {
@@ -340,7 +343,131 @@ void main() {
 
       expect(renderObject, isA<TestRenderElement>().having((e) => e.attributes, 'attributes', {'data': 'test-2'}));
     });
+
+    testComponents('preserves child state across reordering when wrapped with wrapWithInheritedDomComponent', (
+      tester,
+    ) async {
+      final keyA = UniqueKey();
+      final keyB = UniqueKey();
+
+      final component = FakeComponent(
+        child: _TestSlottedParent(
+          children: [
+            _TestStatefulChild(key: keyA, label: 'A'),
+            _TestStatefulChild(key: keyB, label: 'B'),
+          ],
+        ),
+      );
+
+      tester.pumpComponent(component);
+
+      final stateA1 = (find.byKey(keyA).evaluate().first as StatefulElement).state;
+      final stateB1 = (find.byKey(keyB).evaluate().first as StatefulElement).state;
+
+      component.updateChild(
+        _TestSlottedParent(
+          children: [
+            _TestStatefulChild(key: keyB, label: 'B'),
+            _TestStatefulChild(key: keyA, label: 'A'),
+          ],
+        ),
+      );
+      await tester.pump();
+
+      final stateA2 = (find.byKey(keyA).evaluate().first as StatefulElement).state;
+      final stateB2 = (find.byKey(keyB).evaluate().first as StatefulElement).state;
+
+      expect(identical(stateA1, stateA2), isTrue);
+      expect(identical(stateB1, stateB2), isTrue);
+    });
+
+    testComponents('applies inherited dom params to reparented dom element', (tester) async {
+      final key = GlobalKey();
+
+      final component = FakeComponent(
+        child: div([
+          Component.apply(
+            classes: 'applied-class',
+            child: div([]),
+          ),
+          span([
+            p(key: key, []),
+          ]),
+        ]),
+      );
+
+      tester.pumpComponent(component);
+
+      final pFinder = find.tag('p');
+      expect(pFinder, findsOneComponent);
+      final renderObject = (pFinder.evaluate().first as RenderObjectElement).renderObject as TestRenderElement;
+      expect(renderObject.classes, isNull);
+
+      // Reparent the p element directly under Component.apply
+      component.updateChild(
+        div([
+          Component.apply(
+            classes: 'applied-class',
+            child: p(key: key, []),
+          ),
+          span([]),
+        ]),
+      );
+      await tester.pump();
+
+      expect(renderObject.classes, equals('applied-class'));
+    });
   });
+}
+
+class _TestSlottedParent extends Component {
+  const _TestSlottedParent({required this.children});
+  final List<Component> children;
+
+  @override
+  Element createElement() => _TestSlottedParentElement(this);
+}
+
+class _TestSlottedParentElement extends DomRenderObjectElement {
+  _TestSlottedParentElement(super.component);
+
+  @override
+  _TestSlottedParent get component => super.component as _TestSlottedParent;
+
+  @override
+  List<Component> buildOwnChildren() => component.children;
+
+  @override
+  List<Component> buildChildren() {
+    return [
+      for (final child in buildOwnChildren())
+        wrapWithInheritedDomComponent(
+          getParams: (_) => const [],
+          child: child,
+        ),
+    ];
+  }
+
+  @override
+  RenderObject createRenderObject() => parentRenderObjectElement!.renderObject.createChildRenderElement('div');
+
+  @override
+  void updateRenderObject(RenderElement renderObject) {}
+}
+
+class _TestStatefulChild extends StatefulComponent {
+  const _TestStatefulChild({super.key, required this.label});
+  final String label;
+
+  @override
+  State<StatefulComponent> createState() => _TestStatefulChildState();
+}
+
+class _TestStatefulChildState extends State<_TestStatefulChild> {
+  @override
+  Component build(BuildContext context) {
+    return Component.text(component.label);
+  }
 }
 
 TypeMatcher<List<int>> decodedMatches(dynamic string) {

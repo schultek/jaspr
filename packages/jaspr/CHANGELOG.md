@@ -1,17 +1,98 @@
 ## Unreleased breaking
 
-- Added hot-reload support.
-- **Breaking**: `ClientAppBinding` is not a singleton and can be accessed via `ClientAppBinding.ensureInitialized()`.
-- Added **Server Components** to allow for more fine-grained control over the server-side rendered component trees.
-- **Breaking**: Renamed `Component.wrapElement()` to `Component.apply()` and added `ApplyTarget target` parameter used to target specific elements instead of only direct children.
-- **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
-- Added stateful server-side reload feature.
-- Require Dart 3.13 or later.
-- Update `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+### New features
 
+- Added hot-reload support.
+- **Breaking**: `ClientAppBinding` is now a singleton and can be accessed via `ClientAppBinding.ensureInitialized()`.
+
+- Added **Server Components** to allow for more fine-grained control over
+  server-side rendered component trees.
+- Added support for stateful server-side reload.
 - Added hot-reloading of generated stylesheets in `standalone` mode.
-- Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
-- Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with the [`listen`](https://pub.dev/packages/listen) package.
+- Added an `ApplyTarget target` parameter to `Component.apply` (previously `Component.wrapElement`)
+  to target specific elements instead of only direct children.
+
+### Breaking changes
+
+- Require Dart 3.13 or later.
+- Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`.
+- Renamed `Component.wrapElement` to `Component.apply`.
+- Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
+- The following classes can no longer be extended,
+  but can still be implemented:
+
+  - `RenderObject`
+  - `RenderElement`
+  - `RenderText`
+  - `RenderFragment`,
+  - `RawableRenderObject`
+  - `RawableRenderText`
+
+- The following classes no longer be implemented,
+  but can still be extended:
+
+  - `RenderAdapter`
+  - `ElementBoundaryAdapter`
+  - `HeadScopeAdapter`
+
+  Their subclasses must be declared `base`, `final`, or `sealed`.
+- The following classes can no longer be extended or implemented:
+
+  - `MarkupRenderObject`
+  - `MarkupRenderElement`
+  - `MarkupRenderText`
+  - `MarkupRenderFragment`,
+  - `RootMarkupRenderObject`
+  - `ChildList`
+  - `ChildListRange`
+  - `ChildNodeData`
+
+  To customize server rendering, instead use render adapters.
+- The following classes are no longer public:
+
+  - `AttachAdapter`, previously exported by `package:jaspr/server.dart`.
+  - `TemplateDocumentAdapter`, previously exported by `package:jaspr/server.dart`.
+  - `BaseChildNode` and `ChildNodeBoundary`, previously available through an implementation import.
+  - Removed the `ChildListRange` constructor and its unused `nodes` getter.
+    Obtain ranges through `ChildList.range` or an `ElementBoundaryAdapter` hook.
+  - `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
+    Access a render object's child list through `MarkupRenderObject.children`.
+  - `BaseDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.new` instead.
+  - `TemplateDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.template` instead.
+  - `HeadDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.head` instead.
+  - `AttachDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.body` instead.
+- Removed the `ChildListRange` constructor and its unused `nodes` getter.
+  Obtain ranges through `ChildList.range` or an `ElementBoundaryAdapter` hook.
+- `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
+  Access a render object's child list through `MarkupRenderObject.children`.
+
+### Behavior changes
+
+- Replaced Jaspr's implementation of
+  `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with
+  types from the [`listen`](https://pub.dev/packages/listen) package.
+- Added `@Target` meta annotation to
+  `@client`, `@encoder`, `@decoder`, and `@Import` annotations to
+  indicate where they are allowed to be used.
+- Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+
+### Bug fixes
+
+- Fixed style generation in `standalone` mode when
+  importing web libraries like `package:web` or `dart:js_interop`.
+- Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.
+- Fixed the server output of a client component that
+  renders `<head>` when the document has no `<body>`.
+
+## 0.23.5
+
+- Fixed a dependency resolution problem when creating a new project by setting `build_web_compilers` to `4.8.5`.
+- Fixed `RawText` (`raw()`) putting its nodes in the xhtml namespace, which made svg markup render as nothing. It is now parsed against the element the nodes are inserted into, which also covers markup that is only valid inside a specific parent, such as a `<td>` in a `<tr>`.
+- Fixed a request failing with a 500 when the client sends an invalid `If-Modified-Since` header. The header is now dropped if it fails to parse, instead of throwing an error. Affects both the development proxy and the framework's server handler.
 
 ## 0.23.4
 

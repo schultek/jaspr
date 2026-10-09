@@ -1,8 +1,6 @@
 ---
 name: jaspr-fundamentals
 description: Use when working in a Jaspr project, on Jaspr components, or other Jaspr-related tasks. Contains fundamentals of writing Jaspr components and using HTML components.
-metadata:
-  jaspr_version: 0.23.4
 ---
 
 ## Components

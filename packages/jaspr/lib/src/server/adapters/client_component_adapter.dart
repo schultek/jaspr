@@ -6,7 +6,7 @@ import '../options.dart';
 import 'element_boundary_adapter.dart';
 import 'server_component_adapter.dart';
 
-class ClientComponentAdapter extends ElementBoundaryAdapter {
+final class ClientComponentAdapter extends ElementBoundaryAdapter {
   ClientComponentAdapter(this.registry, this.target, super.element)
     : super(priority: ElementBoundaryAdapter.clientComponentBoundaryPriority);
 

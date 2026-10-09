@@ -4,15 +4,14 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../server.dart';
 import '../dom/validator.dart';
-import 'child_nodes.dart';
 
-abstract class MarkupRenderObject extends RenderObject implements RawableRenderObject {
+abstract final class MarkupRenderObject implements RawableRenderObject {
   @override
   MarkupRenderObject? parent;
   @override
   web.Node? get node => null;
 
-  late final ChildList children = ChildList(this);
+  late final ChildList children = ChildList();
 
   @override
   MarkupRenderElement createChildRenderElement(String tag) {
@@ -155,7 +154,7 @@ abstract class MarkupRenderObject extends RenderObject implements RawableRenderO
   }
 }
 
-class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
+final class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
   MarkupRenderElement(this.tag);
 
   final String tag;
@@ -234,7 +233,7 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
   }
 }
 
-class MarkupRenderText extends MarkupRenderObject implements RawableRenderText {
+final class MarkupRenderText extends MarkupRenderObject implements RawableRenderText {
   MarkupRenderText(this.text, this.rawHtml);
 
   String text;
@@ -270,7 +269,7 @@ class MarkupRenderText extends MarkupRenderObject implements RawableRenderText {
   }
 }
 
-class MarkupRenderFragment extends MarkupRenderObject implements RenderFragment {
+final class MarkupRenderFragment extends MarkupRenderObject implements RenderFragment {
   @override
   (String, bool, bool) _renderAndFormat([
     bool strictFormatting = false,
@@ -282,7 +281,7 @@ class MarkupRenderFragment extends MarkupRenderObject implements RenderFragment 
   }
 }
 
-class RootMarkupRenderObject extends MarkupRenderObject {
+final class RootMarkupRenderObject extends MarkupRenderObject {
   @override
   (String, bool, bool) _renderAndFormat([
     bool strictFormatting = false,

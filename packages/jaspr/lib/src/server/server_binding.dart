@@ -156,7 +156,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   static final Uint8List _emptyResponse = Uint8List(0);
 }
 
-abstract class RenderAdapter {
+abstract base class RenderAdapter {
   late ServerAppBinding binding;
   FutureOr<void> prepare() {}
   void apply(MarkupRenderObject root) {}

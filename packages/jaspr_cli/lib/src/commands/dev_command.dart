@@ -479,17 +479,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final usesDdcLibraryBundles = moduleFormat == 'ddc';
 
     List<String> additionalFlutterBuildArgs() {
-      final sdkKernelPath = p.url.join(
-        'kernel',
-        flutterVersion.compareTo('3.32.0') >= 0 ? 'ddc_outline.dill' : 'ddc_outline_sound.dill',
-      );
+      final sdkKernelPath = p.url.join('kernel', 'ddc_outline.dill');
       final librariesPath = p.join(webSdkDir, 'libraries.json');
       final ddcSdkPrefix = usesDdcLibraryBundles ? 'ddcLibraryBundle-canvaskit' : 'amd-canvaskit';
-      final sdkJsPath = p.join(
-        webSdkDir,
-        'kernel',
-        flutterVersion.compareTo('3.32.0') >= 0 ? ddcSdkPrefix : '$ddcSdkPrefix-sound',
-      );
+      final sdkJsPath = p.join(webSdkDir, 'kernel', ddcSdkPrefix);
       return [
         '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
         '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',

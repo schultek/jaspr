@@ -1,7 +1,10 @@
+import 'package:meta/meta_meta.dart';
+
 /// Used to annotate a client component.
 const client = ClientAnnotation._();
 
 /// Use with [client] to annotate a client component.
+@Target({TargetKind.classType})
 final class ClientAnnotation {
   const ClientAnnotation._();
 }
@@ -10,6 +13,7 @@ final class ClientAnnotation {
 const encoder = EncoderAnnotation._();
 
 /// Use with [encoder] to annotate an encoder function for a custom model.
+@Target({TargetKind.method})
 final class EncoderAnnotation {
   const EncoderAnnotation._();
 }
@@ -18,6 +22,7 @@ final class EncoderAnnotation {
 const decoder = DecoderAnnotation._();
 
 /// Use with [decoder] to annotate an decoder function for a custom model.
+@Target({TargetKind.constructor, TargetKind.method})
 final class DecoderAnnotation {
   const DecoderAnnotation._();
 }
@@ -52,6 +57,7 @@ final class DecoderAnnotation {
 /// ```
 ///
 /// Accessing your imported elements on the wrong platform will result in runtime exceptions.
+@Target({TargetKind.importDirective})
 final class Import {
   const Import.onWeb(this.import, {required this.show}) : platform = ImportPlatform.web;
   const Import.onServer(this.import, {required this.show}) : platform = ImportPlatform.server;

@@ -1,3 +1,7 @@
+## Unreleased minor
+
+- Require Dart 3.13 or later.
+
 ## 0.4.6
 
 - Support `riverpod` version `3.3.2`.
