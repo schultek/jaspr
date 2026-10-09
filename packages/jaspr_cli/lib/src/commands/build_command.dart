@@ -12,6 +12,7 @@ import 'package:path/path.dart' as p;
 import '../dev/util.dart';
 import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
+import '../helpers/experiment_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
@@ -109,6 +110,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       defaultsTo: true,
     );
     addDartDefineArgs();
+    addExperimentArgs();
   }
 
   @override
@@ -213,6 +215,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       final process = await ProcessRunner.instance.start(dartExecutable, [
         'compile',
         compileTarget,
+        ...experimentArgs,
         if (targetOS != null) ...[
           '--target-os',
           targetOS,
@@ -503,6 +506,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       '--release',
       '--verbose',
       '--delete-conflicting-outputs',
+      ...experimentArgs,
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
         '--define=build_web_compilers:entrypoint=${compiler}_args=${jsonEncode(args)}',

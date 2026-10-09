@@ -8,6 +8,9 @@
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Added an `ApplyTarget target` parameter to `Component.apply` (previously `Component.wrapElement`)
   to target specific elements instead of only direct children.
+- Added `--enable-experiment` to `jaspr build` and `jaspr serve`, for Dart language experiments such as
+  `primary-constructors`. The flag is passed on to `build_runner`, which applies it to the analysis Jaspr's
+  builders do and to the web compilers, and to the Dart command that runs or compiles the server.
 
 ### Breaking changes
 

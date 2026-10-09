@@ -13,6 +13,7 @@ import '../dev/chrome.dart';
 import '../dev/client_workflow.dart';
 import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
+import '../helpers/experiment_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
@@ -75,6 +76,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       defaultsTo: false,
     );
     addDartDefineArgs();
+    addExperimentArgs();
   }
 
   @override
@@ -235,6 +237,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       // 'run',
       if (!release) ...['--enable-vm-service', '--enable-asserts'] else '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
+      ...experimentArgs,
       for (final define in userDefines.entries) '-D${define.key}=${define.value}',
     ];
 
@@ -410,6 +413,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       if (verbose) '--verbose',
       if (release) '--release',
       '--delete-conflicting-outputs',
+      ...experimentArgs,
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:ddc=generate-full-dill=true',
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
