@@ -1,3 +1,8 @@
+## Unreleased patch
+
+- Fixed `Animation(count: double.infinity)` rendering `infinity`, which is not a valid `animation-iteration-count`, so
+  browsers dropped the whole `animation` declaration and nothing moved. It now renders `infinite`.
+
 ## 0.23.5
 
 - Fixed a dependency resolution problem when creating a new project by setting `build_web_compilers` to `4.8.5`.
