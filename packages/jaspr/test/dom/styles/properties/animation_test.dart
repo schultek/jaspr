@@ -28,7 +28,7 @@ void main() {
         expect(
           styles.properties,
           equals({
-            'animation': '500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinity normal forwards running slide',
+            'animation': '500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinite normal forwards running slide',
           }),
         );
       });
