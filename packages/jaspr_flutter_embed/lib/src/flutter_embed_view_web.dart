@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
@@ -38,7 +40,10 @@ class FlutterEmbedView extends StatefulComponent {
   final Widget? widget;
   final Widget Function()? builder;
 
-  static final Future<void> _libraryFuture = flutter.loadLibrary().then((_) => flutter.FlutterEmbedView.preload());
+  static final Future<void> _libraryFuture = [
+    flutter.loadLibrary().then((_) => flutter.FlutterEmbedView.preload()),
+    ?(loadSkwasmInstance?.callAsFunction() as JSPromise?)?.toDart,
+  ].wait;
 
   static Future<void> preload() => _libraryFuture;
 
@@ -106,3 +111,6 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
     return component._buildFlutter();
   }
 }
+
+@JS('__loadSkwasmInstance')
+external JSFunction? get loadSkwasmInstance;
