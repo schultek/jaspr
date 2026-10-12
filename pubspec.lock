@@ -189,10 +189,10 @@ packages:
     dependency: transitive
     description:
       name: build_web_compilers
-      sha256: f8136b4d19e55917711f134a5f4cf2fded7dfe97e4accf0c9a47b5d0fea4e296
+      sha256: "0c41652721f5ae373028e13e140806867b7cb73ee00df18d48cf6b5386cbe090"
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.11"
+    version: "4.8.12"
   built_collection:
     dependency: transitive
     description:
