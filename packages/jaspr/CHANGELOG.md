@@ -40,6 +40,7 @@
   - `MarkupRenderText`
   - `MarkupRenderFragment`,
   - `RootMarkupRenderObject`
+  - `ChildList`
   - `ChildListRange`
   - `ChildNodeData`
 
@@ -48,6 +49,23 @@
 
   - `AttachAdapter`, previously exported by `package:jaspr/server.dart`.
   - `TemplateDocumentAdapter`, previously exported by `package:jaspr/server.dart`.
+  - `BaseChildNode` and `ChildNodeBoundary`, previously available through an implementation import.
+  - Removed the `ChildListRange` constructor and its unused `nodes` getter.
+    Obtain ranges through `ChildList.range` or an `ElementBoundaryAdapter` hook.
+  - `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
+    Access a render object's child list through `MarkupRenderObject.children`.
+  - `BaseDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.new` instead.
+  - `TemplateDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.template` instead.
+  - `HeadDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.head` instead.
+  - `AttachDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.body` instead.
+- Removed the `ChildListRange` constructor and its unused `nodes` getter.
+  Obtain ranges through `ChildList.range` or an `ElementBoundaryAdapter` hook.
+- `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
+  Access a render object's child list through `MarkupRenderObject.children`.
 
 ### Behavior changes
 
@@ -63,6 +81,9 @@
 
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
+- Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.
+- Fixed the server output of a client component that
+  renders `<head>` when the document has no `<body>`.
 
 ## 0.23.5
 

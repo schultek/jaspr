@@ -9,6 +9,7 @@ import 'sources/client_basic.dart';
 import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
 import 'sources/client_model_extension.dart';
+import 'sources/client_nullable_models.dart';
 import 'sources/client_with_server_components.dart';
 
 void main() {
@@ -48,6 +49,17 @@ void main() {
           ClientModuleBuilder(BuilderOptions({})),
           clientModelExtensionSources,
           outputs: {...clientModelExtensionModuleOutputs},
+          readerWriter: reader,
+        );
+      });
+    });
+
+    group('on component using nullable models', () {
+      test('generates null-safe decoders for class and extension codecs', () async {
+        await testBuilder(
+          ClientModuleBuilder(BuilderOptions({})),
+          clientNullableModelsSources,
+          outputs: {...clientNullableModelsModuleOutputs},
           readerWriter: reader,
         );
       });

@@ -100,5 +100,55 @@ void main() {
       expect(elements4[0].component.num, equals(1));
       expect(elements4.skip(1), equals([elements3[0], elements1[1]]));
     });
+
+    testComponents('should deactivate removed children before mounting new ones', (tester) async {
+      final log = <String>[];
+      final component = FakeComponent(
+        child: div([
+          _LifecycleComponent('a', log, key: const ValueKey('a')),
+          _LifecycleComponent('b', log, key: const ValueKey('b')),
+        ]),
+      );
+      tester.pumpComponent(component);
+      log.clear();
+
+      // The new child takes the position of the first removed child, ahead of the second one.
+      component.updateChild(div([_LifecycleComponent('c', log, key: const ValueKey('c'))]));
+      await tester.pump();
+
+      expect(log, equals(['deactivate a', 'deactivate b', 'mount c']));
+    });
   });
+}
+
+class _LifecycleComponent extends Component {
+  const _LifecycleComponent(this.name, this.log, {super.key});
+
+  final String name;
+  final List<String> log;
+
+  @override
+  Element createElement() => _LifecycleElement(this);
+}
+
+class _LifecycleElement extends BuildableElement {
+  _LifecycleElement(_LifecycleComponent super.component);
+
+  @override
+  _LifecycleComponent get component => super.component as _LifecycleComponent;
+
+  @override
+  void mount(Element? parent, ElementSlot newSlot) {
+    super.mount(parent, newSlot);
+    component.log.add('mount ${component.name}');
+  }
+
+  @override
+  void deactivate() {
+    component.log.add('deactivate ${component.name}');
+    super.deactivate();
+  }
+
+  @override
+  Component build() => .text(component.name);
 }
