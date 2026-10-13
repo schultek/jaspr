@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:dwds/data/build_result.dart';
 import 'package:frontend_server_client/frontend_server_client.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
@@ -23,11 +22,13 @@ extension CssHelper on BaseCommand {
     final runner = CssRunner(workflow, project, logger)..prepare();
     await runner.start();
 
-    workflow.devProxy.registerPostReloadCallback(runner.reload);
+    workflow.devProxy.getCssFiles = () => runner.cssFiles;
+    workflow.devProxy.registerPreReloadCallback(runner.reload);
 
     guardResource(() {
       logger.write('Terminating CSS runner...', level: Level.debug);
-      workflow.devProxy.unregisterPostReloadCallback(runner.reload);
+      workflow.devProxy.getCssFiles = null;
+      workflow.devProxy.unregisterPreReloadCallback(runner.reload);
       runner.dispose();
     });
 
@@ -60,6 +61,9 @@ class CssRunner {
   final Set<Uri> sources = {};
   VmService? vmService;
   String? isolateId;
+
+  List<String> cssFiles = [];
+  Completer<void>? _generationCompleter;
 
   final Completer<void> _initialGenerationCompleter = Completer<void>();
   Future<void> get initialGenerationComplete => process != null ? _initialGenerationCompleter.future : Future.value();
@@ -137,6 +141,7 @@ class CssRunner {
 
     final cssFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
+    this.cssFiles = cssFiles;
 
     final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
 
@@ -197,11 +202,10 @@ class CssRunner {
           if (!_initialGenerationCompleter.isCompleted) {
             _initialGenerationCompleter.complete();
           }
-          // if (workflow?.devProxy.reload == ReloadConfiguration.hotReload) {
-          //   for (final connection in workflow!.devProxy.getClientConnections()) {
-          //     _reloadStylesheets(connection, cssFiles);
-          //   }
-          // }
+          if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+            _generationCompleter!.complete();
+            _generationCompleter = null;
+          }
         },
       );
     });
@@ -224,9 +228,10 @@ class CssRunner {
     });
   }
 
-  Future<void> reload(BuildResult result) async {
+  Future<void> reload() async {
     final cssFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
+    this.cssFiles = cssFiles;
 
     logger.write('Regenerating CSS files...', tag: Tag.css);
 
@@ -253,11 +258,13 @@ class CssRunner {
         if (process == null) {
           await _startProcess(cssFiles);
         } else if (vmService != null && isolateId != null) {
+          final completer = _generationCompleter = Completer<void>();
           await vmService!.reloadSources(
             isolateId!,
             rootLibUri: Uri.file(p.absolute(compilerResult.dillOutput!)).toString(),
           );
           process!.stdin.writeln(jsonEncode({'command': 'run'}));
+          await completer.future;
         }
       }
     } catch (e) {
@@ -401,18 +408,6 @@ class CssRunner {
     return runnerCode.toString();
   }
 
-  // Future<void> _reloadStylesheets(ClientConnection connection, List<String> cssFiles) async {
-  //   if (connection.vmService == null) {
-  //     return;
-  //   }
-  //   try {
-  //     logger.write('Hot-reloading CSS stylesheets: $cssFiles', tag: Tag.css, level: Level.verbose);
-  //     await connection.vmService!.callServiceExtension('ext.jaspr.reload_stylesheets', args: {'urls': cssFiles});
-  //   } catch (e) {
-  //     logger.write('Failed to reload CSS stylesheets: $e', tag: Tag.css, level: Level.warning);
-  //   }
-  // }
-
   void _processCssOutput(String line, {void Function(String uri)? onVmServiceUri, void Function()? onDone}) {
     while (line.startsWith('Running build hooks...')) {
       line = line.substring('Running build hooks...'.length);
@@ -451,6 +446,10 @@ class CssRunner {
     vmService?.dispose();
     if (!_initialGenerationCompleter.isCompleted) {
       _initialGenerationCompleter.complete();
+    }
+    if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+      _generationCompleter!.complete();
+      _generationCompleter = null;
     }
   }
 }
