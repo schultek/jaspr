@@ -29,10 +29,10 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
         rootElement?.visitChildren((element) => element.reassemble());
         return ServiceExtensionResponse.result('{}');
       });
-      registerExtension('ext.jaspr.reload', (method, parameters) async {
+      registerExtension('ext.jaspr.reload_html', (method, parameters) async {
         final path = parameters['path'];
         if (path == null || path == web.window.location.pathname) {
-          _reloadPage();
+          await _reloadPage(path);
         }
         return ServiceExtensionResponse.result('{}');
       });
@@ -53,7 +53,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
           }
         }
         if (stylesheetUrls != null) {
-          _reloadStylesheets(stylesheetUrls);
+          await _reloadStylesheets(stylesheetUrls);
         }
         return ServiceExtensionResponse.result('{}');
       });
@@ -118,7 +118,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     web.console.error('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace'.toJS);
   }
 
-  void _reloadStylesheets(List<String> urls) {
+  Future<void> _reloadStylesheets(List<String> urls) async {
     Future<void> performReload() async {
       final futures = <Future<void>>[];
 
@@ -141,9 +141,10 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     }
 
     if (web.document.has('startViewTransition')) {
-      web.document.startViewTransition((() => performReload().toJS).toJS);
+      final transition = web.document.startViewTransition((() => performReload().toJS).toJS);
+      await transition.finished.toDart;
     } else {
-      performReload();
+      await performReload();
     }
   }
 
@@ -192,7 +193,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     return completer.future;
   }
 
-  void _reloadPage([String? path]) async {
+  Future<void> _reloadPage([String? path]) async {
     final response = await http.get(
       Uri.parse(web.window.location.href).replace(path: path),
       headers: {'X-Jaspr-Reload': 'true'},

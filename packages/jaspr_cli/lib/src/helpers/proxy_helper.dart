@@ -61,8 +61,8 @@ mixin ProxyHelper on BaseCommand {
         if (res.statusCode == 404 &&
             redirectNotFound &&
             path.extension(req.url.path).isEmpty &&
-            !req.url.path.contains('dwds') &&
-            !req.url.path.startsWith(r'$')) {
+            !req.url.path.startsWith(r'$dwds') &&
+            !req.url.path.startsWith(r'$jaspr')) {
           await res.read().drain<void>().catchError((_) {});
           return await webdevHandler(
             Request(

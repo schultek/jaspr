@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -98,8 +97,7 @@ Handler createHandler(
     final segment = request.url.pathSegments.lastOrNull ?? '';
     if (!segment.contains('.')) {
       if (kDebugMode) {
-        isAllowedPath =
-            !request.url.path.contains('dwds') && !request.url.path.startsWith(r'$') && request.url.path != 'null';
+        isAllowedPath = !request.url.path.startsWith(r'$dwds') && !request.url.path.startsWith(r'$jaspr');
       } else {
         isAllowedPath = true;
       }

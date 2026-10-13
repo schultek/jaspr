@@ -63,7 +63,6 @@ final class ServerApp {
     _setup = setup;
     _handler = _createHandler();
     _reassembleController.add(Object());
-    reloadClients();
   }
 
   Handler _createHandler() {
@@ -72,7 +71,8 @@ final class ServerApp {
       pipeline = pipeline.addMiddleware(middleware);
     }
     _middleware.clear();
-    return createHandler((_, render) => render(_setup), client: _client);
+    final handler = createHandler((_, render) => render(_setup), client: _client);
+    return pipeline.addHandler(handler);
   }
 
   Future<HttpServer> _createServer() async {
@@ -106,6 +106,9 @@ final class ServerApp {
   }
 
   static Future<void> _sendDebugMessage(Object message) async {
+    if (jasprProxyPort == null) {
+      return;
+    }
     await _client.post(Uri.http('localhost:$jasprProxyPort', r'$jasprMessageHandler'), body: jsonEncode(message));
   }
 

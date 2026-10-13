@@ -340,14 +340,18 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     );
 
     if (mode != 'none') {
-      workflow.devProxy.registerPostReloadCallback(() async {
+      workflow.devProxy.registerPreReloadCallback(() async {
         if (vmService case final vmService?) {
           try {
             final vmObj = await vmService.getVM();
             final mainIsolate = vmObj.isolates!.first;
-            await vmService.reloadSources(mainIsolate.id!);
-            await vmService.callServiceExtension('ext.jaspr.reload', isolateId: mainIsolate.id!);
-            logger.write('Server reloaded.', tag: Tag.server);
+            final report = await vmService.reloadSources(mainIsolate.id!);
+            if (report.success ?? false) {
+              await vmService.callServiceExtension('ext.jaspr.reload', isolateId: mainIsolate.id!);
+              logger.write('Server reloaded.', tag: Tag.server);
+            } else {
+              logger.write('Failed to reload server.', tag: Tag.server, level: Level.warning);
+            }
           } catch (e) {
             logger.write('Failed to reload server: $e', tag: Tag.server, level: Level.warning);
           }
@@ -460,7 +464,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'restart' => ReloadConfiguration.hotRestart,
       _ => ReloadConfiguration.none,
     };
-    final moduleFormat = this.moduleFormat ?? 'ddc';
+    if (compiler != 'dartdevc') {
+      reloadConfig = reloadConfig == ReloadConfiguration.none
+          ? ReloadConfiguration.none
+          : ReloadConfiguration.liveReload;
+    }
+
+    final moduleFormat = compiler == 'dartdevc' ? (this.moduleFormat ?? 'ddc') : 'amd';
     if (moduleFormat == 'amd' && reloadConfig == ReloadConfiguration.hotReload) {
       logger.write(
         'The AMD module format does not support hot reload. Using hot restart instead of hot reload.',
@@ -476,7 +486,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       }
     }
 
-    final usesDdcLibraryBundles = moduleFormat == 'ddc';
+    final usesDdcLibraryBundles = compiler == 'dartdevc' && moduleFormat == 'ddc';
 
     List<String> additionalFlutterBuildArgs() {
       final sdkKernelPath = p.url.join('kernel', 'ddc_outline.dill');

@@ -63,13 +63,28 @@ class DevProxy {
         for (final callback in _preReloadCallbacks) {
           await callback();
         }
+        final cssFiles = getCssFiles?.call();
+
         if (reload == ReloadConfiguration.hotReload) {
           for (final clientConnection in _clientConnections.values) {
             await clientConnection.performHotReload();
+            if (cssFiles != null && cssFiles.isNotEmpty) {
+              await clientConnection.reloadStylesheets(cssFiles);
+            }
+            await clientConnection.reassemble();
+            await clientConnection.reloadHtml();
           }
         } else if (reload == ReloadConfiguration.hotRestart) {
           for (final clientConnection in _clientConnections.values) {
+            if (cssFiles != null && cssFiles.isNotEmpty) {
+              await clientConnection.reloadStylesheets(cssFiles);
+            }
             await clientConnection.restart();
+            await clientConnection.reloadHtml();
+          }
+        } else if (reload == ReloadConfiguration.liveReload) {
+          for (final clientConnection in _clientConnections.values) {
+            await clientConnection.reloadPage();
           }
         }
         for (final callback in _postReloadCallbacks) {
@@ -79,11 +94,17 @@ class DevProxy {
     }
   }
 
+  List<String> Function()? getCssFiles;
+
   final List<FutureOr<void> Function()> _preReloadCallbacks = [];
   final List<FutureOr<void> Function()> _postReloadCallbacks = [];
 
   void registerPreReloadCallback(FutureOr<void> Function() callback) {
     _preReloadCallbacks.add(callback);
+  }
+
+  void unregisterPreReloadCallback(FutureOr<void> Function() callback) {
+    _preReloadCallbacks.remove(callback);
   }
 
   void registerPostReloadCallback(FutureOr<void> Function() callback) {
@@ -168,8 +189,8 @@ class DevProxy {
 
     final reloadedSourcesUri = Uri.parse('/reloaded_sources.json');
 
-    // We handle hot-reload ourselves, so we don't need the DDC service to do it.
-    final reloadStrategy = reload == ReloadConfiguration.hotReload ? ReloadConfiguration.none : reload;
+    // We handle reload ourselves, so we don't need DWDS to trigger it automatically.
+    final reloadStrategy = ReloadConfiguration.none;
 
     final loadStrategy = moduleFormat == 'ddc'
         ? BuildRunnerDdcLibraryBundleStrategyProvider(
@@ -450,21 +471,63 @@ class ClientConnection {
         break;
       }
     }
-    if (response?.success ?? false) {
-      await reassemble();
-    } else {
+    if (!(response?.success ?? false)) {
       devProxy.logger?.write(
-        'Hot reload failed after 5 attempts for unknown reason. Skipping reassemble.',
+        'Hot reload failed after 5 attempts for unknown reason.',
         tag: Tag.client,
         level: Level.warning,
       );
     }
   }
 
+  Future<vm.Response?> reloadStylesheets(List<String> urls) async {
+    final reloadMethod = _registeredMethodsForService['ext.jaspr.reload_stylesheets'] ?? 'ext.jaspr.reload_stylesheets';
+    for (var i = 0; i < 5; i++) {
+      try {
+        final response = await vmService?.callServiceExtension(
+          reloadMethod,
+          args: {'urls': jsonEncode(urls)},
+        );
+        if (response != null) return response;
+      } catch (_) {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      }
+    }
+    return null;
+  }
+
   Future<vm.Response?> reassemble() async {
     final reassembleMethod = _registeredMethodsForService['ext.jaspr.reassemble'] ?? 'ext.jaspr.reassemble';
+    for (var i = 0; i < 5; i++) {
+      try {
+        final response = await vmService?.callServiceExtension(reassembleMethod);
+        if (response != null) return response;
+      } catch (_) {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      }
+    }
+    return null;
+  }
+
+  Future<vm.Response?> reloadHtml([String? path]) async {
+    final reloadMethod = _registeredMethodsForService['ext.jaspr.reload_html'] ?? 'ext.jaspr.reload_html';
+    final args = path != null ? {'path': path} : <String, String>{};
+    for (var i = 0; i < 5; i++) {
+      try {
+        final response = await vmService?.callServiceExtension(reloadMethod, args: args);
+        if (response != null) return response;
+      } catch (_) {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      }
+    }
+    return null;
+  }
+
+  Future<vm.Response?> reloadPage() async {
+    final reloadMethod =
+        _registeredMethodsForService['fullReload'] ?? _registeredMethodsForService['ext.dwds.reload'] ?? 'fullReload';
     try {
-      final response = await vmService?.callServiceExtension(reassembleMethod);
+      final response = await vmService?.callServiceExtension(reloadMethod);
       return response;
     } catch (_) {
       return null;
