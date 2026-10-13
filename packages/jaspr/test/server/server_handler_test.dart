@@ -111,5 +111,39 @@ void main() {
       expect(streamListened, isTrue, reason: 'proxyFileLoader must listen to 404 body stream');
       expect(streamDrained, isTrue, reason: 'proxyFileLoader must drain 404 body stream');
     });
+
+    test('routes reaching render handler vs blocked DWDS/internal endpoints', () async {
+      final handler = createHandler(
+        (request, render) {
+          return Response.ok('rendered: ${request.url.path}');
+        },
+        fileHandler: (_) => Response.notFound(''),
+      );
+
+      // Valid debug routes containing 'dwds' reach render handler
+      var response = await handler(Request('GET', Uri.http('localhost', '/guides/dwds')));
+      expect(response.statusCode, equals(200));
+      expect(await response.readAsString(), equals('rendered: guides/dwds'));
+
+      response = await handler(Request('GET', Uri.http('localhost', '/dwds')));
+      expect(response.statusCode, equals(200));
+      expect(await response.readAsString(), equals('rendered: dwds'));
+
+      // Valid route '/null' reaches render handler
+      response = await handler(Request('GET', Uri.http('localhost', '/null')));
+      expect(response.statusCode, equals(200));
+      expect(await response.readAsString(), equals('rendered: null'));
+
+      // DWDS concrete endpoint prefixes return 404
+      response = await handler(Request('GET', Uri.http('localhost', r'/$dwdsSseHandler')));
+      expect(response.statusCode, equals(404));
+
+      response = await handler(Request('GET', Uri.http('localhost', r'/$dwdsExtensionAuthentication')));
+      expect(response.statusCode, equals(404));
+
+      // Jaspr internal endpoint prefixes return 404
+      response = await handler(Request('GET', Uri.http('localhost', r'/$jasprMessageHandler')));
+      expect(response.statusCode, equals(404));
+    });
   });
 }

@@ -3,7 +3,7 @@ import 'client_binding.dart';
 
 /// Main entry point for the browser app.
 ClientAppBinding runApp(Component app, {String attachTo = 'body'}) {
-  final binding = ClientAppBinding();
+  final binding = ClientAppBinding.ensureInitialized();
   binding.attachRootComponent(app, attachTo: attachTo);
   return binding;
 }
