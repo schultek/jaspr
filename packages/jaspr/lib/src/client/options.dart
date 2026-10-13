@@ -8,9 +8,7 @@ import 'component_anchors.dart';
 ///
 /// Call [Jaspr.initializeApp] at the start of your app, before any calls to [runApp].
 abstract final class Jaspr {
-  static void initializeApp({
-    ClientOptions options = const ClientOptions(),
-  }) {
+  static void initializeApp({ClientOptions options = const ClientOptions()}) {
     _options = options;
     options.initialize?.call();
   }
@@ -81,7 +79,7 @@ final class ClientParams {
   Component mount(String sId) {
     assert(sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
     final name = sId.substring(2);
-    return ServerComponent(serverComponents, name);
+    return ServerComponent(serverComponents, name, key: GlobalKey());
   }
 
   Component? mountOrNull(String? sId) {

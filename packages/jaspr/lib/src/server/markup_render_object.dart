@@ -4,7 +4,6 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../server.dart';
 import '../dom/validator.dart';
-import 'child_nodes.dart';
 
 abstract final class MarkupRenderObject implements RawableRenderObject {
   @override
@@ -12,7 +11,7 @@ abstract final class MarkupRenderObject implements RawableRenderObject {
   @override
   web.Node? get node => null;
 
-  late final ChildList children = ChildList(this);
+  late final ChildList children = ChildList();
 
   @override
   MarkupRenderElement createChildRenderElement(String tag) {

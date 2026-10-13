@@ -231,7 +231,11 @@ final class ProviderScopeState extends State<ProviderScope> with SyncScopeMixin 
 
     if (_dirty) {
       _dirty = false;
-      container.updateOverrides([_bindingProvider.overrideWithValue(context.binding), ...component.overrides]);
+      container.updateOverrides([
+        _bindingProvider.overrideWithValue(context.binding),
+        ..._syncOverrides,
+        ...component.overrides,
+      ]);
     }
 
     return UncontrolledProviderScope(container: container, child: component.child);
