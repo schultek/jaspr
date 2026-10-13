@@ -15,10 +15,10 @@ final class _SyncAdapter extends ElementBoundaryAdapter {
   final SyncStateMixin<StatefulComponent, Object?> sync;
 
   @override
-  void applyBoundary(ChildListRange range) {
+  void applyBoundary(ChildGroup group) {
     final value = sync.getState();
     if (value == null) return;
     final data = const DomValidator().escapeMarkerText(jsonEncode(value));
-    range.start.insertNext(ChildNodeData(MarkupRenderText('<!--${DomValidator.syncMarkerPrefix}$data-->', true)));
+    group.children.insertAfter(MarkupRenderText('<!--${DomValidator.syncMarkerPrefix}$data-->', true));
   }
 }

@@ -1,11 +1,8 @@
 import 'dart:async';
 
 import '../../framework/framework.dart';
-import '../child_nodes.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
-
-export '../child_nodes.dart' show ChildList, ChildListRange, ChildNode, ChildNodeData;
 
 abstract base class ElementBoundaryAdapter extends RenderAdapter {
   /// Priority for client component boundaries.
@@ -31,25 +28,26 @@ abstract base class ElementBoundaryAdapter extends RenderAdapter {
   /// wrapping lower priority ones, independent of the order they are applied in.
   final int priority;
 
-  late ChildListRange range;
+  /// The group wrapping [element]'s output, created in [prepare]
+  /// and passed to [prepareBoundary] and [applyBoundary].
+  late final ChildGroup _group;
 
   @override
   FutureOr<void> prepare() {
     final parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
-    range = parent.children.wrapElement(element, priority);
-    prepareBoundary(range);
+    _group = parent.children.wrapElement(element, priority);
+    prepareBoundary(_group);
   }
 
   @override
-  void apply(MarkupRenderObject root) {
-    return applyBoundary(range);
-  }
+  void apply(MarkupRenderObject root) => applyBoundary(_group);
 
-  /// Called once [range] wraps [element], before any adapter is applied.
+  /// Called with the group wrapping [element]'s output, before any adapter is applied.
   ///
-  /// Don't insert nodes into the child list here,
-  /// as that can break the nesting of boundaries wrapped afterward.
-  /// Insert them in [applyBoundary].
-  void prepareBoundary(ChildListRange range) {}
-  void applyBoundary(ChildListRange range) {}
+  /// Entries inserted into [group] here don't affect how the groups of other adapters nest.
+  /// Prefer [applyBoundary] for mutations that depend on other adapters.
+  void prepareBoundary(ChildGroup group) {}
+
+  /// Called with the same [group] as [prepareBoundary], once all adapters are prepared.
+  void applyBoundary(ChildGroup group) {}
 }

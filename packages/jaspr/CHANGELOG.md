@@ -14,6 +14,10 @@
 - Require Dart 3.13 or later.
 - Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`.
 - Renamed `Component.wrapElement` to `Component.apply`.
+- Server render adapters now receive direct,
+  nestable `ChildGroup` nodes instead of `ChildListRange` nodes,
+  and `MarkupRenderObject` is now itself a `ChildNode` in
+  at most one child list, replacing `ChildNodeData`.
 - Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
 - The following classes can no longer be extended,
   but can still be implemented:
@@ -41,8 +45,6 @@
   - `MarkupRenderFragment`,
   - `RootMarkupRenderObject`
   - `ChildList`
-  - `ChildListRange`
-  - `ChildNodeData`
 
   To customize server rendering, instead use render adapters.
 - The following classes are no longer public:
@@ -50,10 +52,6 @@
   - `AttachAdapter`, previously exported by `package:jaspr/server.dart`.
   - `TemplateDocumentAdapter`, previously exported by `package:jaspr/server.dart`.
   - `BaseChildNode` and `ChildNodeBoundary`, previously available through an implementation import.
-  - Removed the `ChildListRange` constructor and its unused `nodes` getter.
-    Obtain ranges through `ChildList.range` or an `ElementBoundaryAdapter` hook.
-  - `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
-    Access a render object's child list through `MarkupRenderObject.children`.
   - `BaseDocument`, previously exported by `package:jaspr/server.dart`.
     Use `Document.new` instead.
   - `TemplateDocument`, previously exported by `package:jaspr/server.dart`.
@@ -62,8 +60,6 @@
     Use `Document.head` instead.
   - `AttachDocument`, previously exported by `package:jaspr/server.dart`.
     Use `Document.body` instead.
-- Removed the `ChildListRange` constructor and its unused `nodes` getter.
-  Obtain ranges through `ChildList.range` or an `ElementBoundaryAdapter` hook.
 - `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
   Access a render object's child list through `MarkupRenderObject.children`.
 
