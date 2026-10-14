@@ -28,7 +28,7 @@ class DevProxy {
   final Logger? logger;
 
   final Map<String, ClientConnection> _clientConnections = {};
-  final StreamController<Map<String, Object?>> _clientEvents = StreamController();
+  final StreamController<Map<String, Object?>> _clientEvents = StreamController.broadcast();
   Stream<Map<String, Object?>> get clientEvents => _clientEvents.stream;
 
   DevProxy._({

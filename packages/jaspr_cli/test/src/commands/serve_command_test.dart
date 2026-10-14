@@ -73,7 +73,7 @@ void main() {
       });
     });
 
-    test('handles keyboard shortcuts (r, R, d)', () async {
+    test('handles keyboard shortcuts (r, R, d, l)', () async {
       await io.runZoned(() async {
         io.stdin.hasTerminalOverride = true;
         io.setupFakeProject('myapp', mode: 'client');
@@ -133,6 +133,13 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emits('[LOG] DevTools not available yet.'),
+        );
+
+        // Press 'l' for launch chrome
+        io.stdin.addBytes([utf8.encode('l').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[LOG] Launching Chrome...'),
         );
 
         // Press 'q' for quit

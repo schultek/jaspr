@@ -126,6 +126,9 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   DevStatus _currentStatus = DevStatus.ready;
 
   late final ClientWorkflow workflow;
+
+  Chrome? _chrome;
+
   late final CssRunner cssRunner;
 
   String? serverVmServiceUri;
@@ -159,6 +162,24 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     this.workflow = workflow;
     handleClientWorkflow(workflow);
+
+    final clientEventsSub = workflow.devProxy.clientEvents.listen((event) {
+      if (event['method'] == 'client.stop') {
+        _chrome?.close();
+        _chrome = null;
+      }
+    });
+    guardResource(() async {
+      await clientEventsSub.cancel();
+    });
+
+    guardResource(() async {
+      if (_chrome != null) {
+        logger.write('Closing Chrome...', level: Level.debug);
+        await _chrome?.close();
+        _chrome = null;
+      }
+    });
 
     cssRunner = await watchCss(workflow);
 
@@ -214,6 +235,17 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     updateFooter(DevStatus.ready);
 
+    if (stdout.hasTerminal && !Platform.isWindows && IOOverrides.current == null) {
+      try {
+        final resizeSub = ProcessSignal.sigwinch.watch().listen((_) {
+          updateFooter(_currentStatus);
+        });
+        guardResource(() async {
+          await resizeSub.cancel();
+        });
+      } catch (_) {}
+    }
+
     _setupKeyHandler(flutterProcess);
 
     return await workflow.done;
@@ -222,15 +254,25 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   void updateFooter(DevStatus status) {
     _currentStatus = status;
     final width = stdout.hasTerminal ? stdout.terminalColumns : 80;
+    final availableWidth = width > 1 ? width - 1 : width;
     final leftText = ' Serving on http://localhost:$port';
     final rightText = switch (status) {
       DevStatus.ready => 'All ready ',
       DevStatus.rebuilding => 'Rebuilding... ',
       DevStatus.error => 'Errors occurred. Fix and save to retry. ',
     };
-    final spacesCount = width - leftText.length - rightText.length;
-    final spaces = spacesCount < 0 ? 0 : spacesCount;
-    final footerContent = leftText + (' ' * spaces) + rightText;
+
+    final String footerContent;
+    if (leftText.length + rightText.length <= availableWidth) {
+      final spaces = availableWidth - leftText.length - rightText.length;
+      footerContent = '$leftText${' ' * spaces}$rightText';
+    } else if (leftText.length <= availableWidth) {
+      final spaces = availableWidth - leftText.length;
+      footerContent = '$leftText${' ' * spaces}';
+    } else {
+      footerContent = leftText.substring(0, availableWidth);
+    }
+
     final footerColor = switch (status) {
       DevStatus.ready => backgroundGreen,
       DevStatus.rebuilding => backgroundYellow,
@@ -238,26 +280,78 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     };
     final footerLine = footerColor.wrap(black.wrap(styleBold.wrap(footerContent)))!;
 
-    final dot = '  ·  ';
-    final keys = [
-      if (canHotReload) '${styleBold.wrap('[r]')}: Reload',
-      '${styleBold.wrap('[R]')}: Restart',
-      '${styleBold.wrap('[d]')}: DevTools',
-      '${styleBold.wrap('[q]')}: Quit',
-    ];
-    final rawKeys = [
-      if (canHotReload) '[r]: Reload',
-      '[R]: Restart',
-      '[d]: DevTools',
-      '[q]: Quit',
-    ];
-    final rawKeysContent = ' ${rawKeys.join(dot)}';
-    final keysSpacesCount = width - rawKeysContent.length;
-    final keysSpaces = keysSpacesCount < 0 ? 0 : keysSpacesCount;
-    final keysContent = ' ${keys.join(dot)}${' ' * keysSpaces}';
-    final keysLine = darkGray.wrap(keysContent)!;
+    List<String> getKeys(bool showColons, bool shortChrome, bool minimal) {
+      if (minimal) {
+        return [
+          if (canHotReload) '${styleBold.wrap('[r]')}',
+          '${styleBold.wrap('[R]')}',
+          '${styleBold.wrap('[l]')}',
+          '${styleBold.wrap('[d]')}',
+          '${styleBold.wrap('[q]')}',
+        ];
+      }
+      final c = showColons ? ':' : '';
+      final chromeName = shortChrome ? 'Chrome' : 'Launch Chrome';
+      return [
+        if (canHotReload) '${styleBold.wrap('[r]$c')} Reload',
+        '${styleBold.wrap('[R]$c')} Restart',
+        '${styleBold.wrap('[l]$c')} $chromeName',
+        '${styleBold.wrap('[d]$c')} DevTools',
+        '${styleBold.wrap('[q]$c')} Quit',
+      ];
+    }
+
+    List<String> getRawKeys(bool showColons, bool shortChrome, bool minimal) {
+      if (minimal) {
+        return [
+          if (canHotReload) '[r]',
+          '[R]',
+          '[l]',
+          '[d]',
+          '[q]',
+        ];
+      }
+      final c = showColons ? ':' : '';
+      final chromeName = shortChrome ? 'Chrome' : 'Launch Chrome';
+      return [
+        if (canHotReload) '[r]$c Reload',
+        '[R]$c Restart',
+        '[l]$c $chromeName',
+        '[d]$c DevTools',
+        '[q]$c Quit',
+      ];
+    }
+
+    String dot = (availableWidth >= 88) ? '  ·  ' : ' · ';
+    var selectedKeys = getKeys(true, false, false);
+    var selectedRaw = getRawKeys(true, false, false);
+
+    if (' ${selectedRaw.join(dot)}'.length > availableWidth) {
+      dot = ' · ';
+    }
+    if (' ${selectedRaw.join(dot)}'.length > availableWidth) {
+      selectedKeys = getKeys(true, true, false);
+      selectedRaw = getRawKeys(true, true, false);
+    }
+    if (' ${selectedRaw.join(dot)}'.length > availableWidth) {
+      selectedKeys = getKeys(false, true, false);
+      selectedRaw = getRawKeys(false, true, false);
+    }
+    if (' ${selectedRaw.join(dot)}'.length > availableWidth) {
+      selectedKeys = getKeys(false, false, true);
+      selectedRaw = getRawKeys(false, false, true);
+    }
+
+    while (selectedKeys.length > 1 && ' ${selectedRaw.join(dot)}'.length > availableWidth) {
+      selectedKeys.removeLast();
+      selectedRaw.removeLast();
+    }
+
+    final content = ' ${selectedKeys.join(dot)}';
+    final keysLine = darkGray.wrap(content)!;
 
     logger.setFooter([
+      '',
       '',
       footerLine,
       keysLine,
@@ -368,6 +462,18 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         } catch (e) {
           logger.write('Failed to restart: $e', tag: Tag.cli, level: Level.warning);
         }
+      case 'l':
+        if (_chrome case final chrome?) {
+          final focused = await chrome.focus();
+          if (focused) {
+            logger.write('Chrome is already running.', tag: Tag.cli);
+            break;
+          } else {
+            chrome.close();
+            _chrome = null;
+          }
+        }
+        await _launchChrome();
       case 'd':
         final clientUri = workflow.devProxy.clientDevToolsUri;
         final serverUri =
@@ -620,21 +726,23 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   Future<void> _runChrome() async {
     if (!launchInChrome) return;
+    await _launchChrome();
+  }
 
-    var chrome = await startChrome(int.parse(port), logger);
+  Future<void> _launchChrome() async {
+    if (_chrome != null) {
+      await _chrome?.close();
+      _chrome = null;
+    }
+
+    logger.write('Launching Chrome...', tag: Tag.cli, progress: ProgressState.running);
+    final chrome = await startChrome(int.parse(port), logger);
     if (chrome == null) {
       return;
     }
 
+    _chrome = chrome;
     logger.write('Chrome started.', tag: Tag.cli, progress: ProgressState.completed);
-
-    guardResource(() async {
-      if (chrome != null) {
-        logger.write('Closing Chrome...', level: Level.debug);
-        chrome?.close();
-        chrome = null;
-      }
-    });
   }
 
   Future<ClientWorkflow?> _runClient(String proxyPort) async {
