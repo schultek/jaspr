@@ -10,25 +10,25 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../commands/base_command.dart';
-import '../dev/dev_proxy.dart';
+import '../dev/dev_workflow.dart';
 import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
   Future<HttpServer> startProxy(
     int port, {
-    DevProxy? devProxy,
+    DevWorkflow? devWorkflow,
     int? flutterPort,
     bool redirectNotFound = false,
     void Function(Object?)? onMessage,
   }) async {
-    final client = devProxy?.client ?? http.Client();
+    final client = devWorkflow?.client ?? http.Client();
     final flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
     Directory('.dart_tool/jaspr/generated').createSync(recursive: true);
     final generatedHandler = noCachingHandler(createStaticHandler('.dart_tool/jaspr/generated'));
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
-    final webdevHandler = devProxy?.handler ?? (req) => Response.notFound(null);
+    final webdevHandler = devWorkflow?.handler ?? (req) => Response.notFound(null);
 
-    Future<Response> handleRequest(Request req, {Stream<List<int>>? body, bool isRetry = false}) async {
+    Future<Response> handleRequest(Request req, {Stream<List<int>>? body, int retries = 0}) async {
       // Each proxyHandler will read the body, so we have to duplicate the stream beforehand,
       // or else this will throw.
       body ??= req.read().asBroadcastStream();
@@ -81,10 +81,13 @@ mixin ProxyHelper on BaseCommand {
           rethrow;
         }
         final isConnectionError = e is SocketException || e is http.ClientException;
-        if (isConnectionError && !isRetry && (req.method == 'GET' || req.method == 'HEAD')) {
-          // The backend connection may have been closed due to keep-alive idle timeout.
-          // Retry once on a fresh connection.
-          return await handleRequest(req, body: body, isRetry: true);
+        if (isConnectionError && retries < 2 && (req.method == 'GET' || req.method == 'HEAD')) {
+          // The backend connection may have been closed due to keep-alive idle timeout or rebuild.
+          // Retry on a fresh connection.
+          if (retries > 0) {
+            await Future<void>.delayed(const Duration(milliseconds: 100));
+          }
+          return await handleRequest(req, body: body, retries: retries + 1);
         }
         if (isConnectionError) {
           logger.write('Proxy connection to backend failed: $e', tag: Tag.cli, level: Level.verbose);

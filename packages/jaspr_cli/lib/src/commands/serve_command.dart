@@ -1,4 +1,4 @@
-import '../dev/client_workflow.dart';
+import '../dev/dev_workflow.dart';
 import '../logging.dart';
 import 'dev_command.dart';
 
@@ -21,8 +21,8 @@ class ServeCommand extends DevCommand {
   late final bool launchInChrome = argResults?.flag('launch-in-chrome') ?? false;
 
   @override
-  void handleClientWorkflow(ClientWorkflow workflow) {
-    workflow.devProxy.clientEvents.listen((event) {
+  void handleDevWorkflow(DevWorkflow workflow) {
+    workflow.clientEvents.listen((event) {
       if (event['method'] == 'client.debugPort') {
         final params = event['params'] as Map<String, Object?>;
         final wsUri = params['wsUri'] as String;

@@ -1,6 +1,6 @@
 import '../daemon/logger.dart';
 import '../dev/client_domain.dart';
-import '../dev/client_workflow.dart';
+import '../dev/dev_workflow.dart';
 import '../helpers/daemon_helper.dart';
 import 'dev_command.dart';
 
@@ -38,7 +38,7 @@ class DaemonCommand extends DevCommand with DaemonHelper {
   }
 
   @override
-  void handleClientWorkflow(ClientWorkflow workflow) {
-    daemon.registerDomain(ClientDomain(daemon, workflow.devProxy));
+  void handleDevWorkflow(DevWorkflow workflow) {
+    daemon.registerDomain(ClientDomain(daemon, workflow));
   }
 }
