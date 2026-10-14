@@ -307,10 +307,10 @@ class Project {
     final minVersion = VersionConstraint.compatibleWith(Version(4, 8, 12));
     if (version == null || !minVersion.allowsAll(version)) {
       logger.write(
-        'Using "--mode=reload" requires build_web_compilers 4.8.12 or newer. '
+        'Hot reload requires build_web_compilers 4.8.12 or newer. '
         'Please update your version constraint in pubspec.yaml.',
         tag: Tag.cli,
-        level: Level.error,
+        level: Level.warning,
       );
 
       return false;

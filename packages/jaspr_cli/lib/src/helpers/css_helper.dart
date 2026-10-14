@@ -30,7 +30,7 @@ extension CssHelper on BaseCommand {
         logger.write('Terminating CSS runner...', level: Level.debug);
       }
       workflow.devProxy.getCssFiles = null;
-      workflow.devProxy.unregisterPostReloadCallback(runner.reload);
+      workflow.devProxy.unregisterPreReloadCallback(runner.reload);
       runner.dispose();
     });
 

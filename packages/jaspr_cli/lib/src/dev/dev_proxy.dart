@@ -60,35 +60,26 @@ class DevProxy {
   void _listenToBuildResults() async {
     await for (final buildResult in buildResults) {
       if (buildResult.status == BuildStatus.succeeded) {
-        for (final callback in _preReloadCallbacks) {
-          await callback();
-        }
-        final cssFiles = getCssFiles?.call();
-
         if (reload == ReloadConfiguration.hotReload) {
-          for (final clientConnection in _clientConnections.values) {
-            await clientConnection.performHotReload();
-            if (cssFiles != null && cssFiles.isNotEmpty) {
-              await clientConnection.reloadStylesheets(cssFiles);
-            }
-            await clientConnection.reassemble();
-            await clientConnection.reloadHtml();
-          }
+          await reloadClients();
         } else if (reload == ReloadConfiguration.hotRestart) {
-          for (final clientConnection in _clientConnections.values) {
-            if (cssFiles != null && cssFiles.isNotEmpty) {
-              await clientConnection.reloadStylesheets(cssFiles);
-            }
-            await clientConnection.restart();
-            await clientConnection.reloadHtml();
+          for (final callback in _preReloadCallbacks) {
+            await callback();
+          }
+          await restartClients();
+          for (final callback in _postReloadCallbacks) {
+            await callback();
           }
         } else if (reload == ReloadConfiguration.liveReload) {
+          for (final callback in _preReloadCallbacks) {
+            await callback();
+          }
           for (final clientConnection in _clientConnections.values) {
             await clientConnection.reloadPage();
           }
-        }
-        for (final callback in _postReloadCallbacks) {
-          await callback();
+          for (final callback in _postReloadCallbacks) {
+            await callback();
+          }
         }
       }
     }
@@ -125,11 +116,17 @@ class DevProxy {
   }
 
   Future<void> reloadClients() async {
-    if (reload != ReloadConfiguration.hotReload) {
-      throw StateError('Cannot reload clients in ${reload.name} mode.');
+    for (final callback in _preReloadCallbacks) {
+      await callback();
     }
+    final cssFiles = getCssFiles?.call();
     for (final clientConnection in _clientConnections.values) {
       await clientConnection.performHotReload();
+      if (cssFiles != null && cssFiles.isNotEmpty) {
+        await clientConnection.reloadStylesheets(cssFiles);
+      }
+      await clientConnection.reassemble();
+      await clientConnection.reloadHtml();
     }
     for (final callback in _postReloadCallbacks) {
       await callback();
@@ -137,8 +134,13 @@ class DevProxy {
   }
 
   Future<void> restartClients() async {
+    final cssFiles = getCssFiles?.call();
     for (final clientConnection in _clientConnections.values) {
+      if (cssFiles != null && cssFiles.isNotEmpty) {
+        await clientConnection.reloadStylesheets(cssFiles);
+      }
       await clientConnection.restart();
+      await clientConnection.reloadHtml();
     }
   }
 

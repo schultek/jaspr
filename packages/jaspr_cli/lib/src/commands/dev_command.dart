@@ -36,15 +36,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     argParser.addOption(
       'mode',
       abbr: 'm',
-      help: 'Sets the reload/refresh mode.',
-      allowed: ['reload', 'restart', 'refresh', 'none'],
+      help: 'Perform an automatic action after each rebuild.',
+      allowed: ['reload', 'restart', 'refresh'],
       allowedHelp: {
         'reload': 'Hot-reloads both client and server apps',
         'restart': 'Restarts the client app (loses current state)',
         'refresh': 'Performs a full page refresh and server reload',
-        'none': 'Does not perform any reloads',
       },
-      defaultsTo: 'reload',
     );
     argParser.addOption(
       'port',
@@ -88,13 +86,40 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
   late final input = argResults!.option('input');
   late final debug = argResults!.flag('debug');
   late final release = argResults!.flag('release');
-  late final mode = argResults!.option('mode')!;
+  late final mode = argResults!.option('mode');
   late final port = argResults!.option('port') ?? project.port ?? defaultServePort;
   late final customProxyPort = argResults!.option('proxy-port') ?? serverProxyPort;
   late final useWasm = argResults!.flag('experimental-wasm');
   late final moduleFormat = argResults!.option('module-format');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
   late final skipServer = argResults!.flag('skip-server');
+
+  String get compiler => useWasm
+      ? 'dart2wasm'
+      : release
+      ? 'dart2js'
+      : 'dartdevc';
+
+  String get effectiveModuleFormat => compiler == 'dartdevc' ? (moduleFormat ?? 'ddc') : 'amd';
+
+  bool get usesDdcLibraryBundles => compiler == 'dartdevc' && effectiveModuleFormat == 'ddc';
+
+  bool canHotReload = false;
+
+  bool _checkHotReloadSupport() {
+    if (compiler != 'dartdevc') {
+      return false;
+    }
+    if (effectiveModuleFormat == 'amd') {
+      logger.write(
+        'The AMD module format does not support hot reload.',
+        tag: Tag.cli,
+        level: Level.warning,
+      );
+      return false;
+    }
+    return project.checkHotReloadSupport();
+  }
 
   bool get launchInChrome;
 
@@ -119,6 +144,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       logger.write('Showing reduced log output. Pass --verbose to see all output.', level: Level.debug);
     }
     logger.write('\n');
+
+    canHotReload = _checkHotReloadSupport();
 
     final entryPoint = await getServerEntryPoint(input);
 
@@ -213,13 +240,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final dot = '  ·  ';
     final keys = [
-      if (workflow.devProxy.reload == ReloadConfiguration.hotReload) '${styleBold.wrap('[r]')}: Reload',
+      if (canHotReload) '${styleBold.wrap('[r]')}: Reload',
       '${styleBold.wrap('[R]')}: Restart',
       '${styleBold.wrap('[d]')}: DevTools',
       '${styleBold.wrap('[q]')}: Quit',
     ];
     final rawKeys = [
-      if (workflow.devProxy.reload == ReloadConfiguration.hotReload) '[r]: Reload',
+      if (canHotReload) '[r]: Reload',
       '[R]: Restart',
       '[d]: DevTools',
       '[q]: Quit',
@@ -266,13 +293,18 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     StreamSubscription<List<int>>? sub;
     var inEscape = false;
     var inBracket = false;
+    var isHandling = false;
 
     sub = stdin.listen((bytes) async {
       for (final byte in bytes) {
+        // Handle Ctrl+C (ETX) or Ctrl+D (EOT).
         if (byte == 3 || byte == 4) {
           shutdown();
           return;
         }
+
+        // Filter out ANSI escape sequences (e.g. arrow keys) so their trailing
+        // characters are not mistakenly processed as shortcut keys.
         if (byte == 27) {
           inEscape = true;
           inBracket = false;
@@ -284,6 +316,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             continue;
           }
           if (inBracket) {
+            // CSI sequences terminate on bytes 64-126 (@ to ~).
             if (byte >= 64 && byte <= 126) {
               inEscape = false;
               inBracket = false;
@@ -295,7 +328,17 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         }
 
         final char = String.fromCharCode(byte);
-        await _handleKey(char, flutterProcess);
+        // Ignore input while an operation is running, but still allow quit.
+        if (isHandling && char != 'q') {
+          continue;
+        }
+
+        isHandling = true;
+        try {
+          await _handleKey(char, flutterProcess);
+        } finally {
+          isHandling = false;
+        }
       }
     });
 
@@ -306,10 +349,11 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
   Future<void> _handleKey(String key, Process? flutterProcess) async {
     switch (key) {
-      case 'r' when workflow.devProxy.reload == ReloadConfiguration.hotReload:
+      case 'r' when canHotReload:
         logger.write('Reloading...', tag: Tag.client);
         try {
           await workflow.devProxy.reloadClients();
+          logger.write('Reload complete.', tag: Tag.client);
         } catch (e) {
           logger.write('Failed to reload: $e', tag: Tag.cli, level: Level.warning);
         }
@@ -320,6 +364,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
           flutterProcess?.stdin.writeln('R');
           await _reloadServer();
           await cssRunner.restart();
+          logger.write('Restart complete.', tag: Tag.client);
         } catch (e) {
           logger.write('Failed to restart: $e', tag: Tag.cli, level: Level.warning);
         }
@@ -347,7 +392,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         stdout.write('\x1b[2J\x1b[0;0H');
         updateFooter(_currentStatus);
       case 'q':
-        shutdown();
+        await workflow.shutDown();
     }
   }
 
@@ -498,7 +543,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
             serverDevToolsUri = match.group(1)!;
           }
         }
-        if (mode != 'none' && serverVmServiceUri == null) {
+        if (serverVmServiceUri == null) {
           final match = RegExp(r'The Dart VM service is listening on (http://[a-zA-Z0-9:/_=\-\.\?]+)').firstMatch(log);
           if (match != null) {
             serverVmServiceUri = match.group(1)!;
@@ -525,9 +570,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       },
     );
 
-    if (mode != 'none') {
-      workflow.devProxy.registerPreReloadCallback(_reloadServer);
-    }
+    workflow.devProxy.registerPreReloadCallback(_reloadServer);
 
     var serverClosed = false;
     serverFuture.then((code) {
@@ -635,29 +678,17 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       'restart' => ReloadConfiguration.hotRestart,
       _ => ReloadConfiguration.none,
     };
+
+    if (reloadConfig == ReloadConfiguration.hotReload && !canHotReload) {
+      logger.write('Falling back to hot restart instead of hot reload.', tag: Tag.cli, level: Level.warning);
+      reloadConfig = ReloadConfiguration.hotRestart;
+    }
+
     if (compiler != 'dartdevc') {
       reloadConfig = reloadConfig == ReloadConfiguration.none
           ? ReloadConfiguration.none
           : ReloadConfiguration.liveReload;
     }
-
-    final moduleFormat = compiler == 'dartdevc' ? (this.moduleFormat ?? 'ddc') : 'amd';
-    if (moduleFormat == 'amd' && reloadConfig == ReloadConfiguration.hotReload) {
-      logger.write(
-        'The AMD module format does not support hot reload. Using hot restart instead of hot reload.',
-        level: Level.warning,
-      );
-      reloadConfig = ReloadConfiguration.hotRestart;
-    }
-
-    if (reloadConfig == ReloadConfiguration.hotReload) {
-      if (!project.checkHotReloadSupport()) {
-        logger.write('Falling back to hot restart instead of hot reload.', level: Level.warning);
-        reloadConfig = ReloadConfiguration.hotRestart;
-      }
-    }
-
-    final usesDdcLibraryBundles = compiler == 'dartdevc' && moduleFormat == 'ddc';
 
     List<String> additionalFlutterBuildArgs() {
       final sdkKernelPath = p.url.join('kernel', 'ddc_outline.dill');
@@ -702,7 +733,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         ],
 
         // Add Web Hot Reload defines.
-        if (reloadConfig == ReloadConfiguration.hotReload) ...[
+        if (canHotReload) ...[
           '--define=build_web_compilers:sdk_js=web-hot-reload=true',
           '--define=build_web_compilers:entrypoint=web-hot-reload=true',
           '--define=build_web_compilers:entrypoint_marker=web-hot-reload=true',
@@ -725,7 +756,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       enableDebugging: true,
       useDwdsWebSocketConnection: !launchInChrome,
       reload: reloadConfig,
-      moduleFormat: moduleFormat,
+      moduleFormat: effectiveModuleFormat,
     );
     if (workflow == null) {
       return null;

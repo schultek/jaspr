@@ -113,8 +113,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrderWithTimeout([
-            '[LOG] Reloading...',
-            '[LOG] Reload complete.',
+            '[CLIENT] Reloading...',
+            '[CLIENT] Reload complete.',
           ]),
         );
 
@@ -123,8 +123,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrderWithTimeout([
-            '[LOG] Restarting...',
-            '[LOG] Restart complete.',
+            '[CLIENT] Restarting...',
+            '[CLIENT] Restart complete.',
           ]),
         );
 
@@ -135,7 +135,72 @@ void main() {
           emits('[LOG] DevTools not available yet.'),
         );
 
-        await io.shutdownBuildDaemon(buildDaemon);
+        // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('disables reload shortcut and warns when hot reload is not supported', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon();
+
+        final serveResult = runner.run(['serve', '--verbose', '--module-format=amd', '--mode=reload']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[LOG] [WARNING] The AMD module format does not support hot reload.',
+            '[BUILDER] Starting web compilers...',
+            '[LOG] [WARNING] Falling back to hot restart instead of hot reload.',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        // Press 'r' for reload - should be ignored
+        io.stdin.addBytes([utf8.encode('r').first]);
+
+        // Press 'R' for restart - should work
+        io.stdin.addBytes([utf8.encode('R').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Restarting...',
+            '[CLIENT] Restart complete.',
+          ]),
+        );
+
+        // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
 
         expect(
           io.stdout.queue,
