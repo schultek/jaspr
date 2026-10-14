@@ -26,7 +26,7 @@ void main() {
         backend: BackendOption.none,
       );
 
-      await runner.run('create --no-pub-get -v ${variant.options} myapp', dir: dirs.root);
+      await runner.run('create --no-pub-get --no-skills -v ${variant.options} myapp', dir: dirs.root);
 
       await bootstrap(
         variant,
@@ -67,7 +67,7 @@ final styles = [
 """;
       stylesFile.writeAsStringSync(stylesContent);
 
-      final serveResult = runner.run('serve -v', dir: dirs.app, checkExitCode: false);
+      final serveResult = runner.run('serve --mode=reload -v', dir: dirs.app, checkExitCode: false);
 
       // Wait until server is started.
       await Future<void>.delayed(Duration(seconds: 10));

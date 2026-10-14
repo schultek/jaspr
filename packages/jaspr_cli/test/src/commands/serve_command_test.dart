@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:jaspr_cli/src/command_runner.dart';
@@ -65,7 +66,153 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             'Stopping web compilers...',
-            'Terminating CSS runner...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('handles keyboard shortcuts (r, R, d, l)', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        // Press 'r' for reload
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Reloading...',
+            '[CLIENT] Reload complete.',
+          ]),
+        );
+
+        // Press 'R' for restart
+        io.stdin.addBytes([utf8.encode('R').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Restarting...',
+            '[CLIENT] Restart complete.',
+          ]),
+        );
+
+        // Press 'd' for devtools
+        io.stdin.addBytes([utf8.encode('d').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[LOG] DevTools not available yet.'),
+        );
+
+        // Press 'l' for launch chrome
+        io.stdin.addBytes([utf8.encode('l').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[LOG] Launching Chrome...'),
+        );
+
+        // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('disables reload shortcut and warns when hot reload is not supported', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon();
+
+        final serveResult = runner.run(['serve', '--verbose', '--module-format=amd', '--mode=reload']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[LOG] [WARNING] The AMD module format does not support hot reload.',
+            '[BUILDER] Starting web compilers...',
+            '[LOG] [WARNING] Falling back to hot restart instead of hot reload.',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        // Press 'r' for reload - should be ignored
+        io.stdin.addBytes([utf8.encode('r').first]);
+
+        // Press 'R' for restart - should work
+        io.stdin.addBytes([utf8.encode('R').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Restarting...',
+            '[CLIENT] Restart complete.',
+          ]),
+        );
+
+        // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
           ]),
         );
 
@@ -110,7 +257,6 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             'Stopping web compilers...',
-            'Terminating CSS runner...',
           ]),
         );
 
@@ -171,7 +317,6 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             'Stopping web compilers...',
-            'Terminating CSS runner...',
             'Terminating flutter run...',
           ]),
         );
@@ -184,7 +329,6 @@ void main() {
 
 const buildRunnerDartArgs = [
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:ddc=generate-full-dill=true',
   '--define=build_web_compilers:entrypoint=compiler=dartdevc',
   '--define=build_web_compilers:ddc=ddc-library-bundle=true',
@@ -201,7 +345,6 @@ const buildRunnerDartArgs = [
 
 const buildRunnerFlutterArgs = [
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:ddc=generate-full-dill=true',
   '--define=build_web_compilers:entrypoint=compiler=dartdevc',
   '--define=build_web_compilers:ddc=ddc-library-bundle=true',

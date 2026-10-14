@@ -26,7 +26,9 @@ extension CssHelper on BaseCommand {
     workflow.devProxy.registerPreReloadCallback(runner.reload);
 
     guardResource(() {
-      logger.write('Terminating CSS runner...', level: Level.debug);
+      if (runner.stylesFiles.isNotEmpty) {
+        logger.write('Terminating CSS runner...', level: Level.debug);
+      }
       workflow.devProxy.getCssFiles = null;
       workflow.devProxy.unregisterPreReloadCallback(runner.reload);
       runner.dispose();
@@ -51,6 +53,9 @@ class CssRunner {
   final Project project;
   final Logger logger;
 
+  // Tracks the *.styles.dart files generated from `@css` declarations.
+  List<String> stylesFiles = [];
+
   final librariesFile = File('.dart_tool/jaspr/css/libraries.json').absolute;
   final runnerFile = File('.dart_tool/jaspr/css/css_runner.dart').absolute;
   final packageConfigFile = File('.dart_tool/jaspr/css/package_config.json').absolute;
@@ -69,6 +74,7 @@ class CssRunner {
   Future<void> get initialGenerationComplete => process != null ? _initialGenerationCompleter.future : Future.value();
 
   bool _disposed = false;
+  bool _restarting = false;
 
   void prepare() {
     final generatedDir = Directory('.dart_tool/jaspr/generated');
@@ -139,7 +145,7 @@ class CssRunner {
     assert(client == null);
     assert(process == null);
 
-    final cssFiles = await _generateRunner(watch: true);
+    final cssFiles = stylesFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
     this.cssFiles = cssFiles;
 
@@ -215,7 +221,7 @@ class CssRunner {
     });
 
     process!.exitCode.then((value) {
-      if (_disposed) return;
+      if (_disposed || _restarting) return;
       if (value != 0) {
         logger.write('CSS runner exited with code $value', tag: Tag.css, level: Level.error);
       }
@@ -228,8 +234,30 @@ class CssRunner {
     });
   }
 
+  Future<void> restart() async {
+    if (stylesFiles.isNotEmpty) {
+      logger.write('Restarting CSS runner...', tag: Tag.css);
+    }
+    _restarting = true;
+    try {
+      client?.kill();
+      client = null;
+      process?.kill();
+      process = null;
+      vmService?.dispose();
+      vmService = null;
+      isolateId = null;
+      sources.clear();
+
+      prepare();
+      await start();
+    } finally {
+      _restarting = false;
+    }
+  }
+
   Future<void> reload() async {
-    final cssFiles = await _generateRunner(watch: true);
+    final cssFiles = stylesFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
     this.cssFiles = cssFiles;
 
@@ -273,7 +301,7 @@ class CssRunner {
   }
 
   Future<int> build() async {
-    final cssFiles = await _generateRunner(watch: false);
+    final cssFiles = stylesFiles = await _generateRunner(watch: false);
     if (cssFiles.isEmpty) return 0;
 
     String stdoutOutput;
@@ -334,7 +362,6 @@ class CssRunner {
   Future<List<String>> _generateRunner({required bool watch}) async {
     final projectName = project.requirePubspecYaml['name'] as String;
     final buildDir = Directory('.dart_tool/build/generated/$projectName/lib').absolute;
-
     if (!buildDir.existsSync()) {
       return <String>[];
     }

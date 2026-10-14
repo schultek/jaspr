@@ -28,7 +28,7 @@ class DevProxy {
   final Logger? logger;
 
   final Map<String, ClientConnection> _clientConnections = {};
-  final StreamController<Map<String, Object?>> _clientEvents = StreamController();
+  final StreamController<Map<String, Object?>> _clientEvents = StreamController.broadcast();
   Stream<Map<String, Object?>> get clientEvents => _clientEvents.stream;
 
   DevProxy._({
@@ -60,35 +60,26 @@ class DevProxy {
   void _listenToBuildResults() async {
     await for (final buildResult in buildResults) {
       if (buildResult.status == BuildStatus.succeeded) {
-        for (final callback in _preReloadCallbacks) {
-          await callback();
-        }
-        final cssFiles = getCssFiles?.call();
-
         if (reload == ReloadConfiguration.hotReload) {
-          for (final clientConnection in _clientConnections.values) {
-            await clientConnection.performHotReload();
-            if (cssFiles != null && cssFiles.isNotEmpty) {
-              await clientConnection.reloadStylesheets(cssFiles);
-            }
-            await clientConnection.reassemble();
-            await clientConnection.reloadHtml();
-          }
+          await reloadClients();
         } else if (reload == ReloadConfiguration.hotRestart) {
-          for (final clientConnection in _clientConnections.values) {
-            if (cssFiles != null && cssFiles.isNotEmpty) {
-              await clientConnection.reloadStylesheets(cssFiles);
-            }
-            await clientConnection.restart();
-            await clientConnection.reloadHtml();
+          for (final callback in _preReloadCallbacks) {
+            await callback();
+          }
+          await restartClients();
+          for (final callback in _postReloadCallbacks) {
+            await callback();
           }
         } else if (reload == ReloadConfiguration.liveReload) {
+          for (final callback in _preReloadCallbacks) {
+            await callback();
+          }
           for (final clientConnection in _clientConnections.values) {
             await clientConnection.reloadPage();
           }
-        }
-        for (final callback in _postReloadCallbacks) {
-          await callback();
+          for (final callback in _postReloadCallbacks) {
+            await callback();
+          }
         }
       }
     }
@@ -123,6 +114,37 @@ class DevProxy {
   Iterable<ClientConnection> getClientConnections() {
     return _clientConnections.values;
   }
+
+  Future<void> reloadClients() async {
+    for (final callback in _preReloadCallbacks) {
+      await callback();
+    }
+    final cssFiles = getCssFiles?.call();
+    for (final clientConnection in _clientConnections.values) {
+      await clientConnection.performHotReload();
+      if (cssFiles != null && cssFiles.isNotEmpty) {
+        await clientConnection.reloadStylesheets(cssFiles);
+      }
+      await clientConnection.reassemble();
+      await clientConnection.reloadHtml();
+    }
+    for (final callback in _postReloadCallbacks) {
+      await callback();
+    }
+  }
+
+  Future<void> restartClients() async {
+    final cssFiles = getCssFiles?.call();
+    for (final clientConnection in _clientConnections.values) {
+      if (cssFiles != null && cssFiles.isNotEmpty) {
+        await clientConnection.reloadStylesheets(cssFiles);
+      }
+      await clientConnection.restart();
+      await clientConnection.reloadHtml();
+    }
+  }
+
+  String? get clientDevToolsUri => _clientConnections.values.firstOrNull?.devToolsUri;
 
   static Future<DevProxy> start(
     int daemonPort,
@@ -359,6 +381,7 @@ class ClientConnection {
   StreamSubscription<vm.Event>? _vmServiceSub;
 
   bool _isDisposed = false;
+  String? devToolsUri;
 
   vm.VmService? get vmService => _debugConnection?.vmService;
 
@@ -368,6 +391,10 @@ class ClientConnection {
     try {
       final debugConnection = _debugConnection = await dwds.debugConnection(appConnection);
       final debugUri = debugConnection.ddsUri ?? debugConnection.uri;
+      final wsUri = debugUri.startsWith('http') ? '${debugUri.replaceFirst('http', 'ws')}ws' : debugUri;
+      final httpUri = debugUri.startsWith('ws') ? 'http${debugUri.substring(2).replaceAll('/ws', '/')}' : debugUri;
+      final normalizedHttp = httpUri.endsWith('/') ? httpUri : '$httpUri/';
+      devToolsUri = '${normalizedHttp}devtools/?uri=$wsUri';
       final vmService = await vmServiceConnectUri(debugUri);
 
       if (_isDisposed) return;
@@ -556,6 +583,7 @@ class ClientConnection {
   void dispose() {
     if (_isDisposed) return;
     _isDisposed = true;
+    devToolsUri = null;
 
     _stdOutSub?.cancel();
     _resultSub?.cancel();

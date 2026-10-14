@@ -23,7 +23,7 @@ class ServeCommand extends DevCommand {
   @override
   void handleClientWorkflow(ClientWorkflow workflow) {
     workflow.devProxy.clientEvents.listen((event) {
-      if (launchInChrome && event['method'] == 'client.debugPort') {
+      if (event['method'] == 'client.debugPort') {
         final params = event['params'] as Map<String, Object?>;
         final wsUri = params['wsUri'] as String;
         logger.write(
