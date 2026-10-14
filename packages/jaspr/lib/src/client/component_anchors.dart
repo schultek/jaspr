@@ -208,8 +208,10 @@ List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
         comp.endNode = currNode;
         comp.builder = getClientByName(name);
 
-        // Remove the data string.
-        start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
+        if (!kDebugMode) {
+          // Remove the data string.
+          start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
+        }
 
         if (anchors.isEmpty) {
           clientAnchors.add(comp);
