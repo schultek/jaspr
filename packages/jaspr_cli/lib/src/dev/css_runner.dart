@@ -453,6 +453,14 @@ class CssRunner {
     } catch (_) {}
   }
 
+  Future<void> stop() async {
+    if (_disposed) return;
+    if (stylesFiles.isNotEmpty) {
+      logger.write('Stopping CSS runner...', level: Level.debug);
+    }
+    dispose();
+  }
+
   void dispose() {
     if (_disposed) return;
     _disposed = true;

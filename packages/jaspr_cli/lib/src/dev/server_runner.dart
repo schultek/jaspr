@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:vm_service/vm_service.dart' as vm;
 import 'package:vm_service/vm_service_io.dart';
 
+import '../commands/base_command.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
@@ -120,6 +121,7 @@ class ServerRunner {
     var serverClosed = false;
 
     final errSub = process.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen((String line) {
+      if (runner._stopped || BaseCommand.isShuttingDown) return;
       logger.write(line, tag: Tag.server, level: Level.error, progress: ProgressState.completed);
     });
 
@@ -151,7 +153,16 @@ class ServerRunner {
       runner._vmService = null;
       errSub.cancel();
       outSub.cancel();
-      if (!runner._stopped && code != 0) {
+      // Ignore normal exit (0) and termination via interruption signals:
+      // - 130 / -2: SIGINT (Ctrl+C). 130 is 128 + 2 (POSIX shell convention); -2 is Dart's negative signal code.
+      // - 143 / -15: SIGTERM. 143 is 128 + 15; -15 is Dart's negative signal code.
+      if (!runner._stopped &&
+          !BaseCommand.isShuttingDown &&
+          code != 0 &&
+          code != 130 &&
+          code != -2 &&
+          code != 143 &&
+          code != -15) {
         logger.write(
           'Server stopped unexpectedly. There is probably more output above.',
           tag: Tag.cli,
@@ -248,7 +259,13 @@ class ServerRunner {
     process.exitCode.then((int code) {
       errSub.cancel();
       outSub.cancel();
-      if (!runner._stopped) {
+      if (!runner._stopped &&
+          !BaseCommand.isShuttingDown &&
+          code != 0 &&
+          code != 130 &&
+          code != -2 &&
+          code != 143 &&
+          code != -15) {
         logger.write('Server process stopped unexpectedly.', level: Level.error, progress: ProgressState.completed);
       }
       if (!serverStartedCompleter.isCompleted) {
