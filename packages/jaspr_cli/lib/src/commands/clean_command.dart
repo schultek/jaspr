@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../dev/util.dart' as util;
 import '../process_runner.dart';
 import '../project.dart';
 import 'base_command.dart';
@@ -38,13 +39,18 @@ class CleanCommand extends BaseCommand {
         buildDir.deleteSync(recursive: true);
       }
 
+      await util.stopDaemon(Directory.current.path);
       logger.write("Running 'dart run build_runner clean'...");
       await ProcessRunner.instance.run(dartExecutable, ['run', 'build_runner', 'clean']);
     }
 
+    final daemonPort = util.getDaemonPort(Directory.current.path)?.toString();
+    final assetPort = util.getAssetServerPort(Directory.current.path)?.toString();
     final pids = await findRunawayProcesses([
-      // server, vm, proxy, flutter
+      // server, vm, proxy, flutter, daemon
       defaultServePort, '8181', serverProxyPort, flutterProxyPort,
+      ?daemonPort,
+      ?assetPort,
     ]);
 
     if (pids.isNotEmpty) {
