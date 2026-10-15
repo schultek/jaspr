@@ -46,7 +46,7 @@ class DevWorkflow {
   FlutterRunner? flutter;
 
   late final StreamSubscription<Map<String, Object?>> _clientEventsSub;
-  StreamSubscription<BuildResult>? _buildResultsSub;
+  StreamSubscription<void>? _buildResultsSub;
 
   final _doneCompleter = Completer<int>();
   Future<int> get done => _doneCompleter.future;
@@ -91,19 +91,21 @@ class DevWorkflow {
   }
 
   void _listenToBuildResults() {
-    _buildResultsSub = buildResults.listen((buildResult) async {
-      if (buildResult.status == BuildStatus.succeeded) {
-        switch (reload) {
-          case ReloadConfiguration.hotReload:
-            await reloadClients();
-          case ReloadConfiguration.hotRestart:
-            await restartClients(incremental: true);
-          case ReloadConfiguration.liveReload:
-            await refreshClients();
-          case ReloadConfiguration.none:
-        }
-      }
-    });
+    _buildResultsSub = buildResults
+        .asyncMap((buildResult) async {
+          if (buildResult.status == BuildStatus.succeeded) {
+            switch (reload) {
+              case ReloadConfiguration.hotReload:
+                await reloadClients();
+              case ReloadConfiguration.hotRestart:
+                await restartClients(incremental: true);
+              case ReloadConfiguration.liveReload:
+                await refreshClients();
+              case ReloadConfiguration.none:
+            }
+          }
+        })
+        .listen(null);
   }
 
   Future<void> reloadClients() async {

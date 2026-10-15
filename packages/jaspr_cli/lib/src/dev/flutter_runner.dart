@@ -19,6 +19,9 @@ class FlutterRunner {
   final Logger logger;
   final StreamSubscription<void>? errSub;
   final StreamSubscription<void>? outSub;
+  final _doneCompleter = Completer<int>();
+
+  Future<int> get done => _doneCompleter.future;
 
   bool _stopped = false;
 
@@ -76,6 +79,9 @@ class FlutterRunner {
     flutterProcess.exitCode.then((code) {
       errSub.cancel();
       outSub.cancel();
+      if (!runner._doneCompleter.isCompleted) {
+        runner._doneCompleter.complete(code);
+      }
     });
 
     guard?.call(() => runner.stop());
@@ -155,6 +161,9 @@ class FlutterRunner {
   Future<void> stop() async {
     if (_stopped) return;
     _stopped = true;
+    if (!_doneCompleter.isCompleted) {
+      _doneCompleter.complete(0);
+    }
     logger.write('Terminating flutter run...', level: Level.debug);
     process.kill();
     await errSub?.cancel();

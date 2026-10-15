@@ -186,6 +186,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         guard: guardResource,
       );
       workflow.flutter = flutter;
+      flutter.done.then((code) {
+        if (code != 0 && !workflow.isShuttingDown) {
+          logger.write('Flutter process stopped unexpectedly.', tag: Tag.flutter, level: Level.error);
+          workflow.shutDown(code);
+        }
+      });
     }
 
     await startProxy(
@@ -233,14 +239,16 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         debug: debug,
         guard: guardResource,
       );
-      if (server != null) {
-        workflow.server = server;
-        server.done.then((code) {
-          workflow.shutDown(code);
-        });
-        if (launchInChrome) {
-          await workflow.chrome.launch(port);
-        }
+      if (server == null) {
+        await workflow.shutDown(1);
+        return 1;
+      }
+      workflow.server = server;
+      server.done.then((code) {
+        workflow.shutDown(code);
+      });
+      if (launchInChrome) {
+        await workflow.chrome.launch(port);
       }
     }
 

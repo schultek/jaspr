@@ -61,7 +61,9 @@ class ClientRunner {
           ),
         );
 
-        return ClientRunner._(client, util.daemonPort(workingDirectory), logger);
+        final runner = ClientRunner._(client, util.daemonPort(workingDirectory), logger);
+        guard(() => runner.shutDown());
+        return runner;
       }),
     );
 
