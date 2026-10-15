@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import '../commands/base_command.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 
@@ -60,12 +61,15 @@ class FlutterRunner {
       workingDirectory: Directory.current.path,
     );
 
+    var stopped = false;
+
     final errSub = flutterProcess.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen((line) {
+      if (BaseCommand.isShuttingDown || stopped) return;
       logger.write(line, tag: Tag.flutter, level: Level.error, progress: ProgressState.completed);
     });
 
     final outSub = flutterProcess.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((log) {
-      if (!verbose) return;
+      if (!verbose || BaseCommand.isShuttingDown || stopped) return;
       logger.write(log, tag: Tag.flutter, level: Level.info);
     });
 
@@ -84,7 +88,10 @@ class FlutterRunner {
       }
     });
 
-    guard?.call(() => runner.stop());
+    guard?.call(() {
+      stopped = true;
+      return runner.stop();
+    });
 
     return runner;
   }
@@ -164,10 +171,10 @@ class FlutterRunner {
     if (!_doneCompleter.isCompleted) {
       _doneCompleter.complete(0);
     }
-    logger.write('Terminating flutter run...', level: Level.debug);
-    process.kill();
     await errSub?.cancel();
     await outSub?.cancel();
+    logger.write('Terminating flutter run...', level: Level.debug);
+    process.kill();
     await process.exitCode;
   }
 

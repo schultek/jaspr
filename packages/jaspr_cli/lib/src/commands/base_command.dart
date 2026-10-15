@@ -46,6 +46,7 @@ abstract class BaseCommand extends Command<int> {
           // SIGTERM is not supported on Windows.
           Platform.isWindows ? const Stream<void>.empty() : ProcessSignal.sigterm.watch(),
         ]).listen((signal) async {
+          isShuttingDown = true;
           cancelCount++;
           if (cancelCount > 1) exit(1);
           shutdown();
@@ -101,13 +102,15 @@ abstract class BaseCommand extends Command<int> {
     }
   }
 
+  static bool isShuttingDown = false;
+
   Future<Never>? _shutdownFuture;
 
   Future<Never> shutdown() async {
     if (_shutdownFuture != null) return _shutdownFuture!;
 
     _shutdownFuture = Future<Never>.sync(() async {
-      logger.complete(false);
+      isShuttingDown = true;
 
       if (guards.isNotEmpty) {
         logger.write('\nShutting down...');
