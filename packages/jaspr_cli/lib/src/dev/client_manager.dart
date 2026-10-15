@@ -30,6 +30,7 @@ class ClientManager {
   StreamSubscription<AppConnection>? _appsSubscription;
 
   void listenTo(Dwds dwds) {
+    _isStopped = false;
     _appsSubscription?.cancel();
     _appsSubscription = dwds.connectedApps.listen((appConnection) {
       final appId = appConnection.request.appId;
