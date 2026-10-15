@@ -422,6 +422,7 @@ class DevWorkflow {
       await _buildResultsSub?.cancel();
       await clientRunner.shutDown(code);
       await flutter?.stop();
+      await server?.stop();
       await chrome.close();
       if (css.stylesFiles.isNotEmpty) {
         logger.write('Stopping CSS runner...', level: Level.debug);

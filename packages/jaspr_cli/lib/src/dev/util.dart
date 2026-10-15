@@ -58,6 +58,184 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
   }
 }
 
+/// Returns the port of the running daemon if the port file exists.
+int? getDaemonPort(String workingDirectory) {
+  try {
+    final portFile = File(portFilePath(workingDirectory));
+    if (!portFile.existsSync()) return null;
+    final lines = portFile.readAsLinesSync();
+    if (lines.isEmpty) return null;
+    return int.tryParse(lines.first);
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Returns the port of the daemon asset server if the port file exists.
+int? getAssetServerPort(String workingDirectory) {
+  try {
+    final portFile = File(assetServerPortFilePath(workingDirectory));
+    if (!portFile.existsSync()) return null;
+    return int.tryParse(portFile.readAsStringSync().trim());
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Finds the PIDs of processes listening on the given port.
+Future<List<int>> findPidsForPort(int port) async {
+  final pids = <int>{};
+  if (Platform.isWindows) {
+    try {
+      final proc = await ProcessRunner.instance.run('netstat', ['-ano']);
+      if (proc.exitCode == 0) {
+        final lines = (proc.stdout as String).split('\n');
+        for (final line in lines) {
+          final trimmed = line.trim();
+          if (trimmed.isEmpty) continue;
+          final tokens = trimmed.split(RegExp(r'\s+'));
+          if (tokens.length < 4) continue;
+
+          final localAddress = tokens[1];
+          final parts = localAddress.split(':');
+          if (parts.isNotEmpty) {
+            final p = parts.last;
+            if (p == '$port') {
+              final pidStr = tokens.last;
+              final pid = int.tryParse(pidStr);
+              if (pid != null && pid != 0) {
+                pids.add(pid);
+              }
+            }
+          }
+        }
+      }
+    } catch (_) {}
+  } else {
+    try {
+      final proc = await ProcessRunner.instance.run('lsof', ['-tiTCP:$port', '-sTCP:LISTEN']);
+      if (proc.exitCode == 0) {
+        final lines = (proc.stdout as String).split('\n');
+        for (final line in lines) {
+          final trimmed = line.trim();
+          if (trimmed.isEmpty) continue;
+          final pid = int.tryParse(trimmed);
+          if (pid != null && pid != 0) {
+            pids.add(pid);
+          }
+        }
+      }
+    } catch (_) {}
+  }
+  return pids.toList();
+}
+
+bool _isPidRunning(int pid) {
+  if (Platform.isWindows) {
+    try {
+      final res = ProcessRunner.instance.runSync('tasklist', ['/FI', 'PID eq $pid']);
+      return res.stdout.toString().contains('$pid');
+    } catch (_) {
+      return false;
+    }
+  } else {
+    try {
+      final res = ProcessRunner.instance.runSync('kill', ['-0', '$pid']);
+      return res.exitCode == 0;
+    } catch (_) {
+      return false;
+    }
+  }
+}
+
+/// Recursively terminates a process and its child processes.
+Future<void> killProcessTree(int pid) async {
+  if (Platform.isWindows) {
+    try {
+      await ProcessRunner.instance.run('taskkill', ['/F', '/T', '/PID', '$pid']);
+    } catch (_) {
+      try {
+        Process.killPid(pid);
+      } catch (_) {}
+    }
+    return;
+  }
+
+  // Find child processes on Unix
+  final childPids = <int>[];
+  try {
+    final res = await ProcessRunner.instance.run('pgrep', ['-P', '$pid']);
+    if (res.exitCode == 0) {
+      final lines = (res.stdout as String).split('\n');
+      for (final line in lines) {
+        final child = int.tryParse(line.trim());
+        if (child != null && child != 0) {
+          childPids.add(child);
+        }
+      }
+    }
+  } catch (_) {}
+
+  for (final child in childPids) {
+    await killProcessTree(child);
+  }
+
+  // Request graceful termination first
+  try {
+    Process.killPid(pid);
+  } catch (_) {}
+
+  final sw = Stopwatch()..start();
+  while (sw.elapsedMilliseconds < 500) {
+    if (!_isPidRunning(pid)) return;
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+  }
+
+  // Force kill if still running
+  try {
+    Process.killPid(pid, ProcessSignal.sigkill);
+  } catch (_) {}
+}
+
+/// Stops any running build daemon in the given working directory and cleans up lock/port files.
+Future<void> stopDaemon(String workingDirectory, {List<int>? knownPids}) async {
+  final pids = <int>{...?knownPids};
+
+  final daemonPort = getDaemonPort(workingDirectory);
+  if (daemonPort != null) {
+    pids.addAll(await findPidsForPort(daemonPort));
+  }
+
+  final assetPort = getAssetServerPort(workingDirectory);
+  if (assetPort != null) {
+    pids.addAll(await findPidsForPort(assetPort));
+  }
+
+  for (final pid in pids) {
+    await killProcessTree(pid);
+  }
+
+  _cleanupDaemonFiles(workingDirectory);
+}
+
+void _cleanupDaemonFiles(String workingDirectory) {
+  for (final path in [
+    portFilePath(workingDirectory),
+    assetServerPortFilePath(workingDirectory),
+    versionFilePath(workingDirectory),
+    optionsFilePath(workingDirectory),
+    lockFilePath(workingDirectory),
+  ]) {
+    try {
+      final file = File(path);
+      if (file.existsSync()) {
+        file.deleteSync();
+      }
+    } catch (_) {}
+  }
+}
+
+
 /// Returns the port of the daemon asset server.
 int daemonPort(String workingDirectory) {
   final portFile = File(assetServerPortFilePath(workingDirectory));

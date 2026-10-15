@@ -15,6 +15,7 @@ class ClientRunner {
   final BuildDaemonClient client;
   final int daemonPort;
   final Logger logger;
+  final List<int> daemonPids;
   final _doneCompleter = Completer<int>();
 
   Stream<daemon.BuildResults> get buildResults => client.buildResults;
@@ -22,7 +23,7 @@ class ClientRunner {
 
   void startBuild() => client.startBuild();
 
-  ClientRunner._(this.client, this.daemonPort, this.logger) {
+  ClientRunner._(this.client, this.daemonPort, this.logger, [this.daemonPids = const []]) {
     client.shutdownNotifications.listen((data) {
       logger.write(data.message, tag: Tag.builder, level: Level.warning);
       if (data.failureType == 75) {
@@ -39,15 +40,26 @@ class ClientRunner {
     void Function(FutureOr<void> Function()) guard,
   ) async {
     var cancelled = false;
+    late final CancelableOperation<ClientRunner?> op;
+    guard(() async {
+      cancelled = true;
+      if (!op.isCompleted) {
+        op.cancel();
+      }
+      await util.stopDaemon(Directory.current.path);
+    });
 
-    final op = CancelableOperation<ClientRunner?>.fromFuture(
+    op = CancelableOperation<ClientRunner?>.fromFuture(
       Future(() async {
         final workingDirectory = Directory.current.path;
 
         final client = await util.startBuildDaemon(workingDirectory, buildOptions, logger);
         if (client == null) return null;
         if (cancelled) {
-          await client.close();
+          try {
+            await client.close();
+          } catch (_) {}
+          await util.stopDaemon(workingDirectory);
           return null;
         }
 
@@ -61,18 +73,14 @@ class ClientRunner {
           ),
         );
 
-        final runner = ClientRunner._(client, util.daemonPort(workingDirectory), logger);
+        final daemonPort = util.daemonPort(workingDirectory);
+        final daemonPids = await util.findPidsForPort(daemonPort);
+
+        final runner = ClientRunner._(client, daemonPort, logger, daemonPids);
         guard(() => runner.shutDown());
         return runner;
       }),
     );
-
-    guard(() {
-      if (!op.isCompleted) {
-        op.cancel();
-        cancelled = true;
-      }
-    });
 
     return op.valueOrCancellation(null);
   }
@@ -84,14 +92,24 @@ class ClientRunner {
     required Logger logger,
     void Function(FutureOr<void> Function())? guard,
   }) async {
-    final client = await util.startBuildDaemon(Directory.current.path, buildOptions, logger);
+    final workingDirectory = Directory.current.path;
+    final client = await util.startBuildDaemon(workingDirectory, buildOptions, logger);
     if (client == null) {
+      await util.stopDaemon(workingDirectory);
       return 1;
     }
 
-    guard?.call(() async {
-      await client.close();
-    });
+    final daemonPort = util.daemonPort(workingDirectory);
+    final daemonPids = await util.findPidsForPort(daemonPort);
+
+    Future<void> cleanUp() async {
+      try {
+        await client.close();
+      } catch (_) {}
+      await util.stopDaemon(workingDirectory, knownPids: daemonPids);
+    }
+
+    guard?.call(cleanUp);
 
     final outputLocation = OutputLocation(
       (b) => b
@@ -133,7 +151,7 @@ class ClientRunner {
       break;
     }
 
-    await client.close();
+    await cleanUp();
     return exitCode;
   }
 
@@ -143,7 +161,10 @@ class ClientRunner {
     if (_isShutDown) return;
     _isShutDown = true;
     logger.write('Stopping web compilers...', level: Level.debug);
-    await client.close();
+    try {
+      await client.close();
+    } catch (_) {}
+    await util.stopDaemon(Directory.current.path, knownPids: daemonPids);
     if (!_doneCompleter.isCompleted) _doneCompleter.complete(code);
   }
 }

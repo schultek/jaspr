@@ -93,7 +93,11 @@ abstract class BaseCommand extends Command<int> {
     final gs = [...guards];
     guards.clear();
     for (final g in gs) {
-      await g();
+      try {
+        await g();
+      } catch (e) {
+        logger.write('Error stopping resource: $e', level: Level.debug);
+      }
     }
   }
 
