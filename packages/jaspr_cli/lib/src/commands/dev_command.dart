@@ -139,8 +139,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final explicitPort = argResults?.option('port');
     if (explicitPort != null) {
       final parsed = int.tryParse(explicitPort);
-      if (parsed == null) {
-        logger.write('Invalid port "$explicitPort". Must be a number.', tag: Tag.cli, level: Level.error);
+      if (parsed == null || parsed < 1 || parsed > 65535) {
+        logger.write(
+          'Invalid port "$explicitPort". Must be a number between 1 and 65535.',
+          tag: Tag.cli,
+          level: Level.error,
+        );
         return 1;
       }
       if (!await isPortAvailable(parsed)) {

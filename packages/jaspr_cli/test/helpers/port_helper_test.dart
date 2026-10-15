@@ -24,6 +24,14 @@ void main() {
       });
     });
 
+    test('isPortAvailable returns false for ports outside 1-65535', () async {
+      await io.runZoned(() async {
+        expect(await isPortAvailable(0), isFalse);
+        expect(await isPortAvailable(-1), isFalse);
+        expect(await isPortAvailable(65536), isFalse);
+      });
+    });
+
     test('findAvailablePort finds the first available port', () async {
       await io.runZoned(() async {
         expect(await findAvailablePort(8080), equals(8080));

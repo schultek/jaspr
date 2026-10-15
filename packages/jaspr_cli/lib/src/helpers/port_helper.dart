@@ -2,6 +2,9 @@ import 'dart:io';
 
 /// Checks if a given TCP port is available on [InternetAddress.anyIPv4].
 Future<bool> isPortAvailable(int port) async {
+  if (port < 1 || port > 65535) {
+    return false;
+  }
   try {
     final socket = await ServerSocket.bind(InternetAddress.anyIPv4, port);
     await socket.close();

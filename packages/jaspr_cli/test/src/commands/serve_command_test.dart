@@ -424,6 +424,23 @@ void main() {
         expect(await serveResult, equals(1));
       });
     });
+
+    test('fails when explicit --port is invalid or out of range', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final serveResult = runner.run(['serve', '--port', '0']);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Invalid port "0". Must be a number between 1 and 65535.'),
+        );
+
+        expect(await serveResult, equals(1));
+      });
+    });
   });
 }
 
