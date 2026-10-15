@@ -38,27 +38,54 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
   @override
   void initState() {
     super.initState();
+    _attachView();
+  }
 
-    if (kIsWeb) {
-      context.binding.addPostFrameCallback(() async {
-        var element = findChildDomElement(context as Element)!;
-        element = element.children.item(element.children.length - 1)!;
-        viewId = await addView(
-          element,
-          component.constraints,
-          flt.StatefulBuilder(
-            builder: (context, setState) {
-              rebuildFlutterApp = () {
-                if (!context.mounted) return;
-                setState(() {});
-              };
-              waitOnWarmupFrames();
-              return component.widget ?? flt.SizedBox.shrink();
-            },
-          ),
-        );
-      });
-    }
+  @override
+  void onReload() {
+    super.onReload();
+    _attachView();
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    rebuildFlutterApp?.call();
+    try {
+      flt.WidgetsBinding.instance.reassembleApplication();
+    } catch (_) {}
+  }
+
+  void _attachView() {
+    if (!kIsWeb) return;
+
+    context.binding.addPostFrameCallback(() async {
+      if (!mounted) return;
+      final element = findChildDomElement(context as Element);
+      if (element == null) return;
+      final target = element.children.item(element.children.length - 1);
+      if (target == null) return;
+
+      if (viewId case final oldId?) {
+        await removeView(oldId);
+        viewId = null;
+      }
+
+      viewId = await addView(
+        target,
+        component.constraints,
+        flt.StatefulBuilder(
+          builder: (context, setState) {
+            rebuildFlutterApp = () {
+              if (!context.mounted) return;
+              setState(() {});
+            };
+            waitOnWarmupFrames();
+            return component.widget ?? flt.SizedBox.shrink();
+          },
+        ),
+      );
+    });
   }
 
   // The flutter view does only actually appear after the second frame.
@@ -80,8 +107,9 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
 
   @override
   void dispose() {
-    if (viewId != null) {
-      removeView(viewId!);
+    if (viewId case final id?) {
+      removeView(id);
+      viewId = null;
     }
     super.dispose();
   }
