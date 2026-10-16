@@ -65,6 +65,21 @@ void main() {
       expect(styleOf(host.querySelector('.box')!, 'width'), equals('20px'));
     });
 
+    test('a bare & in a nested at-rule reaches a pseudo-element', () {
+      // `& {}` would match nothing here: `&` behaves like `:is()`, which
+      // cannot hold a pseudo-element. Declarations straight inside the
+      // at-rule apply to the enclosing rule's own selector.
+      final host = render([
+        css('.box::before', [
+          css('&').styles(display: Display.block, width: 10.px, raw: {'content': '""'}),
+          css.media(MediaQuery.all(minWidth: 1.px), [css('&').styles(width: 20.px)]),
+        ]),
+      ], '<div class="box">box</div>');
+
+      final before = window.getComputedStyle(host.querySelector('.box')!, '::before');
+      expect(before.getPropertyValue('width'), equals('20px'));
+    });
+
     test('three levels deep still resolve', () {
       final host = render([
         css('.a', [

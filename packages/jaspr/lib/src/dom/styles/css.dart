@@ -68,7 +68,7 @@ class CssUtility {
   /// Rules can be nested using the optional second list parameter. Nested rules
   /// can use the `&` symbol in their selector to refer to the parent selector.
   NestedStyleRule call(String selector, [List<StyleRule> children = const []]) {
-    return NestedStyleRule._(Selector(selector), Styles(), children);
+    return NestedStyleRule(Selector(selector), Styles(), children);
   }
 
   /// Renders a `@import url(...)` css rule.
@@ -122,16 +122,22 @@ class CssUtility {
   }
 }
 
+/// A style rule with a [selector], its [ownStyles] and the rules nested under
+/// it, rendered as [nested css](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting).
 class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
-  NestedStyleRule._(this._selector, this._styles, this._children);
+  const NestedStyleRule(this.selector, this.ownStyles, [this.children = const []]);
 
-  final Selector _selector;
-  final Styles _styles;
-  final List<StyleRule> _children;
+  final Selector selector;
+
+  /// The styles of this rule itself, as opposed to its [children].
+  ///
+  /// Not `styles`, which is the [StylesMixin] builder that `css()` chains.
+  final Styles ownStyles;
+  final List<StyleRule> children;
 
   @override
   NestedStyleRule combine(Styles styles) {
-    return NestedStyleRule._(_selector, _styles.combine(styles), _children);
+    return NestedStyleRule(selector, ownStyles.combine(styles), children);
   }
 
   @override
@@ -142,25 +148,25 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
     // renders as nothing, rather than as an empty block.
     if (contents.isEmpty) return '';
 
-    return '$indent${_selector.selector} {$cssPropSpace$contents$indent}';
+    return '$indent${selector.selector} {$cssPropSpace$contents$indent}';
   }
 
   /// The properties and nested rules of this rule, rendered at [indent].
   String _contentsCss(String indent) {
     final contents = StringBuffer();
 
-    for (final entry in _styles.properties.entries) {
+    for (final entry in ownStyles.properties.entries) {
       contents.write('$indent${entry.key}: ${entry.value};$cssPropSpace');
     }
 
-    for (final child in _children) {
+    for (final child in children) {
       // A child whose selector is just `&` is the parent, so what it holds
       // belongs in the parent's block rather than in one of its own.
-      if (child is NestedStyleRule && child._selector.selector == '&') {
-        contents.write(child._contentsCss(indent));
+      if (child._isBareParent) {
+        contents.write((child as NestedStyleRule)._contentsCss(indent));
         continue;
       }
-      final css = child.toCss(indent);
+      final css = _withinStyleRule(child).toCss(indent);
       if (css.isNotEmpty) contents.write(css + cssPropSpace);
     }
 
@@ -168,66 +174,53 @@ class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
   }
 }
 
-extension SelectorResolve on Selector {
-  Selector resolve(String parent) {
-    return Selector(
-      selector.startsWith('&') || parent.isEmpty ? selector.replaceAll('&', parent) : '$parent $selector',
-    );
-  }
+extension on StyleRule {
+  /// Whether this is a nested rule whose selector is just `&`.
+  bool get _isBareParent => this is NestedStyleRule && (this as NestedStyleRule).selector.selector == '&';
 }
 
-extension StyleRuleResolve on StyleRule {
-  List<StyleRule> resolve(String parent) {
-    final self = this;
-    return switch (self) {
-      NestedStyleRule() => self._resolve(parent),
-      BlockStyleRule() => [self._resolve(parent)],
-      MediaStyleRule() => [self._resolve(parent)],
-      LayerStyleRule() => [self._resolve(parent)],
-      SupportsStyleRule() => [self._resolve(parent)],
-      _ => throw UnsupportedError('Cannot nest ${self.runtimeType} inside other StyleRule.'),
-    };
-  }
+/// [rule] as it renders inside a style rule.
+///
+/// A grouping at-rule nested in a style rule keeps that rule as its context,
+/// so a bare `&` inside it writes its declarations straight into the at-rule's
+/// block, which the browser applies to the enclosing rule. Wrapping them in
+/// `& {}` instead would not reach a pseudo-element: `&` matches like `:is()`,
+/// which cannot hold one.
+StyleRule _withinStyleRule(StyleRule rule) {
+  return switch (rule) {
+    MediaStyleRule(:final query, :final styles) => MediaStyleRule(
+      query: query,
+      styles: styles.map(_withinGroupingRule).toList(),
+    ),
+    SupportsStyleRule(:final condition, :final styles) => SupportsStyleRule(
+      condition: condition,
+      styles: styles.map(_withinGroupingRule).toList(),
+    ),
+    LayerStyleRule(:final name, :final styles) => LayerStyleRule(
+      name: name,
+      styles: styles.map(_withinGroupingRule).toList(),
+    ),
+    _ => rule,
+  };
 }
 
-extension on NestedStyleRule {
-  List<StyleRule> _resolve(String parent) {
-    final rules = <StyleRule>[];
-
-    final selector = _selector.resolve(parent);
-
-    if (_styles.properties.isNotEmpty) {
-      rules.add(StyleRule(selector: selector, styles: _styles));
-    }
-
-    for (final child in _children) {
-      rules.addAll(child.resolve(selector.selector));
-    }
-
-    return rules;
-  }
+/// [rule] as it renders inside a grouping at-rule that is nested in a style
+/// rule.
+StyleRule _withinGroupingRule(StyleRule rule) {
+  if (rule._isBareParent) return _NestedDeclarations(rule as NestedStyleRule);
+  return _withinStyleRule(rule);
 }
 
-extension on BlockStyleRule {
-  StyleRule _resolve(String parent) {
-    return BlockStyleRule(selector: selector.resolve(parent), styles: styles);
-  }
-}
+/// The contents of a bare `&` rule, rendered without a block of their own.
+class _NestedDeclarations implements StyleRule {
+  const _NestedDeclarations(this.rule);
 
-extension on MediaStyleRule {
-  StyleRule _resolve(String parent) {
-    return MediaStyleRule(query: query, styles: [for (final style in styles) ...style.resolve(parent)]);
-  }
-}
+  final NestedStyleRule rule;
 
-extension on LayerStyleRule {
-  StyleRule _resolve(String parent) {
-    return LayerStyleRule(name: name, styles: [for (final style in styles) ...style.resolve(parent)]);
-  }
-}
-
-extension on SupportsStyleRule {
-  StyleRule _resolve(String parent) {
-    return SupportsStyleRule(condition: condition, styles: [for (final style in styles) ...style.resolve(parent)]);
+  @override
+  String toCss([String indent = '']) {
+    final contents = rule._contentsCss(indent);
+    // The grouping rule ends every child it renders with its own separator.
+    return contents.endsWith(cssPropSpace) ? contents.substring(0, contents.length - cssPropSpace.length) : contents;
   }
 }
