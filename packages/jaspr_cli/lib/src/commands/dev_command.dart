@@ -134,7 +134,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     await ensureInProject();
     printLogo();
 
-    final String targetPort;
+    final shouldCheckPort = !skipServer || project.requireMode == JasprMode.client;
 
     final explicitPort = argResults?.option('port');
     if (explicitPort != null) {
@@ -147,7 +147,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         );
         return 1;
       }
-      if (!await isPortAvailable(parsed)) {
+      if (shouldCheckPort && !await isPortAvailable(parsed)) {
         logger.write(
           'Port $explicitPort is already in use.\nPlease quit the running process or choose a different port.',
           tag: Tag.cli,
@@ -155,14 +155,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         );
         return 1;
       }
-      targetPort = explicitPort;
+      port = parsed;
     } else {
       final defaultPort = int.tryParse(project.port ?? defaultServePort) ?? 8080;
-      final resolvedPort = await findAvailablePort(defaultPort);
-      targetPort = '$resolvedPort';
+      port = shouldCheckPort ? await findAvailablePort(defaultPort) : defaultPort;
     }
 
-    port = int.parse(targetPort);
     final proxyPort = project.requireMode == JasprMode.client
         ? port
         : await findAvailablePort(int.parse(serverProxyPort), exclude: [port]);
