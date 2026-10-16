@@ -9,6 +9,7 @@ import '../commands/base_command.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
+import 'util.dart';
 
 /// Manages the server process lifecycle, log watching, and VM service reload.
 class ServerRunner {
@@ -307,7 +308,11 @@ class ServerRunner {
     logger.write('Stopping server...', level: Level.debug);
     _vmService?.dispose();
     _vmService = null;
-    process.kill();
+    if (Platform.isWindows) {
+      await killProcessTree(process.pid);
+    } else {
+      process.kill();
+    }
   }
 }
 
