@@ -11,6 +11,16 @@ abstract interface class RenderObject {
   void attach(covariant RenderObject child, {covariant RenderObject? after});
 
   void remove(covariant RenderObject child);
+
+  /// Releases the resources this render object holds,
+  /// such as event listeners added to its [node].
+  ///
+  /// Called once the render object is no longer used,
+  /// such as when its element unmounts.
+  /// Its [node] can stay in the document afterwards,
+  /// such as in a removed slot of a `SlottedChildView` or
+  /// after the root component is detached.
+  void dispose();
 }
 
 abstract interface class RenderElement implements RenderObject {
@@ -142,8 +152,15 @@ mixin RenderObjectElement on Element {
 
   @override
   void onReload() {
+    _renderObject?.dispose();
     _renderObject = createRenderObject();
     _attached = false;
     super.onReload();
+  }
+
+  @override
+  void unmount() {
+    _renderObject?.dispose();
+    super.unmount();
   }
 }
