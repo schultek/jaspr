@@ -6,12 +6,12 @@ import 'dart:async';
 
 import '../daemon/daemon.dart';
 import '../daemon/domain.dart';
-import 'dev_proxy.dart';
+import 'dev_workflow.dart';
 import 'util.dart';
 
 /// A collection of method and events relevant to the running application.
 class ClientDomain extends Domain {
-  ClientDomain(Daemon daemon, this.devProxy) : super(daemon, 'client') {
+  ClientDomain(Daemon daemon, this.workflow) : super(daemon, 'client') {
     registerHandler('restart', _restart);
     registerHandler('callServiceExtension', _callServiceExtension);
     registerHandler('stop', _stop);
@@ -19,19 +19,19 @@ class ClientDomain extends Domain {
     _handleAppConnections();
   }
 
-  final DevProxy devProxy;
+  final DevWorkflow workflow;
 
   StreamSubscription<dynamic>? _clientEventSubscription;
 
   Future<void> _handleAppConnections() async {
-    _clientEventSubscription = devProxy.clientEvents.listen((event) {
+    _clientEventSubscription = workflow.clientEvents.listen((event) {
       sendEvent(event['method'] as String, event['params']);
     });
   }
 
   Future<Map<String, Object?>?> _callServiceExtension(Map<String, Object?> args) async {
     final appId = getStringArg(args, 'appId', required: true);
-    final appState = devProxy.getClientConnection(appId);
+    final appState = workflow.clients.getConnection(appId);
     if (appState == null) {
       throw ArgumentError.value(appId, 'appId', 'Not found');
     }
@@ -43,7 +43,7 @@ class ClientDomain extends Domain {
 
   Future<Map<String, Object?>> _restart(Map<String, Object?> args) async {
     final appId = getStringArg(args, 'appId', required: true);
-    final appState = devProxy.getClientConnection(appId);
+    final appState = workflow.clients.getConnection(appId);
     if (appState == null) {
       throw ArgumentError.value(appId, 'appId', 'Not found');
     }
@@ -89,7 +89,7 @@ class ClientDomain extends Domain {
 
   Future<bool> _stop(Map<String, Object?> args) async {
     final appId = getStringArg(args, 'appId', required: true);
-    final appState = devProxy.getClientConnection(appId);
+    final appState = workflow.clients.getConnection(appId);
     if (appState == null) {
       throw ArgumentError.value(appId, 'appId', 'Not found');
     }

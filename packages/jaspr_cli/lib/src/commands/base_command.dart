@@ -46,6 +46,7 @@ abstract class BaseCommand extends Command<int> {
           // SIGTERM is not supported on Windows.
           Platform.isWindows ? const Stream<void>.empty() : ProcessSignal.sigterm.watch(),
         ]).listen((signal) async {
+          isShuttingDown = true;
           cancelCount++;
           if (cancelCount > 1) exit(1);
           shutdown();
@@ -82,20 +83,34 @@ abstract class BaseCommand extends Command<int> {
       return result;
     } finally {
       await cancelSub.cancel();
-      await stop();
+      if (_shutdownFuture != null) {
+        await _shutdownFuture;
+      } else {
+        await stop();
+      }
     }
   }
 
   Future<int> runCommand();
 
-  Future<void> stop() async {
-    logger.clearFooter();
-    final gs = [...guards];
-    guards.clear();
-    for (final g in gs) {
-      await g();
-    }
+  Future<void>? _stopFuture;
+
+  Future<void> stop() {
+    return _stopFuture ??= () async {
+      logger.clearFooter();
+      final gs = [...guards];
+      guards.clear();
+      for (final g in gs) {
+        try {
+          await g();
+        } catch (e) {
+          logger.write('Error stopping resource: $e', level: Level.debug);
+        }
+      }
+    }();
   }
+
+  static bool isShuttingDown = false;
 
   Future<Never>? _shutdownFuture;
 
@@ -103,12 +118,12 @@ abstract class BaseCommand extends Command<int> {
     if (_shutdownFuture != null) return _shutdownFuture!;
 
     _shutdownFuture = Future<Never>.sync(() async {
-      logger.complete(false);
+      isShuttingDown = true;
 
       if (guards.isNotEmpty) {
         logger.write('\nShutting down...');
-        await stop();
       }
+      await stop();
 
       exit(1);
     });
