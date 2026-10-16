@@ -216,19 +216,21 @@ class LabeledGlobalKey extends GlobalKey {
 /// Any [GlobalObjectKey] created for the same value will match.
 @optionalTypeArgs
 class GlobalObjectKey extends GlobalKey {
-  /// Creates a global key that uses [identical] on [value] for its [operator==].
+  /// Creates a global key that uses [identical] on [value] for its [operator==],
+  /// except that [String] values are compared by their contents.
   const GlobalObjectKey(this.value) : super.constructor();
 
-  /// The object whose identity is used by this key's [operator==].
+  /// The object whose identity, or contents if it is a [String],
+  /// is used by this key's [operator==].
   final Object value;
 
   @override
   bool operator ==(Object other) {
-    return other.runtimeType == runtimeType && other is GlobalObjectKey && identical(other.value, value);
+    return other.runtimeType == runtimeType && other is GlobalObjectKey && _objectKeyValuesEqual(other.value, value);
   }
 
   @override
-  int get hashCode => identityHashCode(value);
+  int get hashCode => _objectKeyHashCode(value);
 
   @override
   String toString() {
@@ -313,19 +315,23 @@ class LabeledGlobalStateKey<T extends State<StatefulComponent>> extends GlobalSt
 /// Any [GlobalObjectStateKey] created for the same value will match.
 @optionalTypeArgs
 class GlobalObjectStateKey<T extends State<StatefulComponent>> extends GlobalStateKey<T> {
-  /// Creates a global key that uses [identical] on [value] for its [operator==].
+  /// Creates a global key that uses [identical] on [value] for its [operator==],
+  /// except that [String] values are compared by their contents.
   const GlobalObjectStateKey(this.value) : super.constructor();
 
-  /// The object whose identity is used by this key's [operator==].
+  /// The object whose identity, or contents if it is a [String],
+  /// is used by this key's [operator==].
   final Object value;
 
   @override
   bool operator ==(Object other) {
-    return other.runtimeType == runtimeType && other is GlobalObjectKey && identical(other.value, value);
+    return other.runtimeType == runtimeType &&
+        other is GlobalObjectStateKey &&
+        _objectKeyValuesEqual(other.value, value);
   }
 
   @override
-  int get hashCode => identityHashCode(value);
+  int get hashCode => _objectKeyHashCode(value);
 
   @override
   String toString() {
@@ -417,19 +423,23 @@ class LabeledGlobalNodeKey<T extends web.Node> extends GlobalNodeKey<T> {
 /// Any [GlobalObjectNodeKey] created for the same value will match.
 @optionalTypeArgs
 class GlobalObjectNodeKey<T extends web.Node> extends GlobalNodeKey<T> {
-  /// Creates a global key that uses [identical] on [value] for its [operator==].
+  /// Creates a global key that uses [identical] on [value] for its [operator==],
+  /// except that [String] values are compared by their contents.
   const GlobalObjectNodeKey(this.value) : super.constructor();
 
-  /// The object whose identity is used by this key's [operator==].
+  /// The object whose identity, or contents if it is a [String],
+  /// is used by this key's [operator==].
   final Object value;
 
   @override
   bool operator ==(Object other) {
-    return other.runtimeType == runtimeType && other is GlobalObjectKey && identical(other.value, value);
+    return other.runtimeType == runtimeType &&
+        other is GlobalObjectNodeKey &&
+        _objectKeyValuesEqual(other.value, value);
   }
 
   @override
-  int get hashCode => identityHashCode(value);
+  int get hashCode => _objectKeyHashCode(value);
 
   @override
   String toString() {
@@ -444,3 +454,21 @@ class GlobalObjectNodeKey<T extends web.Node> extends GlobalNodeKey<T> {
     return '[$selfType ${describeIdentity(value)}]';
   }
 }
+
+/// Whether two values of an object key refer to the same object.
+///
+/// Strings are compared by their contents because
+/// whether two equal strings are [identical] depends on the platform:
+/// equivalent strings are always identical with dart2js,
+/// but only canonicalized ones, such as constants, are on the VM and with dart2wasm.
+bool _objectKeyValuesEqual(Object a, Object b) {
+  if (a is String && b is String) return a == b;
+  return identical(a, b);
+}
+
+/// The hash code of an object key's [value],
+/// consistent with how [_objectKeyValuesEqual] compares values.
+///
+/// Strings use their [String.hashCode] so that equal strings hash the same,
+/// while all other values use their [identityHashCode].
+int _objectKeyHashCode(Object value) => value is String ? value.hashCode : identityHashCode(value);

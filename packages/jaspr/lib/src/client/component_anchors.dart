@@ -42,7 +42,7 @@ class ClientComponentAnchor extends ComponentAnchor {
 
     final clientParameters = ClientParams(_decodedParameters, serverAnchors);
     final component = (builder as ClientBuilder)(clientParameters);
-    return Builder(key: GlobalObjectKey(key), builder: (_) => component);
+    return Builder(key: _ClientAnchorKey(key), builder: (_) => component);
   }
 
   ChildSlot createSlot() {
@@ -53,6 +53,13 @@ class ClientComponentAnchor extends ComponentAnchor {
       child: build(),
     );
   }
+}
+
+/// A global key for a client component anchor,
+/// private so it can't clash with a [GlobalObjectKey] that
+/// an app creates with the same string.
+final class _ClientAnchorKey extends GlobalObjectKey {
+  const _ClientAnchorKey(String super.value);
 }
 
 class ServerComponentAnchor extends ComponentAnchor {
