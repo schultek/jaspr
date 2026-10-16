@@ -1,283 +1,275 @@
-import 'package:meta/meta.dart';
+part of 'markup_render_object.dart';
 
-import '../framework/framework.dart';
-import 'markup_render_object.dart';
-
-/// A child-list node containing a render object.
-final class ChildNodeData extends _BaseChildNode {
-  ChildNodeData(this.node);
-
-  final MarkupRenderObject node;
-}
-
-final class _ChildNodeBoundary extends _BaseChildNode {
-  _ChildNodeBoundary(this.element, this.priority);
-
-  final Element element;
-  final int priority;
-  late final ChildListRange range;
-}
-
-final class _BaseChildNode extends ChildNode {
-  @override
-  ChildNode? _prev;
-  @override
-  ChildNode? _next;
-}
-
-/// A node or contiguous range in a server render object's child list.
+/// An entry in a [ChildList]. Either a [MarkupRenderObject] or a [ChildGroup].
 ///
-/// Child-list mutations do not update [MarkupRenderObject.parent].
+/// An entry is in at most one list, and inserting it elsewhere moves it.
+/// The list containing an entry is independent of its logical
+/// [MarkupRenderObject.parent], which only [MarkupRenderObject.attach],
+/// [MarkupRenderObject.remove], and the `createChildRender*` methods change.
 sealed class ChildNode {
-  ChildNode? get _prev;
-  set _prev(ChildNode? prev);
+  ChildList? _owner;
+  ChildNode? _prev;
+  ChildNode? _next;
+
+  /// The list directly containing this entry, or `null` if it is detached.
+  ChildList? get owner => _owner;
+
+  /// The entry before this one in [owner], or `null` if this is the first.
   ChildNode? get prev => _prev;
 
-  ChildNode? get _next;
-  set _next(ChildNode? next);
+  /// The entry after this one in [owner], or `null` if this is the last.
   ChildNode? get next => _next;
 
-  ChildNode get _start => this;
-  ChildNode get _end => this;
-
-  void insertNext(ChildNode node) {
-    node._prev = this;
-    node._next = next;
-    next?._prev = node._end;
-    _next = node._start;
-  }
-
-  void insertPrev(ChildNode node) {
-    node._next = this;
-    node._prev = prev;
-    prev?._next = node._start;
-    _prev = node._end;
-  }
-
-  void remove() {
-    prev?._next = next;
-    next?._prev = prev;
+  /// Removes this entry from its list. Does nothing if it is detached.
+  void detach() {
+    final owner = _owner;
+    if (owner == null) return;
+    if (_prev case final prev?) {
+      prev._next = _next;
+    } else {
+      owner._first = _next;
+    }
+    if (_next case final next?) {
+      next._prev = _prev;
+    } else {
+      owner._last = _prev;
+    }
+    _owner = null;
     _prev = null;
     _next = null;
   }
 }
 
-/// A range of child nodes that can be moved or removed together.
+/// A transparent, movable sequence of entries.
 ///
-/// Created by [ChildList.range] or [ChildList.wrapElement].
-/// Iteration yields render objects and skips boundary nodes.
-final class ChildListRange extends ChildNode with Iterable<MarkupRenderObject> {
-  ChildListRange._(this.start, this.end) {
-    if (start case final _ChildNodeBoundary s) s.range = this;
-    if (end case final _ChildNodeBoundary e) e.range = this;
-  }
+/// Iterating a [ChildList] flattens groups without
+/// adding output or changing formatting, unlike a [MarkupRenderFragment].
+/// Groups can be nested and moved as a unit.
+final class ChildGroup extends ChildNode {
+  /// Creates an empty, detached group.
+  ChildGroup();
 
-  /// The start boundary. Use [ChildNode.insertNext] to insert inside the range.
-  final ChildNode start;
-
-  /// The end boundary. Use [ChildNode.insertPrev] to insert inside the range.
-  final ChildNode end;
-
-  @override
-  ChildNode? get _prev => start._prev;
-  @override
-  set _prev(ChildNode? prev) => start._prev = prev;
-
-  @override
-  ChildNode? get _next => end._next;
-  @override
-  set _next(ChildNode? next) => end._next = next;
-
-  @override
-  ChildNode get _start => start;
-  @override
-  ChildNode get _end => end;
-
-  @override
-  Iterator<MarkupRenderObject> get iterator => _ChildListIterator(start, end.next);
+  /// The entries of this group.
+  late final ChildList children = ChildList._(this);
 }
 
+/// A group created by [ChildList.wrapElement] to wrap the output of [element].
+final class _BoundaryGroup extends ChildGroup {
+  _BoundaryGroup(this.element, this.subject, this.priority);
+
+  /// The element whose output this group wraps.
+  final Element element;
+
+  /// The render object of [element] that this group was created around.
+  final MarkupRenderObject subject;
+
+  /// The priority [element] was wrapped with,
+  /// which orders the groups wrapping the same element.
+  final int priority;
+}
+
+/// The children of a render object or group, flattening groups during iteration.
+///
+/// Mutation during iteration is unsupported.
 final class ChildList with Iterable<MarkupRenderObject> {
-  @internal
-  ChildList() {
-    _first.insertNext(_last);
-  }
+  ChildList._(this._host);
 
+  final ChildNode _host;
+  ChildNode? _first;
+  ChildNode? _last;
+
+  /// The first direct entry of this list, or `null` if it is empty.
   @visibleForTesting
-  ChildNode get firstNode => _first;
+  ChildNode? get firstNode => _first;
+
+  /// The last direct entry of this list, or `null` if it is empty.
   @visibleForTesting
-  ChildNode get lastNode => _last;
+  ChildNode? get lastNode => _last;
 
-  final ChildNode _first = _BaseChildNode();
-  final ChildNode _last = _BaseChildNode();
-
-  void insertAfter(MarkupRenderObject child, {MarkupRenderObject? after}) {
-    insertNodeAfter(find(child) ?? ChildNodeData(child), after: after);
-  }
-
-  void insertNodeAfter(ChildNode node, {MarkupRenderObject? after}) {
-    node.remove();
-    final afterNode = find(after);
-    if (afterNode == null) {
-      _first.insertNext(node);
-    } else {
-      afterNode.insertNext(node);
+  /// Inserts [node] after [after], or at the start if [after] is `null`.
+  ///
+  /// A non-null [after] must be in this list, possibly inside groups,
+  /// and [node] is inserted into the same group.
+  /// If [node] is already in a list, it's moved.
+  /// Inserting [node] next to itself does nothing.
+  ///
+  /// Throws a [StateError] before changing anything if
+  /// [after] isn't in this list or if this list is inside [node].
+  void insertAfter(ChildNode node, {ChildNode? after}) {
+    if (_prepareInsert(node, after) case final list?) {
+      list._link(node, after, after == null ? list._first : after._next);
     }
-    assert(_first.prev == null && _last.next == null);
   }
 
-  void insertBefore(MarkupRenderObject child, {MarkupRenderObject? before}) {
-    insertNodeBefore(find(child) ?? ChildNodeData(child), before: before);
-  }
-
-  void insertNodeBefore(ChildNode node, {MarkupRenderObject? before}) {
-    node.remove();
-    final beforeNode = find(before);
-    if (beforeNode == null) {
-      _last.insertPrev(node);
-    } else {
-      beforeNode.insertPrev(node);
+  /// Inserts [node] before [before], or at the end if [before] is `null`.
+  ///
+  /// Otherwise the same as [insertAfter].
+  void insertBefore(ChildNode node, {ChildNode? before}) {
+    if (_prepareInsert(node, before) case final list?) {
+      list._link(node, before == null ? list._last : before._prev, before);
     }
-    assert(_first.prev == null && _last.next == null);
   }
 
-  ChildNodeData? find(MarkupRenderObject? child) {
-    if (child == null) return null;
-    return findWhere((n) => n == child, visitFragments: false);
+  /// Validates inserting [node] next to [anchor], detaches it,
+  /// and returns the list directly containing [anchor].
+  /// Returns `null` if [node] is [anchor], which is a no-op.
+  ChildList? _prepareInsert(ChildNode node, ChildNode? anchor) {
+    if (anchor != null && !_contains(anchor)) {
+      throw StateError('Anchor is not in this child list.');
+    }
+    if (identical(node, anchor)) return null;
+    final list = anchor?._owner ?? this;
+    for (ChildNode? host = list._host; host != null; host = host._owner?._host) {
+      if (identical(host, node)) throw StateError('Cannot move output into its own subtree.');
+    }
+    node.detach();
+    return list;
   }
 
-  void remove(MarkupRenderObject child) {
-    find(child)?.remove();
+  /// Links the detached [node] into this list between [prev] and [next].
+  void _link(ChildNode node, ChildNode? prev, ChildNode? next) {
+    node._owner = this;
+    node._prev = prev;
+    node._next = next;
+    if (prev == null) {
+      _first = node;
+    } else {
+      prev._next = node;
+    }
+    if (next == null) {
+      _last = node;
+    } else {
+      next._prev = node;
+    }
+  }
+
+  /// Whether [node] is in this list, possibly inside groups.
+  ///
+  /// Takes time proportional to the group nesting depth.
+  bool _contains(ChildNode node) {
+    for (var list = node._owner; list != null;) {
+      if (identical(list, this)) return true;
+      final host = list._host;
+      if (host is! ChildGroup) return false;
+      list = host._owner;
+    }
+    return false;
+  }
+
+  /// Whether [element] is in this list, possibly inside groups, but not inside fragments.
+  ///
+  /// Takes time proportional to the group nesting depth.
+  @override
+  bool contains(Object? element) => element is MarkupRenderObject && _contains(element);
+
+  /// Detaches [node] if it is in this list, possibly inside groups.
+  void remove(ChildNode node) {
+    if (_contains(node)) node.detach();
+  }
+
+  /// Moves all entries of this list into a new detached group,
+  /// leaving this list empty.
+  ChildGroup capture() {
+    final group = ChildGroup();
+    final target = group.children;
+    for (var node = _first; node != null; node = node._next) {
+      node._owner = target;
+    }
+    target._first = _first;
+    target._last = _last;
+    _first = null;
+    _last = null;
+    return group;
   }
 
   @override
   Iterator<MarkupRenderObject> get iterator => _ChildListIterator(_first);
 
-  ChildListRange range({ChildNode? startAfter, ChildNode? endBefore}) {
-    final start = _BaseChildNode();
-    final end = _BaseChildNode();
-
-    (startAfter ?? _first).insertNext(start);
-    (endBefore ?? _last).insertPrev(end);
-
-    return ChildListRange._(start, end);
-  }
-
-  ChildNodeData? findWhere<T extends MarkupRenderObject>(bool Function(T) fn, {bool visitFragments = true}) {
-    ChildNode? curr = _first;
-    while (curr != null) {
-      if (curr case ChildNodeData(:final node)) {
-        if (node is T && fn(node)) {
-          return curr;
-        } else if (visitFragments && node is MarkupRenderFragment) {
-          final found = node.children.findWhere<T>(fn);
-          if (found != null) {
-            return found;
-          }
-        }
+  /// Returns the first render object of type [T] that satisfies [test].
+  ///
+  /// Searches inside groups and, if [visitFragments] is `true`, inside fragments.
+  T? findWhere<T extends MarkupRenderObject>(bool Function(T) test, {bool visitFragments = true}) {
+    for (final node in this) {
+      if (node is T && test(node)) return node;
+      if (visitFragments && node is MarkupRenderFragment) {
+        if (node.children.findWhere<T>(test) case final found?) return found;
       }
-      curr = curr.next;
     }
     return null;
   }
 
-  /// Wraps [element]'s rendered output in a new range and returns it.
+  /// Wraps [element]'s output in a new group and returns it.
   ///
-  /// The output must already be a direct child of this list,
-  /// not nested in a fragment.
-  ///
-  /// Adjacent ranges around the same output nest by element depth,
-  /// so ancestor ranges enclose descendant ranges.
-  /// For the same element, higher [priority] ranges enclose lower ones,
-  /// and at equal priority the newest range is outermost.
-  /// Nodes inserted next to the output, such as markers,
-  /// can hide ranges from this ordering, so wrap before inserting them.
+  /// The output must be in this list, possibly inside groups, but not in a fragment.
+  /// Groups around the same output nest by element depth, so ancestors enclose
+  /// descendants. For the same element, higher [priority] groups enclose lower ones,
+  /// and at equal priority the newest group is outermost.
+  /// Entries already inserted into those groups, such as markers, don't affect this.
   @internal
-  ChildListRange wrapElement(Element element, [int priority = 0]) {
-    final node = find(element.slot.target!.renderObject as MarkupRenderObject);
-    assert(node != null, 'Element not found in child list');
+  ChildGroup wrapElement(Element element, [int priority = 0]) {
+    final subject = element.slot.target!.renderObject as MarkupRenderObject;
+    if (!_contains(subject)) throw StateError('Element not found in child list.');
 
-    /// Whether the new range should enclose the adjacent existing [boundary].
-    bool encloses(_ChildNodeBoundary boundary) {
-      // When wrapping the same element, higher priority wraps lower priority.
-      if (boundary.element == element) return priority >= boundary.priority;
-      assert(boundary.element.depth != element.depth);
-      // Outer elements wrap inner elements.
-      return element.depth <= boundary.element.depth;
+    // Enclose the groups around the same output that this group should enclose.
+    ChildNode inner = subject;
+    for (var list = subject._owner!; !identical(list, this); list = list._host._owner!) {
+      if (list._host case final _BoundaryGroup group) {
+        if (!identical(group.subject, subject)) break;
+        final other = group.element;
+        final encloses = identical(other, element) ? priority >= group.priority : element.depth <= other.depth;
+        if (!encloses) break;
+        inner = group;
+      }
     }
 
-    // Expand both endpoints together to keep complete ranges enclosed,
-    // even when extra contents make only one of their boundaries adjacent.
-    ChildNode startBefore = node!;
-    ChildNode endAfter = node;
-    while (true) {
-      if (startBefore.prev case final _ChildNodeBoundary prev when prev.range.start == prev && encloses(prev)) {
-        startBefore = prev;
-        endAfter = prev.range.end;
-        continue;
-      }
-
-      if (endAfter.next case final _ChildNodeBoundary next when next.range.end == next && encloses(next)) {
-        startBefore = next.range.start;
-        endAfter = next;
-        continue;
-      }
-
-      break;
-    }
-
-    final start = _ChildNodeBoundary(element, priority);
-    final end = _ChildNodeBoundary(element, priority);
-
-    startBefore.insertPrev(start);
-    endAfter.insertNext(end);
-
-    return ChildListRange._(start, end);
+    final group = _BoundaryGroup(element, subject, priority);
+    insertBefore(group, before: inner);
+    group.children.insertAfter(inner);
+    return group;
   }
 
-  /// Returns [child]'s node together with the element boundaries around it.
+  /// Returns the outermost group created by [wrapElement] around [child],
+  /// or [child] itself if it has none.
   ///
-  /// This is the outermost range created by [wrapElement] around [child],
-  /// or [child]'s own node if it has no boundaries.
-  /// Returns `null` if [child] isn't a direct child of this list.
+  /// Returns `null` if [child] isn't in this list, possibly inside groups.
   ChildNode? findWithBoundaries(MarkupRenderObject child) {
-    final node = find(child);
-    if (node == null) return null;
-
-    ChildNode outermost = node;
-    for (var curr = node.prev; curr != null; curr = curr.prev) {
-      if (curr case final _ChildNodeBoundary boundary when boundary.element.slot.target?.renderObject == child) {
-        outermost = boundary.range;
+    if (!_contains(child)) return null;
+    ChildNode outermost = child;
+    for (var list = child._owner!; !identical(list, this); list = list._host._owner!) {
+      if (list._host case final _BoundaryGroup group when identical(group.subject, child)) {
+        outermost = group;
       }
     }
     return outermost;
   }
 }
 
+/// Iterates render objects, flattening groups without recursion.
 final class _ChildListIterator implements Iterator<MarkupRenderObject> {
-  _ChildListIterator(ChildNode? first, [this._end]) : _current = first;
+  _ChildListIterator(this._next);
 
-  ChildNode? _current;
-  final ChildNode? _end;
+  ChildNode? _next;
+  List<ChildNode>? _pending;
 
   @override
   late MarkupRenderObject current;
 
   @override
   bool moveNext() {
-    while (_current != null) {
-      if (_current == _end) {
-        return false;
-      }
-      try {
-        if (_current case ChildNodeData(:final node)) {
+    while (true) {
+      switch (_next) {
+        case null:
+          final pending = _pending;
+          if (pending == null || pending.isEmpty) return false;
+          _next = pending.removeLast();
+        case final MarkupRenderObject node:
+          _next = node._next;
           current = node;
           return true;
-        }
-      } finally {
-        _current = _current!.next;
+        case final ChildGroup group:
+          if (group._next case final next?) (_pending ??= []).add(next);
+          _next = group.children._first;
       }
     }
-    return false;
   }
 }

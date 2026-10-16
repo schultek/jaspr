@@ -9,11 +9,11 @@ final class ServerComponentAdapter extends ElementBoundaryAdapter {
   final int id;
 
   @override
-  void applyBoundary(ChildListRange range) {
+  void applyBoundary(ChildGroup group) {
     final startMarker = MarkupRenderText('<!--s${DomValidator.clientMarkerPrefix}$id-->', true);
     final endMarker = MarkupRenderText('<!--/s${DomValidator.clientMarkerPrefix}$id-->', true);
 
-    range.start.insertNext(ChildNodeData(startMarker));
-    range.end.insertPrev(ChildNodeData(endMarker));
+    group.children.insertAfter(startMarker);
+    group.children.insertBefore(endMarker);
   }
 }

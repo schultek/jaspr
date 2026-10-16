@@ -215,53 +215,50 @@ final class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
   }
 
   @override
-  void applyBoundary(ChildListRange range) {
-    var curr = range.start.prev!;
-    range.remove();
+  void applyBoundary(ChildGroup group) {
+    // Move the rendered output into the template's target, and the template into its place.
+    final output = group.children.capture();
     final document = parse(template);
     final target = document.querySelector((element.component as _TemplateDocument).attachTo)!;
 
-    final MarkupRenderObject parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
+    final parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
 
     MarkupRenderObject? createTree(dom.Node node) {
-      final MarkupRenderObject n;
+      final MarkupRenderObject renderObject;
 
       if (node is dom.Text) {
         final processedNodeText = node.text.trim();
         if (processedNodeText.isEmpty) {
           return null;
         }
-        n = parent.createChildRenderText(processedNodeText, true);
+        renderObject = parent.createChildRenderText(processedNodeText, true);
       } else if (node is dom.Comment) {
-        n = parent.createChildRenderText('<!--${node.data}-->', true);
+        renderObject = parent.createChildRenderText('<!--${node.data}-->', true);
       } else if (node is dom.Element) {
-        n = parent.createChildRenderElement(node.localName!)..update(null, null, null, node.attributes.cast(), null);
+        renderObject = parent.createChildRenderElement(node.localName!)
+          ..update(null, null, null, node.attributes.cast(), null);
       } else if (node is dom.DocumentType) {
-        n = parent.createChildRenderText(node.toString(), true);
+        renderObject = parent.createChildRenderText(node.toString(), true);
       } else {
         throw UnsupportedError('Unsupported node type ${node.nodeType}');
       }
 
       if (node == target) {
-        n.children.insertNodeAfter(range);
+        renderObject.children.insertAfter(output);
       } else {
-        for (final c in node.nodes) {
-          final o = createTree(c);
-          if (o != null) {
-            n.children.insertBefore(o);
+        for (final child in node.nodes) {
+          if (createTree(child) case final childObject?) {
+            renderObject.children.insertBefore(childObject);
           }
         }
       }
 
-      return n;
+      return renderObject;
     }
 
-    for (final n in document.nodes) {
-      final o = createTree(n);
-      if (o != null) {
-        final next = ChildNodeData(o);
-        curr.insertNext(next);
-        curr = next;
+    for (final node in document.nodes) {
+      if (createTree(node) case final renderObject?) {
+        group.children.insertBefore(renderObject);
       }
     }
   }
@@ -352,8 +349,8 @@ final class _AttachAdapter extends RenderAdapter {
     }
   }
 
-  final Map<String, ({Map<String, String> attributes, List<({ChildListRange range, int depth})> children})>
-  targetElements = {};
+  final Map<String, ({Map<String, String> attributes, List<({ChildGroup group, int depth})> children})> targetElements =
+      {};
 
   @override
   void apply(MarkupRenderObject root) {
@@ -410,8 +407,8 @@ final class _AttachAdapter extends RenderAdapter {
         }
 
         for (final child in value.children) {
-          child.range.remove();
-          for (final n in child.range) {
+          child.group.detach();
+          for (final n in child.group.children) {
             visitRenderObject(n, child.depth);
           }
         }
@@ -433,7 +430,7 @@ final class _AttachChildrenAdapter extends ElementBoundaryAdapter {
   final String target;
 
   @override
-  void prepareBoundary(ChildListRange range) {
-    adapter.targetElements[target]!.children.add((range: range, depth: element.depth));
+  void prepareBoundary(ChildGroup group) {
+    adapter.targetElements[target]!.children.add((group: group, depth: element.depth));
   }
 }

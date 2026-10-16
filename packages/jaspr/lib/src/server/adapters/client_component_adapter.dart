@@ -17,7 +17,7 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
   late String? data;
 
   @override
-  void prepareBoundary(ChildListRange range) {
+  void prepareBoundary(ChildGroup group) {
     // If a client component is itself a server component, it is a client boundary.
     if (registry.serverElements.containsKey(element)) {
       _isClientBoundary = true;
@@ -46,7 +46,7 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
   }
 
   @override
-  void applyBoundary(ChildListRange range) {
+  void applyBoundary(ChildGroup group) {
     if (!_isClientBoundary) {
       return;
     }
@@ -57,8 +57,8 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
     );
     final endMarker = MarkupRenderText('<!--/${DomValidator.clientMarkerPrefix}${target.name}-->', true);
 
-    range.start.insertNext(ChildNodeData(startMarker));
-    range.end.insertPrev(ChildNodeData(endMarker));
+    group.children.insertAfter(startMarker);
+    group.children.insertBefore(endMarker);
   }
 
   String? getData() {
