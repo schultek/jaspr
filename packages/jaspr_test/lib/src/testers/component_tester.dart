@@ -183,6 +183,9 @@ class TestRenderObject implements RawableRenderObject {
     children.remove(child);
     child.parent = null;
   }
+
+  @override
+  void dispose() {}
 }
 
 class TestRenderElement extends TestRenderObject implements RenderElement {

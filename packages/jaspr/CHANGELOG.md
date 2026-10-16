@@ -23,6 +23,11 @@
   and `MarkupRenderObject` is now itself a `ChildNode` in
   at most one child list, replacing `ChildNodeData`.
 - Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
+- Added a `dispose()` method to the `RenderObject` interface,
+  which is called once a render object is no longer used,
+  such as when its element unmounts.
+  Custom `RenderObject` implementations must implement it to release the resources they hold,
+  such as event listeners, or leave its body empty if they hold none.
 - The following classes can no longer be extended,
   but can still be implemented:
 
@@ -82,6 +87,8 @@
 
 ### Bug fixes
 
+- Fixed DOM nodes sometimes staying in place after their component is removed,
+  keeping the component's event listeners, which could make handlers fire more than once.
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
 - Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.

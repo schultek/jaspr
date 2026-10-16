@@ -3,6 +3,7 @@ library;
 
 import 'package:jaspr/dom.dart';
 import 'package:jaspr_test/client_test.dart';
+import 'package:universal_web/web.dart';
 
 void main() {
   group('events', () {
@@ -96,6 +97,36 @@ void main() {
 
       await tester.change(find.tag('textarea'), value: 'World');
       expect(textChange, equals('World'));
+    });
+
+    testClient('removes listeners from elements left in place', (tester) async {
+      var ownEvents = 0;
+      var appliedEvents = 0;
+
+      tester.pumpComponent(
+        .apply(
+          events: {'applied': (_) => appliedEvents++},
+          child: button(events: {'own': (_) => ownEvents++}, []),
+        ),
+      );
+
+      final btn = tester.findNode(find.tag('button'))!;
+      void dispatchEvents() {
+        btn.dispatchEvent(Event('own'));
+        btn.dispatchEvent(Event('applied'));
+      }
+
+      dispatchEvents();
+      expect(ownEvents, 1);
+      expect(appliedEvents, 1);
+
+      // Detaching the root component leaves its DOM in place,
+      // but without the listeners that its components added.
+      tester.binding.detachRootComponent();
+      expect(btn.isConnected, isTrue);
+      dispatchEvents();
+      expect(ownEvents, 1);
+      expect(appliedEvents, 1);
     });
   });
 }
