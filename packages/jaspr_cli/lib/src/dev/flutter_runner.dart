@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import '../commands/base_command.dart';
 import '../logging.dart';
 import '../process_runner.dart';
+import 'util.dart';
 
 class FlutterRunner {
   FlutterRunner._(
@@ -174,7 +175,11 @@ class FlutterRunner {
     await errSub?.cancel();
     await outSub?.cancel();
     logger.write('Terminating flutter run...', level: Level.debug);
-    process.kill();
+    if (Platform.isWindows) {
+      await killProcessTree(process.pid);
+    } else {
+      process.kill();
+    }
     await process.exitCode;
   }
 

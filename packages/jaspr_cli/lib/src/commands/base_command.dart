@@ -83,23 +83,31 @@ abstract class BaseCommand extends Command<int> {
       return result;
     } finally {
       await cancelSub.cancel();
-      await stop();
+      if (_shutdownFuture != null) {
+        await _shutdownFuture;
+      } else {
+        await stop();
+      }
     }
   }
 
   Future<int> runCommand();
 
-  Future<void> stop() async {
-    logger.clearFooter();
-    final gs = [...guards];
-    guards.clear();
-    for (final g in gs) {
-      try {
-        await g();
-      } catch (e) {
-        logger.write('Error stopping resource: $e', level: Level.debug);
+  Future<void>? _stopFuture;
+
+  Future<void> stop() {
+    return _stopFuture ??= () async {
+      logger.clearFooter();
+      final gs = [...guards];
+      guards.clear();
+      for (final g in gs) {
+        try {
+          await g();
+        } catch (e) {
+          logger.write('Error stopping resource: $e', level: Level.debug);
+        }
       }
-    }
+    }();
   }
 
   static bool isShuttingDown = false;
@@ -114,8 +122,8 @@ abstract class BaseCommand extends Command<int> {
 
       if (guards.isNotEmpty) {
         logger.write('\nShutting down...');
-        await stop();
       }
+      await stop();
 
       exit(1);
     });
