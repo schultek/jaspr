@@ -42,7 +42,7 @@ class ClientComponentAnchor extends ComponentAnchor {
 
     final clientParameters = ClientParams(_decodedParameters, serverAnchors);
     final component = (builder as ClientBuilder)(clientParameters);
-    return Builder(key: GlobalObjectKey(key), builder: (_) => component);
+    return Builder(key: _ClientAnchorKey(key), builder: (_) => component);
   }
 
   ChildSlot createSlot() {
@@ -53,6 +53,28 @@ class ClientComponentAnchor extends ComponentAnchor {
       child: build(),
     );
   }
+}
+
+/// A global key for a client component anchor, compared by its string value.
+///
+/// Anchor keys are rebuilt as new strings each time
+/// markers are extracted, such as on reloads,
+/// so [GlobalObjectKey] can't be used, as it compares with [identical],
+/// which only matches equal strings when compiled with dart2js.
+final class _ClientAnchorKey extends GlobalKey {
+  const _ClientAnchorKey(this.value) : super.constructor();
+
+  /// The string whose value is used by this key's [operator==].
+  final String value;
+
+  @override
+  bool operator ==(Object other) => other is _ClientAnchorKey && other.value == value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => '[_ClientAnchorKey $value]';
 }
 
 class ServerComponentAnchor extends ComponentAnchor {
