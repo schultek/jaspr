@@ -29,17 +29,43 @@ extension on ContentTypography {
 }
 
 List<StyleRule> _scopeContent(List<StyleRule> rules) {
-  return rules.expand((rule) => rule.resolve('')).map((rule) {
-    if (rule is BlockStyleRule) {
-      return BlockStyleRule(
-        selector: Selector(
-          ':where(${rule.selector.selector}):not(:where([class~=not-content],[class~=not-content] *))',
-        ),
-        styles: rule.styles,
-      );
-    }
-    return rule;
-  }).toList();
+  return rules.map(_scopeRule).toList();
+}
+
+StyleRule _scopeRule(StyleRule rule) {
+  return switch (rule) {
+    // Scope only the parent selector; leave children untouched!
+    NestedStyleRule(:final selector, :final ownStyles, :final children) => NestedStyleRule(
+      _scopeSelector(selector),
+      ownStyles,
+      children,
+    ),
+    BlockStyleRule(:final selector, :final styles) => BlockStyleRule(
+      selector: _scopeSelector(selector),
+      styles: styles,
+    ),
+    // Recurse into at-rules because they don't have a selector of their own
+    MediaStyleRule(:final query, :final styles) => MediaStyleRule(
+      query: query,
+      styles: styles.map(_scopeRule).toList(),
+    ),
+    SupportsStyleRule(:final condition, :final styles) => SupportsStyleRule(
+      condition: condition,
+      styles: styles.map(_scopeRule).toList(),
+    ),
+    LayerStyleRule(:final name, :final styles) => LayerStyleRule(
+      name: name,
+      styles: styles.map(_scopeRule).toList(),
+    ),
+    _ => rule,
+  };
+}
+
+Selector _scopeSelector(Selector selector) {
+  if (selector.selector == '&' || selector.selector.isEmpty) {
+    return selector;
+  }
+  return Selector(':where(${selector.selector}):not(:where([class~=not-content],[class~=not-content] *))');
 }
 
 final List<StyleRule> _contentStyles = [
