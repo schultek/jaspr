@@ -51,8 +51,34 @@ abstract class BaseCommand extends Command<int> {
           shutdown();
         });
 
+    final completer = Completer<int>();
+
+    runZonedGuarded(
+      () async {
+        try {
+          final result = await runCommand();
+          if (!completer.isCompleted) {
+            completer.complete(result);
+          }
+        } catch (error, stackTrace) {
+          if (!completer.isCompleted) {
+            completer.completeError(error, stackTrace);
+          }
+        }
+      },
+      (error, stackTrace) {
+        logger.write('Uncaught error: $error', tag: Tag.cli, level: Level.critical);
+        if (verbose) {
+          logger.write(stackTrace.toString(), tag: Tag.cli, level: Level.critical);
+        }
+        if (!completer.isCompleted) {
+          completer.completeError(error, stackTrace);
+        }
+      },
+    );
+
     try {
-      final result = await runCommand();
+      final result = await completer.future;
       return result;
     } finally {
       await cancelSub.cancel();

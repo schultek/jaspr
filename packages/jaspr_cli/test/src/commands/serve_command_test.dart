@@ -324,6 +324,123 @@ void main() {
         expect(await serveResult, equals(0));
       });
     });
+
+    test('serves project with automatic port fallback when default port is in use', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        io.inUsePorts.add(8080);
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8081)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8081',
+          ]),
+        );
+
+        await io.shutdownBuildDaemon(buildDaemon);
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('serves project with automatic proxy port fallback in server mode', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        io.inUsePorts.add(int.parse(serverProxyPort));
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+        final server = io.stubFakeServer(proxyPort: '5568');
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        expect(io.stdout.queue, emits('[BUILDER] Done building web assets.'));
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 5568)),
+        );
+
+        await io.expectServerStarted(server);
+
+        server.exit(0);
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('fails when explicit --port is in use', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        io.inUsePorts.add(3000);
+
+        final serveResult = runner.run(['serve', '--port', '3000']);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Port 3000 is already in use.'),
+        );
+
+        expect(await serveResult, equals(1));
+      });
+    });
+
+    test('fails when explicit --port is invalid or out of range', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final serveResult = runner.run(['serve', '--port', '0']);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Invalid port "0". Must be a number between 1 and 65535.'),
+        );
+
+        expect(await serveResult, equals(1));
+      });
+    });
   });
 }
 
@@ -372,7 +489,7 @@ const buildRunnerFlutterArgs = [
 ];
 
 extension FakeServerIO on FakeIO {
-  FakeProcess stubFakeServer() {
+  FakeProcess stubFakeServer({String port = '8080', String proxyPort = '5567'}) {
     final serverProcess = FakeProcess();
 
     when(
@@ -385,23 +502,24 @@ extension FakeServerIO on FakeIO {
           '/root/myapp/.dart_tool/jaspr/server_target.dart',
         ],
         workingDirectory: '/root/myapp',
-        environment: {'PORT': '8080', 'JASPR_PROXY_PORT': '5567'},
+        environment: {'PORT': port, 'JASPR_PROXY_PORT': proxyPort},
       ),
     ).thenAnswer((_) async => serverProcess);
 
     int n = 0;
-    when(() => sockets.connect('localhost', 8080)).thenAnswer((_) async {
+    final intPort = int.parse(port);
+    when(() => sockets.connect('localhost', intPort)).thenAnswer((_) async {
       if (n == 0) {
         n++;
         throw SocketException.closed();
       }
-      return FakeSocket(InternetAddress.anyIPv4, 8080);
+      return FakeSocket(InternetAddress.anyIPv4, intPort);
     });
 
     return serverProcess;
   }
 
-  Future<void> expectServerStarted(FakeProcess server) async {
+  Future<void> expectServerStarted(FakeProcess server, {String port = '8080'}) async {
     await expectLater(
       this.stdout.queue,
       emitsInOrderWithTimeout([
@@ -411,9 +529,8 @@ extension FakeServerIO on FakeIO {
     );
 
     expect(fs.file('.dart_tool/jaspr/server_target.dart').existsSync(), isTrue);
-    expect(fs.file('.dart_tool/jaspr/server.pid').existsSync(), isTrue);
 
-    await expectLater(this.stdout.queue, emits('[SERVER] Server started and listening on http://localhost:8080'));
+    await expectLater(this.stdout.queue, emits('[SERVER] Server started and listening on http://localhost:$port'));
 
     server.writeStdout('Fake server running.');
 

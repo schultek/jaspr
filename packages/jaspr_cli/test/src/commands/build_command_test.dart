@@ -265,6 +265,31 @@ void main() {
       });
     });
 
+    test('fails when explicit --port is invalid or out of range', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'static');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerBuildArgs);
+        final buildResult = runner.run(['build', '--port', '0', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emits('Building myapp in static rendering mode.'),
+        );
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Invalid port "0". Must be a number between 1 and 65535.'),
+        );
+
+        expect(await buildResult, equals(1));
+      });
+    });
+
     test('builds project with flutter embedding', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'client', flutterEmbedding: true);
