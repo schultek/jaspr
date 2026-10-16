@@ -1,3 +1,7 @@
+## Unreleased
+
+- Support analyzer 13.x and 14.x while retaining compatibility with analyzer 12.1.
+
 ## 0.23.5
 
 - Fixed a dependency resolution problem when creating a new project by setting `build_web_compilers` to `4.8.5`.
