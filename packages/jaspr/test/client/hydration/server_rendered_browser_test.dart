@@ -42,7 +42,7 @@ void main() {
 
     await _hydrate(tester, keys: {0: counterKey, 1: movingCounterKey});
 
-    expect(_button('counter-0'), same(initialButton));
+    expect(_button('counter-0'), equals(initialButton));
     expect(initialButton.textContent, '0:10:0');
     final nestedButton = _button('counter-100');
     await _clickAndExpectText(nestedButton, '100:110:1');
@@ -89,13 +89,8 @@ void main() {
     await _clickAndExpectText(movedButton, '1:101:3');
     // The anchor key of a client boundary is its position in the document,
     // so a component that keeps its position keeps its state without needing a global key.
-    //
-    // TODO: Counter 100 is deliberately rendered with the same seed and
-    // not clicked after the reload, as nested reloads currently
-    // retain stale synced state and duplicate event handlers.
-    // The skipped tests below cover both of those bugs,
-    // so this assertion only verifies that its local click count survived.
     expect(_button('counter-100').textContent, '100:110:1');
+    await _clickAndExpectText(_button('counter-100'), '100:110:2');
 
     // Whereas one that moves is rebuilt against a different anchor,
     // and only the synced count is restored from the server markup.
@@ -121,9 +116,6 @@ void main() {
       expect(_button('counter-100').textContent, '100:110:1');
       await _clickAndExpectText(_button('counter-100'), '100:110:2');
     },
-    // TODO: Enable when nested reloads stop retaining duplicate event handlers.
-    // Currently the first click after reload increments the click count from 1 to 3.
-    skip: true,
   );
 
   testClient(
@@ -139,9 +131,6 @@ void main() {
 
       expect(_button('counter-100').textContent, '100:200:1');
     },
-    // TODO: Enable when nested reloads apply the new server markup and synced state.
-    // Currently counter 100 keeps its old synced count of 110 instead of receiving 200.
-    skip: true,
   );
 }
 
