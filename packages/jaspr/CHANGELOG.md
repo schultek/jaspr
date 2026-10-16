@@ -16,6 +16,7 @@
 
 - Require Dart 3.13 or later.
 - Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`.
+- Removed `--web-port` and `--proxy-port` options from `jaspr dev` in favor of automatic port selection.
 - Renamed `Component.wrapElement` to `Component.apply`.
 - Server render adapters now receive direct,
   nestable `ChildGroup` nodes instead of `ChildListRange` nodes,
@@ -75,6 +76,9 @@
   `@client`, `@encoder`, `@decoder`, and `@Import` annotations to
   indicate where they are allowed to be used.
 - Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+- `jaspr dev` and `jaspr build` now automatically select the next available port
+  when default ports are already in use, and validate explicitly specified `--port` values.
+- Improved CLI error handling for uncaught asynchronous errors during command execution.
 
 ### Bug fixes
 
