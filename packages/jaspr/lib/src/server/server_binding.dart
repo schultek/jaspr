@@ -84,22 +84,14 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       adapter.apply(root);
     }
 
-    if (!standalone) {
-      createDocumentStructure(root, true);
-    }
+    final document = standalone ? null : createDocumentStructure(root, true);
 
     if (_responseBodyOverride case final override?) {
       return override;
     }
 
-    if (!standalone && request.headers.singleValues['X-Jaspr-Reload'] == 'true') {
-      final body = (root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?)
-          ?.children
-          .findWhere<MarkupRenderElement>((c) => c.tag == 'body')
-          ?.node;
-      if (body != null) {
-        return utf8.encode(body.renderToHtml());
-      }
+    if (document != null && request.headers.singleValues['X-Jaspr-Reload'] == 'true') {
+      return utf8.encode(document.body.renderToHtml());
     }
 
     return utf8.encode(root.renderToHtml());

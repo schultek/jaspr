@@ -20,12 +20,14 @@ import 'util.dart';
 /// the DevTools.
 class ClientWorkflow {
   static Future<ClientWorkflow?> start(
-    String proxyPort,
+    int proxyPort,
     List<String> buildOptions,
     Logger logger,
     void Function(FutureOr<void> Function()) guard, {
     bool enableDebugging = false,
+    bool useDwdsWebSocketConnection = true,
     ReloadConfiguration reload = ReloadConfiguration.none,
+    String moduleFormat = 'ddc',
   }) async {
     var cancelled = false;
 
@@ -42,15 +44,24 @@ class ClientWorkflow {
 
         logger.write('Starting initial build...', tag: Tag.builder, progress: ProgressState.running);
 
-        client.registerBuildTarget(DefaultBuildTarget((b) => b..target = 'web'));
+        client.registerBuildTarget(
+          DefaultBuildTarget(
+            (b) => b
+              ..target = 'web'
+              ..reportChangedAssets = true,
+          ),
+        );
         client.startBuild();
 
         final devProxy = await DevProxy.start(
           daemonPort(workingDirectory),
-          int.parse(proxyPort),
+          proxyPort,
           client.buildResults,
           enableDebugging: enableDebugging,
+          useDwdsWebSocketConnection: useDwdsWebSocketConnection,
           reload: reload,
+          moduleFormat: moduleFormat,
+          logger: logger,
         );
 
         if (cancelled) {

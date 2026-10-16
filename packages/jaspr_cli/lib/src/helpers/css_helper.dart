@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:dwds/data/build_result.dart';
 import 'package:frontend_server_client/frontend_server_client.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
@@ -23,11 +22,15 @@ extension CssHelper on BaseCommand {
     final runner = CssRunner(workflow, project, logger)..prepare();
     await runner.start();
 
-    workflow.devProxy.registerPostReloadCallback(runner.reload);
+    workflow.devProxy.getCssFiles = () => runner.cssFiles;
+    workflow.devProxy.registerPreReloadCallback(runner.reload);
 
     guardResource(() {
-      logger.write('Terminating CSS runner...', level: Level.debug);
-      workflow.devProxy.unregisterPostReloadCallback(runner.reload);
+      if (runner.stylesFiles.isNotEmpty) {
+        logger.write('Terminating CSS runner...', level: Level.debug);
+      }
+      workflow.devProxy.getCssFiles = null;
+      workflow.devProxy.unregisterPreReloadCallback(runner.reload);
       runner.dispose();
     });
 
@@ -50,6 +53,9 @@ class CssRunner {
   final Project project;
   final Logger logger;
 
+  // Tracks the *.styles.dart files generated from `@css` declarations.
+  List<String> stylesFiles = [];
+
   final librariesFile = File('.dart_tool/jaspr/css/libraries.json').absolute;
   final runnerFile = File('.dart_tool/jaspr/css/css_runner.dart').absolute;
   final packageConfigFile = File('.dart_tool/jaspr/css/package_config.json').absolute;
@@ -61,10 +67,14 @@ class CssRunner {
   VmService? vmService;
   String? isolateId;
 
+  List<String> cssFiles = [];
+  Completer<void>? _generationCompleter;
+
   final Completer<void> _initialGenerationCompleter = Completer<void>();
   Future<void> get initialGenerationComplete => process != null ? _initialGenerationCompleter.future : Future.value();
 
   bool _disposed = false;
+  bool _restarting = false;
 
   void prepare() {
     final generatedDir = Directory('.dart_tool/jaspr/generated');
@@ -135,8 +145,9 @@ class CssRunner {
     assert(client == null);
     assert(process == null);
 
-    final cssFiles = await _generateRunner(watch: true);
+    final cssFiles = stylesFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
+    this.cssFiles = cssFiles;
 
     final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
 
@@ -197,11 +208,10 @@ class CssRunner {
           if (!_initialGenerationCompleter.isCompleted) {
             _initialGenerationCompleter.complete();
           }
-          // if (workflow?.devProxy.reload == ReloadConfiguration.hotReload) {
-          //   for (final connection in workflow!.devProxy.getClientConnections()) {
-          //     _reloadStylesheets(connection, cssFiles);
-          //   }
-          // }
+          if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+            _generationCompleter!.complete();
+            _generationCompleter = null;
+          }
         },
       );
     });
@@ -211,7 +221,7 @@ class CssRunner {
     });
 
     process!.exitCode.then((value) {
-      if (_disposed) return;
+      if (_disposed || _restarting) return;
       if (value != 0) {
         logger.write('CSS runner exited with code $value', tag: Tag.css, level: Level.error);
       }
@@ -224,9 +234,32 @@ class CssRunner {
     });
   }
 
-  Future<void> reload(BuildResult result) async {
-    final cssFiles = await _generateRunner(watch: true);
+  Future<void> restart() async {
+    if (stylesFiles.isNotEmpty) {
+      logger.write('Restarting CSS runner...', tag: Tag.css);
+    }
+    _restarting = true;
+    try {
+      client?.kill();
+      client = null;
+      process?.kill();
+      process = null;
+      vmService?.dispose();
+      vmService = null;
+      isolateId = null;
+      sources.clear();
+
+      prepare();
+      await start();
+    } finally {
+      _restarting = false;
+    }
+  }
+
+  Future<void> reload() async {
+    final cssFiles = stylesFiles = await _generateRunner(watch: true);
     if (cssFiles.isEmpty) return;
+    this.cssFiles = cssFiles;
 
     logger.write('Regenerating CSS files...', tag: Tag.css);
 
@@ -253,11 +286,13 @@ class CssRunner {
         if (process == null) {
           await _startProcess(cssFiles);
         } else if (vmService != null && isolateId != null) {
+          final completer = _generationCompleter = Completer<void>();
           await vmService!.reloadSources(
             isolateId!,
             rootLibUri: Uri.file(p.absolute(compilerResult.dillOutput!)).toString(),
           );
           process!.stdin.writeln(jsonEncode({'command': 'run'}));
+          await completer.future;
         }
       }
     } catch (e) {
@@ -266,7 +301,7 @@ class CssRunner {
   }
 
   Future<int> build() async {
-    final cssFiles = await _generateRunner(watch: false);
+    final cssFiles = stylesFiles = await _generateRunner(watch: false);
     if (cssFiles.isEmpty) return 0;
 
     String stdoutOutput;
@@ -327,7 +362,6 @@ class CssRunner {
   Future<List<String>> _generateRunner({required bool watch}) async {
     final projectName = project.requirePubspecYaml['name'] as String;
     final buildDir = Directory('.dart_tool/build/generated/$projectName/lib').absolute;
-
     if (!buildDir.existsSync()) {
       return <String>[];
     }
@@ -401,18 +435,6 @@ class CssRunner {
     return runnerCode.toString();
   }
 
-  // Future<void> _reloadStylesheets(ClientConnection connection, List<String> cssFiles) async {
-  //   if (connection.vmService == null) {
-  //     return;
-  //   }
-  //   try {
-  //     logger.write('Hot-reloading CSS stylesheets: $cssFiles', tag: Tag.css, level: Level.verbose);
-  //     await connection.vmService!.callServiceExtension('ext.jaspr.reload_stylesheets', args: {'urls': cssFiles});
-  //   } catch (e) {
-  //     logger.write('Failed to reload CSS stylesheets: $e', tag: Tag.css, level: Level.warning);
-  //   }
-  // }
-
   void _processCssOutput(String line, {void Function(String uri)? onVmServiceUri, void Function()? onDone}) {
     while (line.startsWith('Running build hooks...')) {
       line = line.substring('Running build hooks...'.length);
@@ -451,6 +473,10 @@ class CssRunner {
     vmService?.dispose();
     if (!_initialGenerationCompleter.isCompleted) {
       _initialGenerationCompleter.complete();
+    }
+    if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+      _generationCompleter!.complete();
+      _generationCompleter = null;
     }
   }
 }

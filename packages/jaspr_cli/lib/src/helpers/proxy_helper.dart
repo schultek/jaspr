@@ -15,10 +15,9 @@ import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
   Future<HttpServer> startProxy(
-    String port, {
+    int port, {
     DevProxy? devProxy,
-    required String serverPort,
-    String? flutterPort,
+    int? flutterPort,
     bool redirectNotFound = false,
     void Function(Object?)? onMessage,
   }) async {
@@ -41,17 +40,6 @@ mixin ProxyHelper on BaseCommand {
         // First try to load the resource from the webdev handler.
         var res = await webdevHandler(req.change(body: body));
 
-        // The bootstrap script hardcodes the host:port url for the dwds handler endpoint,
-        // so we have to change it to our server url to be able to intercept it.
-        if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
-          var basePath = req.headers['jaspr_base_path'] ?? '/';
-          if (!basePath.endsWith('/')) basePath += '/';
-          if (!basePath.startsWith('/')) basePath = '/$basePath';
-          final body = await res.readAsString();
-          // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<port>/$dwdsSseHandler";'
-          return res.change(body: body.replaceAll('http://localhost:$port/', 'http://localhost:$serverPort$basePath'));
-        }
-
         // Temporary fix for Safari until build_web_compilers is fixed.
         if (res.statusCode == 200 && req.url.path.endsWith('.dart.js')) {
           final body = await res.readAsString();
@@ -69,7 +57,11 @@ mixin ProxyHelper on BaseCommand {
           res = await flutterHandler(req.change(body: body));
         }
 
-        if (res.statusCode == 404 && redirectNotFound && path.extension(req.url.path).isEmpty) {
+        if (res.statusCode == 404 &&
+            redirectNotFound &&
+            path.extension(req.url.path).isEmpty &&
+            !req.url.path.startsWith(r'$dwds') &&
+            !req.url.path.startsWith(r'$jaspr')) {
           await res.read().drain<void>().catchError((_) {});
           return await webdevHandler(
             Request(
@@ -123,7 +115,7 @@ mixin ProxyHelper on BaseCommand {
     runZonedGuarded(
       () async {
         try {
-          final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
+          final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, port);
           completer.complete(server);
         } catch (e, st) {
           completer.completeError(e, st);

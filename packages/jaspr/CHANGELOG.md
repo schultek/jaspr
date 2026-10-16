@@ -2,6 +2,9 @@
 
 ### New features
 
+- Added hot-reload support.
+- **Breaking**: `ClientAppBinding` is now a singleton and can be accessed via `ClientAppBinding.ensureInitialized()`.
+
 - Added **Server Components** to allow for more fine-grained control over
   server-side rendered component trees.
 - Added support for stateful server-side reload.
@@ -13,7 +16,12 @@
 
 - Require Dart 3.13 or later.
 - Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`.
+- Removed `--web-port` and `--proxy-port` options from `jaspr dev` in favor of automatic port selection.
 - Renamed `Component.wrapElement` to `Component.apply`.
+- Server render adapters now receive direct,
+  nestable `ChildGroup` nodes instead of `ChildListRange` nodes,
+  and `MarkupRenderObject` is now itself a `ChildNode` in
+  at most one child list, replacing `ChildNodeData`.
 - Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
 - The following classes can no longer be extended,
   but can still be implemented:
@@ -40,14 +48,24 @@
   - `MarkupRenderText`
   - `MarkupRenderFragment`,
   - `RootMarkupRenderObject`
-  - `ChildListRange`
-  - `ChildNodeData`
+  - `ChildList`
 
   To customize server rendering, instead use render adapters.
 - The following classes are no longer public:
 
   - `AttachAdapter`, previously exported by `package:jaspr/server.dart`.
   - `TemplateDocumentAdapter`, previously exported by `package:jaspr/server.dart`.
+  - `BaseChildNode` and `ChildNodeBoundary`, previously available through an implementation import.
+  - `BaseDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.new` instead.
+  - `TemplateDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.template` instead.
+  - `HeadDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.head` instead.
+  - `AttachDocument`, previously exported by `package:jaspr/server.dart`.
+    Use `Document.body` instead.
+- `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
+  Access a render object's child list through `MarkupRenderObject.children`.
 - Added a `release` method to `RenderElement`,
   which implementations must now provide.
 
@@ -64,6 +82,9 @@
   such as in a removed `ChildSlot` or after `detachRootComponent()`,
   no longer keep the event listeners and inherited `Component.apply` values the component added.
 - Removed children are now deactivated before new children in the same list are mounted.
+- `jaspr dev` and `jaspr build` now automatically select the next available port
+  when default ports are already in use, and validate explicitly specified `--port` values.
+- Improved CLI error handling for uncaught asynchronous errors during command execution.
 
 ### Bug fixes
 

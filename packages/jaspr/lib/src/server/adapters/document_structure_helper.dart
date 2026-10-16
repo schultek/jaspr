@@ -1,20 +1,19 @@
-import '../child_nodes.dart';
 import '../markup_render_object.dart';
 
 ({MarkupRenderElement html, MarkupRenderElement head, MarkupRenderElement body}) createDocumentStructure(
   MarkupRenderObject root, [
   bool includeDoctype = false,
 ]) {
-  var html = root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?;
+  var html = root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html');
   if (html == null) {
-    final range = root.children.range();
+    final group = root.children.capture();
     html = root.createChildRenderElement('html');
-    html.children.insertNodeAfter(range);
+    html.children.insertAfter(group);
     root.children.insertAfter(html);
   }
 
-  var head = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'head')?.node as MarkupRenderElement?;
-  var body = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'body')?.node as MarkupRenderElement?;
+  var head = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'head');
+  var body = html.children.findWhere<MarkupRenderElement>((c) => c.tag == 'body');
 
   if (head == null) {
     head = html.createChildRenderElement('head');
@@ -26,10 +25,10 @@ import '../markup_render_object.dart';
     final headContents = _findHeadContents(html.children, head)!.node;
 
     body = html.createChildRenderElement('body');
-    body.children.insertNodeAfter(html.children.range());
+    body.children.insertAfter(html.children.capture());
     html.children
       ..insertBefore(body)
-      ..insertNodeAfter(headContents);
+      ..insertAfter(headContents);
   }
 
   if (includeDoctype) {
@@ -61,7 +60,7 @@ import '../markup_render_object.dart';
 
     final node = list.findWithBoundaries(child)!;
     // Nothing else renders if all render objects in the list are in the node.
-    final nodeLength = node is ChildListRange ? node.length : 1;
+    final nodeLength = node is ChildGroup ? node.children.length : 1;
     return (node: node, onlyHead: list.length == nodeLength);
   }
   return null;

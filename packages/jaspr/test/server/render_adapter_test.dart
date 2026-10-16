@@ -89,7 +89,7 @@ void main() {
       });
     }
 
-    test('keeps existing ranges consistent when creating a body around existing contents', () {
+    test('keeps existing groups consistent when creating a body around existing contents', () {
       final root = RootMarkupRenderObject();
       final html = root.createChildRenderElement('html');
       root.children.insertAfter(html);
@@ -98,15 +98,42 @@ void main() {
       html.children
         ..insertBefore(head)
         ..insertBefore(content);
-      final range = html.children.range();
+      final captured = html.children.capture();
+      html.children.insertAfter(captured);
 
       final document = createDocumentStructure(root);
       expect(document.head, same(head));
       expect(html.children.toList(), [head, document.body]);
       expect(document.body.children.toList(), [content]);
-      // The range still spans what it covered, minus the head moved out of it.
-      expect(range.toList(), [content]);
+      // The group still contains what it did, minus the head moved out of it.
+      expect(captured.children.toList(), [content]);
       expect(createDocumentStructure(root), document);
+    });
+
+    test('nests boundaries by priority when marking while preparing', () async {
+      final output = await _render(
+        Builder(
+          builder: (context) {
+            for (final priority in [1, 3, 0, 2]) {
+              (context.binding as ServerAppBinding).addRenderAdapter(
+                _MarkingAdapter(context as Element, label: '$priority', priority: priority, duringPrepare: true),
+              );
+            }
+            return .fragment([]);
+          },
+        ),
+        standalone: true,
+      );
+      expect(parseFragment(output).nodes.whereType<dom.Comment>().map((node) => node.data), [
+        '3',
+        '2',
+        '1',
+        '0',
+        '/0',
+        '/1',
+        '/2',
+        '/3',
+      ]);
     });
 
     test('marks a component whose output is an empty fragment', () async {
@@ -163,12 +190,88 @@ void main() {
     });
   });
 
+  group('document head', () {
+    test('flattens fragments and replaces keyed elements of shallower declarations', () async {
+      final document = await _renderDocument(
+        .element(
+          tag: 'main',
+          children: [
+            Document.head(
+              title: 'outer',
+              meta: {'description': 'outer'},
+              children: [
+                .fragment([
+                  .element(tag: 'link', id: 'shared', attributes: {'href': '/outer.css'}),
+                  .element(tag: 'meta', attributes: {'name': 'unique', 'content': 'retained'}),
+                ]),
+              ],
+            ),
+            .element(
+              tag: 'section',
+              children: [
+                Document.head(
+                  title: 'inner',
+                  meta: {'description': 'inner'},
+                  children: [
+                    .fragment([
+                      .element(tag: 'link', id: 'shared', attributes: {'href': '/inner.css'}),
+                      .fragment([_script('first'), _script('second')]),
+                    ]),
+                  ],
+                ),
+                .text('visible'),
+              ],
+            ),
+          ],
+        ),
+      );
+      expect(_describeHead(document), [
+        'title: inner',
+        'meta: description=inner',
+        'link: /inner.css',
+        'meta: unique=retained',
+        'script: /first.js',
+        'script: /second.js',
+      ]);
+      expect(document.body!.text.trim(), 'visible');
+    });
+
+    test('adds the elements of nested heads after the enclosing head, like the client', () async {
+      final document = await _renderDocument(
+        .element(
+          tag: 'main',
+          children: [
+            Document.head(
+              children: [
+                _script('first'),
+                Document.head(children: [_script('nested')]),
+                _script('last'),
+              ],
+            ),
+            .text('body'),
+          ],
+        ),
+      );
+      expect(_describeHead(document), ['script: /first.js', 'script: /last.js', 'script: /nested.js']);
+      expect(document.body!.text.trim(), 'body');
+    });
+  });
+
   group('template document', () {
     test('wraps component boundaries in a template and replaces target contents', () async {
       final output = await _renderDocument(
         Document.template(
           attachTo: '#content',
-          child: _marked(.element(tag: 'p', children: [.text('Some content')])),
+          child: _marked(
+            label: 'outer',
+            .fragment([
+              _marked(label: 'empty', .fragment([])),
+              _marked(
+                label: 'content',
+                .element(tag: 'p', children: [.text('Some content')]),
+              ),
+            ]),
+          ),
         ),
         files: {
           'index.template.html':
@@ -182,7 +285,10 @@ void main() {
       expect(output.body!.children.map((node) => node.localName), ['main', 'footer']);
       final target = output.querySelector('main#content')!;
       expect(target.attributes, {'id': 'content', 'data-label': 'Main content'});
-      expect(target.innerHtml, '<!--boundary--><p>Some content</p><!--/boundary-->');
+      expect(
+        target.innerHtml,
+        '<!--outer--><!--empty--><!--/empty--><!--content--><p>Some content</p><!--/content--><!--/outer-->',
+      );
       expect(output.querySelector('footer')!.outerHtml, '<footer>Footer content</footer>');
     });
 
@@ -294,26 +400,53 @@ List<String> _describeNodes(dom.Node parent) => [
       text,
 ];
 
-Component _marked(Component child) => Builder(
+Component _script(String name) => .element(tag: 'script', attributes: {'src': '/$name.js'}, children: []);
+
+/// Describes the elements in the head of [document].
+List<String> _describeHead(dom.Document document) => [
+  for (final element in document.head!.children)
+    switch (element.localName) {
+      'title' => 'title: ${element.text}',
+      'meta' => 'meta: ${element.attributes['name']}=${element.attributes['content']}',
+      'link' => 'link: ${element.attributes['href']}',
+      'script' => 'script: ${element.attributes['src']}',
+      final tag => '$tag',
+    },
+];
+
+Component _marked(Component child, {String label = 'boundary'}) => Builder(
   builder: (context) {
-    (context.binding as ServerAppBinding).addRenderAdapter(_MarkingAdapter(context as Element));
+    (context.binding as ServerAppBinding).addRenderAdapter(_MarkingAdapter(context as Element, label: label));
     return child;
   },
 );
 
+/// Marks the start and end of its element's output with comments containing [label].
 final class _MarkingAdapter extends ElementBoundaryAdapter {
-  _MarkingAdapter(super.element, {this.events});
+  _MarkingAdapter(super.element, {this.label = 'boundary', super.priority, this.duringPrepare = false, this.events});
+
+  final String label;
+
+  /// Whether to insert the markers in [prepareBoundary] instead of [applyBoundary].
+  final bool duringPrepare;
 
   final List<String>? events;
 
   @override
-  void prepareBoundary(ChildListRange range) => events?.add('marking.prepare');
+  void prepareBoundary(ChildGroup group) {
+    events?.add('marking.prepare');
+    if (duringPrepare) _mark(group);
+  }
 
   @override
-  void applyBoundary(ChildListRange range) {
+  void applyBoundary(ChildGroup group) {
     events?.add('marking.apply');
-    range.start.insertNext(ChildNodeData(MarkupRenderText('<!--boundary-->', true)));
-    range.end.insertPrev(ChildNodeData(MarkupRenderText('<!--/boundary-->', true)));
+    if (!duringPrepare) _mark(group);
+  }
+
+  void _mark(ChildGroup group) {
+    group.children.insertAfter(MarkupRenderText('<!--$label-->', true));
+    group.children.insertBefore(MarkupRenderText('<!--/$label-->', true));
   }
 }
 

@@ -7,7 +7,7 @@ import '/dom.dart';
 import '/server.dart';
 import '../../server/adapters/document_structure_helper.dart';
 
-abstract class Document implements Component {
+abstract final class Document implements Component {
   /// Sets up a basic document structure at the root of your app and renders the main `<html>`, `<head>` and `<body>` tags.
   ///
   /// The `title` parameter is rendered as the `<title>` element.
@@ -28,14 +28,14 @@ abstract class Document implements Component {
     List<StyleRule> styles,
     List<Component> head,
     required Component body,
-  }) = BaseDocument;
+  }) = _BaseDocument;
 
   /// Loads an external `.template.html` file from the filesystem and attaches the provided
   /// child component to that template.
   ///
   /// The `name` (default 'index') defines which template file to load: `web/<name>.template.html`.
   /// The `attachTo`(default 'body') defines where to attach the child component in the loaded template.
-  const factory Document.template({String name, String attachTo, required Component child}) = TemplateDocument;
+  const factory Document.template({String name, String attachTo, required Component child}) = _TemplateDocument;
 
   /// Attaches a set of attributes to the `<html>` element.
   ///
@@ -44,7 +44,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.html()` components.
-  const factory Document.html({Map<String, String>? attributes, Key? key}) = AttachDocument.html;
+  const factory Document.html({Map<String, String>? attributes, Key? key}) = _AttachDocument.html;
 
   /// Renders metadata and other elements inside the `<head>` of the document.
   ///
@@ -86,7 +86,7 @@ abstract class Document implements Component {
   /// - `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
   /// - `<meta>` elements override other `<meta>` elements with the same `name`
   const factory Document.head({String? title, Map<String, String>? meta, List<Component>? children, Key? key}) =
-      HeadDocument;
+      _HeadDocument;
 
   /// Attaches a set of attributes to the `<body>` element.
   ///
@@ -95,7 +95,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.body()` components.
-  const factory Document.body({Map<String, String>? attributes, Key? key}) = AttachDocument.body;
+  const factory Document.body({Map<String, String>? attributes, Key? key}) = _AttachDocument.body;
 }
 
 // Only allow a single Document.
@@ -105,8 +105,8 @@ class _DocumentKey extends GlobalKey {
   const _DocumentKey() : super.constructor();
 }
 
-class BaseDocument extends StatelessComponent implements Document {
-  const BaseDocument({
+final class _BaseDocument extends StatelessComponent implements Document {
+  const _BaseDocument({
     this.title,
     this.lang,
     this.base = '/',
@@ -155,7 +155,7 @@ class BaseDocument extends StatelessComponent implements Document {
                 tag: 'meta',
                 attributes: {'charset': charset},
               ),
-            HeadDocument(title: title, meta: {'viewport': ?viewport, ...meta}),
+            _HeadDocument(title: title, meta: {'viewport': ?viewport, ...meta}),
             if (styles.isNotEmpty) //
               Style(styles: styles),
             ...head,
@@ -167,8 +167,9 @@ class BaseDocument extends StatelessComponent implements Document {
   }
 }
 
-class TemplateDocument extends StatelessComponent implements Document {
-  const TemplateDocument({this.name = 'index', this.attachTo = 'body', required this.child}) : super(key: _documentKey);
+final class _TemplateDocument extends StatelessComponent implements Document {
+  const _TemplateDocument({this.name = 'index', this.attachTo = 'body', required this.child})
+    : super(key: _documentKey);
 
   final String name;
   final String attachTo;
@@ -184,14 +185,16 @@ class TemplateDocument extends StatelessComponent implements Document {
 }
 
 class _TemplateDocumentElement extends StatelessElement {
-  _TemplateDocumentElement(TemplateDocument super.component);
+  _TemplateDocumentElement(_TemplateDocument super.component);
 
   Future<String?>? _templateFuture;
 
   @override
   Component build() {
     (binding as ServerAppBinding).addRenderAdapter(_TemplateDocumentAdapter(this));
-    _templateFuture ??= (binding as ServerAppBinding).loadFile('${(component as TemplateDocument).name}.template.html');
+    _templateFuture ??= (binding as ServerAppBinding).loadFile(
+      '${(component as _TemplateDocument).name}.template.html',
+    );
     return super.build();
   }
 }
@@ -205,60 +208,57 @@ final class _TemplateDocumentAdapter extends ElementBoundaryAdapter {
   FutureOr<void> prepare() async {
     final template = await (element as _TemplateDocumentElement)._templateFuture!;
     if (template == null) {
-      throw TemplateNotFoundError((element.component as TemplateDocument).name);
+      throw TemplateNotFoundError((element.component as _TemplateDocument).name);
     }
     this.template = template;
     return super.prepare();
   }
 
   @override
-  void applyBoundary(ChildListRange range) {
-    var curr = range.start.prev!;
-    range.remove();
+  void applyBoundary(ChildGroup group) {
+    // Move the rendered output into the template's target, and the template into its place.
+    final output = group.children.capture();
     final document = parse(template);
-    final target = document.querySelector((element.component as TemplateDocument).attachTo)!;
+    final target = document.querySelector((element.component as _TemplateDocument).attachTo)!;
 
-    final MarkupRenderObject parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
+    final parent = element.parentRenderObjectElement!.renderObject as MarkupRenderObject;
 
     MarkupRenderObject? createTree(dom.Node node) {
-      final MarkupRenderObject n;
+      final MarkupRenderObject renderObject;
 
       if (node is dom.Text) {
         final processedNodeText = node.text.trim();
         if (processedNodeText.isEmpty) {
           return null;
         }
-        n = parent.createChildRenderText(processedNodeText, true);
+        renderObject = parent.createChildRenderText(processedNodeText, true);
       } else if (node is dom.Comment) {
-        n = parent.createChildRenderText('<!--${node.data}-->', true);
+        renderObject = parent.createChildRenderText('<!--${node.data}-->', true);
       } else if (node is dom.Element) {
-        n = parent.createChildRenderElement(node.localName!)..update(null, null, null, node.attributes.cast(), null);
+        renderObject = parent.createChildRenderElement(node.localName!)
+          ..update(null, null, null, node.attributes.cast(), null);
       } else if (node is dom.DocumentType) {
-        n = parent.createChildRenderText(node.toString(), true);
+        renderObject = parent.createChildRenderText(node.toString(), true);
       } else {
         throw UnsupportedError('Unsupported node type ${node.nodeType}');
       }
 
       if (node == target) {
-        n.children.insertNodeAfter(range);
+        renderObject.children.insertAfter(output);
       } else {
-        for (final c in node.nodes) {
-          final o = createTree(c);
-          if (o != null) {
-            n.children.insertBefore(o);
+        for (final child in node.nodes) {
+          if (createTree(child) case final childObject?) {
+            renderObject.children.insertBefore(childObject);
           }
         }
       }
 
-      return n;
+      return renderObject;
     }
 
-    for (final n in document.nodes) {
-      final o = createTree(n);
-      if (o != null) {
-        final next = ChildNodeData(o);
-        curr.insertNext(next);
-        curr = next;
+    for (final node in document.nodes) {
+      if (createTree(node) case final renderObject?) {
+        group.children.insertBefore(renderObject);
       }
     }
   }
@@ -275,8 +275,8 @@ class TemplateNotFoundError extends Error {
   }
 }
 
-class HeadDocument extends StatelessComponent implements Document {
-  const HeadDocument({this.title, this.meta, this.children, super.key});
+final class _HeadDocument extends StatelessComponent implements Document {
+  const _HeadDocument({this.title, this.meta, this.children, super.key});
 
   final String? title;
   final Map<String, String>? meta;
@@ -284,7 +284,7 @@ class HeadDocument extends StatelessComponent implements Document {
 
   @override
   Component build(BuildContext context) {
-    return AttachDocument(
+    return _AttachDocument(
       target: 'head',
       attributes: null,
       children: [
@@ -305,10 +305,10 @@ class HeadDocument extends StatelessComponent implements Document {
   }
 }
 
-class AttachDocument extends StatelessComponent implements Document {
-  const AttachDocument.html({this.attributes, super.key}) : target = 'html', children = null;
-  const AttachDocument.body({this.attributes, super.key}) : target = 'body', children = null;
-  const AttachDocument({required this.target, this.attributes, this.children});
+final class _AttachDocument extends StatelessComponent implements Document {
+  const _AttachDocument.html({this.attributes, super.key}) : target = 'html', children = null;
+  const _AttachDocument.body({this.attributes, super.key}) : target = 'body', children = null;
+  const _AttachDocument({required this.target, this.attributes, this.children});
 
   final String target;
   final Map<String, String>? attributes;
@@ -324,7 +324,7 @@ class AttachDocument extends StatelessComponent implements Document {
 final Expando<_AttachAdapter> _attach = Expando();
 
 final class _AttachAdapter extends RenderAdapter {
-  static void register(BuildContext context, AttachDocument item) {
+  static void register(BuildContext context, _AttachDocument item) {
     final binding = context.binding;
     if (binding is! ServerAppBinding) {
       // Return early in component tests.
@@ -349,8 +349,8 @@ final class _AttachAdapter extends RenderAdapter {
     }
   }
 
-  final Map<String, ({Map<String, String> attributes, List<({ChildListRange range, int depth})> children})>
-  targetElements = {};
+  final Map<String, ({Map<String, String> attributes, List<({ChildGroup group, int depth})> children})> targetElements =
+      {};
 
   @override
   void apply(MarkupRenderObject root) {
@@ -407,8 +407,8 @@ final class _AttachAdapter extends RenderAdapter {
         }
 
         for (final child in value.children) {
-          child.range.remove();
-          for (final n in child.range) {
+          child.group.detach();
+          for (final n in child.group.children) {
             visitRenderObject(n, child.depth);
           }
         }
@@ -430,7 +430,7 @@ final class _AttachChildrenAdapter extends ElementBoundaryAdapter {
   final String target;
 
   @override
-  void prepareBoundary(ChildListRange range) {
-    adapter.targetElements[target]!.children.add((range: range, depth: element.depth));
+  void prepareBoundary(ChildGroup group) {
+    adapter.targetElements[target]!.children.add((group: group, depth: element.depth));
   }
 }

@@ -7,7 +7,6 @@ import 'package:path/path.dart' as p;
 import '../commands/base_command.dart';
 import '../logging.dart';
 import '../process_runner.dart';
-import '../project.dart';
 
 mixin FlutterHelper on BaseCommand {
   Map<String, String> getFlutterDartDefines(bool useWasm, bool release) {
@@ -20,7 +19,7 @@ mixin FlutterHelper on BaseCommand {
     return flutterDefines;
   }
 
-  Future<Process> serveFlutter(bool wasm) async {
+  Future<Process> serveFlutter({required int port, required bool wasm}) async {
     await _ensureTarget();
 
     final flutterProcess = await ProcessRunner.instance.start(
@@ -30,7 +29,7 @@ mixin FlutterHelper on BaseCommand {
         '--device-id=web-server',
         '-t',
         '.dart_tool/jaspr/flutter_target.dart',
-        '--web-port=$flutterProxyPort',
+        '--web-port=$port',
         if (wasm) '--wasm',
         if (argResults!.flag('release')) '--release',
       ],

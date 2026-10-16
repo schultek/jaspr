@@ -1,18 +1,21 @@
 import 'dart:convert';
 
+import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../../server.dart';
 import '../dom/validator.dart';
-import 'child_nodes.dart';
 
-abstract final class MarkupRenderObject implements RawableRenderObject {
+part 'child_nodes.dart';
+
+abstract final class MarkupRenderObject extends ChildNode implements RawableRenderObject {
   @override
   MarkupRenderObject? parent;
   @override
   web.Node? get node => null;
 
-  late final ChildList children = ChildList(this);
+  /// The entries rendered as the children of this render object.
+  late final ChildList children = ChildList._(this);
 
   @override
   MarkupRenderElement createChildRenderElement(String tag) {
@@ -31,8 +34,8 @@ abstract final class MarkupRenderObject implements RawableRenderObject {
 
   @override
   void attach(MarkupRenderObject child, {MarkupRenderObject? after}) {
-    child.parent = this;
     children.insertAfter(child, after: after);
+    child.parent = this;
   }
 
   @override

@@ -22,8 +22,6 @@ class ClientComponentAnchor extends ComponentAnchor {
   late FutureOr<ClientBuilder> builder;
   final List<ServerComponentAnchor> serverAnchors = [];
 
-  void Function(void Function())? _setState;
-
   /// The decoded parameters for this client component.
   Map<String, Object?> get _decodedParameters {
     if (data case final rawData?) {
@@ -35,32 +33,16 @@ class ClientComponentAnchor extends ComponentAnchor {
   }
 
   Future<void> resolve() async {
-    final (clientBuilder, _) = await (
-      Future.value(builder),
-      serverAnchors.map((a) => a.resolve()).wait,
-    ).wait;
+    final (clientBuilder, _) = await (Future.value(builder), serverAnchors.map((a) => a.resolve()).wait).wait;
     builder = clientBuilder;
   }
 
   Component build() {
     assert(builder is ClientBuilder, 'ClientComponentAnchor was not resolved before calling build()');
-    return StatefulBuilder(
-      key: GlobalObjectKey(key),
-      builder: (_, setState) {
-        _setState = setState;
-        final clientParameters = ClientParams(_decodedParameters, serverAnchors);
-        return (builder as ClientBuilder)(clientParameters);
-      },
-    );
-  }
 
-  void rebuild(String? data, List<ServerComponentAnchor> serverAnchors) {
-    assert(_setState != null, 'ClientComponentAnchor was not built before calling rebuild()');
-    _setState!(() {
-      this.data = data;
-      this.serverAnchors.clear();
-      this.serverAnchors.addAll(serverAnchors);
-    });
+    final clientParameters = ClientParams(_decodedParameters, serverAnchors);
+    final component = (builder as ClientBuilder)(clientParameters);
+    return Builder(key: _ClientAnchorKey(key), builder: (_) => component);
   }
 
   ChildSlot createSlot() {
@@ -71,6 +53,28 @@ class ClientComponentAnchor extends ComponentAnchor {
       child: build(),
     );
   }
+}
+
+/// A global key for a client component anchor, compared by its string value.
+///
+/// Anchor keys are rebuilt as new strings each time
+/// markers are extracted, such as on reloads,
+/// so [GlobalObjectKey] can't be used, as it compares with [identical],
+/// which only matches equal strings when compiled with dart2js.
+final class _ClientAnchorKey extends GlobalKey {
+  const _ClientAnchorKey(this.value) : super.constructor();
+
+  /// The string whose value is used by this key's [operator==].
+  final String value;
+
+  @override
+  bool operator ==(Object other) => other is _ClientAnchorKey && other.value == value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => '[_ClientAnchorKey $value]';
 }
 
 class ServerComponentAnchor extends ComponentAnchor {
@@ -93,13 +97,7 @@ class ServerComponentAnchor extends ComponentAnchor {
     }
     nodes.add(endNode);
 
-    return SlottedChildView.withNodes(
-      key: GlobalKey(),
-      nodes: nodes,
-      slots: [
-        for (final client in clientAnchors) client.createSlot(),
-      ],
-    );
+    return SlottedChildView.withNodes(nodes: nodes, slots: [for (final client in clientAnchors) client.createSlot()]);
   }
 }
 
@@ -156,9 +154,7 @@ FutureOr<ClientBuilder> getClientByName(String name) {
   return clients[name]!.loadedBuilder;
 }
 
-List<ClientComponentAnchor> extractAnchors({
-  List<web.Node>? nodes,
-}) {
+List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
   nodes ??= [?web.document.body];
 
   final List<ComponentAnchor> anchors = [];

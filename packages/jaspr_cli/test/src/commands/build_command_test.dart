@@ -265,6 +265,31 @@ void main() {
       });
     });
 
+    test('fails when explicit --port is invalid or out of range', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'static');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerBuildArgs);
+        final buildResult = runner.run(['build', '--port', '0', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emits('Building myapp in static rendering mode.'),
+        );
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Invalid port "0". Must be a number between 1 and 65535.'),
+        );
+
+        expect(await buildResult, equals(1));
+      });
+    });
+
     test('builds project with flutter embedding', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'client', flutterEmbedding: true);
@@ -503,7 +528,6 @@ void main() {
 const buildRunnerBuildArgs = [
   '--release',
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:entrypoint=compiler=dart2js',
   '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O2"]',
 ];
@@ -511,7 +535,6 @@ const buildRunnerBuildArgs = [
 const buildRunnerFlutterBuildArgs = [
   '--release',
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:entrypoint=compiler=dart2js',
   '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O2","-Ddart.vm.product=true","-DFLUTTER_WEB_USE_SKWASM=false","-DFLUTTER_WEB_USE_SKIA=true"]',
   '--define=build_web_compilers:entrypoint=use-ui-libraries=true',

@@ -4,7 +4,7 @@ import '../../../client.dart';
 import '../../client/utils.dart';
 import '../../dom/type_checks.dart';
 
-abstract class Document implements Component {
+abstract final class Document implements Component {
   /// Attaches a set of attributes to the `<html>` element.
   ///
   /// This can be used at any point in the component tree and is supported both on the
@@ -12,7 +12,7 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.html()` components.
-  const factory Document.html({Map<String, String>? attributes, Key? key}) = AttachDocument.html;
+  const factory Document.html({Map<String, String>? attributes, Key? key}) = _AttachDocument.html;
 
   /// Renders metadata and other elements inside the `<head>` of the document.
   ///
@@ -54,7 +54,7 @@ abstract class Document implements Component {
   /// - `<title>` and `<base>` elements override other `<title>` or `<base>` elements respectively
   /// - `<meta>` elements override other `<meta>` elements with the same `name`
   const factory Document.head({String? title, Map<String, String>? meta, List<Component>? children, Key? key}) =
-      HeadDocument;
+      _HeadDocument;
 
   /// Attaches a set of attributes to the `<body>` element.
   ///
@@ -63,11 +63,11 @@ abstract class Document implements Component {
   ///
   /// Can be used multiple times in an application where deeper or latter mounted
   /// components will override duplicate attributes from other `.body()` components.
-  const factory Document.body({Map<String, String>? attributes, Key? key}) = AttachDocument.body;
+  const factory Document.body({Map<String, String>? attributes, Key? key}) = _AttachDocument.body;
 }
 
-class HeadDocument extends StatelessComponent implements Document {
-  const HeadDocument({this.title, this.meta, this.children, super.key});
+final class _HeadDocument extends StatelessComponent implements Document {
+  const _HeadDocument({this.title, this.meta, this.children, super.key});
 
   final String? title;
   final Map<String, String>? meta;
@@ -75,36 +75,36 @@ class HeadDocument extends StatelessComponent implements Document {
 
   @override
   Component build(BuildContext context) {
-    return AttachDocument(
-      target: AttachTarget.head,
+    return _AttachDocument(
+      target: _AttachTarget.head,
       attributes: null,
       children: [
-        if (title != null) Component.element(tag: 'title', children: [Component.text(title!)]),
-        if (meta != null)
-          for (final e in meta!.entries)
-            Component.element(tag: 'meta', attributes: {'name': e.key, 'content': e.value}),
+        if (title case final title?) Component.element(tag: 'title', children: [Component.text(title)]),
+        if (meta case final meta?)
+          for (final MapEntry(key: name, value: content) in meta.entries)
+            Component.element(tag: 'meta', attributes: {'name': name, 'content': content}),
         ...?children,
       ],
     );
   }
 }
 
-enum AttachTarget {
+enum _AttachTarget {
   html(true, false),
   body(true, false),
   head(false, true);
 
-  const AttachTarget(this.attachAttributes, this.attachChildren);
+  const _AttachTarget(this.attachAttributes, this.attachChildren);
   final bool attachAttributes;
   final bool attachChildren;
 }
 
-class AttachDocument extends Component implements Document {
-  const AttachDocument.html({this.attributes, super.key}) : target = AttachTarget.html, children = const [];
-  const AttachDocument.body({this.attributes, super.key}) : target = AttachTarget.body, children = const [];
-  const AttachDocument({required this.target, this.attributes, required this.children});
+final class _AttachDocument extends Component implements Document {
+  const _AttachDocument.html({this.attributes, super.key}) : target = _AttachTarget.html, children = const [];
+  const _AttachDocument.body({this.attributes, super.key}) : target = _AttachTarget.body, children = const [];
+  const _AttachDocument({required this.target, this.attributes, required this.children});
 
-  final AttachTarget target;
+  final _AttachTarget target;
   final Map<String, String>? attributes;
   final List<Component> children;
 
@@ -113,20 +113,20 @@ class AttachDocument extends Component implements Document {
 }
 
 class _AttachElement extends MultiChildRenderObjectElement {
-  _AttachElement(AttachDocument super.component);
+  _AttachElement(_AttachDocument super.component);
 
   @override
-  List<Component> buildChildren() => (component as AttachDocument).children;
+  List<Component> buildChildren() => (component as _AttachDocument).children;
 
   @override
   RenderObject createRenderObject() {
-    final AttachDocument(:target, :attributes) = component as AttachDocument;
-    return AttachRenderObject(target, depth)..attributes = attributes;
+    final _AttachDocument(:target, :attributes) = component as _AttachDocument;
+    return _AttachRenderObject(target, depth)..attributes = attributes;
   }
 
   @override
-  void updateRenderObject(AttachRenderObject renderObject) {
-    final AttachDocument(:target, :attributes) = component as AttachDocument;
+  void updateRenderObject(_AttachRenderObject renderObject) {
+    final _AttachDocument(:target, :attributes) = component as _AttachDocument;
     renderObject
       ..target = target
       ..attributes = attributes;
@@ -135,26 +135,26 @@ class _AttachElement extends MultiChildRenderObjectElement {
   @override
   void activate() {
     super.activate();
-    (renderObject as AttachRenderObject).depth = depth;
+    (renderObject as _AttachRenderObject).depth = depth;
   }
 
   @override
   void detachRenderObject() {
     super.detachRenderObject();
-    final renderObject = this.renderObject as AttachRenderObject;
+    final renderObject = this.renderObject as _AttachRenderObject;
     _AttachAdapter.instanceFor(renderObject._target).unregister(renderObject);
   }
 }
 
-class AttachRenderObject extends DomRenderText {
-  AttachRenderObject(this._target, this._depth) : super('', null) {
+class _AttachRenderObject extends DomRenderText {
+  _AttachRenderObject(this._target, this._depth) : super('', null) {
     _AttachAdapter.instanceFor(_target).register(this);
   }
 
   final List<web.Node> children = [];
 
-  AttachTarget _target;
-  set target(AttachTarget target) {
+  _AttachTarget _target;
+  set target(_AttachTarget target) {
     if (_target == target) return;
     _AttachAdapter.instanceFor(_target).unregister(this);
     _target = target;
@@ -215,20 +215,20 @@ class AttachRenderObject extends DomRenderText {
 final class _AttachAdapter {
   _AttachAdapter(this.target);
 
-  static _AttachAdapter instanceFor(AttachTarget target) {
+  static _AttachAdapter instanceFor(_AttachTarget target) {
     return _instances[target] ??= _AttachAdapter(target);
   }
 
-  static final Map<AttachTarget, _AttachAdapter> _instances = {};
+  static final Map<_AttachTarget, _AttachAdapter> _instances = {};
 
-  final AttachTarget target;
+  final _AttachTarget target;
 
-  late final web.Element element = web.document.querySelector(target.name)!;
+  late final web.Element _element = web.document.querySelector(target.name)!;
 
-  late final Map<String, String> initialAttributes = element.attributes.toMap();
+  late final Map<String, String> _initialAttributes = _element.attributes.toMap();
 
-  late final (web.Node, web.Node) attachWindow = () {
-    final iterator = web.document.createNodeIterator(element, 128);
+  late final (web.Node, web.Node) _attachWindow = () {
+    final iterator = web.document.createNodeIterator(_element, 128);
 
     web.Node? start, end;
 
@@ -244,29 +244,29 @@ final class _AttachAdapter {
 
     if (start == null) {
       start = web.Comment(r'$');
-      element.insertBefore(start, end);
+      _element.insertBefore(start, end);
     }
     if (end == null) {
       end = web.Comment('/');
-      element.insertBefore(end, start.nextSibling);
+      _element.insertBefore(end, start.nextSibling);
     }
     return (start, end);
   }();
 
-  Iterable<web.Node> get liveNodes sync* {
-    web.Node? curr = attachWindow.$1.nextSibling;
-    while (curr != null && curr != attachWindow.$2) {
+  Iterable<web.Node> get _liveNodes sync* {
+    web.Node? curr = _attachWindow.$1.nextSibling;
+    while (curr != null && curr != _attachWindow.$2) {
       yield curr;
       curr = curr.nextSibling;
     }
   }
 
-  late final Map<String, web.Node> initialKeyedNodes = {
-    for (var node in liveNodes)
-      if (keyFor(node) case String key) key: node,
+  late final Map<String, web.Node> _initialKeyedNodes = {
+    for (var node in _liveNodes)
+      if (_keyFor(node) case String key) key: node,
   };
 
-  String? keyFor(web.Node node) {
+  String? _keyFor(web.Node node) {
     if (!node.isElement) return null;
     return switch (node as web.Element) {
       web.Element(:final String id) when id.isNotEmpty => id,
@@ -279,8 +279,7 @@ final class _AttachAdapter {
     };
   }
 
-  final List<AttachRenderObject> _renderObjects = [];
-  List<AttachRenderObject> get renderObjects => _renderObjects;
+  final List<_AttachRenderObject> _renderObjects = [];
   bool _needsResorting = true;
 
   void update({bool needsResorting = false}) {
@@ -290,9 +289,9 @@ final class _AttachAdapter {
     }
 
     if (target.attachAttributes) {
-      final Map<String, String> attributes = initialAttributes;
+      final Map<String, String> attributes = _initialAttributes;
 
-      for (final renderObject in renderObjects) {
+      for (final renderObject in _renderObjects) {
         assert(renderObject._target == target);
         if (renderObject._attributes case final attrs?) {
           attributes.addAll(attrs);
@@ -300,30 +299,30 @@ final class _AttachAdapter {
       }
 
       final attributesToRemove = <String>{};
-      for (var i = 0; i < element.attributes.length; i++) {
-        attributesToRemove.add(element.attributes.item(i)!.name);
+      for (var i = 0; i < _element.attributes.length; i++) {
+        attributesToRemove.add(_element.attributes.item(i)!.name);
       }
       if (attributes.isNotEmpty) {
         for (final attr in attributes.entries) {
-          element.clearOrSetAttribute(attr.key, attr.value);
+          _element.clearOrSetAttribute(attr.key, attr.value);
           attributesToRemove.remove(attr.key);
         }
       }
 
       if (attributesToRemove.isNotEmpty) {
         for (final name in attributesToRemove) {
-          element.removeAttribute(name);
+          _element.removeAttribute(name);
         }
       }
     }
 
     if (target.attachChildren) {
-      final Map<String, web.Node> keyedNodes = Map.of(initialKeyedNodes);
-      final List<web.Node> children = List.of(initialKeyedNodes.values);
+      final Map<String, web.Node> keyedNodes = Map.of(_initialKeyedNodes);
+      final List<web.Node> children = List.of(_initialKeyedNodes.values);
 
-      for (final renderObject in renderObjects) {
+      for (final renderObject in _renderObjects) {
         for (final node in renderObject.children) {
-          final key = keyFor(node);
+          final key = _keyFor(node);
           if (key != null) {
             final shadowedNode = keyedNodes[key];
             keyedNodes[key] = node;
@@ -336,22 +335,22 @@ final class _AttachAdapter {
         }
       }
 
-      web.Node? current = attachWindow.$1.nextSibling;
+      web.Node? current = _attachWindow.$1.nextSibling;
 
       for (final node in children) {
-        if (current == null || current == attachWindow.$2) {
-          element.insertBefore(node, current);
+        if (current == null || current == _attachWindow.$2) {
+          _element.insertBefore(node, current);
         } else if (current == node) {
           current = current.nextSibling;
-        } else if (keyFor(node) != null && keyFor(node) == keyFor(current)) {
+        } else if (_keyFor(node) != null && _keyFor(node) == _keyFor(current)) {
           current.parentNode?.replaceChild(node, current);
           current = node.nextSibling;
         } else {
-          element.insertBefore(node, current);
+          _element.insertBefore(node, current);
         }
       }
 
-      while (current != null && current != attachWindow.$2) {
+      while (current != null && current != _attachWindow.$2) {
         final next = current.nextSibling;
         current.parentNode?.removeChild(current);
         current = next;
@@ -359,12 +358,12 @@ final class _AttachAdapter {
     }
   }
 
-  void register(AttachRenderObject renderObject) {
+  void register(_AttachRenderObject renderObject) {
     _renderObjects.add(renderObject);
     _needsResorting = true;
   }
 
-  void unregister(AttachRenderObject renderObject) {
+  void unregister(_AttachRenderObject renderObject) {
     _renderObjects.remove(renderObject);
     update();
   }
