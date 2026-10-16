@@ -77,6 +77,42 @@ class DomElement extends DomRenderObjectElement {
     return renderObject;
   }
 
+  /// The values that the last render merged from the component and the inherited params,
+  /// or `null` if no inherited params applied.
+  ({String? id, Set<String> classes, Map<String, String> styles, Map<String, String> attributes})? _mergedValues;
+
+  /// Removes the values that inherited params added to the node, as well as the listeners,
+  /// since the node can stay in place, such as when this element is in a removed slot
+  /// of a `SlottedChildView`, or the root component is detached.
+  ///
+  /// Whatever takes over the node next would otherwise treat those values as original values.
+  /// The component's own values and the node's state, such as the value of an input, stay in place.
+  /// If this element is reactivated instead, such as when moved with a global key,
+  /// its dependency on the inherited params makes it render again.
+  @override
+  void deactivate() {
+    if (_mergedValues case final merged?) {
+      final ownClasses = {...?_splitClasses(component.classes)};
+      final ownStyles = component.styles?.properties ?? const {};
+      final ownAttributes = component.attributes ?? const {};
+      (renderObject as RenderElement).release(
+        id: component.id == null ? merged.id : null,
+        classes: merged.classes.where((c) => !ownClasses.contains(c)),
+        styles: merged.styles.keys.where((name) => !ownStyles.containsKey(name)),
+        attributes: merged.attributes.keys.where((name) => !ownAttributes.containsKey(name)),
+      );
+      _mergedValues = null;
+    }
+    super.deactivate();
+  }
+
+  @override
+  void unmount() {
+    // The node can stay in place, so remove the component's listeners as well.
+    (renderObject as RenderElement).release();
+    super.unmount();
+  }
+
   @override
   void updateRenderObject(RenderElement renderObject) {
     var id = component.id;
@@ -84,12 +120,14 @@ class DomElement extends DomRenderObjectElement {
     var styles = component.styles?.properties;
     var attributes = component.attributes;
     var events = component.events;
+    _mergedValues = null;
 
     if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
       final classesSet = {...?_splitClasses(classes)};
       styles = Map.of(styles ?? {});
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
+      var applied = false;
 
       for (final param in inheritedDomParams.reversed) {
         if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
@@ -99,6 +137,7 @@ class DomElement extends DomRenderObjectElement {
           continue;
         }
 
+        applied = true;
         id ??= param.id;
 
         if (param.classes case final paramClasses?) {
@@ -125,6 +164,9 @@ class DomElement extends DomRenderObjectElement {
       }
 
       classes = classesSet.join(' ');
+      if (applied) {
+        _mergedValues = (id: id, classes: classesSet, styles: styles, attributes: attributes);
+      }
     }
 
     renderObject.update(id, classes, styles, attributes, events);
@@ -202,18 +244,6 @@ final class ApplyTarget {
   final String? tag;
   final String? id;
   final Set<String>? classes;
-
-  String get query => [
-    if (onlyChildren) '> ',
-    if (tag == null && id == null && classes == null)
-      '*'
-    else ...[
-      ?tag,
-      if (id != null) '#$id',
-      if (classes case final classes?)
-        for (final c in classes) '.$c',
-    ],
-  ].join();
 }
 
 @protected

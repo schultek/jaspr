@@ -66,6 +66,8 @@
     Use `Document.body` instead.
 - `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
   Access a render object's child list through `MarkupRenderObject.children`.
+- Added a `release` method to `RenderElement`,
+  which implementations must now provide.
 
 ### Behavior changes
 
@@ -76,6 +78,10 @@
   `@client`, `@encoder`, `@decoder`, and `@Import` annotations to
   indicate where they are allowed to be used.
 - Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+- DOM nodes that stay in place after their component is removed,
+  such as in a removed `ChildSlot` or after `detachRootComponent()`,
+  no longer keep the event listeners and inherited `Component.apply` values the component added.
+- Removed children are now deactivated before new children in the same list are mounted.
 - `jaspr dev` and `jaspr build` now automatically select the next available port
   when default ports are already in use, and validate explicitly specified `--port` values.
 - Improved CLI error handling for uncaught asynchronous errors during command execution.
@@ -84,6 +90,8 @@
 
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
+- Fixed elements moved into a `Component.apply` with a global key
+  not receiving its inherited values.
 - Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.
 - Fixed the server output of a client component that
   renders `<head>` when the document has no `<body>`.
