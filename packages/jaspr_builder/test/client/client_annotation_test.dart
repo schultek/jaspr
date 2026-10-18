@@ -8,6 +8,7 @@ import 'sources/bundle.dart';
 import 'sources/client_basic.dart';
 import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
+import 'sources/client_model_enum.dart';
 import 'sources/client_model_extension.dart';
 import 'sources/client_nullable_models.dart';
 import 'sources/client_with_server_components.dart';
@@ -38,6 +39,17 @@ void main() {
           ClientModuleBuilder(BuilderOptions({})),
           clientModelClassSources,
           outputs: {...clientModelClassModuleOutputs},
+          readerWriter: reader,
+        );
+      });
+    });
+
+    group('on component using model enum', () {
+      test('generates json module', () async {
+        await testBuilder(
+          ClientModuleBuilder(BuilderOptions({})),
+          clientModelEnumSources,
+          outputs: {...clientModelEnumModuleOutputs},
           readerWriter: reader,
         );
       });

@@ -11,6 +11,7 @@
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Added an `ApplyTarget target` parameter to `Component.apply` (previously `Component.wrapElement`)
   to target specific elements instead of only direct children.
+- `@decoder` and `@encoder` can now be used on enums.
 
 ### Breaking changes
 
