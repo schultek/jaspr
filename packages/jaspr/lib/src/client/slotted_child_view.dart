@@ -226,6 +226,8 @@ class SlottedChildViewElement extends DomRenderObjectElement {
         if (slotRanges[current] case final endNode?) {
           if (current == renderObject.lastChildNode) break;
           current = endNode;
+          // The end of this slot can be the start of an adjacent slot.
+          if (slotRanges.containsKey(current)) continue;
           if (current == renderObject.lastChildNode) break;
           current = current.nextSibling;
           continue;
@@ -497,18 +499,24 @@ class ChildSlotRenderObject extends DomRenderObject
     beforeStart = toHydrate.firstOrNull?.previousSibling;
   }
 
-  factory ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end) {
-    final nodes = <web.Node>[];
+  /// Creates a slot that owns the nodes between [start] and [end].
+  ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end) : node = start.parentElement! {
+    this.parent = parent;
+    toHydrate = [];
     web.Node? curr = start.nextSibling;
     while (curr != null && curr != end) {
-      nodes.add(curr);
+      toHydrate.add(curr);
       curr = curr.nextSibling;
     }
-    return ChildSlotRenderObject(start.parentElement!, parent, nodes);
+    // Place the children after the start node, even if the slot is empty.
+    beforeStart = start;
   }
 
   @override
   final web.Element node;
+
+  /// The node after which the children of this slot are placed,
+  /// or `null` to place them at the start of [node].
   late final web.Node? beforeStart;
 
   @override
