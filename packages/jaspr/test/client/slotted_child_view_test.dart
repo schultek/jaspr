@@ -151,6 +151,46 @@ void main() {
       expect(clicked, 1);
     });
 
+    testClient('removes the listeners of a replaced slot from the nodes left in place', (tester) async {
+      window.document.body!.innerHTML = '<!--start--><button>Click</button><!--end-->'.toJS;
+      final start = window.document.body!.firstChild!;
+      final end = window.document.body!.lastChild!;
+      var slotKey = 0;
+      late void Function(void Function() cb) setState;
+      var clicks = 0;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return SlottedChildView(
+              slots: [
+                .between(
+                  key: ValueKey(slotKey),
+                  start: start,
+                  end: end,
+                  child: button(events: {'click': (_) => clicks++}, [.text('Click')]),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      btn.click();
+      expect(clicks, 1);
+
+      // The new slot's child hydrates the same button,
+      // so the listener of the replaced slot's child must be removed.
+      setState(() => slotKey++);
+      await pumpEventQueue();
+      expect(window.document.querySelector('button'), equals(btn));
+
+      btn.click();
+      expect(clicks, 2);
+    });
+
     testClient('applies direct child params to root range slot', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Click me</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;

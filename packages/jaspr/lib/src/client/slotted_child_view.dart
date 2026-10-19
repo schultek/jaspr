@@ -394,18 +394,6 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     }
     _appliedParams.clear();
     super.unmount();
-    _clearEventListeners(this);
-  }
-
-  static void _clearEventListeners(Element e) {
-    if (e case RenderObjectElement(renderObject: final DomRenderElement r)) {
-      r.events?.forEach((type, binding) {
-        binding.clear();
-      });
-      r.events = null;
-    }
-
-    e.visitChildren(_clearEventListeners);
   }
 }
 
