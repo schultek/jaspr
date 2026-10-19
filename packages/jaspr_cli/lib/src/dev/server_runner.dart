@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:vm_service/vm_service.dart' as vm;
@@ -20,6 +19,7 @@ class ServerRunner {
 
   final Process process;
   final Logger logger;
+  ProcessWatcher? _watcher;
 
   String? _vmServiceUri;
   String? _devToolsUri;
@@ -63,9 +63,7 @@ class ServerRunner {
     }
 
     final args = [
-      // Use direct `dart` entry point for now due to
-      // https://github.com/dart-lang/sdk/issues/61373
-      // 'run',
+      'run',
       if (!release) ...['--enable-vm-service', '--enable-asserts'] else '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
       for (final define in userDefines.entries) '-D${define.key}=${define.value}',
@@ -121,67 +119,57 @@ class ServerRunner {
 
     var serverClosed = false;
 
-    final errSub = process.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen((String line) {
-      if (runner._stopped || BaseCommand.isShuttingDown) return;
-      logger.write(line, tag: Tag.server, level: Level.error, progress: ProgressState.completed);
-    });
-
-    final outSub = process.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((String log) {
-      if (runner._devToolsUri == null) {
-        final match = RegExp(r'The Dart DevTools debugger and profiler is available at:\s*(http://[^\s]+)')
-            .firstMatch(log);
-        if (match != null) {
-          runner._devToolsUri = match.group(1)!;
+    runner._watcher = ProcessWatcher(
+      process,
+      logger: logger,
+      tag: Tag.server,
+      onLine: (log) {
+        if (runner._devToolsUri == null) {
+          final match = RegExp(r'The Dart DevTools debugger and profiler is available at:\s*(http://[^\s]+)')
+              .firstMatch(log);
+          if (match != null) {
+            runner._devToolsUri = match.group(1)!;
+          }
         }
-      }
-      if (runner._vmServiceUri == null) {
-        final match = RegExp(r'The Dart VM service is listening on (http://[a-zA-Z0-9:/_=\-\.\?]+)').firstMatch(log);
-        if (match != null) {
-          runner._vmServiceUri = match.group(1)!;
-          connectToVmService();
+        if (runner._vmServiceUri == null) {
+          final match = RegExp(r'The Dart VM service is listening on (http://[a-zA-Z0-9:/_=\-\.\?]+)').firstMatch(log);
+          if (match != null) {
+            runner._vmServiceUri = match.group(1)!;
+            connectToVmService();
+          }
         }
-      }
-      final level =
-          (log.startsWith('The Dart VM service is listening') ||
-              log.startsWith('The Dart DevTools debugger and profiler is available'))
-          ? Level.verbose
-          : Level.info;
-      logger.write(log, tag: Tag.server, level: level);
-    });
-
-    process.exitCode.then((int code) {
-      serverClosed = true;
-      runner._vmService = null;
-      errSub.cancel();
-      outSub.cancel();
-      // Ignore normal exit (0) and termination via interruption signals:
-      // - 130 / -2: SIGINT (Ctrl+C). 130 is 128 + 2 (POSIX shell convention); -2 is Dart's negative signal code.
-      // - 143 / -15: SIGTERM. 143 is 128 + 15; -15 is Dart's negative signal code.
-      if (!runner._stopped &&
-          !BaseCommand.isShuttingDown &&
-          code != 0 &&
-          code != 130 &&
-          code != -2 &&
-          code != 143 &&
-          code != -15) {
-        logger.write(
-          'Server stopped unexpectedly. There is probably more output above.',
-          tag: Tag.cli,
-          level: Level.error,
-          progress: ProgressState.completed,
-        );
-      }
-      if (!runner._doneCompleter.isCompleted) {
-        runner._doneCompleter.complete(code);
-      }
-    });
+        final level =
+            (log.startsWith('The Dart VM service is listening') ||
+                log.startsWith('The Dart DevTools debugger and profiler is available'))
+            ? Level.verbose
+            : Level.info;
+        logger.write(log, tag: Tag.server, level: level);
+      },
+      onExit: (code) {
+        serverClosed = true;
+        runner._vmService = null;
+        if (!runner._stopped &&
+            !BaseCommand.isShuttingDown &&
+            ProcessWatcher.isUnexpectedExit(code)) {
+          logger.write(
+            'Server stopped unexpectedly. There is probably more output above.',
+            tag: Tag.cli,
+            level: Level.error,
+            progress: ProgressState.completed,
+          );
+        }
+        if (!runner._doneCompleter.isCompleted) {
+          runner._doneCompleter.complete(code);
+        }
+      },
+    );
 
     // Wait until server is reachable.
     var n = 0;
     final sw = Stopwatch()..start();
 
     while (true) {
-      await Future<void>.delayed(Duration(milliseconds: 1000 + (n * 100)));
+      await Future.pause(Duration(milliseconds: 1000 + (n * 100)));
       try {
         final socket = await Socket.connect('localhost', port);
         socket.close();
@@ -230,9 +218,7 @@ class ServerRunner {
     final process = await ProcessRunner.instance.start(
       dartExecutable,
       [
-        // Use direct `dart` entry point for now due to
-        // https://github.com/dart-lang/sdk/issues/61373
-        // 'run',
+        'run',
         '--enable-asserts',
         '-Djaspr.flags.release=true',
         '-Djaspr.flags.generate=true',
@@ -250,32 +236,30 @@ class ServerRunner {
       runner.stop();
     });
 
-    final errSub = process.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen((String line) {
-      logger.write(line, tag: Tag.server, level: Level.error);
-    });
-    final outSub = process.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((String log) {
-      logger.write(log, tag: Tag.server);
-    });
-
-    process.exitCode.then((int code) {
-      errSub.cancel();
-      outSub.cancel();
-      if (!runner._stopped &&
-          !BaseCommand.isShuttingDown &&
-          code != 0 &&
-          code != 130 &&
-          code != -2 &&
-          code != 143 &&
-          code != -15) {
-        logger.write('Server process stopped unexpectedly.', level: Level.error, progress: ProgressState.completed);
-      }
-      if (!serverStartedCompleter.isCompleted) {
-        serverStartedCompleter.completeError(StateError('Server process failed unexpectedly.'));
-      }
-      if (!runner._doneCompleter.isCompleted) {
-        runner._doneCompleter.complete(code);
-      }
-    });
+    runner._watcher = ProcessWatcher(
+      process,
+      logger: logger,
+      tag: Tag.server,
+      onStderr: (line) {
+        logger.write(line, tag: Tag.server, level: Level.error);
+      },
+      onLine: (log) {
+        logger.write(log, tag: Tag.server);
+      },
+      onExit: (code) {
+        if (!runner._stopped &&
+            !BaseCommand.isShuttingDown &&
+            ProcessWatcher.isUnexpectedExit(code)) {
+          logger.write('Server process stopped unexpectedly.', level: Level.error, progress: ProgressState.completed);
+        }
+        if (!serverStartedCompleter.isCompleted) {
+          serverStartedCompleter.completeError(StateError('Server process failed unexpectedly.'));
+        }
+        if (!runner._doneCompleter.isCompleted) {
+          runner._doneCompleter.complete(code);
+        }
+      },
+    );
 
     await serverStartedCompleter.future;
     logger.write('Server started', tag: Tag.server, progress: ProgressState.completed);
@@ -305,14 +289,9 @@ class ServerRunner {
   Future<void> stop() async {
     if (_stopped) return;
     _stopped = true;
-    logger.write('Stopping server...', level: Level.debug);
     _vmService?.dispose();
     _vmService = null;
-    if (Platform.isWindows) {
-      await killProcessTree(process.pid);
-    } else {
-      process.kill();
-    }
+    await _watcher?.stop(message: 'Stopping server...');
   }
 }
 

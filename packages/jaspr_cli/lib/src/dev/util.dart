@@ -1,9 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:build_daemon/client.dart';
 import 'package:build_daemon/constants.dart';
 import 'package:path/path.dart' as p;
 
+import '../commands/base_command.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
@@ -188,7 +191,7 @@ Future<void> killProcessTree(int pid) async {
   final sw = Stopwatch()..start();
   while (sw.elapsedMilliseconds < 500) {
     if (!_isPidRunning(pid)) return;
-    await Future<void>.delayed(const Duration(milliseconds: 50));
+    await Future.pause(const Duration(milliseconds: 50));
   }
 
   // Force kill if still running
@@ -197,7 +200,7 @@ Future<void> killProcessTree(int pid) async {
   } catch (_) {}
 }
 
-/// Stops any running build daemon in the given working directory and cleans up lock/port files.
+/// Stop any running build daemon in the given [workingDirectory] and clean up lock/port files.
 Future<void> stopDaemon(String workingDirectory, {List<int>? knownPids}) async {
   final pids = <int>{...?knownPids};
 
@@ -234,7 +237,6 @@ void _cleanupDaemonFiles(String workingDirectory) {
     } catch (_) {}
   }
 }
-
 
 /// Returns the port of the daemon asset server.
 int daemonPort(String workingDirectory) {
@@ -296,4 +298,154 @@ int? getIntArg(Map<String, dynamic> args, String name, {bool required = false}) 
   final val = args[name];
   if (val != null && val is! int) throw ArgumentError('$name is not an int');
   return val as int?;
+}
+
+/// Watches a running process, streaming its stdout and stderr to [logger],
+/// and tracking its lifecycle.
+class ProcessWatcher {
+  ProcessWatcher(
+    this.process, {
+    required this.logger,
+    this.tag = Tag.none,
+    this.hide,
+    this.levelFor,
+    this.onLine,
+    this.onStderr,
+    this.progress,
+    this.onExit,
+    bool verbose = true,
+    bool cancelOnExit = true,
+  }) {
+    errSub = process.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen((line) {
+      if (_stopped || BaseCommand.isShuttingDown) return;
+      if (onStderr != null) {
+        onStderr!(line);
+      } else {
+        logger.write(line, tag: tag, level: Level.error, progress: ProgressState.completed);
+      }
+    });
+
+    outSub = process.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((log) {
+      if (!verbose || _stopped || BaseCommand.isShuttingDown) return;
+      if (hide != null && hide!(log)) return;
+      if (onLine != null) {
+        onLine!(log);
+      } else {
+        final level = levelFor?.call(log) ?? Level.info;
+        if (progress != null) {
+          logger.write(log, tag: tag, level: level, progress: progress);
+        } else {
+          logger.write(log, tag: tag, level: level);
+        }
+      }
+    });
+
+    if (onExit != null) {
+      process.exitCode.then((code) async {
+        if (cancelOnExit) {
+          await cancel();
+        }
+        onExit!(code);
+      });
+    }
+  }
+
+  final Process process;
+  final Logger logger;
+  final Tag tag;
+  final bool Function(String)? hide;
+  final Level? Function(String)? levelFor;
+  final void Function(String line)? onLine;
+  final void Function(String line)? onStderr;
+  final ProgressState? progress;
+  final void Function(int exitCode)? onExit;
+
+  late final StreamSubscription<void> errSub;
+  late final StreamSubscription<void> outSub;
+
+  bool _stopped = false;
+  bool get isStopped => _stopped;
+
+  Future<void> cancel() async {
+    await errSub.cancel();
+    await outSub.cancel();
+  }
+
+  Future<void> stop({String? message}) async {
+    if (_stopped) return;
+    _stopped = true;
+    if (message != null) {
+      logger.write(message, level: Level.debug);
+    }
+    await cancel();
+    if (Platform.isWindows) {
+      await killProcessTree(process.pid);
+    } else {
+      process.kill();
+    }
+    await process.exitCode;
+  }
+
+  /// Returns true if [exitCode] indicates an abnormal termination (not 0 and not SIGINT/SIGTERM signals).
+  static bool isUnexpectedExit(int code) {
+    return code != 0 && code != 130 && code != -2 && code != 143 && code != -15;
+  }
+}
+
+/// Runs and watches [process] until completion, streaming stdout and stderr.
+Future<int> watchProcess(
+  String name,
+  Process process, {
+  required Logger logger,
+  Tag tag = Tag.none,
+  String? progress,
+  bool Function(String)? hide,
+  Level? Function(String)? levelFor,
+  void Function(FutureOr<void> Function() fn)? guard,
+  void Function(int exitCode)? onComplete,
+  FutureOr<void> Function(int exitCode)? onFail,
+}) async {
+  if (progress != null) {
+    logger.write(progress, tag: tag, progress: ProgressState.running);
+  }
+
+  int? exitCode;
+  bool wasKilled = false;
+
+  final watcher = ProcessWatcher(
+    process,
+    logger: logger,
+    tag: tag,
+    hide: hide,
+    levelFor: levelFor,
+    progress: progress != null ? ProgressState.running : null,
+  );
+
+  guard?.call(() async {
+    if (exitCode == null) {
+      wasKilled = true;
+      await watcher.stop(message: 'Stopping $name...');
+    }
+  });
+
+  exitCode = await process.exitCode.then<int>((c) => Future.delayed(const Duration(seconds: 1), () => c));
+
+  if (wasKilled) {
+    return exitCode;
+  }
+
+  await Future.pause(const Duration(milliseconds: 300));
+  await watcher.cancel();
+
+  onComplete?.call(exitCode);
+
+  if (exitCode != 0) {
+    if (onFail != null) {
+      await onFail(exitCode);
+    }
+  } else if (progress != null) {
+    logger.complete(true);
+  }
+
+  return exitCode;
 }

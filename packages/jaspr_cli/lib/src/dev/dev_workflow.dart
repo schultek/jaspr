@@ -197,10 +197,10 @@ class DevWorkflow {
     }
 
     const target = 'web';
-    final reloadedSources = <Map<String, dynamic>>[];
+    final reloadedSources = <Map<String, Object>>[];
     var pipeline = const Pipeline();
 
-    // Only provide relevant build results as a broadcast stream
+    // Only provide relevant build results as a broadcast stream.
     final filteredBuildResults = clientRunner.buildResults.asyncMap<BuildResult>((results) {
       if (moduleFormat == 'ddc') {
         reloadedSources.clear();
@@ -262,15 +262,6 @@ class DevWorkflow {
     final BuildResult initialResult;
     try {
       initialResult = await initialBuildCompleter.future;
-      logger.write('Done building web assets.', tag: Tag.builder, progress: ProgressState.completed);
-    } on BuildResult catch (_) {
-      logger.write(
-        'Could not start dev server due to build errors.',
-        tag: Tag.builder,
-        level: Level.error,
-        progress: ProgressState.completed,
-      );
-      return null;
     } catch (_) {
       if (aborted) {
         return null;
@@ -290,6 +281,8 @@ class DevWorkflow {
       );
       return null;
     }
+
+    logger.write('Done building web assets.', tag: Tag.builder, progress: ProgressState.completed);
 
     final css = await CssRunner.watch(
       project: project,

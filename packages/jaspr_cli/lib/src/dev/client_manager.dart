@@ -74,6 +74,7 @@ class ClientConnection {
   final ClientManager manager;
 
   DebugConnection? _debugConnection;
+  vm.VmService? _vmServiceClient;
   StreamSubscription<BuildResult>? _resultSub;
   StreamSubscription<vm.Event>? _stdOutSub;
   StreamSubscription<vm.Event>? _vmServiceSub;
@@ -93,9 +94,13 @@ class ClientConnection {
       final httpUri = debugUri.startsWith('ws') ? 'http${debugUri.substring(2).replaceAll('/ws', '/')}' : debugUri;
       final normalizedHttp = httpUri.endsWith('/') ? httpUri : '$httpUri/';
       devToolsUri = '${normalizedHttp}devtools/?uri=$wsUri';
-      final vmService = await vmServiceConnectUri(debugUri);
+      final vmService = _vmServiceClient = await vmServiceConnectUri(debugUri);
 
-      if (_isDisposed) return;
+      if (_isDisposed) {
+        _vmServiceClient?.dispose();
+        _vmServiceClient = null;
+        return;
+      }
 
       unawaited(
         debugConnection.onDone.then((_) {
@@ -127,7 +132,11 @@ class ClientConnection {
         await vmService.streamListen('Service');
       } catch (_) {}
 
-      if (_isDisposed) return;
+      if (_isDisposed) {
+        _vmServiceClient?.dispose();
+        _vmServiceClient = null;
+        return;
+      }
 
       _stdOutSub = vmService.onStdoutEvent.listen((log) {
         sendEvent('client.log', {'appId': appId, 'log': utf8.decode(base64.decode(log.bytes!))});
@@ -217,7 +226,7 @@ class ClientConnection {
         );
         if (response != null) return response;
       } catch (_) {
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await Future.pause(const Duration(milliseconds: 100));
       }
     }
     return null;
@@ -230,7 +239,7 @@ class ClientConnection {
         final response = await vmService?.callServiceExtension(reassembleMethod);
         if (response != null) return response;
       } catch (_) {
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await Future.pause(const Duration(milliseconds: 100));
       }
     }
     return null;
@@ -244,7 +253,7 @@ class ClientConnection {
         final response = await vmService?.callServiceExtension(reloadMethod, args: args);
         if (response != null) return response;
       } catch (_) {
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await Future.pause(const Duration(milliseconds: 100));
       }
     }
     return null;
@@ -288,6 +297,8 @@ class ClientConnection {
     _stdOutSub?.cancel();
     _resultSub?.cancel();
     _vmServiceSub?.cancel();
+    _vmServiceClient?.dispose();
+    _vmServiceClient = null;
     _debugConnection?.close();
   }
 }

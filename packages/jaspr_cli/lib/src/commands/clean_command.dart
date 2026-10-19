@@ -44,13 +44,9 @@ class CleanCommand extends BaseCommand {
       await ProcessRunner.instance.run(dartExecutable, ['run', 'build_runner', 'clean']);
     }
 
-    final daemonPort = util.getDaemonPort(Directory.current.path)?.toString();
-    final assetPort = util.getAssetServerPort(Directory.current.path)?.toString();
     final pids = await findRunawayProcesses([
-      // server, vm, proxy, flutter, daemon
+      // server, vm, proxy, flutter
       defaultServePort, '8181', serverProxyPort, flutterProxyPort,
-      ?daemonPort,
-      ?assetPort,
     ]);
 
     if (pids.isNotEmpty) {

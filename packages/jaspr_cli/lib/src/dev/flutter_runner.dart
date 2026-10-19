@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-import '../commands/base_command.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import 'util.dart';
@@ -12,15 +11,12 @@ import 'util.dart';
 class FlutterRunner {
   FlutterRunner._(
     this.process,
-    this.logger, {
-    this.errSub,
-    this.outSub,
-  });
+    this.logger,
+  );
 
   final Process process;
   final Logger logger;
-  final StreamSubscription<void>? errSub;
-  final StreamSubscription<void>? outSub;
+  ProcessWatcher? _watcher;
   final _doneCompleter = Completer<int>();
 
   Future<int> get done => _doneCompleter.future;
@@ -28,13 +24,11 @@ class FlutterRunner {
   bool _stopped = false;
 
   static Map<String, String> getDartDefines(bool useWasm, bool release) {
-    final flutterDefines = <String, String>{};
-
-    flutterDefines['dart.vm.product'] = '$release';
-    flutterDefines['FLUTTER_WEB_USE_SKWASM'] = '$useWasm';
-    flutterDefines['FLUTTER_WEB_USE_SKIA'] = '${!useWasm}';
-
-    return flutterDefines;
+    return <String, String>{
+      'dart.vm.product': '$release',
+      'FLUTTER_WEB_USE_SKWASM': '$useWasm',
+      'FLUTTER_WEB_USE_SKIA': '${!useWasm}',
+    };
   }
 
   static Future<FlutterRunner> startDev({
@@ -62,35 +56,24 @@ class FlutterRunner {
       workingDirectory: Directory.current.path,
     );
 
-    var stopped = false;
-
-    final errSub = flutterProcess.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen((line) {
-      if (BaseCommand.isShuttingDown || stopped) return;
-      logger.write(line, tag: Tag.flutter, level: Level.error, progress: ProgressState.completed);
-    });
-
-    final outSub = flutterProcess.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((log) {
-      if (!verbose || BaseCommand.isShuttingDown || stopped) return;
-      logger.write(log, tag: Tag.flutter, level: Level.info);
-    });
-
     final runner = FlutterRunner._(
       flutterProcess,
       logger,
-      errSub: errSub,
-      outSub: outSub,
     );
 
-    flutterProcess.exitCode.then((code) {
-      errSub.cancel();
-      outSub.cancel();
-      if (!runner._doneCompleter.isCompleted) {
-        runner._doneCompleter.complete(code);
-      }
-    });
+    runner._watcher = ProcessWatcher(
+      flutterProcess,
+      logger: logger,
+      tag: Tag.flutter,
+      verbose: verbose,
+      onExit: (code) {
+        if (!runner._doneCompleter.isCompleted) {
+          runner._doneCompleter.complete(code);
+        }
+      },
+    );
 
     guard?.call(() {
-      stopped = true;
       return runner.stop();
     });
 
@@ -120,40 +103,20 @@ class FlutterRunner {
       workingDirectory: Directory.current.path,
     );
 
-    final errSub = flutterProcess.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen((line) {
-      logger.write(line, tag: Tag.flutter, level: Level.error, progress: ProgressState.completed);
-    });
-
-    final outSub = flutterProcess.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((log) {
-      logger.write(log, tag: Tag.flutter, level: Level.info);
-    });
-
-    int? exitCode;
-    bool wasKilled = false;
-    guard?.call(() async {
-      if (exitCode == null) {
-        logger.write('Terminating flutter build...', level: Level.debug);
-        flutterProcess.kill();
-        wasKilled = true;
-        await errSub.cancel();
-        await outSub.cancel();
-        await flutterProcess.exitCode;
-      }
-    });
-
-    exitCode = await flutterProcess.exitCode.then<int>((c) => Future.delayed(const Duration(seconds: 1), () => c));
-
-    if (wasKilled) {
-      return exitCode;
-    }
-
-    await errSub.cancel();
-    await outSub.cancel();
-
-    await copyToBuildDir(
-      './build/flutter',
-      ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'],
+    final exitCode = await watchProcess(
+      'flutter build',
+      flutterProcess,
+      logger: logger,
+      tag: Tag.flutter,
+      guard: guard,
     );
+
+    if (exitCode == 0) {
+      await copyToBuildDir(
+        './build/flutter',
+        ['version.json', 'flutter_service_worker.js', 'flutter_bootstrap.js', 'assets/', 'canvaskit/'],
+      );
+    }
 
     return exitCode;
   }
@@ -172,15 +135,7 @@ class FlutterRunner {
     if (!_doneCompleter.isCompleted) {
       _doneCompleter.complete(0);
     }
-    await errSub?.cancel();
-    await outSub?.cancel();
-    logger.write('Terminating flutter run...', level: Level.debug);
-    if (Platform.isWindows) {
-      await killProcessTree(process.pid);
-    } else {
-      process.kill();
-    }
-    await process.exitCode;
+    await _watcher?.stop(message: 'Stopping flutter run...');
   }
 
   static Future<void> _ensureTarget() async {
@@ -191,7 +146,7 @@ class FlutterRunner {
     await flutterTarget.writeAsString('void main() {}');
   }
 
-  static final Map<String, Object?> flutterInfo = (() {
+  static final Map<String, Object?> _flutterInfo = (() {
     final result = ProcessRunner.instance.runSync(
       'flutter',
       ['doctor', '--version', '--machine'],
@@ -219,7 +174,7 @@ class FlutterRunner {
   })();
 
   static final String webSdkDir = (() {
-    final webSdkPath = p.join(flutterInfo['flutterRoot'] as String, 'bin', 'cache', 'flutter_web_sdk');
+    final webSdkPath = p.join(_flutterInfo['flutterRoot'] as String, 'bin', 'cache', 'flutter_web_sdk');
     if (!Directory(webSdkPath).existsSync()) {
       ProcessRunner.instance.runSync('flutter', ['precache', '--web'], runInShell: true);
     }

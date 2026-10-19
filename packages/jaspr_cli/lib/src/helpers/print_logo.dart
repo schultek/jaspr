@@ -113,7 +113,7 @@ extension PrintLogo on BaseCommand {
     if (showLogo) {
       final mascotLines = <String>[];
 
-      // Combine mascot rows vertically into half-blocks
+      // Combine mascot rows vertically into half-blocks.
       for (int y = 0; y < mascotGrid.length; y += 2) {
         final line = StringBuffer();
         for (int x = 0; x < mascotGrid[y].length; x++) {

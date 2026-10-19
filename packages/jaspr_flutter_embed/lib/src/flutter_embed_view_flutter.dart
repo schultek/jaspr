@@ -67,11 +67,12 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
       if (target == null) return;
 
       if (viewId case final oldId?) {
-        await removeView(oldId);
         viewId = null;
+        await removeView(oldId);
+        if (!mounted) return;
       }
 
-      viewId = await addView(
+      final newViewId = await addView(
         target,
         component.constraints,
         flt.StatefulBuilder(
@@ -85,6 +86,13 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
           },
         ),
       );
+
+      if (!mounted) {
+        removeView(newViewId);
+        return;
+      }
+
+      viewId = newViewId;
     });
   }
 

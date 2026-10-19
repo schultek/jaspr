@@ -23,7 +23,7 @@ void main() {
     test('getDaemonPort and getAssetServerPort parse port files correctly', () {
       final tempDir = Directory.systemTemp.createTempSync('daemon_test_');
       try {
-        final ws = Directory(daemonWorkspace(tempDir.path))..createSync(recursive: true);
+        Directory(daemonWorkspace(tempDir.path)).createSync(recursive: true);
         File(portFilePath(tempDir.path)).writeAsStringSync('54321\nsome_token\n');
         File(assetServerPortFilePath(tempDir.path)).writeAsStringSync('54322\n');
 
@@ -37,7 +37,7 @@ void main() {
     test('stopDaemon cleans up daemon files', () async {
       final tempDir = Directory.systemTemp.createTempSync('daemon_clean_test_');
       try {
-        final ws = Directory(daemonWorkspace(tempDir.path))..createSync(recursive: true);
+        Directory(daemonWorkspace(tempDir.path)).createSync(recursive: true);
         final portFile = File(portFilePath(tempDir.path))..writeAsStringSync('59999\ntoken');
         final assetFile = File(assetServerPortFilePath(tempDir.path))..writeAsStringSync('59998');
         final lockFile = File(lockFilePath(tempDir.path))..writeAsStringSync('');
