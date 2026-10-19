@@ -183,6 +183,9 @@ class TestRenderObject implements RawableRenderObject {
     children.remove(child);
     child.parent = null;
   }
+
+  @override
+  void dispose() {}
 }
 
 class TestRenderElement extends TestRenderObject implements RenderElement {
@@ -221,7 +224,6 @@ class TestRenderElement extends TestRenderObject implements RenderElement {
     }
     this.styles = _without(this.styles, styles);
     this.attributes = _without(this.attributes, attributes);
-    events = null;
   }
 
   static Map<String, String>? _without(Map<String, String>? values, Iterable<String>? names) {

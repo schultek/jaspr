@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:js_interop';
 
+import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../dom/type_checks.dart';
@@ -39,6 +40,10 @@ abstract class DomRenderObject implements RenderObject {
   web.Node? retakeNode(bool Function(web.Node node) visitNode);
 
   void finalize();
+
+  @override
+  @mustCallSuper
+  void dispose() {}
 }
 
 class DomRenderElement extends DomRenderObject
@@ -202,9 +207,15 @@ class DomRenderElement extends DomRenderObject
   @override
   void release({String? id, Iterable<String>? classes, Iterable<String>? styles, Iterable<String>? attributes}) {
     (node as web.HTMLElement).removeValues(id: id, classes: classes, styles: styles, attributes: attributes);
-    _clearEvents();
   }
 
+  @override
+  void dispose() {
+    _clearEvents();
+    super.dispose();
+  }
+
+  /// Removes all event listeners this render object added to its [node].
   void _clearEvents() {
     if (events case final existingEvents?) {
       for (final binding in existingEvents.values) {

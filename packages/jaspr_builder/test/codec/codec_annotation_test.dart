@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 
 import 'sources/bundle.dart';
 import 'sources/model_class.dart';
+import 'sources/model_enum.dart';
 import 'sources/model_extension.dart';
 
 void main() {
@@ -28,6 +29,17 @@ void main() {
       });
     });
 
+    group('on enum', () {
+      test('generates json module', () async {
+        await testBuilder(
+          CodecModuleBuilder(BuilderOptions({})),
+          modelEnumSources,
+          outputs: modelEnumOutputs,
+          readerWriter: reader,
+        );
+      });
+    });
+
     group('on extension type', () {
       test('generates json module', () async {
         await testBuilder(
@@ -42,7 +54,7 @@ void main() {
     test('generates bundle', () async {
       await testBuilder(
         CodecBundleBuilder(BuilderOptions({})),
-        {...modelClassOutputs, ...modelExtensionOutputs},
+        {...modelClassOutputs, ...modelEnumOutputs, ...modelExtensionOutputs},
         outputs: codecBundleOutputs,
         readerWriter: reader,
       );

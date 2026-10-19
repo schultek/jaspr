@@ -44,6 +44,9 @@ abstract final class MarkupRenderObject extends ChildNode implements RawableRend
     child.parent = null;
   }
 
+  @override
+  void dispose() {}
+
   String renderToHtml() {
     return _renderAndFormat().$1;
   }

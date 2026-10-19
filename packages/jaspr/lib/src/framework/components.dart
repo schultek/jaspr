@@ -81,12 +81,13 @@ class DomElement extends DomRenderObjectElement {
   /// or `null` if no inherited params applied.
   ({String? id, Set<String> classes, Map<String, String> styles, Map<String, String> attributes})? _mergedValues;
 
-  /// Removes the values that inherited params added to the node, as well as the listeners,
+  /// Removes the values that inherited params added to the node,
   /// since the node can stay in place, such as when this element is in a removed slot
   /// of a `SlottedChildView`, or the root component is detached.
   ///
   /// Whatever takes over the node next would otherwise treat those values as original values.
   /// The component's own values and the node's state, such as the value of an input, stay in place.
+  /// The listeners are removed when the render object is disposed, once this element unmounts.
   /// If this element is reactivated instead, such as when moved with a global key,
   /// its dependency on the inherited params makes it render again.
   @override
@@ -104,13 +105,6 @@ class DomElement extends DomRenderObjectElement {
       _mergedValues = null;
     }
     super.deactivate();
-  }
-
-  @override
-  void unmount() {
-    // The node can stay in place, so remove the component's listeners as well.
-    (renderObject as RenderElement).release();
-    super.unmount();
   }
 
   @override

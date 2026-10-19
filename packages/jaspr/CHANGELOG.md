@@ -11,6 +11,7 @@
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Added an `ApplyTarget target` parameter to `Component.apply` (previously `Component.wrapElement`)
   to target specific elements instead of only direct children.
+- `@decoder` and `@encoder` can now be used on enums.
 
 ### Breaking changes
 
@@ -23,6 +24,11 @@
   and `MarkupRenderObject` is now itself a `ChildNode` in
   at most one child list, replacing `ChildNodeData`.
 - Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
+- Added a `dispose()` method to the `RenderObject` interface,
+  which is called once a render object is no longer used,
+  such as when its element unmounts.
+  Custom `RenderObject` implementations must implement it to release the resources they hold,
+  such as event listeners, or leave its body empty if they hold none.
 - The following classes can no longer be extended,
   but can still be implemented:
 
@@ -80,7 +86,7 @@
 - Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
 - DOM nodes that stay in place after their component is removed,
   such as in a removed `ChildSlot` or after `detachRootComponent()`,
-  no longer keep the event listeners and inherited `Component.apply` values the component added.
+  no longer keep the inherited `Component.apply` values the component added.
 - Removed children are now deactivated before new children in the same list are mounted.
 - `jaspr dev` and `jaspr build` now automatically select the next available port
   when default ports are already in use, and validate explicitly specified `--port` values.
@@ -88,6 +94,8 @@
 
 ### Bug fixes
 
+- Fixed DOM nodes sometimes staying in place after their component is removed,
+  keeping the component's event listeners, which could make handlers fire more than once.
 - Fixed style generation in `standalone` mode when
   importing web libraries like `package:web` or `dart:js_interop`.
 - Fixed elements moved into a `Component.apply` with a global key

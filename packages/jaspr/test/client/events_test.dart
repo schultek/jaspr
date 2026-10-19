@@ -111,7 +111,7 @@ void main() {
         ),
       );
 
-      final btn = window.document.querySelector('button')!;
+      final btn = tester.findNode<HTMLElement>(find.tag('button'))!;
       void dispatchEvents() {
         btn.dispatchEvent(Event('own'));
         btn.dispatchEvent(Event('applied'));
