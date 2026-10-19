@@ -148,9 +148,7 @@ class ServerRunner {
       onExit: (code) {
         serverClosed = true;
         runner._vmService = null;
-        if (!runner._stopped &&
-            !BaseCommand.isShuttingDown &&
-            ProcessWatcher.isUnexpectedExit(code)) {
+        if (!runner._stopped && !BaseCommand.isShuttingDown && ProcessWatcher.isUnexpectedExit(code)) {
           logger.write(
             'Server stopped unexpectedly. There is probably more output above.',
             tag: Tag.cli,
@@ -247,9 +245,7 @@ class ServerRunner {
         logger.write(log, tag: Tag.server);
       },
       onExit: (code) {
-        if (!runner._stopped &&
-            !BaseCommand.isShuttingDown &&
-            ProcessWatcher.isUnexpectedExit(code)) {
+        if (!runner._stopped && !BaseCommand.isShuttingDown && ProcessWatcher.isUnexpectedExit(code)) {
           logger.write('Server process stopped unexpectedly.', level: Level.error, progress: ProgressState.completed);
         }
         if (!serverStartedCompleter.isCompleted) {
