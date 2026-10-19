@@ -109,6 +109,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   }
 
   @override
+  @protected
   void scheduleFrame(VoidCallback frameCallback) {
     throw UnsupportedError('Scheduling a frame is not supported on the server, and should never happen.');
   }

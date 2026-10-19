@@ -1,6 +1,7 @@
 import 'package:universal_web/web.dart' as web;
 
 import '../../../client.dart';
+import '../../client/dom_render_object.dart';
 import '../../client/utils.dart';
 import '../../dom/type_checks.dart';
 

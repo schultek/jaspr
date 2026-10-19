@@ -240,6 +240,7 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
     if (_dirtyRender) markNeedsBuild();
   }
 
+  @internal
   @protected
   DomParamsResolver? get inheritedDomResolver {
     if (_inheritedDomElement case final inheritedDomElement?) {
@@ -249,18 +250,13 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
     return null;
   }
 
-  List<ApplyParams>? get inheritedDomParams {
-    final target = _renderObject;
-    if (target != null) {
-      return inheritedDomParamsFor(target);
-    }
-    return null;
-  }
-
+  @internal
+  @protected
   List<ApplyParams>? inheritedDomParamsFor(RenderObject target) {
     return inheritedDomResolver?.call(target);
   }
 
+  @internal
   @protected
   Component wrapWithInheritedDomComponent({
     required DomParamsResolver getParams,

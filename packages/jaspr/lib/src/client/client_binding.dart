@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'dart:js_interop_unsafe';
 
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
@@ -101,6 +102,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   @override
+  @protected
   void scheduleFrame(VoidCallback frameCallback) {
     // We want the build to trigger asynchronously (to batch updates), but as soon as possible.
     // Microtasks are run before other tasks or events.
@@ -108,6 +110,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   @override
+  @internal
   void completeInitialFrame() {
     (rootElement!.renderObject as DomRenderObject).finalize();
     super.completeInitialFrame();

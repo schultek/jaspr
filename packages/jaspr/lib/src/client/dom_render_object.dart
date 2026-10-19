@@ -19,7 +19,9 @@ abstract class DomRenderObject implements RenderObject {
   @override
   DomRenderObject? parent;
 
+  @internal
   DomRenderObject? previousSibling;
+  @internal
   DomRenderObject? nextSibling;
 
   @override
@@ -37,8 +39,10 @@ abstract class DomRenderObject implements RenderObject {
     return DomRenderFragment(this);
   }
 
+  @internal
   web.Node? retakeNode(bool Function(web.Node node) visitNode);
 
+  @internal
   void finalize();
 
   @override
