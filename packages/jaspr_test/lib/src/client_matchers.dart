@@ -8,5 +8,6 @@ import '../jaspr_test.dart';
 Matcher hasOuterHtml(String outerHtml) {
   return isA<web.HTMLElement>()
       .having((e) => e.instanceOfString('HTMLElement'), 'instanceOf(HTMLElement)', isTrue)
-      .having((e) => e.outerHTML, 'outerHTML', outerHtml);
+      // `outerHTML` is typed as `JSAny`, which only equals a Dart `String` when compiled to JS, not to Wasm.
+      .having((e) => (e.outerHTML as JSString).toDart, 'outerHTML', outerHtml);
 }
