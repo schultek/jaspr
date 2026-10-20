@@ -76,9 +76,6 @@
     previously exported by `package:jaspr/client.dart`.
   - `DomRenderObject.previousSibling`, `DomRenderObject.nextSibling`,
     `DomRenderObject.retakeNode`, and `DomRenderObject.finalize`.
-  - `DomParamsResolver`, previously exported by `package:jaspr/jaspr.dart`.
-  - The `inheritedDomParamsFor`, `inheritedDomResolver`, `inheritedDomParams`
-    and `wrapWithInheritedDomComponent` members of `DomElement`.
   - `SchedulerBinding.scheduleBuild` and `SchedulerBinding.completeInitialFrame`,
     including the `completeInitialFrame` override in `ClientAppBinding`.
 - `SchedulerBinding.scheduleFrame` is now reserved for binding implementations.
