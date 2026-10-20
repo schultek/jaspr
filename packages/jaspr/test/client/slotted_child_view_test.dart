@@ -356,6 +356,61 @@ void main() {
         expect(window.document.querySelector('main'), equals(mainElement));
         expect(mainElement.textContent, 'Updated');
       });
+
+      testClient('resolves a new query slot for $query using values changed in the same build', (tester) async {
+        window.document.body!.innerHTML = '<section><main>Fallback</main></section>'.toJS;
+        final mainElement = window.document.querySelector('main')! as HTMLElement;
+        var enabled = false;
+        var clicks = 0;
+        late void Function(void Function() cb) setState;
+
+        tester.pumpComponent(
+          StatefulBuilder(
+            builder: (context, set) {
+              setState = set;
+              return .apply(
+                target: const .descendantWith(tag: 'main'),
+                id: enabled ? 'mount-target' : null,
+                classes: enabled ? 'mount-target' : null,
+                attributes: enabled ? const {'data-target': 'true'} : null,
+                events: enabled ? {'click': (_) => clicks++} : null,
+                child: SlottedChildView(
+                  slots: [
+                    if (enabled) .fromQuery(query, child: span([.text('Hydrated')])),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+
+        expect(window.document.querySelector(query), isNull);
+        expect(mainElement.textContent, 'Fallback');
+
+        // Add the matching values and the slot together.
+        // The values must be applied before the slot
+        // resolves its query and mounts its child.
+        setState(() => enabled = true);
+        await pumpEventQueue();
+
+        expect(window.document.querySelector(query), equals(mainElement));
+        expect(mainElement.textContent, 'Hydrated');
+
+        // The view applies the values again once its slots are built,
+        // which must not leave a second listener behind.
+        mainElement.click();
+        expect(clicks, 1);
+
+        // Removing the values cleans up after both times they were applied.
+        setState(() => enabled = false);
+        await pumpEventQueue();
+
+        expect(mainElement.hasAttribute('id'), isFalse);
+        expect(mainElement.hasAttribute('class'), isFalse);
+        expect(mainElement.hasAttribute('data-target'), isFalse);
+        mainElement.click();
+        expect(clicks, 1);
+      });
     }
 
     testClient('keeps the state of form elements in a removed slot', (tester) async {
@@ -651,6 +706,51 @@ void main() {
 
       tester.binding.detachRootComponent();
       expect(mainElement.hasAttribute('class'), isFalse);
+    });
+
+    testClient('resolves a new query slot in a nested view using values changed in the same build', (tester) async {
+      window.document.body!.innerHTML = '<!--start--><section><main>Fallback</main></section><!--end-->'.toJS;
+      final start = window.document.body!.firstChild!;
+      final end = window.document.body!.lastChild!;
+      final mainElement = window.document.querySelector('main')!;
+      var enabled = false;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: const .descendantWith(tag: 'main'),
+              classes: enabled ? 'mount-target' : null,
+              child: SlottedChildView(
+                slots: [
+                  .between(
+                    start: start,
+                    end: end,
+                    child: SlottedChildView(
+                      slots: [
+                        if (enabled) .fromQuery('.mount-target', child: span([.text('Hydrated')])),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(mainElement.textContent, 'Fallback');
+
+      // The outer view leaves the range slot's nodes to the nested view,
+      // which receives the new class through the outer view and
+      // must apply it before resolving its query.
+      setState(() => enabled = true);
+      await pumpEventQueue();
+
+      expect(mainElement.textContent, 'Hydrated');
+      expect(mainElement.className, 'mount-target');
     });
 
     testClient('resolves a query slot using applied values after a reload', (tester) async {
