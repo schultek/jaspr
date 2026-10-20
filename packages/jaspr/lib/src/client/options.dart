@@ -63,30 +63,51 @@ final class ClientLoader {
   }
 }
 
-/// The builder function type for a @client component.
+/// A function that builds a @client component from its decoded [ClientParams].
 ///
 /// **DO NOT USE DIRECTLY.**
 /// Use the generated `defaultClientOptions` instead.
 typedef ClientBuilder = Component Function(ClientParams params);
 
+/// The parameters of a @client component, decoded from its server-rendered markup.
+///
+/// Component parameters, which render as server components,
+/// are passed as IDs that [mount] resolves.
+///
+/// **DO NOT USE DIRECTLY.**
+/// Use the generated `defaultClientOptions` instead.
 final class ClientParams {
+  /// Creates the parameters of a client component from its decoded parameter values
+  /// and the server components rendered within it.
   ClientParams(this._params, List<ServerComponentAnchor> serverComponents)
     : serverComponents = List.of(serverComponents);
 
   final Map<String, Object?> _params;
+
+  /// The server components rendered within the client component that aren't mounted yet.
   final List<ServerComponentAnchor> serverComponents;
 
+  /// Returns a component that renders the server component with the ID [sId],
+  /// reusing the DOM nodes the server rendered for it.
+  ///
+  /// When it mounts, the returned component takes the next instance
+  /// that the server rendered with this ID.
+  /// If none are left, it reports an error and renders nothing.
   Component mount(String sId) {
     assert(sId.startsWith('s${DomValidator.clientMarkerPrefixRegex}'));
     final name = sId.substring(2);
     return ServerComponent(serverComponents, name, key: GlobalKey());
   }
 
+  /// Returns `null` if [sId] is `null`, and otherwise the same as [mount].
   Component? mountOrNull(String? sId) {
     if (sId == null) return null;
     return mount(sId);
   }
 
+  /// Returns the JSON value of the parameter named [key].
+  ///
+  /// Throws a [StateError] if the value isn't a [T].
   T get<T>(String key) {
     final value = _params[key];
     if (value is! T) {

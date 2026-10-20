@@ -212,9 +212,9 @@ final component = Component.empty();
 
 ### Component.apply()
 
-A component which applies its attributes and parameters (like `classes`, `styles`,) etc.) to its target element(s).
+A component which applies its attributes and parameters (like `classes`, `styles`, etc.) to its target element(s).
 
-This does not create a HTML element itself. All properties are merged with the respective target element's properties, with the target's properties taking precedence where there are conflicts.
+This does not create an HTML element itself. All properties are merged with the respective target element's properties, with the target's properties taking precedence where there are conflicts.
 
 ```dart
 final component = Component.apply(
@@ -233,7 +233,7 @@ final component = Component.apply(
 The above component renders the following HTML:
 
 ```html
-<div class="wrapping-class some-class" style="padding: 8px; background-color: red;">
+<div class="some-class wrapping-class" style="background-color: red; padding: 8px;">
   Hello World
 </div>
 ```
