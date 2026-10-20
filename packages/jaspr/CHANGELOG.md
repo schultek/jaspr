@@ -70,9 +70,9 @@
     Use `Document.head` instead.
   - `AttachDocument`, previously exported by `package:jaspr/server.dart`.
     Use `Document.body` instead.
-  - `DomRenderElement`, `DomRenderText`, `DomRenderFragment`, `RootDomRenderObject`,
-    `MultiChildDomRenderObject`, `HydratableDomRenderObject`, `EventBinding`, `DomEventCallback`,
-    and the `AttributeOperation` extension on `Element`,
+  - `RootDomRenderObject`, `MultiChildDomRenderObject`, `HydratableDomRenderObject`,
+    `EventBinding`, `DomEventCallback`, previously exported by `package:jaspr/client.dart`.
+  - The `AttributeOperation` extension on `Element`,
     previously exported by `package:jaspr/client.dart`.
   - `DomRenderObject.previousSibling`, `DomRenderObject.nextSibling`,
     `DomRenderObject.retakeNode`, and `DomRenderObject.finalize`.
