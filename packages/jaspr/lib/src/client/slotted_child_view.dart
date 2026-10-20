@@ -287,13 +287,14 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
   List<web.Element> _findMatchingElements(web.Element root, ApplyTarget target) {
     final elements = <web.Element>[];
+    final selector = _selectorFor(target);
 
-    if (_isMatchingElement(target, root)) {
+    if (root.matches(selector)) {
       elements.add(root);
     }
 
     if (!target.onlyChildren) {
-      final results = root.querySelectorAll(target.query);
+      final results = root.querySelectorAll(selector);
       for (int i = 0; i < results.length; i++) {
         elements.add(results.item(i) as web.Element);
       }
@@ -302,14 +303,17 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     return elements;
   }
 
-  bool _isMatchingElement(ApplyTarget target, web.Element element) {
-    if (target.tag case final expectedTag? when element.localName != expectedTag) return false;
-    if (target.id case final expectedId? when element.id != expectedId) return false;
-    if (target.classes case final expectedClasses? when !expectedClasses.every((c) => element.classList.contains(c))) {
-      return false;
-    }
-
-    return true;
+  /// Builds a CSS selector that matches the elements selected by [target].
+  String _selectorFor(ApplyTarget target) {
+    final cssUtils = web.CSS;
+    // Target fields are literal names, so escape them before using CSS selector syntax.
+    final selector = [
+      if (target.tag case final tag?) cssUtils.escape(tag),
+      if (target.id case final id?) '#${cssUtils.escape(id)}',
+      if (target.classes case final classes?)
+        for (final c in classes) '.${cssUtils.escape(c)}',
+    ].join();
+    return selector.isEmpty ? '*' : selector;
   }
 
   /// Removes the params this view applied to [element],

@@ -217,22 +217,6 @@ final class ApplyTarget {
 
   /// The classes an element must all have to match, or `null` for any.
   final Set<String>? classes;
-
-  /// A CSS selector that matches the same elements as this target.
-  ///
-  /// If [onlyChildren] is `true`, this is a relative selector that
-  /// starts with the `>` child combinator.
-  String get query => [
-    if (onlyChildren) '> ',
-    if (tag == null && id == null && classes == null)
-      '*'
-    else ...[
-      ?tag,
-      if (id != null) '#$id',
-      if (classes case final classes?)
-        for (final c in classes) '.$c',
-    ],
-  ].join();
 }
 
 @protected

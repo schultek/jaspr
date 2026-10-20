@@ -90,6 +90,82 @@ void main() {
       );
     });
 
+    for (final value in ['123target', 'a:b', 'a.b', 'a/b']) {
+      for (final byId in [true, false]) {
+        testClient('matches descendant ${byId ? 'IDs' : 'classes'} literally: $value', (tester) async {
+          window.document.body!.innerHTML =
+              '<section><button>Target</button><button id="a" class="a b">Other</button></section>'.toJS;
+          final buttons = window.document.querySelectorAll('button');
+          final target = buttons.item(0)! as HTMLElement;
+          final other = buttons.item(1)! as HTMLElement;
+          target.id = value;
+          target.className = value;
+
+          tester.pumpComponent(
+            .apply(
+              target: byId ? .descendantWith(id: value) : .descendantWith(classes: {value}),
+              attributes: const {'data-applied': 'true'},
+              child: SlottedChildView(slots: const []),
+            ),
+          );
+
+          expect(target.getAttribute('data-applied'), 'true');
+          // In particular, `a.b` must not select an ID plus a class, or two classes.
+          expect(other.hasAttribute('data-applied'), isFalse);
+        });
+      }
+    }
+
+    for (final value in ['123target', 'a:b', 'a.b', 'a/b']) {
+      for (final byId in [true, false]) {
+        testClient('matches child ${byId ? 'IDs' : 'classes'} literally: $value', (tester) async {
+          window.document.body!.innerHTML = '<button>Target</button><button id="a" class="a b">Other</button>'.toJS;
+          final buttons = window.document.querySelectorAll('button');
+          final target = buttons.item(0)! as HTMLElement;
+          final other = buttons.item(1)! as HTMLElement;
+          target.id = value;
+          target.className = value;
+
+          tester.pumpComponent(
+            .apply(
+              target: byId ? .childWith(id: value) : .childWith(classes: {value}),
+              attributes: const {'data-applied': 'true'},
+              child: SlottedChildView(slots: const []),
+            ),
+          );
+
+          expect(target.getAttribute('data-applied'), 'true');
+          // In particular, `a.b` must not select an ID plus a class, or two classes.
+          expect(other.hasAttribute('data-applied'), isFalse);
+        });
+      }
+    }
+
+    testClient('combines literal descendant target IDs and classes with the tag', (tester) async {
+      window.document.body!.innerHTML =
+          '<section>'
+                  '<button id="a:b" class="sm:hover w-1/2">Target</button>'
+                  '<span id="a:b" class="sm:hover w-1/2">Wrong tag</span>'
+                  '<button id="other" class="sm:hover w-1/2">Wrong ID</button>'
+                  '<button id="a:b" class="sm:hover">Missing class</button>'
+                  '</section>'
+              .toJS;
+
+      tester.pumpComponent(
+        .apply(
+          target: const .descendantWith(tag: 'button', id: 'a:b', classes: {'sm:hover', 'w-1/2'}),
+          attributes: const {'data-applied': 'true'},
+          child: SlottedChildView(slots: const []),
+        ),
+      );
+
+      final children = window.document.querySelector('section')!.children;
+      expect(children.item(0)!.getAttribute('data-applied'), 'true');
+      for (var i = 1; i < children.length; i++) {
+        expect(children.item(i)!.hasAttribute('data-applied'), isFalse);
+      }
+    });
+
     testClient('ignores whitespace between applied class names', (tester) async {
       window.document.body!.innerHTML = '<div>Content</div>'.toJS;
 
