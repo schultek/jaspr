@@ -57,7 +57,7 @@
   - `ChildList`
 
   To customize server rendering, instead use render adapters.
-- The following classes are no longer public:
+- The following APIs are no longer supported for use outside Jaspr:
 
   - `AttachAdapter`, previously exported by `package:jaspr/server.dart`.
   - `TemplateDocumentAdapter`, previously exported by `package:jaspr/server.dart`.
@@ -70,8 +70,21 @@
     Use `Document.head` instead.
   - `AttachDocument`, previously exported by `package:jaspr/server.dart`.
     Use `Document.body` instead.
-- `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private.
-  Access a render object's child list through `MarkupRenderObject.children`.
+  - `RootDomRenderObject`, `MultiChildDomRenderObject`,
+    `HydratableDomRenderObject`, `EventBinding`, and `DomEventCallback`,
+    previously exported by `package:jaspr/client.dart`.
+  - The `AttributeOperation` extension on `Element`,
+    previously exported by `package:jaspr/client.dart`.
+  - `DomRenderObject.previousSibling`, `DomRenderObject.nextSibling`,
+    `DomRenderObject.retakeNode`, and `DomRenderObject.finalize`.
+  - `SchedulerBinding.scheduleBuild` and `SchedulerBinding.completeInitialFrame`,
+    including the `completeInitialFrame` override in `ClientAppBinding`.
+- `SchedulerBinding.scheduleFrame` is now reserved for binding implementations.
+  Custom bindings can still override it,
+  but application code should no longer call it directly.
+- `ChildList` is now exported by `package:jaspr/server.dart`,
+  but can no longer be constructed directly.
+  Access existing instances through `MarkupRenderObject.children`.
 
 ### Behavior changes
 

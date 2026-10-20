@@ -119,6 +119,7 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   final String basePath;
 
   @override
+  @protected
   void scheduleFrame(VoidCallback frameCallback) {
     Future.microtask(frameCallback);
   }

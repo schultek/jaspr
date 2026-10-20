@@ -28,13 +28,15 @@ class BuildOwner {
       _dirtyElementsNeedsResorting = true;
       return;
     }
-    if (!_scheduledBuild) {
-      element.binding.scheduleBuild(performBuild);
-      _scheduledBuild = true;
-    }
-
     _dirtyElements.add(element);
     element._inDirtyList = true;
+
+    if (!_scheduledBuild) {
+      // Queue the element and mark the build as scheduled first,
+      // so a binding that runs the frame synchronously still builds it.
+      _scheduledBuild = true;
+      element.binding.scheduleBuild(performBuild);
+    }
   }
 
   /// Whether this widget tree is in the build phase.

@@ -5,6 +5,7 @@ import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/src/client/dom_render_object.dart' show RootDomRenderObject;
 import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart';
