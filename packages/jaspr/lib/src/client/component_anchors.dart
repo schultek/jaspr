@@ -32,6 +32,8 @@ class ClientComponentAnchor extends ComponentAnchor {
     return const {};
   }
 
+  bool get isResolved => builder is ClientBuilder && serverAnchors.every((a) => a.isResolved);
+
   Future<void> resolve() async {
     final (clientBuilder, _) = await (Future.value(builder), serverAnchors.map((a) => a.resolve()).wait).wait;
     builder = clientBuilder;
@@ -81,6 +83,8 @@ class ServerComponentAnchor extends ComponentAnchor {
   ServerComponentAnchor(super.name, super.key, super.startNode);
 
   final List<ClientComponentAnchor> clientAnchors = [];
+
+  bool get isResolved => clientAnchors.every((a) => a.isResolved);
 
   Future<void> resolve() async {
     await [for (final anchor in clientAnchors) anchor.resolve()].wait;

@@ -23,22 +23,23 @@ extension on ContentTypography {
   StyleRule build() {
     return css('.content', [
       css('&').styles(color: ContentColors.text).combine(styles),
-      ..._scopeContent([..._contentStyles, ...rules]),
+      ...scopeContent([..._contentStyles, ...rules]),
     ]);
   }
 }
 
-List<StyleRule> _scopeContent(List<StyleRule> rules) {
-  return rules.map(_scopeRule).toList();
+@visibleForTesting
+List<StyleRule> scopeContent(List<StyleRule> rules) {
+  return rules.map(scopeRule).toList();
 }
 
-StyleRule _scopeRule(StyleRule rule) {
+@visibleForTesting
+StyleRule scopeRule(StyleRule rule) {
   return switch (rule) {
-    // Scope only the parent selector; leave children untouched!
     NestedStyleRule(:final selector, :final ownStyles, :final children) => NestedStyleRule(
       _scopeSelector(selector),
       ownStyles,
-      children,
+      children.map(scopeRule).toList(),
     ),
     BlockStyleRule(:final selector, :final styles) => BlockStyleRule(
       selector: _scopeSelector(selector),
@@ -47,15 +48,15 @@ StyleRule _scopeRule(StyleRule rule) {
     // Recurse into at-rules because they don't have a selector of their own
     MediaStyleRule(:final query, :final rules) => MediaStyleRule(
       query: query,
-      styles: rules.map(_scopeRule).toList(),
+      styles: rules.map(scopeRule).toList(),
     ),
     SupportsStyleRule(:final condition, :final rules) => SupportsStyleRule(
       condition: condition,
-      styles: rules.map(_scopeRule).toList(),
+      styles: rules.map(scopeRule).toList(),
     ),
     LayerStyleRule(:final name, :final rules) => LayerStyleRule(
       name: name,
-      styles: rules.map(_scopeRule).toList(),
+      styles: rules.map(scopeRule).toList(),
     ),
     _ => rule,
   };

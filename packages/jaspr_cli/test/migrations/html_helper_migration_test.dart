@@ -192,6 +192,40 @@ void main() {
       );
     });
 
+    test('migrates with key argument first', () {
+      testUnitMigration(
+        HtmlHelperMigration(),
+        input: '''
+import 'package:jaspr/jaspr.dart';
+
+void main() {
+  text(key: Key('key'), 'Hello');
+  fragment(key: Key('key'), [text('Hello')]);
+}
+''',
+        expectedOutput: '''
+import 'package:jaspr/jaspr.dart';
+
+void main() {
+  Component.text(key: Key('key'), 'Hello');
+  Component.fragment(key: Key('key'), [Component.text('Hello')]);
+}
+''',
+        expectedMigrations: [
+          isA<MigrationInstance>().having(
+            (m) => m.description,
+            'description',
+            'Replaced text() with Component.text()',
+          ),
+          isA<MigrationInstance>().having(
+            (m) => m.description,
+            'description',
+            'Replaced fragment() with Component.fragment()',
+          ),
+        ],
+      );
+    });
+
     test('migrates text() to .text() with dot-shorthands', () {
       testUnitMigration(
         HtmlHelperMigration(),

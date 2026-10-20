@@ -4,7 +4,7 @@
 
 - Added stateful hot-reload support. Trigger a hot-reload by pressing `r` in the terminal during `jaspr serve`, or enable reload-on-save with `--mode reload`.
 
-  In addition to hot-reloading client-side code, server-rendered components are now also reloaded when their code changes, as well as server-rendered content that is reloaded when its sources (e.g. markdown) change.
+  In addition to hot-reloading client-side code, server-rendered components are now also reloaded when their code changes, as well as server-rendered content that is reloaded when its sources (such as Markdown) change.
 
   When using `styles: standalone` mode, generated stylesheets are also reloaded after changes while keeping client-side state.
 
@@ -12,15 +12,15 @@
 
   With no API changes, `@client` components are now allowed to receive child components as constructor parameters, which will be rendered exclusively on the server.
 
-  Read more about Server Components [here](https://docs.jaspr.site/going_further/server_components)
+  Read more about [Server Components](https://docs.jaspr.site/going_further/server_components).
 
 - Overhauled the CLI interface with improved logging, interactive shortcuts and better surfacing of errors.
 
   - Added key shortcuts for hot-reloading (r), hot-restarting (R), launching Chrome with debugging support (l), opening DevTools (d) and safe quitting (q). 
 
-  - **Breaking**: Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`. Both `jaspr create` and `jaspr update` now promt to install skills automatically.
+  - **Breaking**: Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`. Both `jaspr create` and `jaspr update` now prompt to install skills automatically.
 
-  - **Breaking**: Ports for the server and other sub-processes are now selected automatically based on availability. The `--web-port` and `--proxy-port` options are removed. It is still possible to choose the main port using `--port`, which is now validated for availabiliry. 
+  - **Breaking**: Ports for the server and other sub-processes are now selected automatically based on availability. The `--web-port` and `--proxy-port` options are removed. It is still possible to choose the main port using `--port`, which is now validated for availability.
 
 - Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with
   types from the [`listen`](https://pub.dev/packages/listen) package.

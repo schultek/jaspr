@@ -34,6 +34,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
   void Function()? rebuildFlutterApp;
 
   int? viewId;
+  int _attachGeneration = 0;
 
   @override
   void initState() {
@@ -59,8 +60,10 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
   void _attachView() {
     if (!kIsWeb) return;
 
+    final generation = ++_attachGeneration;
+
     context.binding.addPostFrameCallback(() async {
-      if (!mounted) return;
+      if (!mounted || generation != _attachGeneration) return;
       final element = findChildDomElement(context as Element);
       if (element == null) return;
       final target = element.children.item(element.children.length - 1);
@@ -69,7 +72,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
       if (viewId case final oldId?) {
         viewId = null;
         await removeView(oldId);
-        if (!mounted) return;
+        if (!mounted || generation != _attachGeneration) return;
       }
 
       final newViewId = await addView(
@@ -87,7 +90,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
         ),
       );
 
-      if (!mounted) {
+      if (!mounted || generation != _attachGeneration) {
         removeView(newViewId);
         return;
       }
@@ -115,6 +118,7 @@ class _FlutterEmbedViewState extends State<FlutterEmbedView> {
 
   @override
   void dispose() {
+    _attachGeneration++;
     if (viewId case final id?) {
       removeView(id);
       viewId = null;

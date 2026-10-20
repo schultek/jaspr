@@ -1,4 +1,5 @@
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart' show visibleForTesting;
 // ignore: implementation_imports
 import 'package:jaspr/src/dom/styles/rules.dart'
     show BlockStyleRule, NestedStyleRule, LayerStyleRule, MediaStyleRule, SupportsStyleRule;
