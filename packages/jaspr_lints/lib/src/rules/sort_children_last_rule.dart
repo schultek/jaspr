@@ -63,6 +63,12 @@ class SortChildrenLastFix extends ResolvedCorrectionProducer {
     'Sort children last',
   );
 
+  static const _sortChildrenAllKind = FixKind(
+    'jaspr.fix.sortChildrenLast.all',
+    DartFixKindPriority.standard,
+    'Sort children last everywhere in file',
+  );
+
   SortChildrenLastFix({required super.context});
 
   @override
@@ -70,6 +76,9 @@ class SortChildrenLastFix extends ResolvedCorrectionProducer {
 
   @override
   FixKind get fixKind => _sortChildrenKind;
+
+  @override
+  FixKind? get multiFixKind => _sortChildrenAllKind;
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
