@@ -317,7 +317,7 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             'Stopping web compilers...',
-            'Terminating flutter run...',
+            'Stopping flutter run...',
           ]),
         );
 
@@ -496,6 +496,7 @@ extension FakeServerIO on FakeIO {
       () => process.start(
         '/fake/bin/dart',
         [
+          'run',
           '--enable-vm-service',
           '--enable-asserts',
           '-Djaspr.flags.verbose=false',

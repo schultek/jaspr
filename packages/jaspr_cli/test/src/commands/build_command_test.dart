@@ -116,6 +116,7 @@ void main() {
           expect(
             inv.positionalArguments[1],
             equals([
+              'run',
               '--enable-asserts',
               '-Djaspr.flags.release=true',
               '-Djaspr.flags.generate=true',
