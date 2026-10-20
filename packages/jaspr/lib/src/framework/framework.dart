@@ -112,11 +112,19 @@ abstract class Component {
     Key? key,
   }) = DomComponent._;
 
-  /// Creates a component which applies its parameters (like [classes], [styles], etc.) to its
-  /// [target] element(s).
+  /// Creates a component which applies [id], [classes], [styles], [attributes], and [events]
+  /// to the elements of [child] that [target] matches.
   ///
-  /// This does not create a HTML element itself. All properties are merged with the respective target element's
-  /// properties. The target's properties take precedence where there are conflicts.
+  /// This does not render an element itself.
+  /// By default, [target] is [ApplyTarget.anyChild],
+  /// which matches the top-level elements of [child].
+  ///
+  /// The [classes] are added to each matched element's classes.
+  /// The [id] and each style, attribute, and event only apply where neither
+  /// the element nor a [Component.apply] nested in this one already sets them.
+  ///
+  /// On the client, this also applies to the server-rendered elements of a server component,
+  /// such as a component passed to a @client component.
   ///
   /// Example:
   /// ```dart
@@ -137,7 +145,7 @@ abstract class Component {
   ///
   /// Renders:
   /// ```html
-  /// <div class="applied-class some-class" style="padding: 8px; background-color: red;">
+  /// <div class="some-class applied-class" style="background-color: red; padding: 8px">
   ///   Hello World
   /// </div>
   /// ```

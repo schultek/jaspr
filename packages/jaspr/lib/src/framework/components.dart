@@ -179,30 +179,49 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
   }
 }
 
-/// Defines the target for a [Component.apply] component.
+/// Which elements a [Component.apply] applies its properties to.
 ///
-/// The target can select either a direct child or descendant,
-/// and optionally filter by [tag], [id], and [classes].
+/// A target matches either the top-level elements of the apply's child
+/// (those not nested in another of its elements) or the child's elements at any depth.
+/// The [tag], [id], and [classes] filters narrow the matches further.
 final class ApplyTarget {
+  /// A target that matches all top-level elements of the apply's child.
+  ///
+  /// This is the default target of [Component.apply].
   static const ApplyTarget anyChild = ApplyTarget.childWith();
 
+  /// Creates a target that matches the top-level elements of the apply's child
+  /// with the given [tag], [id], and [classes].
   const ApplyTarget.childWith({
     this.tag,
     this.id,
     this.classes,
   }) : onlyChildren = true;
 
+  /// Creates a target that matches the elements of the apply's child at any depth
+  /// with the given [tag], [id], and [classes].
   const ApplyTarget.descendantWith({
     this.tag,
     this.id,
     this.classes,
   }) : onlyChildren = false;
 
+  /// Whether this target only matches the top-level elements of the apply's child.
   final bool onlyChildren;
+
+  /// The tag name an element must have to match, such as `div`, or `null` for any.
   final String? tag;
+
+  /// The ID an element must have to match, or `null` for any.
   final String? id;
+
+  /// The classes an element must all have to match, or `null` for any.
   final Set<String>? classes;
 
+  /// A CSS selector that matches the same elements as this target.
+  ///
+  /// If [onlyChildren] is `true`, this is a relative selector that
+  /// starts with the `>` child combinator.
   String get query => [
     if (onlyChildren) '> ',
     if (tag == null && id == null && classes == null)

@@ -4,28 +4,36 @@ import '../../framework/framework.dart';
 import '../markup_render_object.dart';
 import '../server_binding.dart';
 
+/// A [RenderAdapter] that wraps the rendered output of [element] in a [ChildGroup],
+/// such as to surround it with markers.
+///
+/// Boundaries around the same output nest by element depth,
+/// so the boundary of an ancestor encloses those of its descendants.
 abstract base class ElementBoundaryAdapter extends RenderAdapter {
-  /// Priority for client component boundaries.
+  /// The [priority] of the boundary around a @client component.
   ///
-  /// This is set to an arbitrary high value so that the client component markers
-  /// always wrap other element boundaries applied to the same element.
-  static const clientComponentBoundaryPriority = 1000;
+  /// Higher than the default priority, so client component markers
+  /// enclose the default-priority boundaries around the same element.
+  static const int clientComponentBoundaryPriority = 1000;
 
-  /// Priority for server component boundaries.
+  /// The [priority] of the boundary around a server component.
   ///
-  /// This is set to an arbitrary value higher than [clientComponentBoundaryPriority]
-  /// so that the server component markers always wrap other element boundaries including
-  /// client component markers applied to the same element.
-  static const serverComponentBoundaryPriority = 2000;
+  /// Higher than [clientComponentBoundaryPriority], so server component markers
+  /// enclose all other boundaries around the same element,
+  /// including those of a @client component passed as a server component.
+  static const int serverComponentBoundaryPriority = 2000;
 
+  /// Creates an adapter for the boundary around [element]'s output.
   ElementBoundaryAdapter(this.element, {this.priority = 0});
 
+  /// The element whose rendered output this boundary wraps.
   final Element element;
 
-  /// Priority of this boundary.
+  /// The order of this boundary among the boundaries around the same element.
   ///
-  /// When multiple adapters are applied to the same element, higher priority adapters are
-  /// wrapping lower priority ones, independent of the order they are applied in.
+  /// Higher priority boundaries enclose lower priority ones,
+  /// regardless of the order their adapters were added in.
+  /// At equal priority, the boundary of the adapter added last is outermost.
   final int priority;
 
   /// The group wrapping [element]'s output, created in [prepare]

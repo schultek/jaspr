@@ -149,8 +149,20 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   static final Uint8List _emptyResponse = Uint8List(0);
 }
 
+/// A pass over the server-rendered markup that runs once the component tree is built,
+/// such as to insert markers or elements.
+///
+/// The binding calls [prepare] on its adapters in the order they were added,
+/// then [apply] in reverse order.
 abstract base class RenderAdapter {
+  /// The binding this adapter was added to with [ServerAppBinding.addRenderAdapter].
   late ServerAppBinding binding;
+
+  /// Called once the component tree is built, before any adapter is applied.
+  ///
+  /// Adapters added while preparing are prepared and applied as well.
   FutureOr<void> prepare() {}
+
+  /// Called once all adapters are prepared, to change the markup of [root].
   void apply(MarkupRenderObject root) {}
 }
