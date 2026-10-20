@@ -296,7 +296,7 @@ String _serverEntrypoint(String import) =>
   import '$import' as m;
   import 'dart:developer';
   import 'dart:io';
-      
+
   void main(List<String> args) async {
     stdin.listen(null, onDone: () => exit(0));
 
@@ -307,7 +307,7 @@ String _serverEntrypoint(String import) =>
       await mainCall();
       return ServiceExtensionResponse.result('{}');
     });
-    
+
     mainCall();
   }
 ''';

@@ -99,31 +99,34 @@ void main() {
       expect(textChange, equals('World'));
     });
 
-    testClient('removes listeners from elements left in place', (tester) async {
+    testClient('removes listeners and inherited values from elements left in place', (tester) async {
       var ownEvents = 0;
       var appliedEvents = 0;
 
       tester.pumpComponent(
         .apply(
+          classes: 'applied',
           events: {'applied': (_) => appliedEvents++},
-          child: button(events: {'own': (_) => ownEvents++}, []),
+          child: button(classes: 'own', events: {'own': (_) => ownEvents++}, []),
         ),
       );
 
-      final btn = tester.findNode(find.tag('button'))!;
+      final btn = tester.findNode<HTMLElement>(find.tag('button'))!;
       void dispatchEvents() {
         btn.dispatchEvent(Event('own'));
         btn.dispatchEvent(Event('applied'));
       }
 
+      expect(btn.className, 'own applied');
       dispatchEvents();
       expect(ownEvents, 1);
       expect(appliedEvents, 1);
 
       // Detaching the root component leaves its DOM in place,
-      // but without the listeners that its components added.
+      // but without the values and listeners that its components added.
       tester.binding.detachRootComponent();
       expect(btn.isConnected, isTrue);
+      expect(btn.className, 'own');
       dispatchEvents();
       expect(ownEvents, 1);
       expect(appliedEvents, 1);

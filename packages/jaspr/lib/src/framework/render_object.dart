@@ -31,6 +31,13 @@ abstract interface class RenderElement implements RenderObject {
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
   );
+
+  /// Removes the given values that [update] rendered,
+  /// leaving any other values and state in place, such as the value of an input.
+  ///
+  /// The [id] is only removed if the element still has it.
+  /// Event listeners stay in place until [dispose] is called.
+  void release({String? id, Iterable<String>? classes, Iterable<String>? styles, Iterable<String>? attributes});
 }
 
 abstract interface class RenderText implements RenderObject {

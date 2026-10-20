@@ -205,6 +205,11 @@ class DomRenderElement extends DomRenderObject
   }
 
   @override
+  void release({String? id, Iterable<String>? classes, Iterable<String>? styles, Iterable<String>? attributes}) {
+    (node as web.HTMLElement).removeValues(id: id, classes: classes, styles: styles, attributes: attributes);
+  }
+
+  @override
   void dispose() {
     _clearEvents();
     super.dispose();

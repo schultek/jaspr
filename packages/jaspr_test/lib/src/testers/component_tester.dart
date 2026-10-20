@@ -213,6 +213,25 @@ class TestRenderElement extends TestRenderObject implements RenderElement {
       ..attributes = attributes
       ..events = events;
   }
+
+  @override
+  void release({String? id, Iterable<String>? classes, Iterable<String>? styles, Iterable<String>? attributes}) {
+    if (id != null && this.id == id) this.id = null;
+    if (classes != null) {
+      final released = classes.toSet();
+      final remaining = this.classes?.split(' ').where((c) => c.isNotEmpty && !released.contains(c)).join(' ');
+      this.classes = remaining == null || remaining.isEmpty ? null : remaining;
+    }
+    this.styles = _without(this.styles, styles);
+    this.attributes = _without(this.attributes, attributes);
+  }
+
+  static Map<String, String>? _without(Map<String, String>? values, Iterable<String>? names) {
+    if (values == null || names == null) return values;
+    final remaining = {...values};
+    names.forEach(remaining.remove);
+    return remaining;
+  }
 }
 
 class TestRenderText extends TestRenderObject implements RawableRenderText {
