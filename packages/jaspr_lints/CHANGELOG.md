@@ -1,4 +1,4 @@
-## Unreleased minor
+## Unreleased 0.8.0-beta.0
 
 - Require Dart 3.13 or later.
 - Added "Fix all" support to `styles_ordering`, `sort_children_last` and `prefer_html_components` rules.

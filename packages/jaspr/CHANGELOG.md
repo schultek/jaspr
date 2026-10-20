@@ -1,125 +1,82 @@
-## Unreleased breaking
+## Unreleased 0.24.0-beta.0
 
-### New features
+### Core Features
 
-- Added hot-reload support.
+- Added stateful hot-reload support. Trigger a hot-reload by pressing `r` in the terminal during `jaspr serve`, or enable reload-on-save with `--mode reload`.
+
+  In addition to hot-reloading client-side code, server-rendered components are now also reloaded when their code changes, as well as server-rendered content that is reloaded when its sources (e.g. markdown) change.
+
+  When using `styles: standalone` mode, generated stylesheets are also reloaded after changes while keeping client-side state.
+
+- Added **Server Components** to allow for more fine-grained control over server-side rendered component trees. 
+
+  With no API changes, `@client` components are now allowed to receive child components as constructor parameters, which will be rendered exclusively on the server.
+
+  Read more about Server Components [here](https://docs.jaspr.site/going_further/server_components)
+
+- Overhauled the CLI interface with improved logging, interactive shortcuts and better surfacing of errors.
+
+  - Added key shortcuts for hot-reloading (r), hot-restarting (R), launching Chrome with debugging support (l), opening DevTools (d) and safe quitting (q). 
+
+  - **Breaking**: Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`. Both `jaspr create` and `jaspr update` now promt to install skills automatically.
+
+  - **Breaking**: Ports for the server and other sub-processes are now selected automatically based on availability. The `--web-port` and `--proxy-port` options are removed. It is still possible to choose the main port using `--port`, which is now validated for availabiliry. 
+
+- Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with
+  types from the [`listen`](https://pub.dev/packages/listen) package.
+
+- Added support for Dart primary constructors for components, including `@client` components.
+
+- **Breaking**: Renamed `Component.wrapElement` to `Component.apply` and added an optional `ApplyTarget target` parameter to target specific elements instead of only direct children.
+
+- Added `@decoder` and `@encoder` support for enums.
+
+- `css()` now renders its definitions as [nested css](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting) rather than flattening them into one selector per rule.
+
+  - A child whose selector is just `&` writes into its parent's block, or straight into a `@media`, `@supports` or `@layer` block nested in the parent, and a rule with neither properties nor children renders nothing. The output is equivalent for a single parent selector; a parent that is a selector list differs, since a nested selector resolves through `:is()` and takes the specificity of its most specific argument. 
+
+  - **Breaking**: A child selector that appends to the parent's name no longer works: `css('.button', [css('&-active')])` used to produce `.button-active`, and native nesting has no such concatenation, so write it as a rule of its own outside the parent, `css('.button-active')`.
+
+### API Changes
+
 - **Breaking**: `ClientAppBinding` is now a singleton and can be accessed via `ClientAppBinding.ensureInitialized()`.
+- **Breaking**: Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
 
-- Added **Server Components** to allow for more fine-grained control over
-  server-side rendered component trees.
-- Added support for stateful server-side reload.
-- Added hot-reloading of generated stylesheets in `standalone` mode.
-- Added an `ApplyTarget target` parameter to `Component.apply` (previously `Component.wrapElement`)
-  to target specific elements instead of only direct children.
-- `@decoder` and `@encoder` can now be used on enums.
+- **Breaking**: Added a `dispose()` method to the `RenderObject` interface, which is called once a render object is no longer used, such as when its element unmounts. Custom `RenderObject` implementations must implement it to release the resources they hold, such as event listeners, or leave its body empty if they hold none.
 
-### Breaking changes
+- **Breaking**: Server render adapters now receive direct, nestable `ChildGroup` nodes instead of `ChildListRange` nodes, and `MarkupRenderObject` is now itself a `ChildNode` in at most one child list, replacing `ChildNodeData`.
+- **Breaking**: `ChildList` is now exported by `package:jaspr/server.dart`, but its constructor is private. Access a render object's child list through `MarkupRenderObject.children`.
 
-- Require Dart 3.13 or later.
-- Removed `jaspr install-skills` command in favor of using Dart's `skills` package with `dart run skills@ get`.
-- Removed `--web-port` and `--proxy-port` options from `jaspr dev` in favor of automatic port selection.
-- Renamed `Component.wrapElement` to `Component.apply`.
-- Server render adapters now receive direct,
-  nestable `ChildGroup` nodes instead of `ChildListRange` nodes,
-  and `MarkupRenderObject` is now itself a `ChildNode` in
-  at most one child list, replacing `ChildNodeData`.
-- Removed support for the `attachBetween` parameter of `ClientAppBinding.attachRootComponent`.
-- Added a `dispose()` method to the `RenderObject` interface,
-  which is called once a render object is no longer used,
-  such as when its element unmounts.
-  Custom `RenderObject` implementations must implement it to release the resources they hold,
-  such as event listeners, or leave its body empty if they hold none.
-- The following classes can no longer be extended,
-  but can still be implemented:
-
-  - `RenderObject`
-  - `RenderElement`
-  - `RenderText`
-  - `RenderFragment`,
-  - `RawableRenderObject`
-  - `RawableRenderText`
-
-- The following classes no longer be implemented,
-  but can still be extended:
-
-  - `RenderAdapter`
-  - `ElementBoundaryAdapter`
-  - `HeadScopeAdapter`
-
+- **Breaking**: The following classes can no longer be extended, but can still be implemented: `RenderObject`, `RenderElement`, `RenderText`, `RenderFragment`, `RawableRenderObject`, `RawableRenderText`.
+- **Breaking**: The following classes no longer be implemented, but can still be extended: `RenderAdapter`, `ElementBoundaryAdapter`, `HeadScopeAdapter`.
   Their subclasses must be declared `base`, `final`, or `sealed`.
-- The following classes can no longer be extended or implemented:
-
-  - `MarkupRenderObject`
-  - `MarkupRenderElement`
-  - `MarkupRenderText`
-  - `MarkupRenderFragment`,
-  - `RootMarkupRenderObject`
-  - `ChildList`
-
+- **Breaking**: The following classes can no longer be extended or implemented: `MarkupRenderObject`, `MarkupRenderElement`, `MarkupRenderText`, `MarkupRenderFragment`, `RootMarkupRenderObject`, `ChildList`.
   To customize server rendering, instead use render adapters.
-- The following APIs are no longer supported for use outside Jaspr:
+- **Breaking**: The following APIs are no longer supported for use outside Jaspr:
 
   - `AttachAdapter`, previously exported by `package:jaspr/server.dart`.
   - `TemplateDocumentAdapter`, previously exported by `package:jaspr/server.dart`.
   - `BaseChildNode` and `ChildNodeBoundary`, previously available through an implementation import.
-  - `BaseDocument`, previously exported by `package:jaspr/server.dart`.
-    Use `Document.new` instead.
-  - `TemplateDocument`, previously exported by `package:jaspr/server.dart`.
-    Use `Document.template` instead.
-  - `HeadDocument`, previously exported by `package:jaspr/server.dart`.
-    Use `Document.head` instead.
-  - `AttachDocument`, previously exported by `package:jaspr/server.dart`.
-    Use `Document.body` instead.
-  - `RootDomRenderObject`, `MultiChildDomRenderObject`,
-    `HydratableDomRenderObject`, `EventBinding`, and `DomEventCallback`,
-    previously exported by `package:jaspr/client.dart`.
-  - The `AttributeOperation` extension on `Element`,
-    previously exported by `package:jaspr/client.dart`.
-  - `DomRenderObject.previousSibling`, `DomRenderObject.nextSibling`,
-    `DomRenderObject.retakeNode`, and `DomRenderObject.finalize`.
-  - `SchedulerBinding.scheduleBuild` and `SchedulerBinding.completeInitialFrame`,
-    including the `completeInitialFrame` override in `ClientAppBinding`.
-- `SchedulerBinding.scheduleFrame` is now reserved for binding implementations.
-  Custom bindings can still override it,
-  but application code should no longer call it directly.
-- `ChildList` is now exported by `package:jaspr/server.dart`,
-  but can no longer be constructed directly.
-  Access existing instances through `MarkupRenderObject.children`.
+  - `BaseDocument`, previously exported by `package:jaspr/server.dart`. Use `Document.new` instead.
+  - `TemplateDocument`, previously exported by `package:jaspr/server.dart`. Use `Document.template` instead.
+  - `HeadDocument`, previously exported by `package:jaspr/server.dart`. Use `Document.head` instead.
+  - `AttachDocument`, previously exported by `package:jaspr/server.dart`. Use `Document.body` instead.
+  - `RootDomRenderObject`, `MultiChildDomRenderObject`, `HydratableDomRenderObject`, `EventBinding`, and `DomEventCallback`, previously exported by `package:jaspr/client.dart`.
+  - The `AttributeOperation` extension on `Element`, previously exported by `package:jaspr/client.dart`.
+  - `DomRenderObject.previousSibling`, `DomRenderObject.nextSibling`, `DomRenderObject.retakeNode`, and `DomRenderObject.finalize`.
+  - `SchedulerBinding.scheduleBuild` and `SchedulerBinding.completeInitialFrame`, including the `completeInitialFrame` override in `ClientAppBinding`.
+  - `SchedulerBinding.scheduleFrame` is now reserved for binding implementations. Custom bindings can still override it, but application code should no longer call it directly.
 
-### Behavior changes
+### Other Changes and Bug Fixes
 
-- Replaced Jaspr's implementation of
-  `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with
-  types from the [`listen`](https://pub.dev/packages/listen) package.
-- Added `@Target` meta annotation to
-  `@client`, `@encoder`, `@decoder`, and `@Import` annotations to
-  indicate where they are allowed to be used.
+- Require Dart 3.13 or later.
 - Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
-- `jaspr dev` and `jaspr build` now automatically select the next available port
-  when default ports are already in use, and validate explicitly specified `--port` values.
-- Improved CLI error handling for uncaught asynchronous errors during command execution.
-- `css()` now renders its definitions as
-  [nested css](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting) rather than flattening
-  them into one selector per rule. A child whose selector is just `&` writes into its parent's block,
-  or straight into a `@media`, `@supports` or `@layer` block nested in the parent, and a rule with
-  neither properties nor children renders nothing. The output is equivalent for a single parent
-  selector; a parent that is a selector list differs, since a nested selector resolves through `:is()`
-  and takes the specificity of its most specific argument. A child selector that appends to the
-  parent's name no longer works: `css('.button', [css('&-active')])` used to produce `.button-active`,
-  and native nesting has no such concatenation, so write it as a rule of its own outside the parent,
-  `css('.button-active')`.
-
-### Bug fixes
-
-- Fixed DOM nodes sometimes staying in place after their component is removed,
-  keeping the component's event listeners, which could make handlers fire more than once.
-- Fixed style generation in `standalone` mode when
-  importing web libraries like `package:web` or `dart:js_interop`.
+- Added `@Target` meta annotation to `@client`, `@encoder`, `@decoder`, and `@Import` annotations to indicate where they are allowed to be used.
+- Fixed DOM nodes sometimes staying in place after their component is removed, keeping the component's event listeners, which could make handlers fire more than once.
+- Fixed style generation in `standalone` mode when importing web libraries like `package:web` or `dart:js_interop`.
 - Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.
-- Fixed the server output of a client component that
-  renders `<head>` when the document has no `<body>`.
-- Fixed the `hasOuterHtml` matcher from `jaspr_test`
-  never matching when compiled to Wasm.
+- Fixed the server output of a client component that renders `<head>` when the document has no `<body>`.
+- Fixed the `hasOuterHtml` matcher from `jaspr_test` never matching when compiled to Wasm.
 
 ## 0.23.5
 

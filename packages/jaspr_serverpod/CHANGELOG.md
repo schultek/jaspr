@@ -1,4 +1,4 @@
-## Unreleased minor
+## Unreleased 0.7.0-beta.0
 
 - Require Dart 3.13 or later.
 
