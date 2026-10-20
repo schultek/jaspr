@@ -459,10 +459,7 @@ class DevWorkflow {
   }
 }
 
-enum QueuedAction {
-  reload,
-  restart;
-}
+enum QueuedAction { reload, restart }
 
 /// A custom [SdkConfigurationProvider] that resolves the SDK directory
 /// using the `dartExecutable` in AOT mode.
