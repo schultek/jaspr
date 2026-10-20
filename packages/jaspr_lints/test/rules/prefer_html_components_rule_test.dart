@@ -56,7 +56,7 @@ class PreferHtmlComponentsRuleTest extends AnalysisRuleTest {
         lint(
           63,
           8,
-          messageContainsAll: ["Prefer using 'div(...)' over 'Component.element(tag: \"div\", ...)'"],
+          messageContainsAll: ["Prefer using 'div(...)' over '.element(tag: \"div\", ...)'"],
         ),
       ],
     );
@@ -83,7 +83,7 @@ class PreferHtmlComponentsRuleTest extends AnalysisRuleTest {
         lint(
           73,
           8,
-          messageContainsAll: ["Prefer using 'p(...)' over 'Component.element(tag: \"p\", ...)'"],
+          messageContainsAll: ["Prefer using 'p(...)' over '.element(tag: \"p\", ...)'"],
         ),
       ],
     );
