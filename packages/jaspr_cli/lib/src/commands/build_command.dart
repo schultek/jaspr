@@ -2,17 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:build_daemon/data/build_status.dart';
-import 'package:build_daemon/data/build_target.dart';
-import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http show Client, Response;
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
-import '../dev/util.dart';
-import '../helpers/css_helper.dart';
+import '../dev/client_runner.dart';
+import '../dev/css_runner.dart';
+import '../dev/flutter_runner.dart';
+import '../dev/server_runner.dart';
 import '../helpers/dart_define_helpers.dart';
-import '../helpers/flutter_helpers.dart';
 import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
@@ -22,7 +20,7 @@ import '../project.dart';
 import '../utils.dart';
 import 'base_command.dart';
 
-class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
+class BuildCommand extends BaseCommand with ProxyHelper {
   BuildCommand({super.logger}) {
     argParser.addOption(
       'input',
@@ -175,13 +173,23 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final Future<int>? flutterResult;
     if (project.flutterMode == FlutterMode.embedded) {
-      flutterResult = buildFlutter(useWasm);
+      flutterResult = FlutterRunner.build(
+        wasm: useWasm,
+        logger: logger,
+        copyToBuildDir: copyToBuildDir,
+        guard: guardResource,
+      );
     } else {
       flutterResult = null;
     }
 
     if (!hasBuildError) {
-      hasBuildError = (await buildCss()) != 0;
+      final exitCode = await CssRunner.build(project: project, logger: logger);
+      if (exitCode != 0) {
+        hasBuildError = true;
+      } else {
+        await copyToBuildDir('.dart_tool/jaspr/generated');
+      }
     }
 
     final serverDefines = getServerDartDefines();
@@ -262,6 +270,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         final defaultPort = int.tryParse(project.port ?? defaultServePort) ?? 8080;
         serverPort = await findAvailablePort(defaultPort);
       }
+
       final proxyPort = await findAvailablePort(int.parse(serverProxyPort), exclude: [serverPort]);
 
       await startProxy(
@@ -284,39 +293,15 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         },
       );
 
-      final process = await ProcessRunner.instance.start(
-        dartExecutable,
-        [
-          // Use direct `dart` entry point for now due to
-          // https://github.com/dart-lang/sdk/issues/61373.
-          // 'run',
-          '--enable-asserts',
-          '-Djaspr.flags.release=true',
-          '-Djaspr.flags.generate=true',
-          '-Djaspr.dev.web=build/jaspr',
-          for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
-          entryPoint!,
-        ],
-        environment: {'PORT': '$serverPort', 'JASPR_PROXY_PORT': '$proxyPort'},
-        workingDirectory: Directory.current.path,
+      final serverRunner = await ServerRunner.startForGeneration(
+        entryPoint: entryPoint!,
+        port: serverPort,
+        proxyPort: proxyPort,
+        serverDefines: serverDefines,
+        logger: logger,
+        serverStartedCompleter: serverStartedCompleter,
+        guard: guardResource,
       );
-
-      bool done = false;
-      watchProcess(
-        'server',
-        process,
-        tag: Tag.server,
-        progress: 'Starting server for static rendering...',
-        onFail: () {
-          if (done) return false;
-          logger.write('Server process failed unexpectedly.', level: Level.error, progress: ProgressState.completed);
-          return true;
-        },
-      );
-
-      await serverStartedCompleter.future;
-
-      logger.write('Server started', tag: Tag.server, progress: ProgressState.completed);
 
       logger.write('\nGenerating pages:');
 
@@ -393,9 +378,8 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         }
       }
 
-      done = true;
       httpClient.close();
-      process.kill();
+      await serverRunner.stop();
 
       logger.complete(!hasBuildError);
 
@@ -482,7 +466,7 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
 
     final dartDefines = getClientDartDefines();
     if (project.flutterMode == FlutterMode.embedded) {
-      dartDefines.addAll(getFlutterDartDefines(useWasm, true));
+      dartDefines.addAll(FlutterRunner.getDartDefines(useWasm, true));
     }
 
     if (project.flutterMode != FlutterMode.none) {
@@ -497,14 +481,14 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       else
         ...argResults!.multiOption('extra-js-compiler-option'),
       if (useWasm && project.flutterMode != FlutterMode.none)
-        '--extra-compiler-option=--platform=${p.join(webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
+        '--extra-compiler-option=--platform=${p.join(FlutterRunner.webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
       for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
     ];
 
     List<String> additionalFlutterBuildArgs() {
-      final librariesPath = p.join(webSdkDir, 'libraries.json');
-      final sdkJsPath = p.join(webSdkDir, 'kernel', 'amd-canvaskit');
+      final librariesPath = p.join(FlutterRunner.webSdkDir, 'libraries.json');
+      final sdkJsPath = p.join(FlutterRunner.webSdkDir, 'kernel', 'amd-canvaskit');
       return [
         '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
         '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
@@ -518,74 +502,31 @@ class BuildCommand extends BaseCommand with ProxyHelper, FlutterHelper {
       ];
     }
 
-    final client = await startBuildDaemon(Directory.current.path, [
-      '--release',
-      '--verbose',
-      if (managedBuildOptions) ...[
-        '--define=build_web_compilers:entrypoint=compiler=$compiler',
-        '--define=build_web_compilers:entrypoint=${compiler}_args=${jsonEncode(args)}',
-        if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
-        if (includeSourceMaps) ...[
-          '--define=build_web_compilers:dart2js_archive_extractor=filter_outputs=false',
-          '--define=build_web_compilers:dart_source_cleanup=enabled=false',
+    final outputDir = 'build/jaspr${project.requireMode == JasprMode.server ? '/web' : ''}';
+    final exitCode = await ClientRunner.build(
+      buildOptions: [
+        '--release',
+        '--verbose',
+        if (managedBuildOptions) ...[
+          '--define=build_web_compilers:entrypoint=compiler=$compiler',
+          '--define=build_web_compilers:entrypoint=${compiler}_args=${jsonEncode(args)}',
+          if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
+          if (includeSourceMaps) ...[
+            '--define=build_web_compilers:dart2js_archive_extractor=filter_outputs=false',
+            '--define=build_web_compilers:dart_source_cleanup=enabled=false',
+          ],
         ],
       ],
-    ], logger);
-    if (client == null) {
-      return 1;
-    }
-
-    guardResource(() async {
-      await client.close();
-    });
-
-    final OutputLocation outputLocation = OutputLocation(
-      (b) => b
-        ..output = 'build/jaspr${project.requireMode == JasprMode.server ? '/web' : ''}'
-        ..useSymlinks = false
-        ..hoist = true,
+      outputDir: outputDir,
+      logger: logger,
+      guard: guardResource,
     );
 
-    client.registerBuildTarget(
-      DefaultBuildTarget(
-        (b) => b
-          ..target = 'web'
-          ..outputLocation = outputLocation.toBuilder(),
-      ),
-    );
-
-    client.startBuild();
-
-    var exitCode = 0;
-    var gotBuildStart = false;
-    await for (final result in client.buildResults) {
-      final targetResult = result.results.firstWhereOrNull((buildResult) => buildResult.target == 'web');
-      if (targetResult == null) continue;
-      // We ignore any builds that happen before we get a `started` event,
-      // because those could be stale (from some other client).
-      gotBuildStart = gotBuildStart || targetResult.status == BuildStatus.started;
-      if (!gotBuildStart) continue;
-
-      // Shouldn't happen, but being a bit defensive here.
-      if (targetResult.status == BuildStatus.started) continue;
-
-      if (targetResult.status == BuildStatus.failed) {
-        exitCode = 1;
-      }
-
-      final error = targetResult.error ?? '';
-      if (error.isNotEmpty) {
-        logger.complete(false);
-        logger.write(error, level: Level.error);
-      }
-      break;
-    }
-    await client.close();
     if (exitCode == 0) {
       logger.write('Completed building web assets.', tag: Tag.builder, progress: ProgressState.completed);
 
       if (includeSourceMaps) {
-        _fixSourceMaps(outputLocation.output);
+        _fixSourceMaps(outputDir);
       }
     }
     return exitCode;

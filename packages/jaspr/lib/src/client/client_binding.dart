@@ -225,6 +225,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     rootElement!.owner.performReload(rootElement!);
 
     web.document.body!.replaceWith(body);
+    completeInitialFrame();
 
     sw.stop();
 

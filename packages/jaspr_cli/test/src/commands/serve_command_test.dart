@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:build_daemon/data/build_status.dart';
 import 'package:jaspr_cli/src/command_runner.dart';
 import 'package:jaspr_cli/src/project.dart';
 import 'package:mocktail/mocktail.dart';
@@ -143,6 +144,210 @@ void main() {
         );
 
         // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('queues reload and restart shortcuts when build is in progress', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        // 1. Start a rebuild, queue reload ('r'), and complete build
+        buildDaemon.sendMessage(
+          BuildResults((b) {
+            b.results.add(
+              DefaultBuildResult((b) {
+                b.target = 'web';
+                b.status = BuildStatus.started;
+              }),
+            );
+          }),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emits('[BUILDER] Rebuilding web assets...'),
+        );
+
+        // Press 'r' for reload while building
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[CLIENT] Build in progress. Queued reload...'),
+        );
+
+        // Pressing 'r' again informs that reload is already queued
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[CLIENT] Build in progress. Reload already queued.'),
+        );
+
+        // Build finishes successfully -> executes queued reload
+        buildDaemon.sendMessage(
+          BuildResults((b) {
+            b.results.add(
+              DefaultBuildResult((b) {
+                b.target = 'web';
+                b.status = BuildStatus.succeeded;
+              }),
+            );
+          }),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Rebuilt web assets.',
+            '[CLIENT] Reloading...',
+            '[CLIENT] Reload complete.',
+          ]),
+        );
+
+        // 2. Start another rebuild, queue reload then upgrade to restart ('R')
+        buildDaemon.sendMessage(
+          BuildResults((b) {
+            b.results.add(
+              DefaultBuildResult((b) {
+                b.target = 'web';
+                b.status = BuildStatus.started;
+              }),
+            );
+          }),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emits('[BUILDER] Rebuilding web assets...'),
+        );
+
+        // Press 'r' while building
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[CLIENT] Build in progress. Queued reload...'),
+        );
+
+        // Press 'R' to upgrade to restart
+        io.stdin.addBytes([utf8.encode('R').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[CLIENT] Build in progress. Queued restart...'),
+        );
+
+        // Press 'r' while restart is queued
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[CLIENT] Build in progress. Restart already queued.'),
+        );
+
+        // Build finishes successfully -> executes queued restart
+        buildDaemon.sendMessage(
+          BuildResults((b) {
+            b.results.add(
+              DefaultBuildResult((b) {
+                b.target = 'web';
+                b.status = BuildStatus.succeeded;
+              }),
+            );
+          }),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Rebuilt web assets.',
+            '[CLIENT] Restarting...',
+            '[CLIENT] Restart complete.',
+          ]),
+        );
+
+        // 3. Start a rebuild, queue reload, but build fails
+        buildDaemon.sendMessage(
+          BuildResults((b) {
+            b.results.add(
+              DefaultBuildResult((b) {
+                b.target = 'web';
+                b.status = BuildStatus.started;
+              }),
+            );
+          }),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emits('[BUILDER] Rebuilding web assets...'),
+        );
+
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emits('[CLIENT] Build in progress. Queued reload...'),
+        );
+
+        // Build fails
+        buildDaemon.sendMessage(
+          BuildResults((b) {
+            b.results.add(
+              DefaultBuildResult((b) {
+                b.target = 'web';
+                b.status = BuildStatus.failed;
+              }),
+            );
+          }),
+        );
+
+        await expectLater(
+          io.stderr.queue,
+          emits('[BUILDER] [ERROR] Failed building web assets. There is probably more output above.'),
+        );
+        await expectLater(
+          io.stdout.queue,
+          emits('[CLIENT] Build failed. Skipped queued reload.'),
+        );
+
+        // Quit
         io.stdin.addBytes([utf8.encode('q').first]);
 
         expect(
@@ -317,7 +522,7 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             'Stopping web compilers...',
-            'Terminating flutter run...',
+            'Stopping flutter run...',
           ]),
         );
 
@@ -496,6 +701,7 @@ extension FakeServerIO on FakeIO {
       () => process.start(
         '/fake/bin/dart',
         [
+          'run',
           '--enable-vm-service',
           '--enable-asserts',
           '-Djaspr.flags.verbose=false',
