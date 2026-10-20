@@ -1,8 +1,7 @@
 import 'package:jaspr/dom.dart';
 // ignore: implementation_imports
-import 'package:jaspr/src/dom/styles/css.dart' show NestedStyleRule;
-// ignore: implementation_imports
-import 'package:jaspr/src/dom/styles/rules.dart' show BlockStyleRule, LayerStyleRule, MediaStyleRule, SupportsStyleRule;
+import 'package:jaspr/src/dom/styles/rules.dart'
+    show BlockStyleRule, NestedStyleRule, LayerStyleRule, MediaStyleRule, SupportsStyleRule;
 
 part '_base.dart';
 part '_reset.dart';

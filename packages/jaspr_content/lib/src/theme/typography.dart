@@ -45,17 +45,17 @@ StyleRule _scopeRule(StyleRule rule) {
       styles: styles,
     ),
     // Recurse into at-rules because they don't have a selector of their own
-    MediaStyleRule(:final query, :final styles) => MediaStyleRule(
+    MediaStyleRule(:final query, :final rules) => MediaStyleRule(
       query: query,
-      styles: styles.map(_scopeRule).toList(),
+      styles: rules.map(_scopeRule).toList(),
     ),
-    SupportsStyleRule(:final condition, :final styles) => SupportsStyleRule(
+    SupportsStyleRule(:final condition, :final rules) => SupportsStyleRule(
       condition: condition,
-      styles: styles.map(_scopeRule).toList(),
+      styles: rules.map(_scopeRule).toList(),
     ),
-    LayerStyleRule(:final name, :final styles) => LayerStyleRule(
+    LayerStyleRule(:final name, :final rules) => LayerStyleRule(
       name: name,
-      styles: styles.map(_scopeRule).toList(),
+      styles: rules.map(_scopeRule).toList(),
     ),
     _ => rule,
   };

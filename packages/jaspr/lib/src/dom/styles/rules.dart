@@ -45,7 +45,7 @@ abstract class StyleRule {
   const factory StyleRule.keyframes({required String name, required Map<String, Styles> styles}) = KeyframesStyleRule;
 
   /// Returns the rendered css for this rule.
-  String toCss([String indent]);
+  String toCss([String indent = '']);
 }
 
 const cssBlockInset = kDebugMode || kGenerateMode ? '  ' : '';
@@ -86,16 +86,96 @@ class BlockStyleRule implements StyleRule {
   }
 }
 
-class MediaStyleRule implements StyleRule {
-  const MediaStyleRule({required this.query, required this.styles});
+abstract mixin class GroupStyleRule implements StyleRule {
+  /// The list of style rules contained in this rule.
+  List<StyleRule> get rules;
+
+  /// Renders the child [rules] at [indent].
+  ///
+  /// Nested rules with selector `&` are flattened into the current block.
+  ///
+  /// A grouping at-rule nested in a style rule keeps that rule as its context,
+  /// so a bare `&` inside it writes its declarations straight into the at-rule's
+  /// block, which the browser applies to the enclosing rule. Wrapping them in
+  /// `& {}` instead would not reach a pseudo-element: `&` matches like `:is()`,
+  /// which cannot hold one.
+  String _renderRules(String indent) {
+    final buffer = StringBuffer();
+    for (final rule in rules) {
+      if (rule case NestedStyleRule(selector: Selector(selector: '&'))) {
+        buffer.write(rule._renderContents(indent));
+      } else if (rule case BlockStyleRule(selector: Selector(selector: '&'))) {
+        for (final entry in rule.styles.properties.entries) {
+          buffer.write('$indent${entry.key}: ${entry.value};$cssPropSpace');
+        }
+      } else {
+        final css = rule.toCss(indent);
+        if (css.isNotEmpty) {
+          buffer.write(css);
+          buffer.write(cssPropSpace);
+        }
+      }
+    }
+    return buffer.toString();
+  }
+}
+
+/// A style rule with a [selector], its [ownStyles] and the rules nested under
+/// it, rendered as [nested css](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting).
+class NestedStyleRule with StylesMixin<NestedStyleRule>, GroupStyleRule {
+  const NestedStyleRule(this.selector, this.ownStyles, [this.rules = const []]);
+
+  final Selector selector;
+
+  /// The styles of this rule itself, as opposed to its [rules].
+  ///
+  /// Not `styles`, which is the [StylesMixin] builder that `css()` chains.
+  final Styles ownStyles;
+
+  @override
+  final List<StyleRule> rules;
+
+  /// Alias for [rules] for backwards compatibility.
+  List<StyleRule> get children => rules;
+
+  @override
+  NestedStyleRule combine(Styles styles) {
+    return NestedStyleRule(selector, ownStyles.combine(styles), rules);
+  }
+
+  String _renderContents(String indent) {
+    final buffer = StringBuffer();
+    for (final entry in ownStyles.properties.entries) {
+      buffer.write('$indent${entry.key}: ${entry.value};$cssPropSpace');
+    }
+    buffer.write(_renderRules(indent));
+    return buffer.toString();
+  }
+
+  @override
+  String toCss([String indent = '']) {
+    final contents = _renderContents('$indent$cssBlockInset');
+
+    // A rule that says nothing about itself and has nothing nested under it
+    // renders as nothing, rather than as an empty block.
+    if (contents.isEmpty) return '';
+
+    return '$indent${selector.selector} {$cssPropSpace$contents$indent}';
+  }
+}
+
+class MediaStyleRule with GroupStyleRule {
+  const MediaStyleRule({required this.query, required List<StyleRule> styles}) : rules = styles;
 
   final MediaQuery query;
-  final List<StyleRule> styles;
+
+  @override
+  final List<StyleRule> rules;
 
   @override
   String toCss([String indent = '']) {
     return '$indent@media ${query._value} {$cssPropSpace'
-        '${styles.map((r) => r.toCss('$indent$cssBlockInset') + cssPropSpace).join()}'
+        '${_renderRules('$indent$cssBlockInset')}'
         '$indent}';
   }
 }
@@ -332,30 +412,34 @@ class FontFaceStyleRule implements StyleRule {
   }
 }
 
-class LayerStyleRule implements StyleRule {
-  const LayerStyleRule({this.name, required this.styles});
+class LayerStyleRule with GroupStyleRule {
+  const LayerStyleRule({this.name, required List<StyleRule> styles}) : rules = styles;
 
   final String? name;
-  final List<StyleRule> styles;
+
+  @override
+  final List<StyleRule> rules;
 
   @override
   String toCss([String indent = '']) {
     return '$indent@layer${name != null ? ' $name' : ''} {$cssPropSpace'
-        '${styles.map((r) => r.toCss('$indent$cssBlockInset') + cssPropSpace).join()}'
+        '${_renderRules('$indent$cssBlockInset')}'
         '$indent}';
   }
 }
 
-class SupportsStyleRule implements StyleRule {
-  const SupportsStyleRule({required this.condition, required this.styles});
+class SupportsStyleRule with GroupStyleRule {
+  const SupportsStyleRule({required this.condition, required List<StyleRule> styles}) : rules = styles;
 
   final String condition;
-  final List<StyleRule> styles;
+
+  @override
+  final List<StyleRule> rules;
 
   @override
   String toCss([String indent = '']) {
     return '$indent@supports $condition {$cssPropSpace'
-        '${styles.map((r) => r.toCss('$indent$cssBlockInset') + cssPropSpace).join()}'
+        '${_renderRules('$indent$cssBlockInset')}'
         '$indent}';
   }
 }
