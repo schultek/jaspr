@@ -1,7 +1,9 @@
 ## Unreleased minor
 
 - Require Dart 3.13 or later.
+- Added "Fix all" support to `styles_ordering`, `sort_children_last` and `prefer_html_components` rules.
 - Update `unsafe_imports` rule to properly handle standalone style mode.
+- Fixed `prefer_html_components` rule to also detect dot-shorthands invocations.
 - Update `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
 
 ## 0.7.2
