@@ -47,6 +47,26 @@ class DevWorkflow {
 
   late final StreamSubscription<Map<String, Object?>> _clientEventsSub;
   StreamSubscription<void>? _buildResultsSub;
+  StreamSubscription<void>? _buildActionsSub;
+
+  bool _isBuilding = false;
+  bool get isBuilding => _isBuilding;
+
+  QueuedAction? _queuedAction;
+  QueuedAction? get queuedAction => _queuedAction;
+
+  void queueAction(QueuedAction action) {
+    if (_queuedAction == QueuedAction.restart && action == QueuedAction.reload) {
+      return;
+    }
+    _queuedAction = action;
+  }
+
+  QueuedAction? takeQueuedAction() {
+    final action = _queuedAction;
+    _queuedAction = null;
+    return action;
+  }
 
   final _doneCompleter = Completer<int>();
   Future<int> get done => _doneCompleter.future;
@@ -91,17 +111,27 @@ class DevWorkflow {
   }
 
   void _listenToBuildResults() {
-    _buildResultsSub = buildResults
+    _buildResultsSub = buildResults.listen((buildResult) {
+      if (buildResult.status == BuildStatus.started) {
+        _isBuilding = true;
+      } else {
+        _isBuilding = false;
+      }
+    });
+
+    _buildActionsSub = buildResults
         .asyncMap((buildResult) async {
           if (buildResult.status == BuildStatus.succeeded) {
-            switch (reload) {
-              case ReloadConfiguration.hotReload:
-                await reloadClients();
-              case ReloadConfiguration.hotRestart:
-                await restartClients(incremental: true);
-              case ReloadConfiguration.liveReload:
-                await refreshClients();
-              case ReloadConfiguration.none:
+            if (_queuedAction == null) {
+              switch (reload) {
+                case ReloadConfiguration.hotReload:
+                  await reloadClients();
+                case ReloadConfiguration.hotRestart:
+                  await restartClients(incremental: true);
+                case ReloadConfiguration.liveReload:
+                  await refreshClients();
+                case ReloadConfiguration.none:
+              }
             }
           }
         })
@@ -413,6 +443,7 @@ class DevWorkflow {
       clients.stop();
       await _clientEventsSub.cancel();
       await _buildResultsSub?.cancel();
+      await _buildActionsSub?.cancel();
       await clientRunner.shutDown(code);
       await flutter?.stop();
       await server?.stop();
@@ -426,6 +457,11 @@ class DevWorkflow {
       }
     }();
   }
+}
+
+enum QueuedAction {
+  reload,
+  restart;
 }
 
 /// A custom [SdkConfigurationProvider] that resolves the SDK directory

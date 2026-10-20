@@ -465,23 +465,61 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
     });
   }
 
+  bool _isPerformingAction = false;
+
+  Future<void> _performReload() async {
+    if (_isPerformingAction) return;
+    _isPerformingAction = true;
+    logger.write('Reloading...', tag: Tag.client);
+    try {
+      await workflow.reloadClients();
+      logger.write('Reload complete.', tag: Tag.client);
+    } catch (e) {
+      logger.write('Failed to reload: $e', tag: Tag.cli, level: Level.warning);
+    } finally {
+      _isPerformingAction = false;
+    }
+  }
+
+  Future<void> _performRestart() async {
+    if (_isPerformingAction) return;
+    _isPerformingAction = true;
+    logger.write('Restarting...', tag: Tag.client);
+    try {
+      await workflow.restartClients();
+      logger.write('Restart complete.', tag: Tag.client);
+    } catch (e) {
+      logger.write('Failed to restart: $e', tag: Tag.cli, level: Level.warning);
+    } finally {
+      _isPerformingAction = false;
+    }
+  }
+
   Future<void> _handleKey(String key) async {
     switch (key) {
       case 'r' when canHotReload:
-        logger.write('Reloading...', tag: Tag.client);
-        try {
-          await workflow.reloadClients();
-          logger.write('Reload complete.', tag: Tag.client);
-        } catch (e) {
-          logger.write('Failed to reload: $e', tag: Tag.cli, level: Level.warning);
+        if (workflow.isBuilding) {
+          if (workflow.queuedAction == QueuedAction.restart) {
+            logger.write('Build in progress. Restart already queued.', tag: Tag.client);
+          } else if (workflow.queuedAction == QueuedAction.reload) {
+            logger.write('Build in progress. Reload already queued.', tag: Tag.client);
+          } else {
+            workflow.queueAction(QueuedAction.reload);
+            logger.write('Build in progress. Queued reload...', tag: Tag.client);
+          }
+        } else {
+          await _performReload();
         }
       case 'R':
-        logger.write('Restarting...', tag: Tag.client);
-        try {
-          await workflow.restartClients();
-          logger.write('Restart complete.', tag: Tag.client);
-        } catch (e) {
-          logger.write('Failed to restart: $e', tag: Tag.cli, level: Level.warning);
+        if (workflow.isBuilding) {
+          if (workflow.queuedAction == QueuedAction.restart) {
+            logger.write('Build in progress. Restart already queued.', tag: Tag.client);
+          } else {
+            workflow.queueAction(QueuedAction.restart);
+            logger.write('Build in progress. Queued restart...', tag: Tag.client);
+          }
+        } else {
+          await _performRestart();
         }
       case 'l':
         await workflow.chrome.launch(port);
@@ -653,6 +691,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       if (event.status == BuildStatus.succeeded) {
         logger.write('Rebuilt web assets.', tag: Tag.builder, progress: ProgressState.completed);
         updateFooter(DevStatus.ready);
+        final queuedAction = workflow.takeQueuedAction();
+        if (queuedAction == QueuedAction.reload) {
+          await _performReload();
+        } else if (queuedAction == QueuedAction.restart) {
+          await _performRestart();
+        }
       } else if (event.status == BuildStatus.failed) {
         logger.write(
           'Failed building web assets. There is probably more output above.',
@@ -661,6 +705,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
           progress: ProgressState.completed,
         );
         updateFooter(DevStatus.error);
+        final queuedAction = workflow.takeQueuedAction();
+        if (queuedAction != null) {
+          logger.write('Build failed. Skipped queued ${queuedAction.name}.', tag: Tag.client);
+        }
       } else if (event.status == BuildStatus.started) {
         logger.write('Rebuilding web assets...', tag: Tag.builder, progress: ProgressState.running);
         updateFooter(DevStatus.rebuilding);
