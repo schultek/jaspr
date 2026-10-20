@@ -49,6 +49,7 @@ Future<int> addView(Element target, ViewConstraints? constraints, flt.Widget wid
 Future<void> removeView(int viewId) async {
   final app = await _flutterApp;
   app.removeView(viewId);
+  _viewWidgets.remove(viewId);
 }
 
 /// Handle to the [_flutter] object defined by the 'flutter.js' script.

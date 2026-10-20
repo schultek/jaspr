@@ -116,6 +116,7 @@ void main() {
           expect(
             inv.positionalArguments[1],
             equals([
+              'run',
               '--enable-asserts',
               '-Djaspr.flags.release=true',
               '-Djaspr.flags.generate=true',
@@ -177,8 +178,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrderWithTimeout([
+            emitsThrough('Stopping server...'),
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -256,8 +257,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrderWithTimeout([
+            emitsThrough('Stopping server...'),
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -422,6 +423,7 @@ void main() {
             'Generating pages:',
             '(1/1) Generating "/abc" ...',
             '(2/2) Generating "/abc2" ...',
+            'Stopping server...',
             '[LOG] Generating sitemap.xml...',
           ]),
         );
@@ -461,7 +463,6 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
 
