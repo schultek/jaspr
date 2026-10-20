@@ -173,18 +173,18 @@ packages:
     dependency: transitive
     description:
       name: build_runner
-      sha256: "894c243f6bc32015fec466ce30a6925bd537a77a426ee5bf481120477eb3de67"
+      sha256: "6feadd32d90a68253c1f7b4fcff76adb4b41ad32a53f8bad835dc65f01ac9dc5"
       url: "https://pub.dev"
     source: hosted
-    version: "2.16.1"
+    version: "2.16.2"
   build_test:
     dependency: transitive
     description:
       name: build_test
-      sha256: "1f89d59da9565f99f735ed43c7307ad7ad4a2b10c19cb5b474e650bbe9c2d768"
+      sha256: a7e266bde08abce14c6ff0bac7ea57cb98bc169c262adef6efc7a4aec1cfa788
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.20"
+    version: "3.5.21"
   build_web_compilers:
     dependency: transitive
     description:
