@@ -10,46 +10,14 @@ import 'package:path/path.dart' as p;
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
 
-import '../commands/base_command.dart';
-import '../dev/client_workflow.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
 import '../utils.dart';
 
-extension CssHelper on BaseCommand {
-  Future<CssRunner> watchCss(ClientWorkflow workflow) async {
-    final runner = CssRunner(workflow, project, logger)..prepare();
-    await runner.start();
-
-    workflow.devProxy.getCssFiles = () => runner.cssFiles;
-    workflow.devProxy.registerPreReloadCallback(runner.reload);
-
-    guardResource(() {
-      if (runner.stylesFiles.isNotEmpty) {
-        logger.write('Terminating CSS runner...', level: Level.debug);
-      }
-      workflow.devProxy.getCssFiles = null;
-      workflow.devProxy.unregisterPreReloadCallback(runner.reload);
-      runner.dispose();
-    });
-
-    return runner;
-  }
-
-  Future<int> buildCss() async {
-    final runner = CssRunner(null, project, logger)..prepare();
-    final exitCode = await runner.build();
-
-    await copyToBuildDir('.dart_tool/jaspr/generated');
-    return exitCode;
-  }
-}
-
 class CssRunner {
-  CssRunner(this.workflow, this.project, this.logger);
+  CssRunner(this.project, this.logger);
 
-  final ClientWorkflow? workflow;
   final Project project;
   final Logger logger;
 
@@ -75,6 +43,25 @@ class CssRunner {
 
   bool _disposed = false;
   bool _restarting = false;
+
+  /// Starts the CSS runner in watch mode for development.
+  static Future<CssRunner> watch({
+    required Project project,
+    required Logger logger,
+  }) async {
+    final runner = CssRunner(project, logger)..prepare();
+    await runner.start();
+    return runner;
+  }
+
+  /// Runs the CSS runner once to compile CSS for production builds.
+  static Future<int> build({
+    required Project project,
+    required Logger logger,
+  }) async {
+    final runner = CssRunner(project, logger)..prepare();
+    return await runner._build();
+  }
 
   void prepare() {
     final generatedDir = Directory('.dart_tool/jaspr/generated');
@@ -300,7 +287,7 @@ class CssRunner {
     }
   }
 
-  Future<int> build() async {
+  Future<int> _build() async {
     final cssFiles = stylesFiles = await _generateRunner(watch: false);
     if (cssFiles.isEmpty) return 0;
 
@@ -466,9 +453,20 @@ class CssRunner {
     } catch (_) {}
   }
 
+  Future<void> stop() async {
+    if (_disposed) return;
+    if (stylesFiles.isNotEmpty) {
+      logger.write('Stopping CSS runner...', level: Level.debug);
+    }
+    dispose();
+  }
+
   void dispose() {
+    if (_disposed) return;
     _disposed = true;
-    client?.kill();
+    try {
+      client?.kill();
+    } catch (_) {}
     process?.kill();
     vmService?.dispose();
     if (!_initialGenerationCompleter.isCompleted) {

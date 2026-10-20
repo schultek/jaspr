@@ -371,7 +371,7 @@ void main() {
                     setSlot = set;
                     return SlottedChildView(
                       slots: [
-                        if (slotted) ChildSlot.fromQuery(query, child: span([.text(text)])),
+                        if (slotted) .fromQuery(query, child: span([.text(text)])),
                       ],
                     );
                   },
@@ -745,7 +745,7 @@ void main() {
               return SlottedChildView(
                 slots: [
                   if (slotted)
-                    ChildSlot.fromQuery(
+                    .fromQuery(
                       'main',
                       child: input<String>(value: 'Initial', onInput: (_) => inputs++),
                     ),
@@ -785,10 +785,10 @@ void main() {
         StatefulBuilder(
           builder: (context, set) {
             setState = set;
-            return Component.fragment([
+            return .fragment([
               SlottedChildView(
                 slots: [
-                  if (!moved) ChildSlot.fromQuery('main', child: movable),
+                  if (!moved) .fromQuery('main', child: movable),
                 ],
               ),
               div(id: 'destination', [if (moved) movable]),
@@ -818,7 +818,7 @@ void main() {
         StatefulBuilder(
           builder: (context, set) {
             setState = set;
-            return Component.fragment([
+            return .fragment([
               div(id: 'source', [if (!moved) movable]),
               .apply(
                 target: const .descendantWith(tag: 'p'),
@@ -864,7 +864,7 @@ void main() {
                   return SlottedChildView(
                     slots: [
                       if (slotted)
-                        ChildSlot.fromQuery(
+                        .fromQuery(
                           'main',
                           child: button(events: {'own': (_) => ownEvents++}, [.text('Hydrated')]),
                         ),
@@ -877,6 +877,10 @@ void main() {
         ),
       );
 
+      // Confirm the slot's child installed its listener before testing cleanup.
+      btn.dispatchEvent(Event('own'));
+      expect(ownEvents, 1);
+
       // Remove the slot while the view's DOM is detached, then attach it again.
       section.remove();
       setSlot(() => slotted = false);
@@ -887,7 +891,7 @@ void main() {
       // and the view applies its params in place of the child's.
       expect(btn.className, 'applied');
       btn.dispatchEvent(Event('own'));
-      expect(ownEvents, 0);
+      expect(ownEvents, 1);
       btn.click();
       expect(clicks, 1);
 
@@ -917,7 +921,7 @@ void main() {
               return SlottedChildView(
                 slots: [
                   if (slotted)
-                    ChildSlot.between(
+                    .between(
                       start: start,
                       end: end,
                       child: button([.text('Hydrated')]),
@@ -936,7 +940,8 @@ void main() {
       setState(() => slotted = false);
       await pumpEventQueue();
 
-      // The removed slot's DOM stays in place and the view now owns the leftover button,
+      // The removed slot's DOM stays in place and
+      // the view now applies its params to the leftover button,
       // so only the view's listener remains and the handler fires once.
       expect(window.document.querySelector('button'), equals(btn));
       btn.click();
@@ -1334,7 +1339,7 @@ void main() {
           classes: 'mount-target',
           child: SlottedChildView(
             slots: [
-              ChildSlot.fromQuery('.mount-target', child: span([.text('Hydrated')])),
+              .fromQuery('.mount-target', child: span([.text('Hydrated')])),
             ],
           ),
         ),
@@ -1410,7 +1415,7 @@ void main() {
           classes: 'applied',
           child: SlottedChildView(
             slots: [
-              ChildSlot.between(
+              .between(
                 start: start,
                 end: end,
                 child: p(classes: 'own', [.text('Slotted')]),
@@ -1420,8 +1425,8 @@ void main() {
         ),
       );
 
-      // The view applies the params to the paragraphs before and after the slot,
-      // while the slot's child applies them to its own paragraph.
+      // The static paragraphs before and after the slot receive the applied class,
+      // and the slotted paragraph has both its own and the applied class.
       final paragraphs = window.document.querySelectorAll('p');
       expect(
         [for (var i = 0; i < paragraphs.length; i++) (paragraphs.item(i)! as HTMLElement).className],

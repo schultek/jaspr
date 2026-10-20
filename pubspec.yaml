@@ -32,6 +32,11 @@ workspace:
 dev_dependencies:
   melos: ^8.7.0
 
+dependency_overrides:
+  # Needed to resolve a dependency conflict with latest analysis_server_plugin
+  # TODO: Remove once Flutter upgrades to this version
+  test_api: ^0.7.13
+
 melos:
   command:
     bootstrap:

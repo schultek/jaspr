@@ -109,6 +109,12 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
     'Sort styles',
   );
 
+  static const _sortStylesAllKind = FixKind(
+    'jaspr.fix.sortStyles.all',
+    DartFixKindPriority.standard,
+    'Sort all styles',
+  );
+
   OrderStylesFix({required super.context});
 
   @override
@@ -116,6 +122,9 @@ class OrderStylesFix extends ResolvedCorrectionProducer {
 
   @override
   FixKind get fixKind => _sortStylesKind;
+
+  @override
+  FixKind? get multiFixKind => _sortStylesAllKind;
 
   @override
   Future<void> compute(ChangeBuilder builder) async {

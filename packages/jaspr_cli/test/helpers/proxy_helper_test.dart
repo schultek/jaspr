@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:jaspr_cli/src/commands/base_command.dart';
-import 'package:jaspr_cli/src/dev/dev_proxy.dart';
+import 'package:jaspr_cli/src/dev/dev_workflow.dart';
 import 'package:jaspr_cli/src/helpers/proxy_helper.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 
-class MockDevProxy extends Mock implements DevProxy {}
+class MockDevWorkflow extends Mock implements DevWorkflow {}
 
 class TestCommand extends BaseCommand with ProxyHelper {
   @override
@@ -28,10 +28,10 @@ void main() {
 
     setUp(() async {
       client = http.Client();
-      final mockDevProxy = MockDevProxy();
+      final mockDevWorkflow = MockDevWorkflow();
 
-      when(() => mockDevProxy.client).thenReturn(client);
-      when(() => mockDevProxy.handler).thenReturn((req) async {
+      when(() => mockDevWorkflow.client).thenReturn(client);
+      when(() => mockDevWorkflow.handler).thenReturn((req) async {
         if (req.url.path.isEmpty) {
           return Response.ok('root page');
         }
@@ -41,7 +41,7 @@ void main() {
       final command = TestCommand();
       server = await command.startProxy(
         0,
-        devProxy: mockDevProxy,
+        devWorkflow: mockDevWorkflow,
         redirectNotFound: true,
       );
     });

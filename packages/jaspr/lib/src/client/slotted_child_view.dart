@@ -10,10 +10,10 @@ import 'utils.dart';
 abstract class ChildSlot extends Component {
   const ChildSlot({super.key});
 
-  factory ChildSlot.fromQuery(String query, {required Component child, Key? key}) = QueryChildSlot;
+  factory ChildSlot.fromQuery(String query, {required Component child, Key? key}) = _QueryChildSlot;
 
   factory ChildSlot.between({required web.Node start, required web.Node end, required Component child, Key? key}) =
-      RangeChildSlot;
+      _RangeChildSlot;
 
   Component get child;
 
@@ -21,12 +21,12 @@ abstract class ChildSlot extends Component {
   bool canUpdate(ChildSlot oldComponent);
 
   @override
-  Element createElement() => ChildSlotElement(this);
+  Element createElement() => _ChildSlotElement(this);
 }
 
 /// A [ChildSlot] that attaches its child between two given DOM [start] and [end] nodes.
-class RangeChildSlot extends ChildSlot {
-  const RangeChildSlot({required this.start, required this.end, required this.child, super.key});
+class _RangeChildSlot extends ChildSlot {
+  const _RangeChildSlot({required this.start, required this.end, required this.child, super.key});
 
   final web.Node start;
   final web.Node end;
@@ -40,7 +40,7 @@ class RangeChildSlot extends ChildSlot {
 
   @override
   bool canUpdate(ChildSlot oldComponent) {
-    return oldComponent is RangeChildSlot && oldComponent.start == start && oldComponent.end == end;
+    return oldComponent is _RangeChildSlot && oldComponent.start == start && oldComponent.end == end;
   }
 }
 
@@ -49,8 +49,8 @@ class RangeChildSlot extends ChildSlot {
 ///
 /// The query is resolved when the slot mounts and can match inherited DOM params.
 /// Updates keep the resolved element, even if it no longer matches the query.
-class QueryChildSlot extends ChildSlot {
-  const QueryChildSlot(this.query, {required this.child, super.key});
+class _QueryChildSlot extends ChildSlot {
+  const _QueryChildSlot(this.query, {required this.child, super.key});
 
   final String query;
   @override
@@ -78,12 +78,12 @@ class QueryChildSlot extends ChildSlot {
 
   @override
   bool canUpdate(ChildSlot oldComponent) {
-    return oldComponent is QueryChildSlot && oldComponent.query == query;
+    return oldComponent is _QueryChildSlot && oldComponent.query == query;
   }
 }
 
-class ChildSlotElement extends MultiChildRenderObjectElement {
-  ChildSlotElement(ChildSlot super.component);
+class _ChildSlotElement extends MultiChildRenderObjectElement {
+  _ChildSlotElement(ChildSlot super.component);
 
   @override
   void update(ChildSlot newComponent) {
@@ -105,10 +105,10 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
   ChildSlotRenderObject createRenderObject() {
     final parent = parentRenderObjectElement;
     assert(
-      parent is SlottedChildViewElement,
+      parent is _SlottedChildViewElement,
       'ChildSlot must be used as a direct child of SlottedChildView.',
     );
-    return (parent as SlottedChildViewElement)._createSlotRenderObject(component as ChildSlot);
+    return (parent as _SlottedChildViewElement)._createSlotRenderObject(component as ChildSlot);
   }
 
   @override
@@ -116,7 +116,7 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
 
   @override
   void unmount() {
-    final view = parentRenderObjectElement as SlottedChildViewElement;
+    final view = parentRenderObjectElement as _SlottedChildViewElement;
     final renderObject = this.renderObject as ChildSlotRenderObject;
     super.unmount();
     view._reclaimSlot(renderObject);
@@ -141,11 +141,11 @@ class SlottedChildView extends Component {
   final List<ChildSlot> slots;
 
   @override
-  Element createElement() => SlottedChildViewElement(this);
+  Element createElement() => _SlottedChildViewElement(this);
 }
 
-class SlottedChildViewElement extends DomRenderObjectElement {
-  SlottedChildViewElement(SlottedChildView super.component);
+class _SlottedChildViewElement extends DomRenderObjectElement {
+  _SlottedChildViewElement(SlottedChildView super.component);
 
   @override
   SlottedChildView get component => super.component as SlottedChildView;
@@ -215,7 +215,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   @override
   RenderObject createRenderObject() {
     final parent = parentRenderObjectElement!.renderObject;
-    final renderObject = SlottedDomRenderObject.fromNodes(component.nodes, parent as DomRenderObject);
+    final renderObject = SlottedDomRenderObject._fromNodes(component.nodes, parent as DomRenderObject);
     // The new nodes, such as on mount or reload, don't have the params applied yet.
     markNeedsRender();
     return renderObject;
@@ -242,8 +242,8 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     // The view normally applies changed params after rebuilding its slots,
     // but a query must be able to match them, so apply them first.
     // That includes the elements of removed slots, which released their params when deactivated.
-    final queriedRemovedSlots = slot is RangeChildSlot ? const <ChildSlotRenderObject>{} : renderObject._removedSlots;
-    if (slot is! RangeChildSlot && (_paramsChanged || queriedRemovedSlots.isNotEmpty)) {
+    final queriedRemovedSlots = slot is _RangeChildSlot ? const <ChildSlotRenderObject>{} : renderObject._removedSlots;
+    if (slot is! _RangeChildSlot && (_paramsChanged || queriedRemovedSlots.isNotEmpty)) {
       _applyParams(renderObject, includeRemovedSlots: queriedRemovedSlots.isNotEmpty);
     }
     final slotRenderObject = slot.createRenderObject(renderObject);
@@ -498,7 +498,7 @@ class _AppliedParams extends ApplyParams {
 class SlottedDomRenderObject extends DomRenderFragment {
   SlottedDomRenderObject._(DomRenderObject parent, {this.firstChildNode, this.lastChildNode}) : super(parent, []);
 
-  factory SlottedDomRenderObject.fromNodes(List<web.Node>? nodes, DomRenderObject parent) {
+  factory SlottedDomRenderObject._fromNodes(List<web.Node>? nodes, DomRenderObject parent) {
     final nodesToAdd = nodes ?? [if (parent is HydratableDomRenderObject) ...parent.toHydrate];
 
     if (nodesToAdd.isEmpty) {
@@ -582,7 +582,10 @@ class ChildSlotRenderObject extends DomRenderObject
   /// Creates a slot that owns all children of [node].
   ChildSlotRenderObject(this.node, DomRenderObject parent) : _range = null {
     this.parent = parent;
-    toHydrate = [...node.childNodes.toIterable()];
+    final childNodes = node.childNodes;
+    toHydrate = [
+      for (var childIndex = 0; childIndex < childNodes.length; childIndex += 1) childNodes.item(childIndex)!,
+    ];
   }
 
   /// Creates a slot that owns the nodes between [start] and [end].
@@ -607,7 +610,7 @@ class ChildSlotRenderObject extends DomRenderObject
 
   /// The node after which the children of this slot are placed,
   /// or `null` to place them at the start of [node].
-  web.Node? get beforeStart => _range?.start;
+  web.Node? get _beforeStart => _range?.start;
 
   /// Whether [other] is one of the nodes owned by this slot, or inside one of them.
   bool _owns(web.Node other) {
@@ -623,7 +626,7 @@ class ChildSlotRenderObject extends DomRenderObject
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
-    attachChild(child, after, startNode: beforeStart);
+    attachChild(child, after, startNode: _beforeStart);
   }
 
   @override
