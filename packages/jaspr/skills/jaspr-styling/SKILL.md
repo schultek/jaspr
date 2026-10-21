@@ -28,12 +28,13 @@ class App extends StatelessComponent {
   @css
   static List<StyleRule> get styles => [
     css('.main', [
-      // Use css('&') to refer to the parent selector (.main)
+      // In native CSS nesting, '&' refers to the parent selector (.main)
       css('&').styles(
         width: 100.px, // Note: Use `.px`, `.rem`, `.percent` extensions on numbers.
         padding: .all(10.rem),
         display: .flex,
       ),
+      // Pseudo-classes and child selectors work natively with '&'
       css('&:hover').styles(
         backgroundColor: Colors.blue,
       ),
@@ -41,6 +42,11 @@ class App extends StatelessComponent {
         color: Colors.blue,
       ),
     ]),
+    // NOTE on native nesting: Do NOT concatenate class suffixes like css('&-active') inside css('.button').
+    // Native CSS nesting cannot concatenate class names. Define modifier rules as separate top-level selectors:
+    css('.main-active').styles(
+      borderColor: Colors.blue,
+    ),
     // Responsive queries
     css.media(MediaQuery.screen(maxWidth: 600.px), [
       css('.main').styles(flexDirection: .column),
