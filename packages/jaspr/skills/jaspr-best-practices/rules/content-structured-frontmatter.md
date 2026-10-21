@@ -1,15 +1,15 @@
 ---
-title: Use Structured Frontmatter for Page Metadata, Layout Selection, and Navigation
+title: Use Structured Frontmatter for Page Metadata and Layout Selection
 impact: MEDIUM
-impactDescription: Enables automated metadata generation, SEO tags, layout routing, and table of contents generation
+impactDescription: Enables automated metadata generation, SEO tags, and layout routing
 tags: content, frontmatter, seo, layouts, jaspr_content
 ---
 
-## Use Structured Frontmatter for Page Metadata, Layout Selection, and Navigation
+## Use Structured Frontmatter for Page Metadata and Layout Selection
 
-**Impact: MEDIUM (Enables automated metadata generation, SEO tags, layout routing, and table of contents generation)**
+**Impact: MEDIUM (Enables automated metadata generation, SEO tags, and layout routing)**
 
-`jaspr_content` parses YAML frontmatter at the head of content Markdown files. This frontmatter drives automatic metadata generation (page titles, `<meta name="description">`, OpenGraph tags), layout selection (`layout: docs`, `layout: blog`), and navigation sidebar grouping.
+`jaspr_content` parses YAML frontmatter at the head of content Markdown files. This frontmatter drives automatic metadata generation (page titles, `<meta name="description">`, OpenGraph tags) and layout selection (`layout: docs`, `layout: blog`).
 
 Always provide structured frontmatter on Markdown pages rather than hardcoding headings and metadata manually.
 

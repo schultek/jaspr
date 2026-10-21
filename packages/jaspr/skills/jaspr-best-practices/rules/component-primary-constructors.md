@@ -41,9 +41,9 @@ class UserAvatar extends StatelessComponent {
 ```dart
 @client
 class UserAvatar({
-  required this.name,
-  required this.imageUrl,
-  this.size = 40,
+  required final String name,
+  required final String imageUrl,
+  final int size = 40,
   super.key,
 }) extends StatelessComponent {
   @override

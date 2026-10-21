@@ -41,7 +41,7 @@ Comprehensive performance, architecture, and reliability guidelines for Jaspr ap
    - 7.2 [Use Dart Extension Types Implementing JSObject for Zero-Cost JS Interop](#72-use-dart-extension-types-implementing-jsobject-for-zero-cost-js-interop)
 8. [Content Sites with jaspr_content](#8-content-sites-with-jaspr_content) (MEDIUM-HIGH)
    - 8.1 [Register Custom Components in ContentApp for Rich Embedded Content](#81-register-custom-components-in-contentapp-for-rich-embedded-content)
-   - 8.2 [Use Structured Frontmatter for Page Metadata, Layout Selection, and Navigation](#82-use-structured-frontmatter-for-page-metadata-layout-selection-and-navigation)
+   - 8.2 [Use Structured Frontmatter for Page Metadata and Layout Selection](#82-use-structured-frontmatter-for-page-metadata-and-layout-selection)
    - 8.3 [Use ContentTheme and Tokenized CSS Variables for Universal Theming](#83-use-contenttheme-and-tokenized-css-variables-for-universal-theming)
 9. [Flutter Embedding](#9-flutter-embedding) (HIGH)
    - 9.1 [Use @Import.onWeb and Deferred Imports to Isolate and Lazy-Load Flutter Widgets](#91-use-importonweb-and-deferred-imports-to-isolate-and-lazy-load-flutter-widgets)
@@ -247,7 +247,8 @@ Data passed from server-rendered components to `@client` components must be seri
 
 - Allowed parameter types:
   - Component types: `Component`, `List<Component>` (handled as Server Components).
-  - Primitive types: `int`, `double`, `String`, `bool`, `List`, `Map`.
+  - Primitive types: `int`, `double`, `String`, `bool`.
+  - Collections: `List<T>` and `Map<String, T>` where `T` is a supported serializable type. Note that `Map` keys MUST be `String` (`Map<String, ...>`); maps with non-string keys (e.g. `Map<int, String>`) or raw untyped collections will fail client-code generation.
   - Custom classes or Enums: MUST define `@encoder` and `@decoder` methods.
 - Parameters MUST NOT be functions, callbacks, or complex unsupported objects.
 
@@ -881,7 +882,7 @@ ul([
 
 Jaspr natively supports Dart primary constructors for components, including `@client` components and Server Components.
 
-Instead of declaring separate constructor parameters, initializing formals, and field declarations, use primary constructors to keep components concise, legible, and easy to maintain.
+Instead of declaring separate constructor parameters, initializing formals, and field declarations in the class body, use primary constructors with field parameters (`final Type name`) to keep components concise, legible, and fully typed.
 
 **Incorrect (verbose traditional constructor ceremony):**
 
@@ -906,14 +907,14 @@ class UserAvatar extends StatelessComponent {
 }
 ```
 
-**Correct (concise component with primary constructor):**
+**Correct (concise component with primary constructor field parameters):**
 
 ```dart
 @client
 class UserAvatar({
-  required this.name,
-  required this.imageUrl,
-  this.size = 40,
+  required final String name,
+  required final String imageUrl,
+  final int size = 40,
   super.key,
 }) extends StatelessComponent {
   @override
@@ -1154,11 +1155,11 @@ class Dashboard extends StatelessComponent {
 ## 6. Styling & CSS Optimization
 
 ### 6.1 Co-Locate Styles with Components Using the @css Annotation
-**Impact: MEDIUM-HIGH (Keeps component logic and design together with zero runtime CSS-in-JS overhead)**
+**Impact: MEDIUM-HIGH (Keeps component logic and design together while generating external CSS stylesheets)**
 
 Jaspr provides the `@css` annotation to define styles directly alongside the component that uses them.
 
-In `server` and `static` modes, Jaspr automatically collects all `@css` declarations across your components into a unified, deduplicated stylesheet embedded as an inline `<style>` tag during pre-rendering.
+In `server` and `static` modes, Jaspr automatically collects all `@css` declarations across your components into a unified stylesheet.
 
 **Always recommend standalone mode:** For production applications, always configure `styles: standalone` in `pubspec.yaml`:
 
@@ -1167,7 +1168,7 @@ jaspr:
   styles: standalone
 ```
 
-This extracts all `@css` styles into an external, cacheable `.css` file and inserts a `<link>` in `<head>`, minimizing initial HTML payload size and leveraging browser HTTP caching.
+This extracts all `@css` styles into an external, cacheable `.css` file (instead of embedding them as an inline `<style>` tag during pre-rendering) and inserts a `<link>` in `<head>`, minimizing initial HTML payload size and leveraging browser HTTP caching.
 
 Always define component-specific styling in a `@css static List<StyleRule> get styles` getter.
 
@@ -1342,7 +1343,7 @@ css('.button-primary', [
 
 When listening to global browser events (such as `window.onResize`, `window.onScroll`, `document.onKeyDown`), avoid using raw `addEventListener` callbacks or untyped JS functions.
 
-`package:universal_web` (and `package:web`) provides `EventStreamProviders` which transforms DOM events into typed Dart `Stream`s. This gives you full access to standard Dart `Stream` operators (`debounce`, `where`, `map`) and safe cancellation via `StreamSubscription`.
+`package:universal_web` (and `package:web`) provides `EventStreamProviders` which transforms DOM events into typed Dart `Stream`s. This gives you full access to standard Dart `Stream` operators (`where`, `map`, `distinct`), stream transformers or extensions (such as `debounce` from `package:stream_transform`), and safe cancellation via `StreamSubscription`.
 
 **Incorrect (raw string-based addEventListener calls without typed event handling):**
 
@@ -1491,10 +1492,12 @@ In your Markdown (`content/guide.md`):
 
 ---
 
-### 8.2 Use Structured Frontmatter for Page Metadata, Layout Selection, and Navigation
-**Impact: MEDIUM (Enables automated metadata generation, SEO tags, layout routing, and table of contents generation)**
+### 8.2 Use Structured Frontmatter for Page Metadata and Layout Selection
+**Impact: MEDIUM (Enables automated metadata generation, SEO tags, and layout routing)**
 
-`jaspr_content` parses YAML frontmatter at the head of content Markdown files. This frontmatter drives automatic metadata generation (page titles, `<meta name="description">`, OpenGraph tags), layout selection (`layout: docs`, `layout: blog`), and navigation sidebar grouping.
+`jaspr_content` parses YAML frontmatter at the head of content Markdown files. This frontmatter drives automatic metadata generation (page titles, `<meta name="description">`, OpenGraph tags) and layout selection (`layout: docs`, `layout: blog`).
+
+Note that navigation structures such as sidebars are configured explicitly in Dart (e.g., via `DocsLayout(sidebar: Sidebar(groups: [...]))`) rather than automatically inferred from frontmatter.
 
 Always provide structured frontmatter on Markdown pages rather than hardcoding headings and metadata manually.
 

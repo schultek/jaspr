@@ -72,7 +72,7 @@ Reference these guidelines when:
 
 ### 6. Styling & CSS Optimization (MEDIUM)
 
-- [styling-colocate-with-at-css](rules/styling-colocate-with-at-css.md) — Co-Locate Styles with Components Using the @css Annotation — Keeps component logic and design together with zero runtime CSS-in-JS overhead.
+- [styling-colocate-with-at-css](rules/styling-colocate-with-at-css.md) — Co-Locate Styles with Components Using the @css Annotation — Keeps component logic and design together while generating external CSS stylesheets.
 - [styling-inline-only-dynamic](rules/styling-inline-only-dynamic.md) — Restrict Inline Styles to Truly Dynamic Runtime Values — Eliminates bloated HTML markup and enables browser caching of CSS rules.
 - [styling-typed-units](rules/styling-typed-units.md) — Use Typed Unit Extensions and Dot-Shorthands — Guarantees valid CSS values, eliminates unit string typos, and optimizes readability.
 - [styling-valid-css-nesting](rules/styling-valid-css-nesting.md) — Follow Native CSS Nesting Rules in css() — Prevents silent CSS styling bugs caused by invalid selector concatenation.
@@ -85,7 +85,7 @@ Reference these guidelines when:
 ### 8. Content Sites with jaspr_content (MEDIUM-HIGH)
 
 - [content-custom-components](rules/content-custom-components.md) — Register Custom Components in ContentApp for Rich Embedded Content — Allows embedding interactive client widgets and rich callouts directly inside Markdown content.
-- [content-structured-frontmatter](rules/content-structured-frontmatter.md) — Use Structured Frontmatter for Page Metadata, Layout Selection, and Navigation — Enables automated metadata generation, SEO tags, layout routing, and table of contents generation.
+- [content-structured-frontmatter](rules/content-structured-frontmatter.md) — Use Structured Frontmatter for Page Metadata and Layout Selection — Enables automated metadata generation, SEO tags, and layout routing.
 - [content-theme-tokens](rules/content-theme-tokens.md) — Use ContentTheme and Tokenized CSS Variables for Universal Theming — Guarantees consistent dark/light mode adaptation across built-in and custom components.
 
 ### 9. Flutter Embedding (HIGH)

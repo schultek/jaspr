@@ -108,7 +108,7 @@ class ArticleHeader extends StatelessComponent {
 
     return header(classes: 'article-header', [
       h1([.text(title)]),
-      if (date != null) time([.text(date)]),
+      if (date != null) span([.text(date)]),
     ]);
   }
 }
