@@ -54,7 +54,7 @@ class Card extends StatelessComponent {
         ),
       ),
       css('&:hover').styles(
-        backgroundColor: Color.hex('#f9fafb'),
+        backgroundColor: Color('#f9fafb'),
       ),
     ]),
   ];

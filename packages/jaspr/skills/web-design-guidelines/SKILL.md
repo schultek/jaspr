@@ -15,28 +15,28 @@ Always prefer native HTML elements over ARIA attributes or custom div click hand
 
 ### Core Rules
 - **Rule 1 (Links vs Buttons):** Use `a(href: ...)` for navigation and `button(type: ButtonType.button, ...)` for actions. NEVER use `div(onClick: ...)` or `span(onClick: ...)` as interactive elements.
-- **Rule 2 (Icon Buttons):** Icon-only buttons MUST have an `ariaLabel:` or visually hidden text for screen readers.
-- **Rule 3 (Decorative Media):** Decorative icons and SVG illustrations MUST set `ariaHidden: 'true'`.
+- **Rule 2 (Icon Buttons):** Icon-only buttons MUST have `attributes: {'aria-label': '...'}` or visually hidden text for screen readers.
+- **Rule 3 (Decorative Media):** Decorative icons and SVG illustrations MUST set `attributes: {'aria-hidden': 'true'}`.
 - **Rule 4 (Images):** Every `img()` MUST provide an `alt` attribute (use `alt: ''` if purely decorative).
 - **Rule 5 (Headings):** Maintain logical heading hierarchy (`h1` through `h6`). Headings with anchor links MUST include `scroll-margin-top` to avoid being obscured by sticky headers.
-- **Rule 6 (Async Announcements):** Dynamic alerts, toasts, or inline validation updates MUST use `ariaLive: 'polite'`.
+- **Rule 6 (Async Announcements):** Dynamic alerts, toasts, or inline validation updates MUST use `attributes: {'aria-live': 'polite'}`.
 
 ### Good vs Bad Example
 
 ```dart
 // ❌ BAD: Non-semantic, inaccessible div-button
 div(classes: 'btn', onClick: () => doAction(), [
-  img(src: '/icons/trash.svg'), // Missing alt / ariaHidden
+  img(src: '/icons/trash.svg'), // Missing alt and aria-hidden
 ])
 
 // ✅ GOOD: Semantic, fully accessible Jaspr button
 button(
   type: ButtonType.button,
   classes: 'btn-icon',
-  ariaLabel: 'Delete item',
+  attributes: {'aria-label': 'Delete item'},
   onClick: () => doAction(),
   [
-    img(src: '/icons/trash.svg', alt: '', ariaHidden: 'true'),
+    img(src: '/icons/trash.svg', alt: '', attributes: {'aria-hidden': 'true'}),
   ],
 )
 ```
@@ -49,7 +49,7 @@ Every interactive element must provide clear, accessible focus states for keyboa
 
 ### Core Rules
 - **Rule 1 (Use `:focus-visible`):** Apply focus styles to `:focus-visible` rather than `:focus` so click/tap users don't see distracting rings.
-- **Rule 2 (Never Bare `outline: none`):** NEVER remove the outline (`outline: none` or `outline: Outline.none`) without immediately replacing it with an accessible focus indicator (e.g. outline ring or box-shadow).
+- **Rule 2 (Never Bare `outline: none`):** NEVER remove the outline (`outline: Outline(style: OutlineStyle.none)`) without immediately replacing it with an accessible focus indicator (e.g. outline ring or box-shadow).
 - **Rule 3 (Group Focus):** Use `:focus-within` on compound controls (e.g. an input with an embedded clear button or action dropdown).
 - **Rule 4 (No Obscuring):** Sticky headers, floating banners, and drawers must never overlap or cover the actively focused element.
 
@@ -59,16 +59,20 @@ Every interactive element must provide clear, accessible focus states for keyboa
 // ❌ BAD: Removing focus ring completely
 @css
 static List<StyleRule> get styles => [
-  css('button:focus').styles(outline: Outline.none),
+  css('button:focus').styles(outline: Outline(style: OutlineStyle.none)),
 ];
 
 // ✅ GOOD: Accessible focus ring with :focus-visible
 @css
 static List<StyleRule> get styles => [
-  css('button:focus').styles(outline: Outline.none),
+  css('button:focus').styles(outline: Outline(style: OutlineStyle.none)),
   css('button:focus-visible').styles(
-    outline: Outline(width: 2.px, style: OutlineStyle.solid, color: Colors.blue),
-    outlineOffset: 2.px,
+    outline: Outline(
+      color: Colors.blue,
+      style: OutlineStyle.solid,
+      width: OutlineWidth(2.px),
+      offset: 2.px,
+    ),
   ),
   css('.input-group:focus-within').styles(
     border: .all(color: Colors.blue),
@@ -89,7 +93,7 @@ Form controls must be resilient, convenient, and mobile-friendly.
 - **Rule 4 (Hit Target Sizes):** Interactive targets must be at least `24px` on desktop and at least `44px` on mobile/touch interfaces.
 - **Rule 5 (Never Block Paste):** NEVER disable paste events (`onPaste`) on password or code inputs.
 - **Rule 6 (Loading State):** When submitting forms, keep the submit button visible and disabled, show a loading spinner, and preserve the original label or use an ellipsis: `"Saving…"`.
-- **Rule 7 (Spellcheck):** Set `spellCheck: false` on emails, usernames, API keys, and verification codes.
+- **Rule 7 (Spellcheck, Autocomplete, Placeholder via Attributes):** Set `attributes: {'spellcheck': 'false', 'autocomplete': '...', 'placeholder': '...'}` on inputs as appropriate.
 
 ### Good vs Bad Example
 
@@ -101,9 +105,11 @@ div(classes: 'field', [
     id: 'email-input',
     type: InputType.email,
     name: 'email',
-    autoComplete: 'email',
-    spellCheck: false,
-    placeholder: 'name@example.com',
+    attributes: {
+      'autocomplete': 'email',
+      'spellcheck': 'false',
+      'placeholder': 'name@example.com',
+    },
   ),
 ])
 ```
@@ -116,7 +122,7 @@ Animations should clarify cause-and-effect or add deliberate delight without cau
 
 ### Core Rules
 - **Rule 1 (Compositor-Friendly Properties):** Animate ONLY GPU-accelerated properties (`transform` and `opacity`). NEVER animate layout-triggering properties (`width`, `height`, `top`, `left`, `margin`, `padding`).
-- **Rule 2 (Never `transition: all`):** Explicitly declare only the properties being animated (e.g. `transition: 'transform 0.2s ease, opacity 0.2s ease'`).
+- **Rule 2 (Never `transition: all`):** Explicitly declare only the properties being animated using `Transition(...)` or `Transition.combine([...])`.
 - **Rule 3 (Respect Reduced Motion):** ALWAYS provide a `@media (prefers-reduced-motion: reduce)` override that removes or simplifies motion.
 - **Rule 4 (Interruptible):** Animations must be cancelable and immediately respond to user input mid-flight.
 - **Rule 5 (Autoplay Controls):** Any automatically looping animation lasting longer than 5 seconds must provide controls to pause, stop, or hide it.
@@ -128,7 +134,7 @@ Animations should clarify cause-and-effect or add deliberate delight without cau
 @css
 static List<StyleRule> get styles => [
   css('.panel').styles(
-    transition: Transition('all', duration: 300),
+    transition: Transition('all', duration: Duration(milliseconds: 300)),
   ),
   css('.panel.open').styles(
     height: 300.px, // Triggers layout thrashing / jank
@@ -141,7 +147,10 @@ static List<StyleRule> get styles => [
   css('.panel').styles(
     opacity: 0,
     transform: Transform.translate(y: 8.px),
-    transition: Transition('opacity 0.2s ease, transform 0.2s ease'),
+    transition: Transition.combine([
+      Transition('opacity', duration: Duration(milliseconds: 200), curve: Curve.ease),
+      Transition('transform', duration: Duration(milliseconds: 200), curve: Curve.ease),
+    ]),
   ),
   css('.panel.open').styles(
     opacity: 1,
@@ -149,8 +158,10 @@ static List<StyleRule> get styles => [
   ),
   css('@media (prefers-reduced-motion: reduce)', [
     css('.panel').styles(
-      transition: Transition.none,
-      transform: Transform.none,
+      raw: {
+        'transition': 'none',
+        'transform': 'none',
+      },
     ),
   ]),
 ];
@@ -166,8 +177,8 @@ Small typographic details distinguish high-end products from amateur designs.
 - **Rule 1 (Ellipsis):** Use the actual ellipsis character `…` (`&hellip;`), not three periods `...`.
 - **Rule 2 (Loading & Menu Actions):** Menu items that open a dialog end with an ellipsis (e.g. `"Rename…"`, `"Export…"`). Active processing states end with an ellipsis (e.g. `"Loading…"`, `"Saving…"`, `"Deploying…"`).
 - **Rule 3 (Curly Quotes):** Use typographic curly quotes `“` `”` / `‘` `’` rather than straight quotes `"`, `'` in marketing and editorial text.
-- **Rule 4 (Tabular Figures for Numbers):** Use `font-variant-numeric: tabular-nums` (or monospace) when displaying columns of numbers, timers, or metric counters to prevent horizontal jitter as digits change.
-- **Rule 5 (Preventing Widows):** Apply `text-wrap: balance` on headings and `text-wrap: pretty` on paragraphs to avoid lone dangling words on the final line.
+- **Rule 4 (Tabular Figures for Numbers):** Use `font-variant-numeric: tabular-nums` (via `raw: {'font-variant-numeric': 'tabular-nums'}`) or monospace when displaying columns of numbers, timers, or metric counters to prevent horizontal jitter as digits change.
+- **Rule 5 (Preventing Widows):** Apply `text-wrap: balance` on headings (via `raw: {'text-wrap': 'balance'}`) and `text-wrap: pretty` on paragraphs to avoid lone dangling words on the final line.
 - **Rule 6 (Non-Breaking Spaces):** Use non-breaking spaces (`\u00A0` or `&nbsp;`) between numbers and units (e.g. `10\u00A0MB`, `⌘\u00A0K`).
 
 ### Good vs Bad Example
@@ -182,10 +193,10 @@ p([.text('Loading… “Project Alpha” (10\u00A0MB)')])
 @css
 static List<StyleRule> get styles => [
   css('h1, h2, h3').styles(
-    textWrap: TextWrap.balance,
+    raw: {'text-wrap': 'balance'},
   ),
   css('.metric-counter, .table-numbers').styles(
-    fontVariantNumeric: FontVariantNumeric.tabularNums,
+    raw: {'font-variant-numeric': 'tabular-nums'},
   ),
 ];
 ```
@@ -199,7 +210,7 @@ Designs must gracefully handle varying content sizes without breaking layouts.
 ### Core Rules
 - **Rule 1 (Flex Truncation with `min-w-0`):** Flex child containers that truncate text MUST set `min-width: 0` (`minWidth: Unit.zero`), otherwise CSS flex minimum size rules prevent text truncation (`text-overflow: ellipsis`) from working.
 - **Rule 2 (No Cumulative Layout Shift - CLS):** Every `img()` MUST specify explicit `width` and `height` attributes (or an `aspect-ratio` style) so the browser reserves space before the image loads.
-- **Rule 3 (Lazy Loading):** Images below the fold MUST use `loading: 'lazy'`. Images critical to the initial viewport (LCP) should use `loading: 'eager'`.
+- **Rule 3 (Lazy Loading):** Images below the fold MUST use `loading: MediaLoading.lazy`. Images critical to the initial viewport (LCP) should use `loading: MediaLoading.eager`.
 - **Rule 4 (Handle All States):** Design for all 4 states: Empty, Sparse, Dense, and Error. Never render broken UI or blank containers for empty arrays/strings.
 
 ### Good vs Bad Example
