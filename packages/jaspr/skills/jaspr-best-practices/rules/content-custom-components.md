@@ -9,7 +9,7 @@ tags: content, markdown, components, jaspr_content
 
 **Impact: MEDIUM-HIGH (Allows embedding interactive client widgets and rich callouts directly inside Markdown content)**
 
-`jaspr_content` enables authoring rich content sites where Markdown files can include custom HTML-like tags (e.g. `<Callout>`, `<Tabs>`, `<Demo>`).
+`jaspr_content` enables authoring rich content sites where Markdown files can include custom HTML-like tags (e.g. `<Warning>`, `<Tabs>`, `<Demo>`).
 
 Instead of writing fragile raw HTML snippets or scripts inside Markdown files, register components using `ContentApp(components: [...])`. You can use built-in components (such as `Callout()`, `Tabs()`, `FileTree()`), or create custom components by constructing a `CustomComponent` or extending `CustomComponentBase`. This enables:
 - Seamless embedding of interactive `@client` islands inside static Markdown documentation.
@@ -34,8 +34,15 @@ import 'package:jaspr_content/components/callout.dart';
 import 'package:jaspr_content/components/tabs.dart';
 import 'package:jaspr_content/jaspr_content.dart';
 
+import 'main.server.options.dart';
+
 void main() {
+  Jaspr.initializeApp(options: defaultServerOptions);
+
   runApp(ContentApp(
+    parsers: [
+      MarkdownParser(),
+    ],
     components: [
       // 1. Built-in components:
       Callout(),
@@ -59,9 +66,9 @@ In your Markdown (`content/guide.md`):
 ```markdown
 # Configuration Guide
 
-<Callout type="warning">
+<Warning>
   Be careful with this configuration!
-</Callout>
+</Warning>
 
 <Demo title="Interactive Preview">
   Check out this demo component embedded directly in markdown.

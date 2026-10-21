@@ -16,7 +16,7 @@ Jaspr exports `ChangeNotifier`, `ValueNotifier`, and `Listenable` from `package:
 **Incorrect (calling setState high in the tree, rebuilding static children):**
 
 ```dart
-@client
+// Ordinary component inside a client island:
 class Dashboard extends StatefulComponent {
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -40,7 +40,7 @@ class _DashboardState extends State<Dashboard> {
 **Correct (isolating updates to a ListenableBuilder):**
 
 ```dart
-@client
+// Ordinary component inside an existing client island:
 class Dashboard extends StatelessComponent {
   const Dashboard({required this.notifications, super.key});
   final ValueNotifier<int> notifications;

@@ -100,8 +100,11 @@ Usage on the server:
 import 'package:jaspr/server.dart';
 import 'package:jaspr/dom.dart';
 import 'components/expandable_card.dart';
+import 'main.server.options.dart';
 
 void main() {
+  Jaspr.initializeApp(options: defaultServerOptions);
+
   runApp(Document(
     body: ExpandableCard(
       title: 'Server Details',

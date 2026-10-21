@@ -38,6 +38,7 @@ class EmbedSection extends StatelessComponent {
 
 ```dart
 // lib/components/embed_section.dart
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
@@ -46,12 +47,14 @@ import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 // 2. Import as deferred to lazy-load the Flutter bundle:
 import 'embed_section.imports.dart' deferred as widget;
 
+// 3. Mark with @client so it hydrates in the browser and initializes Flutter:
+@client
 class EmbedSection extends StatelessComponent {
   const EmbedSection({super.key});
 
   @override
   Component build(BuildContext context) {
-    // 3. Use FlutterEmbedView.deferred:
+    // 4. Use FlutterEmbedView.deferred:
     return FlutterEmbedView.deferred(
       constraints: const ViewConstraints(minWidth: 300, minHeight: 400),
       loader: div([.text('Loading Flutter experience...')]),

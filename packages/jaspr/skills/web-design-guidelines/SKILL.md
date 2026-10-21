@@ -71,7 +71,7 @@ static List<StyleRule> get styles => [
     outlineOffset: 2.px,
   ),
   css('.input-group:focus-within').styles(
-    borderColor: Colors.blue,
+    border: .all(color: Colors.blue),
   ),
 ];
 ```

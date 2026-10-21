@@ -6,40 +6,40 @@ Comprehensive performance, architecture, and reliability guidelines for Jaspr ap
 
 ## Table of Contents
 
-1. [Server Components & Surgical Hydration](#1-server-components-surgical-hydration) (CRITICAL)
+1. [Server Components & Surgical Hydration](#1-server-components--surgical-hydration) (CRITICAL)
    - 1.1 [Use Component.apply to Style Server Components from Client Shells](#11-use-componentapply-to-style-server-components-from-client-shells)
    - 1.2 [Use Server Components for Static Content Inside Interactive Shells](#12-use-server-components-for-static-content-inside-interactive-shells)
    - 1.3 [Toggle Server Component Visibility with CSS, Never Conditional Dart If](#13-toggle-server-component-visibility-with-css-never-conditional-dart-if)
    - 1.4 [Ensure Non-Component Props Across @client Boundaries Are Serializable](#14-ensure-non-component-props-across-client-boundaries-are-serializable)
    - 1.5 [Place @client on the Uppermost Interactive Boundary](#15-place-client-on-the-uppermost-interactive-boundary)
-2. [Bundle Size & Code Isolation](#2-bundle-size-code-isolation) (CRITICAL)
+2. [Bundle Size & Code Isolation](#2-bundle-size--code-isolation) (CRITICAL)
    - 2.1 [Design Small, Focused Interactive Islands Rather Than Monolithic Client Trees](#21-design-small-focused-interactive-islands-rather-than-monolithic-client-trees)
    - 2.2 [Strictly Isolate Platform Libraries Between Server and Client](#22-strictly-isolate-platform-libraries-between-server-and-client)
-   - 2.3 [Guard Browser API Calls with kIsWeb When Using universal_web](#23-guard-browser-api-calls-with-kisweb-when-using-universalweb)
-3. [Async Data Fetching & Waterfalls](#3-async-data-fetching-waterfalls) (HIGH)
+   - 2.3 [Guard Browser API Calls with kIsWeb When Using universal_web](#23-guard-browser-api-calls-with-kisweb-when-using-universal_web)
+3. [Async Data Fetching & Waterfalls](#3-async-data-fetching--waterfalls) (HIGH)
    - 3.1 [Defer Await Until Value is Needed in Conditional Branches](#31-defer-await-until-value-is-needed-in-conditional-branches)
    - 3.2 [Use Future.wait for Independent Asynchronous Operations](#32-use-futurewait-for-independent-asynchronous-operations)
    - 3.3 [Fetch Data on the Server with AsyncStatelessComponent to Eliminate Client Waterfalls](#33-fetch-data-on-the-server-with-asyncstatelesscomponent-to-eliminate-client-waterfalls)
-4. [Component Architecture & Composition](#4-component-architecture-composition) (MEDIUM-HIGH)
+4. [Component Architecture & Composition](#4-component-architecture--composition) (MEDIUM-HIGH)
    - 4.1 [Use const Constructors for Components](#41-use-const-constructors-for-components)
    - 4.2 [Use Dot-Shorthands for Core Component Primitives](#42-use-dot-shorthands-for-core-component-primitives)
    - 4.3 [Use GlobalNodeKey with Explicit HTML Element Types for Direct DOM Access](#43-use-globalnodekey-with-explicit-html-element-types-for-direct-dom-access)
    - 4.4 [Assign Stable Keys When Rendering Dynamic Lists](#44-assign-stable-keys-when-rendering-dynamic-lists)
    - 4.5 [Use Dart Primary Constructors for Concise Component Definitions](#45-use-dart-primary-constructors-for-concise-component-definitions)
    - 4.6 [Prefer Typed DOM Parameters Over Raw Attributes and Events Maps](#46-prefer-typed-dom-parameters-over-raw-attributes-and-events-maps)
-5. [State & Reactivity Performance](#5-state-reactivity-performance) (MEDIUM)
+5. [State & Reactivity Performance](#5-state--reactivity-performance) (MEDIUM)
    - 5.1 [Always Clean Up Subscriptions, Streams, and Notifiers in dispose()](#51-always-clean-up-subscriptions-streams-and-notifiers-in-dispose)
    - 5.2 [Use InheritedComponent to Avoid Prop Drilling Across Deep Trees](#52-use-inheritedcomponent-to-avoid-prop-drilling-across-deep-trees)
    - 5.3 [Localize Re-Renders with ListenableBuilder and package:listen](#53-localize-re-renders-with-listenablebuilder-and-packagelisten)
-6. [Styling & CSS Optimization](#6-styling-css-optimization) (MEDIUM)
+6. [Styling & CSS Optimization](#6-styling--css-optimization) (MEDIUM)
    - 6.1 [Co-Locate Styles with Components Using the @css Annotation](#61-co-locate-styles-with-components-using-the-css-annotation)
    - 6.2 [Restrict Inline Styles to Truly Dynamic Runtime Values](#62-restrict-inline-styles-to-truly-dynamic-runtime-values)
    - 6.3 [Use Typed Unit Extensions and Dot-Shorthands](#63-use-typed-unit-extensions-and-dot-shorthands)
    - 6.4 [Follow Native CSS Nesting Rules in css()](#64-follow-native-css-nesting-rules-in-css)
-7. [JS Interop & Web Performance](#7-js-interop-web-performance) (LOW-MEDIUM)
+7. [JS Interop & Web Performance](#7-js-interop--web-performance) (LOW-MEDIUM)
    - 7.1 [Use web.EventStreamProviders for Global Event Streams](#71-use-webeventstreamproviders-for-global-event-streams)
    - 7.2 [Use Dart Extension Types Implementing JSObject for Zero-Cost JS Interop](#72-use-dart-extension-types-implementing-jsobject-for-zero-cost-js-interop)
-8. [Content Sites with jaspr_content](#8-content-sites-with-jasprcontent) (MEDIUM-HIGH)
+8. [Content Sites with jaspr_content](#8-content-sites-with-jaspr_content) (MEDIUM-HIGH)
    - 8.1 [Register Custom Components in ContentApp for Rich Embedded Content](#81-register-custom-components-in-contentapp-for-rich-embedded-content)
    - 8.2 [Use Structured Frontmatter for Page Metadata, Layout Selection, and Navigation](#82-use-structured-frontmatter-for-page-metadata-layout-selection-and-navigation)
    - 8.3 [Use ContentTheme and Tokenized CSS Variables for Universal Theming](#83-use-contenttheme-and-tokenized-css-variables-for-universal-theming)
@@ -92,7 +92,7 @@ class ThemeWrapper extends StatelessComponent {
     return Component.apply(
       classes: isDarkMode ? 'dark-theme' : 'light-theme',
       styles: Styles(padding: .all(16.px)),
-      child: component.child,
+      child: child,
     );
   }
 }
@@ -341,7 +341,7 @@ class FormInput extends StatelessComponent { ... }
 class SubmitButton extends StatelessComponent { ... }
 
 @client
-class MyForm extends StatefulComponent {
+class MyForm extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return form([
@@ -362,7 +362,7 @@ class SubmitButton extends StatelessComponent { ... }
 
 // Only the root boundary gets @client
 @client
-class MyForm extends StatefulComponent {
+class MyForm extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return form([
@@ -1102,7 +1102,7 @@ Jaspr exports `ChangeNotifier`, `ValueNotifier`, and `Listenable` from `package:
 **Incorrect (calling setState high in the tree, rebuilding static children):**
 
 ```dart
-@client
+// Ordinary component inside a client island:
 class Dashboard extends StatefulComponent {
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -1126,7 +1126,7 @@ class _DashboardState extends State<Dashboard> {
 **Correct (isolating updates to a ListenableBuilder):**
 
 ```dart
-@client
+// Ordinary component inside an existing client island:
 class Dashboard extends StatelessComponent {
   const Dashboard({required this.notifications, super.key});
   final ValueNotifier<int> notifications;
@@ -1198,7 +1198,7 @@ class Card extends StatelessComponent {
         ),
       ),
       css('&:hover').styles(
-        backgroundColor: Colors.grey.shade50,
+        backgroundColor: Color.hex('#f9fafb'),
       ),
     ]),
   ];
@@ -1411,7 +1411,7 @@ void setupMap() {
 ### 8.1 Register Custom Components in ContentApp for Rich Embedded Content
 **Impact: MEDIUM-HIGH (Allows embedding interactive client widgets and rich callouts directly inside Markdown content)**
 
-`jaspr_content` enables authoring rich content sites where Markdown files can include custom HTML-like tags (e.g. `<Callout>`, `<Tabs>`, `<Demo>`).
+`jaspr_content` enables authoring rich content sites where Markdown files can include custom HTML-like tags (e.g. `<Warning>`, `<Tabs>`, `<Demo>`).
 
 Instead of writing fragile raw HTML snippets or scripts inside Markdown files, register components using `ContentApp(components: [...])`. You can use built-in components (such as `Callout()`, `Tabs()`, `FileTree()`), or create custom components by constructing a `CustomComponent` or extending `CustomComponentBase`. This enables:
 - Seamless embedding of interactive `@client` islands inside static Markdown documentation.
@@ -1436,8 +1436,15 @@ import 'package:jaspr_content/components/callout.dart';
 import 'package:jaspr_content/components/tabs.dart';
 import 'package:jaspr_content/jaspr_content.dart';
 
+import 'main.server.options.dart';
+
 void main() {
+  Jaspr.initializeApp(options: defaultServerOptions);
+
   runApp(ContentApp(
+    parsers: [
+      MarkdownParser(),
+    ],
     components: [
       // 1. Built-in components:
       Callout(),
@@ -1461,9 +1468,9 @@ In your Markdown (`content/guide.md`):
 ```markdown
 # Configuration Guide
 
-<Callout type="warning">
+<Warning>
   Be careful with this configuration!
-</Callout>
+</Warning>
 
 <Demo title="Interactive Preview">
   Check out this demo component embedded directly in markdown.
@@ -1555,7 +1562,7 @@ static List<StyleRule> get styles => [
   css('.custom-card').styles(
     backgroundColor: ContentColors.background, // ColorToken implements Color directly
     color: ContentColors.text,
-    borderColor: customAccent,
+    border: .all(color: customAccent),
     fontFamily: ContentTheme.currentFont,
   ),
 ];
@@ -1597,6 +1604,7 @@ class EmbedSection extends StatelessComponent {
 
 ```dart
 // lib/components/embed_section.dart
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 
@@ -1605,12 +1613,14 @@ import 'package:jaspr_flutter_embed/jaspr_flutter_embed.dart';
 // 2. Import as deferred to lazy-load the Flutter bundle:
 import 'embed_section.imports.dart' deferred as widget;
 
+// 3. Mark with @client so it hydrates in the browser and initializes Flutter:
+@client
 class EmbedSection extends StatelessComponent {
   const EmbedSection({super.key});
 
   @override
   Component build(BuildContext context) {
-    // 3. Use FlutterEmbedView.deferred:
+    // 4. Use FlutterEmbedView.deferred:
     return FlutterEmbedView.deferred(
       constraints: const ViewConstraints(minWidth: 300, minHeight: 400),
       loader: div([.text('Loading Flutter experience...')]),

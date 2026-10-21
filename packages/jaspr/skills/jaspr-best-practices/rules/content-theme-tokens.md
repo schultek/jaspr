@@ -55,7 +55,7 @@ static List<StyleRule> get styles => [
   css('.custom-card').styles(
     backgroundColor: ContentColors.background, // ColorToken implements Color directly
     color: ContentColors.text,
-    borderColor: customAccent,
+    border: .all(color: customAccent),
     fontFamily: ContentTheme.currentFont,
   ),
 ];

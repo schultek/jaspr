@@ -24,7 +24,7 @@ class FormInput extends StatelessComponent { ... }
 class SubmitButton extends StatelessComponent { ... }
 
 @client
-class MyForm extends StatefulComponent {
+class MyForm extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return form([
@@ -45,7 +45,7 @@ class SubmitButton extends StatelessComponent { ... }
 
 // Only the root boundary gets @client
 @client
-class MyForm extends StatefulComponent {
+class MyForm extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return form([

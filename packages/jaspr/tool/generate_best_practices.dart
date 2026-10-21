@@ -122,12 +122,15 @@ List<Section> _parseSections(String content) {
   String? currentDescription;
 
   void pushCurrent() {
-    if (currentPriority != null && currentTitle != null && currentPrefix != null) {
+    final priority = currentPriority;
+    final title = currentTitle;
+    final prefix = currentPrefix;
+    if (priority != null && title != null && prefix != null) {
       sections.add(
         Section(
-          priority: currentPriority!,
-          title: currentTitle!,
-          prefix: currentPrefix!,
+          priority: priority,
+          title: title,
+          prefix: prefix,
           impact: currentImpact ?? 'MEDIUM',
           description: currentDescription ?? '',
         ),
@@ -276,7 +279,7 @@ String _generateAgentsMd(List<Section> sections, List<Rule> rules) {
     }
   }
 
-  return buffer.toString().trim() + '\n';
+  return '${buffer.toString().trim()}\n';
 }
 
 String _generateSkillMd(List<Section> sections, List<Rule> rules) {
@@ -349,5 +352,5 @@ String _generateSkillMd(List<Section> sections, List<Rule> rules) {
 }
 
 String _toAnchor(String text) {
-  return text.toLowerCase().replaceAll(RegExp(r'[^a-z0-9\s-]'), '').replaceAll(RegExp(r'\s+'), '-');
+  return text.toLowerCase().replaceAll(RegExp(r'[^a-z0-9\s_-]'), '').replaceAll(RegExp(r'\s'), '-');
 }

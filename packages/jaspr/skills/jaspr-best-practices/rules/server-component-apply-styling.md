@@ -48,7 +48,7 @@ class ThemeWrapper extends StatelessComponent {
     return Component.apply(
       classes: isDarkMode ? 'dark-theme' : 'light-theme',
       styles: Styles(padding: .all(16.px)),
-      child: component.child,
+      child: child,
     );
   }
 }

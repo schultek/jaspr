@@ -45,7 +45,7 @@ class App extends StatelessComponent {
     // NOTE on native nesting: Do NOT concatenate class suffixes like css('&-active') inside css('.button').
     // Native CSS nesting cannot concatenate class names. Define modifier rules as separate top-level selectors:
     css('.main-active').styles(
-      borderColor: Colors.blue,
+      border: .all(color: Colors.blue),
     ),
     // Responsive queries
     css.media(MediaQuery.screen(maxWidth: 600.px), [

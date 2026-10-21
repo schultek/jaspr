@@ -155,7 +155,11 @@ ContentApp(
       ),
     ),
     BlogLayout(
-      header: Header(title: 'Jaspr Blog', items: [ThemeToggle()]),
+      header: Header(
+        title: 'Jaspr Blog',
+        logo: '/images/logo.svg',
+        items: [ThemeToggle()],
+      ),
     ),
     EmptyLayout(),
   ],
@@ -257,6 +261,7 @@ When a component embedded in markdown requires client-side state or event listen
 
 ```dart
 // lib/components/counter.dart
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 @client
@@ -377,7 +382,7 @@ static List<StyleRule> get styles => [
   css('.featured-pill').styles(
     backgroundColor: brandAccent,
     color: ContentColors.background,
-    borderColor: ContentColors.quoteBorders,
+    border: .all(color: ContentColors.quoteBorders),
   ),
 ];
 ```
@@ -393,7 +398,7 @@ To embed custom HTML or marketing widgets without prose styling (margins, line-h
 ```
 
 #### Dos and Don'ts:
-- **DO** pass `ColorToken` instances directly to style properties (`backgroundColor`, `color`, `borderColor`). Because `ColorToken` implements `Color`, no manual `Color.variable(...)` string wrapper is needed.
+- **DO** pass `ColorToken` instances directly to style properties (`backgroundColor`, `color`, `border: .all(color: ...)`). Because `ColorToken` implements `Color`, no manual `Color.variable(...)` string wrapper is needed.
 - **DO** use `ThemeColor(light, dark: dark)` for automatic dark mode handling.
 - **DO** apply `class="not-content"` to isolate custom UI cards, grids, or embeds from global markdown prose rules.
 - **DO NOT** hardcode raw hex values in individual component styles when semantic tokens exist.
