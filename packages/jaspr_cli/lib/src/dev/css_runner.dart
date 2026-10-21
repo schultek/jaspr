@@ -134,41 +134,52 @@ class CssRunner {
     assert(process == null);
 
     _changedFiles.clear();
-    final cssFiles = stylesFiles = await _generateRunner(watch: true);
-    if (cssFiles.isEmpty) return;
-    this.cssFiles = cssFiles;
+    try {
+      final cssFiles = stylesFiles = await _generateRunner(watch: true);
+      if (cssFiles.isEmpty) return;
+      this.cssFiles = cssFiles;
 
-    final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
+      final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
 
-    if (!_initialGenerationCompleter.isCompleted) {
-      logger.write('Starting CSS generation...', tag: Tag.css);
-    }
+      if (!_initialGenerationCompleter.isCompleted) {
+        logger.write('Starting CSS generation...', tag: Tag.css);
+      }
 
-    client = await FrontendServerClient.start(
-      runnerFile.path,
-      Directory.current.absolute.uri.resolve('.dart_tool/jaspr/css/css_runner.dill').toFilePath(),
-      platformKernel,
-      target: 'vm',
-      sdkRoot: dartSdkDir,
-      librariesSpec: librariesFile.uri.toString(),
-      packagesJson: packageConfigFile.uri.toString(),
-      printIncrementalDependencies: true,
-    );
+      client = await FrontendServerClient.start(
+        runnerFile.path,
+        Directory.current.absolute.uri.resolve('.dart_tool/jaspr/css/css_runner.dill').toFilePath(),
+        platformKernel,
+        target: 'vm',
+        sdkRoot: dartSdkDir,
+        librariesSpec: librariesFile.uri.toString(),
+        packagesJson: packageConfigFile.uri.toString(),
+        printIncrementalDependencies: true,
+      );
 
-    final compilerResult = await client!.compile();
+      final compilerResult = await client!.compile();
 
-    if (compilerResult.errorCount > 0) {
-      logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
-      logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
-    }
+      if (compilerResult.errorCount > 0) {
+        logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
+        logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
+      }
 
-    if (compilerResult.dillOutput != null) {
-      client!.accept();
-      sources.addAll(compilerResult.newSources.whereNot(_uriInPubCache));
-      await _startProcess(cssFiles);
-    } else {
-      await client!.reject();
-      sources.clear();
+      if (compilerResult.dillOutput != null) {
+        client!.accept();
+        sources.addAll(compilerResult.newSources.whereNot(_uriInPubCache));
+        await _startProcess(cssFiles);
+      } else {
+        await client!.reject();
+        sources.clear();
+      }
+    } catch (e) {
+      logger.write('Failed to start CSS runner: $e', tag: Tag.css, level: Level.warning);
+      if (!_initialGenerationCompleter.isCompleted) {
+        _initialGenerationCompleter.complete();
+      }
+      if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+        _generationCompleter!.complete();
+        _generationCompleter = null;
+      }
     }
   }
 
@@ -264,23 +275,27 @@ class CssRunner {
       _restarting = false;
     }
 
-    prepare();
-    await start();
+    try {
+      prepare();
+      await start();
+    } catch (e) {
+      logger.write('Failed to restart CSS runner: $e', tag: Tag.css, level: Level.warning);
+    }
     return List.unmodifiable(_changedFiles);
   }
 
   Future<List<String>> reload() async {
     _changedFiles.clear();
-    final cssFiles = stylesFiles = await _generateRunner(watch: true);
-    if (cssFiles.isEmpty) return const [];
-    this.cssFiles = cssFiles;
-
-    if (client == null) {
-      await start();
-      return List.unmodifiable(_changedFiles);
-    }
-
     try {
+      final cssFiles = stylesFiles = await _generateRunner(watch: true);
+      if (cssFiles.isEmpty) return const [];
+      this.cssFiles = cssFiles;
+
+      if (client == null) {
+        await start();
+        return List.unmodifiable(_changedFiles);
+      }
+
       final compilerResult = await client!.compile([Uri.file(runnerFile.path), ...sources]);
 
       if (compilerResult.errorCount > 0) {
@@ -464,13 +479,14 @@ class CssRunner {
       if (json case {'event': 'init', 'vmServiceUri': final String uri} when vmService == null) {
         onVmServiceUri?.call(uri);
       } else if (json case {'event': 'css', 'file': final String file, 'data': {'css': final String cssValue}}) {
-        final outputFile = File('.dart_tool/jaspr/generated/$file').absolute..createSync(recursive: true);
+        final outputFile = File('.dart_tool/jaspr/generated/$file').absolute;
+        final exists = outputFile.existsSync();
 
-        final currentContent = outputFile.readAsStringSync();
-        if (currentContent == cssValue) {
+        if (exists && outputFile.readAsStringSync() == cssValue) {
           return;
         }
 
+        outputFile.createSync(recursive: true);
         outputFile.writeAsStringSync(cssValue);
         if (!_changedFiles.contains(file)) {
           _changedFiles.add(file);
