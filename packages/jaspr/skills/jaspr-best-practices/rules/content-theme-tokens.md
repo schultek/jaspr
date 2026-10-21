@@ -9,7 +9,7 @@ tags: content, theming, colors, jaspr_content
 
 **Impact: MEDIUM (Guarantees consistent dark/light mode adaptation across built-in and custom components)**
 
-`jaspr_content` includes a built-in theming system (`ContentTheme`) that automatically handles light and dark mode through CSS custom properties (variables like `--content-primary`, `--content-background`, `--content-font`).
+`jaspr_content` includes a built-in theming system (`ContentTheme`) that automatically handles light and dark mode through CSS custom properties (variables like `--primary`, `--background`, `--text`, and `--content-font`).
 
 Every `ColorToken` (such as `ContentColors.background` or `ContentColors.text`) implements `Color` directly and resolves to `var(--name)` in CSS.
 

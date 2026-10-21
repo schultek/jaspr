@@ -56,7 +56,7 @@ class EmbedSection extends StatelessComponent {
   Component build(BuildContext context) {
     // 4. Use FlutterEmbedView.deferred:
     return FlutterEmbedView.deferred(
-      constraints: const ViewConstraints(minWidth: 300, minHeight: 400),
+      constraints: ViewConstraints(minWidth: 300, minHeight: 400),
       loader: div([.text('Loading Flutter experience...')]),
       loadLibrary: widget.loadLibrary(),
       builder: () => widget.MyFlutterApp(),

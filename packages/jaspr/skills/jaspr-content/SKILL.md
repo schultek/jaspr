@@ -86,8 +86,6 @@ author: Kilian Schulte
 tags: ["jaspr", "web", "dart"]
 ---
 
-# {{ page.title }}
-
 Written by {{ page.author }} on {{ page.date }}.
 ```
 

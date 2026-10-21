@@ -31,7 +31,7 @@ Use parameters of `@client` components to pass data from the server to the clien
 - **Rule 1:** All parameters MUST be initializing fields (e.g., `const MyClientComponent({required this.title});`) or primary constructor field parameters (e.g., `class MyClientComponent({required final String title})`).
 - **Rule 2:** Data parameters MUST be serializable:
   - Primitive types: `int`, `double`, `String`, `bool`.
-  - Collections: `List<T>` and `Map<String, T>` where `T` is a supported serializable type (`Map` keys must be `String`).
+  - Collections: `List`, `List<dynamic>`, `List<Object?>`, or `List<T>` (where `T` is serializable); `Map<String, dynamic>`, `Map<String, Object?>`, or `Map<String, V>` (where `V` is serializable). Map keys MUST be `String`.
   - Enums or custom types: MUST define `@encoder` and `@decoder` methods.
 - **Rule 3:** Components CAN be passed as parameters (`Component` or `List<Component>`). When a component is passed to a `@client` component, it becomes a **Server Component** (see below).
 - **Rule 4:** Parameters MUST NOT be functions or other non-serializable, non-component types.

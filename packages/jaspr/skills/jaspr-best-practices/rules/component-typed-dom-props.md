@@ -9,9 +9,9 @@ tags: component, dom, safety, events
 
 **Impact: MEDIUM (Guarantees compile-time type safety, IDE autocompletion, and optimal event listener binding)**
 
-Jaspr's typed HTML components (from `package:jaspr/dom.dart`) provide first-class typed named parameters for standard HTML attributes (such as `href`, `src`, `target`, `type`, `value`, `placeholder`, `disabled`) and event handlers (`onClick`, `onInput`, `onChange`, `onSubmit`).
+Jaspr's typed HTML components (from `package:jaspr/dom.dart`) provide first-class typed named parameters for standard HTML attributes (such as `href`, `src`, `target`, `type`, `value`, `placeholder`, `disabled`) and common event handlers (such as `onClick`, `onInput`, `onChange`).
 
-Prefer these typed parameters over writing strings into the generic `attributes: {}` and `events: {}` maps. Only fall back to `attributes` for custom data/aria attributes that do not have a dedicated typed parameter.
+Prefer these typed parameters over writing strings into generic `attributes: {}` and `events: {}` maps. For events or attributes without dedicated named parameters (such as form submission via `'submit'` on `form()`, or custom data/aria attributes), use the `events` or `attributes` map (e.g. `events: {'submit': (event) => ...}`).
 
 **Incorrect (string-based maps prone to typos and missing compiler checks):**
 

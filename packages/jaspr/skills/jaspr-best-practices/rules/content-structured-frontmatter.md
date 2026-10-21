@@ -22,7 +22,7 @@ Posted on Jan 2026 by Author
 Here is the body text...
 ```
 
-**Correct (structured frontmatter providing layout, SEO, and navigation data):**
+**Correct (structured frontmatter providing layout and SEO metadata):**
 
 ```markdown
 ---
@@ -32,8 +32,6 @@ layout: docs
 date: 2026-10-21
 tags: [tutorial, beginner]
 ---
-
-# Getting Started with Jaspr
 
 Here is the body text...
 ```

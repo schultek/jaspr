@@ -14,7 +14,9 @@ Data passed from server-rendered components to `@client` components must be seri
 - Allowed parameter types:
   - Component types: `Component`, `List<Component>` (handled as Server Components).
   - Primitive types: `int`, `double`, `String`, `bool`.
-  - Collections: `List<T>` and `Map<String, T>` where `T` is a supported serializable type. Note that `Map` keys MUST be `String` (`Map<String, ...>`); maps with non-string keys (e.g. `Map<int, String>`) or raw untyped collections will fail client-code generation.
+  - Collections:
+    - Lists: `List`, `List<dynamic>`, `List<Object?>`, or typed `List<T>` where `T` is a supported serializable type.
+    - Maps: `Map<String, dynamic>`, `Map<String, Object?>`, or typed `Map<String, V>` where `V` is a supported serializable type. (Note: Map keys MUST be `String`; raw untyped `Map` or maps with non-string keys such as `Map<int, String>` will fail client-code generation).
   - Custom classes or Enums: MUST define `@encoder` and `@decoder` methods.
 - Parameters MUST NOT be functions, callbacks, or complex unsupported objects.
 

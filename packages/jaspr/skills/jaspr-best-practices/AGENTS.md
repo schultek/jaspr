@@ -248,7 +248,9 @@ Data passed from server-rendered components to `@client` components must be seri
 - Allowed parameter types:
   - Component types: `Component`, `List<Component>` (handled as Server Components).
   - Primitive types: `int`, `double`, `String`, `bool`.
-  - Collections: `List<T>` and `Map<String, T>` where `T` is a supported serializable type. Note that `Map` keys MUST be `String` (`Map<String, ...>`); maps with non-string keys (e.g. `Map<int, String>`) or raw untyped collections will fail client-code generation.
+  - Collections:
+    - Lists: `List`, `List<dynamic>`, `List<Object?>`, or typed `List<T>` where `T` is a supported serializable type.
+    - Maps: `Map<String, dynamic>`, `Map<String, Object?>`, or typed `Map<String, V>` where `V` is a supported serializable type. (Note: Map keys MUST be `String`; raw untyped `Map` or maps with non-string keys such as `Map<int, String>` will fail client-code generation).
   - Custom classes or Enums: MUST define `@encoder` and `@decoder` methods.
 - Parameters MUST NOT be functions, callbacks, or complex unsupported objects.
 
@@ -882,7 +884,7 @@ ul([
 
 Jaspr natively supports Dart primary constructors for components, including `@client` components and Server Components.
 
-Instead of declaring separate constructor parameters, initializing formals, and field declarations in the class body, use primary constructors with field parameters (`final Type name`) to keep components concise, legible, and fully typed.
+Instead of declaring separate constructor parameters, initializing formals, and field declarations, use primary constructors to keep components concise, legible, and easy to maintain.
 
 **Incorrect (verbose traditional constructor ceremony):**
 
@@ -907,7 +909,7 @@ class UserAvatar extends StatelessComponent {
 }
 ```
 
-**Correct (concise component with primary constructor field parameters):**
+**Correct (concise component with primary constructor):**
 
 ```dart
 @client
@@ -929,9 +931,9 @@ class UserAvatar({
 ### 4.6 Prefer Typed DOM Parameters Over Raw Attributes and Events Maps
 **Impact: MEDIUM (Guarantees compile-time type safety, IDE autocompletion, and optimal event listener binding)**
 
-Jaspr's typed HTML components (from `package:jaspr/dom.dart`) provide first-class typed named parameters for standard HTML attributes (such as `href`, `src`, `target`, `type`, `value`, `placeholder`, `disabled`) and event handlers (`onClick`, `onInput`, `onChange`, `onSubmit`).
+Jaspr's typed HTML components (from `package:jaspr/dom.dart`) provide first-class typed named parameters for standard HTML attributes (such as `href`, `src`, `target`, `type`, `value`, `placeholder`, `disabled`) and common event handlers (such as `onClick`, `onInput`, `onChange`).
 
-Prefer these typed parameters over writing strings into the generic `attributes: {}` and `events: {}` maps. Only fall back to `attributes` for custom data/aria attributes that do not have a dedicated typed parameter.
+Prefer these typed parameters over writing strings into generic `attributes: {}` and `events: {}` maps. For events or attributes without dedicated named parameters (such as form submission via `'submit'` on `form()`, or custom data/aria attributes), use the `events` or `attributes` map (e.g. `events: {'submit': (event) => ...}`).
 
 **Incorrect (string-based maps prone to typos and missing compiler checks):**
 
@@ -1497,8 +1499,6 @@ In your Markdown (`content/guide.md`):
 
 `jaspr_content` parses YAML frontmatter at the head of content Markdown files. This frontmatter drives automatic metadata generation (page titles, `<meta name="description">`, OpenGraph tags) and layout selection (`layout: docs`, `layout: blog`).
 
-Note that navigation structures such as sidebars are configured explicitly in Dart (e.g., via `DocsLayout(sidebar: Sidebar(groups: [...]))`) rather than automatically inferred from frontmatter.
-
 Always provide structured frontmatter on Markdown pages rather than hardcoding headings and metadata manually.
 
 **Incorrect (missing frontmatter, leaving pages without metadata or automated layout):**
@@ -1510,7 +1510,7 @@ Posted on Jan 2026 by Author
 Here is the body text...
 ```
 
-**Correct (structured frontmatter providing layout, SEO, and navigation data):**
+**Correct (structured frontmatter providing layout and SEO metadata):**
 
 ```markdown
 ---
@@ -1521,8 +1521,6 @@ date: 2026-10-21
 tags: [tutorial, beginner]
 ---
 
-# Getting Started with Jaspr
-
 Here is the body text...
 ```
 
@@ -1531,7 +1529,7 @@ Here is the body text...
 ### 8.3 Use ContentTheme and Tokenized CSS Variables for Universal Theming
 **Impact: MEDIUM (Guarantees consistent dark/light mode adaptation across built-in and custom components)**
 
-`jaspr_content` includes a built-in theming system (`ContentTheme`) that automatically handles light and dark mode through CSS custom properties (variables like `--content-primary`, `--content-background`, `--content-font`).
+`jaspr_content` includes a built-in theming system (`ContentTheme`) that automatically handles light and dark mode through CSS custom properties (variables like `--primary`, `--background`, `--text`, and `--content-font`).
 
 Every `ColorToken` (such as `ContentColors.background` or `ContentColors.text`) implements `Color` directly and resolves to `var(--name)` in CSS.
 
@@ -1637,7 +1635,7 @@ class EmbedSection extends StatelessComponent {
   Component build(BuildContext context) {
     // 4. Use FlutterEmbedView.deferred:
     return FlutterEmbedView.deferred(
-      constraints: const ViewConstraints(minWidth: 300, minHeight: 400),
+      constraints: ViewConstraints(minWidth: 300, minHeight: 400),
       loader: div([.text('Loading Flutter experience...')]),
       loadLibrary: widget.loadLibrary(),
       builder: () => widget.MyFlutterApp(),
