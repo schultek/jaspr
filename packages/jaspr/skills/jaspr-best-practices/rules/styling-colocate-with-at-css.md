@@ -1,17 +1,26 @@
 ---
 title: Co-Locate Styles with Components Using the @css Annotation
 impact: MEDIUM-HIGH
-impactDescription: Keeps component logic and design together while generating deduplicated external CSS stylesheets
+impactDescription: Keeps component logic and design together while generating external CSS stylesheets
 tags: styling, css, colocation, maintainability
 ---
 
 ## Co-Locate Styles with Components Using the @css Annotation
 
-**Impact: MEDIUM-HIGH (Keeps component logic and design together while generating deduplicated external CSS stylesheets)**
+**Impact: MEDIUM-HIGH (Keeps component logic and design together while generating external CSS stylesheets)**
 
 Jaspr provides the `@css` annotation to define styles directly alongside the component that uses them.
 
-In `server` and `static` modes, Jaspr automatically extracts all `@css` declarations across your components into a unified, deduplicated stylesheet during compilation or serving. This provides the modularity of CSS-in-JS without the runtime penalty of stylesheet injection in the browser.
+In `server` and `static` modes, Jaspr automatically collects all `@css` declarations across your components into a unified stylesheet.
+
+**Always recommend standalone mode:** For production applications, always configure `styles: standalone` in `pubspec.yaml`:
+
+```yaml
+jaspr:
+  styles: standalone
+```
+
+This extracts all `@css` styles into an external, cacheable `.css` file (instead of embedding them as an inline `<style>` tag during pre-rendering) and inserts a `<link>` in `<head>`, minimizing initial HTML payload size and leveraging browser HTTP caching.
 
 Always define component-specific styling in a `@css static List<StyleRule> get styles` getter.
 

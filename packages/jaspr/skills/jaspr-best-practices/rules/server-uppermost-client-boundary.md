@@ -1,22 +1,25 @@
 ---
-title: Place @client on the Uppermost Interactive Boundary
-impact: HIGH
-impactDescription: Avoids redundant hydration boundaries, duplicate markers, and runtime registration overhead
+title: Only Annotate the Root Component of an Interactive Client Island
+impact: LOW-MEDIUM
+impactDescription: Avoids unnecessary client component registrations and clarifies island boundaries
 tags: server, client, hydration, architecture
 ---
 
-## Place @client on the Uppermost Interactive Boundary
+## Only Annotate the Root Component of an Interactive Client Island
 
-**Impact: HIGH (Avoids redundant hydration boundaries, duplicate markers, and runtime registration overhead)**
+**Impact: LOW-MEDIUM (Avoids unnecessary client component registrations and clarifies island boundaries)**
 
-Annotating a component with `@client` marks it as a hydration boundary. During client hydration, `ClientApp()` locates every `@client` root and initializes hydration for that tree.
+Annotating a component with `@client` registers it as an entrypoint for client-side hydration. When building an interactive feature composed of multiple components, you only need to annotate the root of the interactive island.
 
-When you have a tree of interactive components (e.g. an interactive form containing interactive input fields and buttons), you only need to annotate the **uppermost** component with `@client`. Any child components inside an already hydrated client tree are automatically executed and reactive in the browser without needing `@client` annotations of their own.
+While Jaspr automatically suppresses nested `@client` boundaries during hydration when there is no intervening server component, adding `@client` to internal child components that are only ever used inside an existing client island creates unnecessary registration boilerplate.
 
-**Incorrect (redundant @client annotations on nested children):**
+- For **internal child components** that are only used within a specific client island (e.g. `FormInput` and `SubmitButton` inside `MyForm`), omit `@client`. They are compiled and executed in the browser automatically as part of the parent island.
+- For **reusable components** that are also instantiated directly in server components (e.g. a shared `Button` or `Modal`), keep `@client` so they can hydrate independently when used directly from server scope.
+
+**Unnecessary (annotating internal child components used only inside a client island):**
 
 ```dart
-// Redundant: FormInput and SubmitButton are already inside interactive MyForm
+// Redundant: FormInput and SubmitButton are only used inside MyForm:
 @client
 class FormInput extends StatelessComponent { ... }
 
@@ -35,15 +38,15 @@ class MyForm extends StatelessComponent {
 }
 ```
 
-**Correct (only the root of the interactive island is annotated):**
+**Correct (only the island root is annotated):**
 
 ```dart
-// Plain components - executed on client because they are inside MyForm
+// Plain components - executed on client because they are inside MyForm:
 class FormInput extends StatelessComponent { ... }
 
 class SubmitButton extends StatelessComponent { ... }
 
-// Only the root boundary gets @client
+// Only the root boundary gets @client:
 @client
 class MyForm extends StatelessComponent {
   @override

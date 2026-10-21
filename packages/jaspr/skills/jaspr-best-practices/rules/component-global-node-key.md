@@ -54,7 +54,7 @@ class _SearchFieldState extends State<SearchField> {
   @override
   Component build(BuildContext context) {
     return div([
-      input(key: inputKey, type: InputType.text, placeholder: 'Search...'),
+      input(key: inputKey, type: InputType.text, attributes: {'placeholder': 'Search...'}),
       button(onClick: handleFocus, [.text('Focus Input')]),
     ]);
   }

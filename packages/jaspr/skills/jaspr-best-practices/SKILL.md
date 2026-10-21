@@ -41,7 +41,7 @@ Reference these guidelines when:
 - [server-components-static-subtrees](rules/server-components-static-subtrees.md) — Use Server Components for Static Content Inside Interactive Shells — Eliminates client JS compilation and reduces bundle size to 0 KB for static content.
 - [server-css-toggle-not-ssr-if](rules/server-css-toggle-not-ssr-if.md) — Toggle Server Component Visibility with CSS, Never Conditional Dart If — Prevents missing DOM nodes and broken hydration when toggling client state.
 - [server-serializable-props](rules/server-serializable-props.md) — Ensure Non-Component Props Across @client Boundaries Are Serializable — Prevents serialization crashes during SSR and hydration decode errors in the browser.
-- [server-uppermost-client-boundary](rules/server-uppermost-client-boundary.md) — Place @client on the Uppermost Interactive Boundary — Avoids redundant hydration boundaries, duplicate markers, and runtime registration overhead.
+- [server-uppermost-client-boundary](rules/server-uppermost-client-boundary.md) — Only Annotate the Root Component of an Interactive Client Island — Avoids unnecessary client component registrations and clarifies island boundaries.
 
 ### 2. Bundle Size & Code Isolation (CRITICAL)
 
@@ -72,7 +72,7 @@ Reference these guidelines when:
 
 ### 6. Styling & CSS Optimization (MEDIUM)
 
-- [styling-colocate-with-at-css](rules/styling-colocate-with-at-css.md) — Co-Locate Styles with Components Using the @css Annotation — Keeps component logic and design together while generating deduplicated external CSS stylesheets.
+- [styling-colocate-with-at-css](rules/styling-colocate-with-at-css.md) — Co-Locate Styles with Components Using the @css Annotation — Keeps component logic and design together with zero runtime CSS-in-JS overhead.
 - [styling-inline-only-dynamic](rules/styling-inline-only-dynamic.md) — Restrict Inline Styles to Truly Dynamic Runtime Values — Eliminates bloated HTML markup and enables browser caching of CSS rules.
 - [styling-typed-units](rules/styling-typed-units.md) — Use Typed Unit Extensions and Dot-Shorthands — Guarantees valid CSS values, eliminates unit string typos, and optimizes readability.
 - [styling-valid-css-nesting](rules/styling-valid-css-nesting.md) — Follow Native CSS Nesting Rules in css() — Prevents silent CSS styling bugs caused by invalid selector concatenation.

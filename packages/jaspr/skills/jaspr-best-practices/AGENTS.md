@@ -11,7 +11,7 @@ Comprehensive performance, architecture, and reliability guidelines for Jaspr ap
    - 1.2 [Use Server Components for Static Content Inside Interactive Shells](#12-use-server-components-for-static-content-inside-interactive-shells)
    - 1.3 [Toggle Server Component Visibility with CSS, Never Conditional Dart If](#13-toggle-server-component-visibility-with-css-never-conditional-dart-if)
    - 1.4 [Ensure Non-Component Props Across @client Boundaries Are Serializable](#14-ensure-non-component-props-across-client-boundaries-are-serializable)
-   - 1.5 [Place @client on the Uppermost Interactive Boundary](#15-place-client-on-the-uppermost-interactive-boundary)
+   - 1.5 [Only Annotate the Root Component of an Interactive Client Island](#15-only-annotate-the-root-component-of-an-interactive-client-island)
 2. [Bundle Size & Code Isolation](#2-bundle-size--code-isolation) (CRITICAL)
    - 2.1 [Design Small, Focused Interactive Islands Rather Than Monolithic Client Trees](#21-design-small-focused-interactive-islands-rather-than-monolithic-client-trees)
    - 2.2 [Strictly Isolate Platform Libraries Between Server and Client](#22-strictly-isolate-platform-libraries-between-server-and-client)
@@ -323,17 +323,20 @@ class UserDashboard extends StatelessComponent {
 
 ---
 
-### 1.5 Place @client on the Uppermost Interactive Boundary
-**Impact: HIGH (Avoids redundant hydration boundaries, duplicate markers, and runtime registration overhead)**
+### 1.5 Only Annotate the Root Component of an Interactive Client Island
+**Impact: LOW-MEDIUM (Avoids unnecessary client component registrations and clarifies island boundaries)**
 
-Annotating a component with `@client` marks it as a hydration boundary. During client hydration, `ClientApp()` locates every `@client` root and initializes hydration for that tree.
+Annotating a component with `@client` registers it as an entrypoint for client-side hydration. When building an interactive feature composed of multiple components, you only need to annotate the root of the interactive island.
 
-When you have a tree of interactive components (e.g. an interactive form containing interactive input fields and buttons), you only need to annotate the **uppermost** component with `@client`. Any child components inside an already hydrated client tree are automatically executed and reactive in the browser without needing `@client` annotations of their own.
+While Jaspr automatically suppresses nested `@client` boundaries during hydration when there is no intervening server component, adding `@client` to internal child components that are only ever used inside an existing client island creates unnecessary registration boilerplate.
 
-**Incorrect (redundant @client annotations on nested children):**
+- For **internal child components** that are only used within a specific client island (e.g. `FormInput` and `SubmitButton` inside `MyForm`), omit `@client`. They are compiled and executed in the browser automatically as part of the parent island.
+- For **reusable components** that are also instantiated directly in server components (e.g. a shared `Button` or `Modal`), keep `@client` so they can hydrate independently when used directly from server scope.
+
+**Unnecessary (annotating internal child components used only inside a client island):**
 
 ```dart
-// Redundant: FormInput and SubmitButton are already inside interactive MyForm
+// Redundant: FormInput and SubmitButton are only used inside MyForm:
 @client
 class FormInput extends StatelessComponent { ... }
 
@@ -352,15 +355,15 @@ class MyForm extends StatelessComponent {
 }
 ```
 
-**Correct (only the root of the interactive island is annotated):**
+**Correct (only the island root is annotated):**
 
 ```dart
-// Plain components - executed on client because they are inside MyForm
+// Plain components - executed on client because they are inside MyForm:
 class FormInput extends StatelessComponent { ... }
 
 class SubmitButton extends StatelessComponent { ... }
 
-// Only the root boundary gets @client
+// Only the root boundary gets @client:
 @client
 class MyForm extends StatelessComponent {
   @override
@@ -831,7 +834,7 @@ class _SearchFieldState extends State<SearchField> {
   @override
   Component build(BuildContext context) {
     return div([
-      input(key: inputKey, type: InputType.text, placeholder: 'Search...'),
+      input(key: inputKey, type: InputType.text, attributes: {'placeholder': 'Search...'}),
       button(onClick: handleFocus, [.text('Focus Input')]),
     ]);
   }
@@ -1151,11 +1154,20 @@ class Dashboard extends StatelessComponent {
 ## 6. Styling & CSS Optimization
 
 ### 6.1 Co-Locate Styles with Components Using the @css Annotation
-**Impact: MEDIUM-HIGH (Keeps component logic and design together while generating deduplicated external CSS stylesheets)**
+**Impact: MEDIUM-HIGH (Keeps component logic and design together with zero runtime CSS-in-JS overhead)**
 
 Jaspr provides the `@css` annotation to define styles directly alongside the component that uses them.
 
-In `server` and `static` modes, Jaspr automatically extracts all `@css` declarations across your components into a unified, deduplicated stylesheet during compilation or serving. This provides the modularity of CSS-in-JS without the runtime penalty of stylesheet injection in the browser.
+In `server` and `static` modes, Jaspr automatically collects all `@css` declarations across your components into a unified, deduplicated stylesheet embedded as an inline `<style>` tag during pre-rendering.
+
+**Always recommend standalone mode:** For production applications, always configure `styles: standalone` in `pubspec.yaml`:
+
+```yaml
+jaspr:
+  styles: standalone
+```
+
+This extracts all `@css` styles into an external, cacheable `.css` file and inserts a `<link>` in `<head>`, minimizing initial HTML payload size and leveraging browser HTTP caching.
 
 Always define component-specific styling in a `@css static List<StyleRule> get styles` getter.
 

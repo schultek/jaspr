@@ -86,9 +86,9 @@ See the [jaspr-styling](../jaspr-styling/SKILL.md) skill for more information.
 ### Server Components vs. Client Components (@client)
 
 In Jaspr's server and static modes, your application uses a hybrid architecture:
-- **Server Components (Default):** Components are rendered exclusively on the server. They are NOT compiled to JavaScript/Wasm and have zero client bundle size. They can directly access server resources (`dart:io`, databases).
-- **Client Components (`@client`):** Components that need browser interactivity (click events, browser APIs, state). Jaspr compiles these to JavaScript/Wasm and hydrates them in the browser.
-- **Recommending Server Components:** Whenever building interactive wrappers (such as expandable panels, tabs, or dialog shells), pass static inner content as `Component` constructor parameters to the `@client` component. Those child components remain Server Components and will not bloat the client bundle! (See `jaspr-pre-rendering-and-hydration` for details).
+- **Server Components (Default):** Components rendered in server scope, as well as components passed as `Component` constructor parameters from the server into `@client` components. They are rendered exclusively on the server, are NOT compiled to JavaScript/Wasm, have zero client bundle footprint, and can access server resources (`dart:io`, databases).
+- **Client Islands (`@client`) & Descendants:** Components annotated with `@client`, along with any ordinary components constructed *inside* their client build methods, are compiled to JavaScript/Wasm and run in the browser. Because client components are also pre-rendered on the server during SSR, they can access server APIs during pre-rendering when using `@Import.onServer` or conditional imports. However, you must be careful to handle the browser environment where those APIs are unavailable, and avoid direct imports of server-only libraries (`dart:io`) that would fail client compilation.
+- **Surgical Hydration with Server Components:** When building interactive wrappers (such as expandable panels, tabs, or dialog shells), pass static inner content as `Component` constructor parameters to the `@client` component from the outer server scope. Those child components remain Server Components and will not bloat the client bundle! (See `jaspr-pre-rendering-and-hydration` for details).
 
 ## Interactivity and Events
 

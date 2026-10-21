@@ -46,4 +46,12 @@ This directory contains the Jaspr Best Practices skill definitions.
    dart run tool/generate_best_practices.dart
    ```
 
-   This command parses all files in `rules/`, rebuilds `AGENTS.md` and `SKILL.md`, and automatically syncs them to `.agents/skills/jaspr-best-practices/`.
+   This command parses all files in `rules/` and rebuilds `AGENTS.md` and `SKILL.md` in this directory.
+
+3. **Update installed `.agents/skills` copies (if applicable)**:
+
+   If you maintain workspace skills in `.agents/skills/`, copy the updated files separately:
+
+   ```bash
+   cp -R packages/jaspr/skills/* .agents/skills/
+   ```
