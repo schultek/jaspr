@@ -351,6 +351,51 @@ void main() {
       });
     });
 
+    test('builds project with a custom flutter entrypoint', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client', flutterEmbedding: true);
+        io.stubDartSDK();
+        io.stubFlutterSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerFlutterBuildArgs);
+
+        final buildResult = runner.run(['build', '--flutter-target=lib/embedded.dart', '--verbose']);
+
+        await expectLater(io.stdout.queue, emits('Building myapp in client rendering mode.'));
+
+        // No --no-tree-shake-icons: a real entrypoint makes subsetting correct.
+        when(
+          () => io.process.start(
+            'flutter',
+            [
+              'build',
+              'web',
+              '-t',
+              'lib/embedded.dart',
+              '--no-wasm-dry-run',
+              '--output=build/flutter',
+            ],
+            workingDirectory: '/root/myapp',
+            runInShell: true,
+          ),
+        ).thenAnswer((_) async {
+          io.fs.file('/root/myapp/build/flutter/flutter_bootstrap.js')
+            ..createSync(recursive: true)
+            ..writeAsStringSync('FAKE FLUTTER BOOTSTRAP');
+          io.fs.file('/root/myapp/build/flutter/canvaskit/canvaskit.js')
+            ..createSync(recursive: true)
+            ..writeAsStringSync('FAKE FLUTTER CANVASKIT');
+          return FakeProcess.sync();
+        });
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
+
+        expect(await buildResult, equals(0));
+      });
+    });
+
     test('builds project with sitemap', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'static');

@@ -66,6 +66,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       negatable: false,
       defaultsTo: false,
     );
+    argParser.addOption(
+      'flutter-target',
+      help:
+          'Specify the entrypoint of the embedded Flutter app.\n'
+          'Defaults to a generated empty entrypoint that only collects the declared assets.',
+    );
     addDartDefineArgs();
   }
 
@@ -80,6 +86,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
   late final moduleFormat = argResults!.option('module-format');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
   late final skipServer = argResults!.flag('skip-server');
+  late final flutterTarget = argResults!.option('flutter-target');
 
   String get compiler => useWasm
       ? 'dart2wasm'
@@ -181,6 +188,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         port: flutterPort!,
         wasm: useWasm,
         logger: logger,
+        flutterTarget: flutterTarget,
         release: argResults!.flag('release'),
         verbose: verbose,
         guard: guardResource,
