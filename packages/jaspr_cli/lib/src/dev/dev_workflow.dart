@@ -140,45 +140,64 @@ class DevWorkflow {
 
   Future<void> reloadClients() async {
     flutter?.reload();
-    await css.reload();
+    final cssFuture = css.reload();
     await server?.reload();
 
-    final cssFiles = css.cssFiles;
     for (final clientConnection in clients.connections) {
       await clientConnection.performHotReload();
-      if (cssFiles.isNotEmpty) {
-        await clientConnection.reloadStylesheets(cssFiles);
-      }
       await clientConnection.reassemble();
       await clientConnection.reloadHtml();
+    }
+
+    final changedCssFiles = await cssFuture;
+    if (changedCssFiles.isNotEmpty) {
+      for (final clientConnection in clients.connections) {
+        await clientConnection.reloadStylesheets(changedCssFiles);
+      }
+      for (final file in changedCssFiles) {
+        logger.write('Reloaded $file', tag: Tag.css);
+      }
     }
   }
 
   Future<void> restartClients({bool incremental = false}) async {
+    final Future<List<String>> cssFuture;
     if (incremental) {
       flutter?.reload();
-      await css.reload();
+      cssFuture = css.reload();
     } else {
       flutter?.restart();
-      await css.restart();
+      cssFuture = css.restart();
     }
 
     await server?.reload();
 
-    final cssFiles = css.cssFiles;
     for (final clientConnection in clients.connections) {
-      if (cssFiles.isNotEmpty) {
-        await clientConnection.reloadStylesheets(cssFiles);
-      }
       await clientConnection.restart();
       await clientConnection.reloadHtml();
+    }
+
+    final changedCssFiles = await cssFuture;
+    if (changedCssFiles.isNotEmpty) {
+      for (final clientConnection in clients.connections) {
+        await clientConnection.reloadStylesheets(changedCssFiles);
+      }
+      for (final file in changedCssFiles) {
+        logger.write('Reloaded $file', tag: Tag.css);
+      }
     }
   }
 
   Future<void> refreshClients() async {
     flutter?.reload();
-    await css.reload();
+    final cssFuture = css.reload();
     await server?.reload();
+    final changedCssFiles = await cssFuture;
+    if (changedCssFiles.isNotEmpty) {
+      for (final file in changedCssFiles) {
+        logger.write('Reloaded $file', tag: Tag.css);
+      }
+    }
 
     for (final client in clients.connections) {
       await client.refreshPage();

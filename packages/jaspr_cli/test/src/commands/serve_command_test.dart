@@ -369,7 +369,7 @@ void main() {
 
         final buildDaemon = io.setupFakeBuildDaemon();
 
-        final serveResult = runner.run(['serve', '--verbose', '--module-format=amd', '--mode=reload']);
+        final serveResult = runner.run(['serve', '--verbose', '--module-format=amd', '--auto=reload']);
 
         await expectLater(
           io.stdout.queue,

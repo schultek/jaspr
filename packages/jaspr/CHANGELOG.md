@@ -2,7 +2,7 @@
 
 ### Core Features
 
-- Added stateful hot-reload support. Trigger a hot-reload by pressing `r` in the terminal during `jaspr serve`, or enable reload-on-save with `--mode reload`.
+- Added stateful hot-reload support. Trigger a hot-reload by pressing `r` in the terminal during `jaspr serve`, or enable reload-on-save with `--auto reload`.
 
   In addition to hot-reloading client-side code, server-rendered components are now also reloaded when their code changes, as well as server-rendered content that is reloaded when its sources (such as Markdown) change.
 

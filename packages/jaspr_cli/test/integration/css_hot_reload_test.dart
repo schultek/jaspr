@@ -67,7 +67,7 @@ final styles = [
 """;
       stylesFile.writeAsStringSync(stylesContent);
 
-      final serveResult = runner.run('serve --mode=reload -v', dir: dirs.app, checkExitCode: false);
+      final serveResult = runner.run('serve --auto=reload -v', dir: dirs.app, checkExitCode: false);
 
       // Wait until server is started.
       await Future<void>.delayed(Duration(seconds: 10));
