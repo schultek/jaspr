@@ -201,7 +201,7 @@ class CounterDisplay extends StatelessComponent {
 ## Further Resources
 
 - For comprehensive guidelines on performance, server components, and architecture, see [jaspr-best-practices](../jaspr-best-practices/SKILL.md).
-- For web interface guidelines, accessibility, focus states, and interaction standards, see [web-design-guidelines](../web-design-guidelines/SKILL.md).
+- For web interface guidelines, accessibility, focus states, and interaction standards, see [jaspr-web-design-guidelines](../jaspr-web-design-guidelines/SKILL.md).
 - For building content-driven sites (documentation, blogs) with markdown and frontmatter, see [jaspr-content](../jaspr-content/SKILL.md).
 - For information on pre-rendering, server components, async data fetching, and hydration, see [jaspr-pre-rendering-and-hydration](../jaspr-pre-rendering-and-hydration/SKILL.md).
 - For information on styling components see [jaspr-styling](../jaspr-styling/SKILL.md).

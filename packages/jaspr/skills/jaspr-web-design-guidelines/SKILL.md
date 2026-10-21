@@ -1,5 +1,5 @@
 ---
-name: web-design-guidelines
+name: jaspr-web-design-guidelines
 description: Review UI code and build modern web interfaces complying with Web Interface Guidelines. Use when asked to "review my UI", "audit design", "check accessibility", "review UX", or when creating/styling accessible, polished Jaspr web components.
 ---
 
