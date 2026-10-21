@@ -495,32 +495,44 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
     }
   }
 
+  Future<void> triggerReload() async {
+    if (!canHotReload) {
+      await triggerRestart();
+      return;
+    }
+    if (workflow.isBuilding) {
+      if (workflow.queuedAction == QueuedAction.restart) {
+        logger.write('Build in progress. Restart already queued.', tag: Tag.client);
+      } else if (workflow.queuedAction == QueuedAction.reload) {
+        logger.write('Build in progress. Reload already queued.', tag: Tag.client);
+      } else {
+        workflow.queueAction(QueuedAction.reload);
+        logger.write('Build in progress. Queued reload...', tag: Tag.client);
+      }
+    } else {
+      await _performReload();
+    }
+  }
+
+  Future<void> triggerRestart() async {
+    if (workflow.isBuilding) {
+      if (workflow.queuedAction == QueuedAction.restart) {
+        logger.write('Build in progress. Restart already queued.', tag: Tag.client);
+      } else {
+        workflow.queueAction(QueuedAction.restart);
+        logger.write('Build in progress. Queued restart...', tag: Tag.client);
+      }
+    } else {
+      await _performRestart();
+    }
+  }
+
   Future<void> _handleKey(String key) async {
     switch (key) {
       case 'r' when canHotReload:
-        if (workflow.isBuilding) {
-          if (workflow.queuedAction == QueuedAction.restart) {
-            logger.write('Build in progress. Restart already queued.', tag: Tag.client);
-          } else if (workflow.queuedAction == QueuedAction.reload) {
-            logger.write('Build in progress. Reload already queued.', tag: Tag.client);
-          } else {
-            workflow.queueAction(QueuedAction.reload);
-            logger.write('Build in progress. Queued reload...', tag: Tag.client);
-          }
-        } else {
-          await _performReload();
-        }
+        await triggerReload();
       case 'R':
-        if (workflow.isBuilding) {
-          if (workflow.queuedAction == QueuedAction.restart) {
-            logger.write('Build in progress. Restart already queued.', tag: Tag.client);
-          } else {
-            workflow.queueAction(QueuedAction.restart);
-            logger.write('Build in progress. Queued restart...', tag: Tag.client);
-          }
-        } else {
-          await _performRestart();
-        }
+        await triggerRestart();
       case 'l':
         await workflow.chrome.launch(port);
       case 'd':

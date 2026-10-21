@@ -39,6 +39,11 @@ class DaemonCommand extends DevCommand with DaemonHelper {
 
   @override
   void handleDevWorkflow(DevWorkflow workflow) {
-    daemon.registerDomain(ClientDomain(daemon, workflow));
+    daemon.registerDomain(ClientDomain(
+      daemon,
+      workflow,
+      onReload: triggerReload,
+      onRestart: triggerRestart,
+    ));
   }
 }
