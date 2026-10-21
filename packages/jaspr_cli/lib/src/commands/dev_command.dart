@@ -31,8 +31,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
           'Defaults to the first found "*.server.dart" file in the project.',
     );
     argParser.addOption(
-      'mode',
-      abbr: 'm',
+      'auto',
+      abbr: 'a',
       help: 'Perform an automatic action after each rebuild.',
       allowed: ['reload', 'restart', 'refresh'],
       allowedHelp: {
@@ -75,7 +75,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
   late final input = argResults!.option('input');
   late final debug = argResults!.flag('debug');
   late final release = argResults!.flag('release');
-  late final mode = argResults!.option('mode');
+  late final auto = argResults!.option('auto');
   late final useWasm = argResults!.flag('experimental-wasm');
   late final moduleFormat = argResults!.option('module-format');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
@@ -596,7 +596,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       for (final e in dartDefines.entries) '-D${e.key}=${e.value}',
     ];
 
-    var reloadConfig = switch (mode) {
+    var reloadConfig = switch (auto) {
       'reload' => ReloadConfiguration.hotReload,
       'refresh' => ReloadConfiguration.liveReload,
       'restart' => ReloadConfiguration.hotRestart,
