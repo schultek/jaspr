@@ -142,18 +142,6 @@ class _AttachElement extends MultiChildRenderObjectElement {
   @override
   void detachRenderObject() {
     super.detachRenderObject();
-    _unregister();
-  }
-
-  // A render object element doesn't pass `detachRenderObject` on to its children, so a
-  // head nested under a fragment is only ever released here.
-  @override
-  void unmount() {
-    _unregister();
-    super.unmount();
-  }
-
-  void _unregister() {
     final renderObject = this.renderObject as _AttachRenderObject;
     _AttachAdapter.instanceFor(renderObject._target).unregister(renderObject);
   }
