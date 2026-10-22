@@ -86,6 +86,7 @@ class ClientOptionsBuilder implements Builder {
       /// ```
       ClientOptions get defaultClientOptions => ClientOptions(
         ${buildPluginInitializer(plugins)}
+        reload: () => defaultClientOptions,
         ${buildClientEntries(clients, package)}
       );
     ''';

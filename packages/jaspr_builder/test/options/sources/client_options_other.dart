@@ -47,6 +47,7 @@ final clientOptionsOtherOutputs = {
       '/// }\n'
       '/// ```\n'
       'ClientOptions get defaultClientOptions => ClientOptions(\n'
+      '  reload: () => defaultClientOptions,\n'
       '  clients: {\n'
       '    \'client_with_sc\': ClientLoader(\n'
       '      (p) => _client_with_sc.ClientWithSC(\n'

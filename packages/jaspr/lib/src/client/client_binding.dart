@@ -13,7 +13,9 @@ import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/constants.dart';
 import '../framework/framework.dart';
+import 'component_anchors.dart';
 import 'dom_render_object.dart';
+import 'options.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
@@ -26,6 +28,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   ClientAppBinding._() {
     assert(() {
       registerExtension('ext.jaspr.reassemble', (method, parameters) async {
+        Jaspr.reloadOptions();
         // ignore: invalid_use_of_protected_member
         rootElement?.visitChildren((element) => element.reassemble());
         return ServiceExtensionResponse.result('{}');
@@ -218,7 +221,26 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
 
     final sw = Stopwatch()..start();
 
+    await reloadBody(body);
+
+    sw.stop();
+
+    if (kVerboseMode) {
+      print('Page reloaded in ${sw.elapsedMilliseconds}ms');
+    }
+  }
+
+  /// Replaces the page with the server-rendered [body] and reloads the app against it.
+  @visibleForTesting
+  Future<void> reloadBody(web.HTMLElement body) async {
     final newNode = _attachTarget == 'body' ? body : body.querySelector(_attachTarget)!;
+
+    // Load the page's client components before reloading,
+    // so existing ones resolve synchronously and keep their state.
+    // Loading errors are reported when the client app loads its slots.
+    await [
+      for (final anchor in extractAnchors(nodes: [newNode])) anchor.resolve().catchError((_) {}),
+    ].wait;
 
     final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;
     rootRenderObject.setRootNode(newNode);
@@ -226,11 +248,5 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
 
     web.document.body!.replaceWith(body);
     completeInitialFrame();
-
-    sw.stop();
-
-    if (kVerboseMode) {
-      print('Page reloaded in ${sw.elapsedMilliseconds}ms');
-    }
   }
 }

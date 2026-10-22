@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:meta/meta.dart';
+
 import '../../jaspr.dart';
 import '../dom/validator.dart';
 import 'component_anchors.dart';
@@ -17,6 +19,14 @@ abstract final class Jaspr {
 
   static ClientOptions get options => _options ?? const ClientOptions();
   static ClientOptions? _options;
+
+  /// Refreshes generated options after hot reload, without rerunning initialization.
+  @internal
+  static void reloadOptions() {
+    if (_options?.reload?.call() case final updated?) {
+      _options = updated;
+    }
+  }
 }
 
 /// Global options for configuring Jaspr on the client.
@@ -24,10 +34,13 @@ abstract final class Jaspr {
 /// **DO NOT USE DIRECTLY.**
 /// Use the generated `defaultClientOptions` instead.
 final class ClientOptions {
-  const ClientOptions({this.initialize, this.clients = const {}});
+  const ClientOptions({this.initialize, this.clients = const {}, this.reload});
 
   final void Function()? initialize;
   final Map<String, ClientLoader> clients;
+
+  /// Recreates the options from the updated generated code during hot reload.
+  final ClientOptions Function()? reload;
 }
 
 /// The loader configuration for a @client component.

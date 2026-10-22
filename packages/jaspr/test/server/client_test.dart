@@ -147,6 +147,15 @@ void main() {
       );
     });
 
+    testServer('loads the client runtime on pages without clients only in debug mode', (tester) async {
+      tester.pumpComponent(p([.text('No clients yet')]));
+
+      final response = await tester.request('/');
+
+      const script = '<script src="/main.clients.dart.js" defer></script>';
+      expect(response.body, kDebugMode ? contains(script) : isNot(contains(script)));
+    });
+
     testServer('adds parameters as data', (tester) async {
       tester.pumpComponent(App2(count: 1, label: 'Test'));
 

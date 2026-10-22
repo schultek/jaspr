@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../jaspr.dart';
+import 'adapters/client_script_adapter.dart';
 import 'adapters/document_structure_helper.dart';
 import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
@@ -57,6 +58,14 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   void attachRootComponent(Component app) async {
+    if (kDebugMode) {
+      // Development pages need the client runtime even before
+      // their first @client component is added,
+      // so they can receive hot reloads.
+      if (options.clientId case final clientId?) {
+        addRenderAdapter(ClientScriptAdapter(clientId));
+      }
+    }
     super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 

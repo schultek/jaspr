@@ -8,6 +8,13 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
 
   final String clientId;
 
+  /// Compares by [clientId], so adding the script again for a page doesn't duplicate it.
+  @override
+  bool operator ==(Object other) => other is ClientScriptAdapter && other.clientId == clientId;
+
+  @override
+  int get hashCode => clientId.hashCode;
+
   @override
   bool applyHead(MarkupRenderObject head) {
     var scriptSrc = clientId;
