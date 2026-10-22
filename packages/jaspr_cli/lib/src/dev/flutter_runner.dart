@@ -8,6 +8,11 @@ import '../logging.dart';
 import '../process_runner.dart';
 import 'util.dart';
 
+/// Entrypoint used when the project does not provide one.
+///
+/// It is empty on purpose: Flutter only needs a valid program to collect assets.
+const _defaultFlutterTarget = '.dart_tool/jaspr/flutter_target.dart';
+
 class FlutterRunner {
   FlutterRunner._(
     this.process,
@@ -35,11 +40,12 @@ class FlutterRunner {
     required int port,
     required bool wasm,
     required Logger logger,
+    String? flutterTarget,
     bool release = false,
     bool verbose = false,
     void Function(FutureOr<void> Function())? guard,
   }) async {
-    await _ensureTarget();
+    await _ensureTarget(flutterTarget);
 
     final flutterProcess = await ProcessRunner.instance.start(
       'flutter',
@@ -47,7 +53,7 @@ class FlutterRunner {
         'run',
         '--device-id=web-server',
         '-t',
-        '.dart_tool/jaspr/flutter_target.dart',
+        flutterTarget ?? _defaultFlutterTarget,
         '--web-port=$port',
         if (wasm) '--wasm',
         if (release) '--release',
@@ -84,9 +90,10 @@ class FlutterRunner {
     required bool wasm,
     required Logger logger,
     required Future<void> Function(String from, [List<String> targets]) copyToBuildDir,
+    String? flutterTarget,
     void Function(FutureOr<void> Function())? guard,
   }) async {
-    await _ensureTarget();
+    await _ensureTarget(flutterTarget);
 
     final flutterProcess = await ProcessRunner.instance.start(
       'flutter',
@@ -94,9 +101,11 @@ class FlutterRunner {
         'build',
         'web',
         '-t',
-        '.dart_tool/jaspr/flutter_target.dart',
+        flutterTarget ?? _defaultFlutterTarget,
         if (wasm) '--wasm' else '--no-wasm-dry-run',
-        '--no-tree-shake-icons',
+        // The empty default target has no icons to shake, so the declared fonts
+        // would be stripped entirely; a real target makes the subsetting correct.
+        if (flutterTarget == null) '--no-tree-shake-icons',
         '--output=build/flutter',
       ],
       runInShell: true,
@@ -138,12 +147,15 @@ class FlutterRunner {
     await _watcher?.stop(message: 'Stopping flutter run...');
   }
 
-  static Future<void> _ensureTarget() async {
-    final flutterTarget = File('.dart_tool/jaspr/flutter_target.dart').absolute;
-    if (!await flutterTarget.exists()) {
-      await flutterTarget.create(recursive: true);
+  static Future<void> _ensureTarget(String? flutterTarget) async {
+    // A configured entrypoint belongs to the project and stays untouched.
+    if (flutterTarget != null) return;
+
+    final targetFile = File(_defaultFlutterTarget).absolute;
+    if (!await targetFile.exists()) {
+      await targetFile.create(recursive: true);
     }
-    await flutterTarget.writeAsString('void main() {}');
+    await targetFile.writeAsString('void main() {}');
   }
 
   static final Map<String, Object?> _flutterInfo = (() {

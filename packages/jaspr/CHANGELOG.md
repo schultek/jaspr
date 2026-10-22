@@ -22,6 +22,8 @@
 
   - **Breaking**: Ports for the server and other sub-processes are now selected automatically based on availability. The `--web-port` and `--proxy-port` options are removed. It is still possible to choose the main port using `--port`, which is now validated for availability.
 
+  - Added a `--flutter-target` option to `jaspr build` and `jaspr serve` to set the entrypoint of the embedded Flutter app. Pointing it at the app's own entrypoint lets Flutter tree-shake the icon fonts instead of shipping every declared font in full.
+
 - Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with
   types from the [`listen`](https://pub.dev/packages/listen) package.
 

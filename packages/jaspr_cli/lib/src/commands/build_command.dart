@@ -107,6 +107,13 @@ class BuildCommand extends BaseCommand with ProxyHelper {
       negatable: true,
       defaultsTo: true,
     );
+    argParser.addOption(
+      'flutter-target',
+      help:
+          'Specify the entrypoint of the embedded Flutter app.\n'
+          'Defaults to a generated empty entrypoint that only collects the declared assets. '
+          "Point this at the app's own entrypoint so Flutter can tree-shake the icon fonts.",
+    );
     addDartDefineArgs();
   }
 
@@ -125,6 +132,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
   late final sitemapDomain = argResults!.option('sitemap-domain');
   late final sitemapExclude = argResults!.option('sitemap-exclude');
   late final managedBuildOptions = argResults!.flag('managed-build-options');
+  late final flutterTarget = argResults!.option('flutter-target');
 
   @override
   Future<int> runCommand() async {
@@ -177,6 +185,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
         wasm: useWasm,
         logger: logger,
         copyToBuildDir: copyToBuildDir,
+        flutterTarget: flutterTarget,
         guard: guardResource,
       );
     } else {
