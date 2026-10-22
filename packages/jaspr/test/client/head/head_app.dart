@@ -41,32 +41,3 @@ class _PageState extends State<Page> {
     ]);
   }
 }
-
-/// Swaps between pages whose head sits in a fragment, as a router does.
-class SwappingApp extends StatefulComponent {
-  const SwappingApp({super.key});
-
-  @override
-  State<SwappingApp> createState() => _SwappingAppState();
-}
-
-class _SwappingAppState extends State<SwappingApp> {
-  bool second = false;
-
-  @override
-  Component build(BuildContext context) {
-    return Component.fragment([
-      if (second)
-        Component.fragment([
-          Document.head(title: 'second'),
-          div([Component.text('second')]),
-        ], key: const ValueKey('second'))
-      else
-        Component.fragment([
-          Document.head(title: 'first'),
-          div([Component.text('first')]),
-        ], key: const ValueKey('first')),
-      button(onClick: () => setState(() => second = !second), [Component.text('Swap')]),
-    ]);
-  }
-}
