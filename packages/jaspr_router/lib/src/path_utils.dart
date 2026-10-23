@@ -1,6 +1,20 @@
 import 'route.dart';
 
-final RegExp _parameterRegExp = RegExp(r':(\w+)(\((?:\\.|[^\\()])+\))?');
+/// Matches a `:name` path parameter, optionally followed by a custom pattern
+/// in parentheses.
+///
+/// The name must be a valid identifier — it may not start with a digit — because
+/// it becomes a named capture group in the generated [RegExp], and `RegExp`
+/// rejects group names like `27017` with a `FormatException`.
+///
+/// Without this restriction any path that merely *looks* like a parameter is
+/// treated as one. The router builds its error screen from the unmatched
+/// location, so a request such as `/:27017` (port scanners send these) turned
+/// into the invalid pattern `^(?<27017>[^/]+)` and crashed the whole response
+/// with a `FormatException` instead of rendering the error screen.
+final RegExp _parameterRegExp = RegExp(
+  r':([A-Za-z_]\w*)(\((?:\\.|[^\\()])+\))?',
+);
 
 /// Converts a [pattern] such as `/user/:id` into [RegExp].
 ///

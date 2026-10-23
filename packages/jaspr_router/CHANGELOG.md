@@ -1,3 +1,9 @@
+## Unreleased 0.10.0-beta.1
+
+- A path segment that merely looks like a parameter (`/:27017`) is escaped as a
+  literal instead of building an invalid named capture group and failing the
+  response with a 500.
+
 ## 0.10.0-beta.0
 
 - Require Dart 3.13 or later.
