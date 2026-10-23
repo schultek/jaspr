@@ -1,6 +1,8 @@
 ## Unreleased 0.24.0-beta.1
 
 - Fixed issue with hot-reload in client mode.
+- Fixed hot reload when adding new `@client` components,
+  including the first client on a page.
 
 ## 0.24.0-beta.0
 
