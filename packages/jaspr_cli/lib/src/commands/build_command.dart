@@ -11,6 +11,7 @@ import '../dev/css_runner.dart';
 import '../dev/flutter_runner.dart';
 import '../dev/server_runner.dart';
 import '../helpers/dart_define_helpers.dart';
+import '../helpers/experiment_helpers.dart';
 import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
@@ -108,6 +109,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
       defaultsTo: true,
     );
     addDartDefineArgs();
+    addExperimentArgs();
   }
 
   @override
@@ -184,7 +186,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
     }
 
     if (!hasBuildError) {
-      final exitCode = await CssRunner.build(project: project, logger: logger);
+      final exitCode = await CssRunner.build(project: project, logger: logger, experiments: experiments);
       if (exitCode != 0) {
         hasBuildError = true;
       } else {
@@ -222,6 +224,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
       final process = await ProcessRunner.instance.start(dartExecutable, [
         'compile',
         compileTarget,
+        ...experimentArgs,
         if (targetOS != null) ...[
           '--target-os',
           targetOS,
@@ -298,6 +301,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
         port: serverPort,
         proxyPort: proxyPort,
         serverDefines: serverDefines,
+        experiments: experiments,
         logger: logger,
         serverStartedCompleter: serverStartedCompleter,
         guard: guardResource,
@@ -516,6 +520,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
             '--define=build_web_compilers:dart_source_cleanup=enabled=false',
           ],
         ],
+        ...experimentArgs,
       ],
       outputDir: outputDir,
       logger: logger,

@@ -14,6 +14,7 @@ import '../dev/dev_workflow.dart';
 import '../dev/flutter_runner.dart';
 import '../dev/server_runner.dart';
 import '../helpers/dart_define_helpers.dart';
+import '../helpers/experiment_helpers.dart';
 import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
@@ -67,6 +68,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       defaultsTo: false,
     );
     addDartDefineArgs();
+    addExperimentArgs();
   }
 
   @override
@@ -234,6 +236,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         project: project,
         logger: logger,
         userDefines: getServerDartDefines(),
+        experiments: experiments,
         restArgs: argResults!.rest,
         release: release,
         debug: debug,
@@ -670,11 +673,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         },
         if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
       ],
+      ...experimentArgs,
     ];
 
     final workflow = await DevWorkflow.start(
       proxyPort: proxyPort,
       buildArgs: buildArgs,
+      experiments: experiments,
       project: project,
       logger: logger,
       guard: guardResource,

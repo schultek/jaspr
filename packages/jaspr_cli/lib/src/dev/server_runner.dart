@@ -40,6 +40,7 @@ class ServerRunner {
     required Logger logger,
     required Map<String, String> userDefines,
     required List<String> restArgs,
+    List<String> experiments = const [],
     bool release = false,
     bool debug = false,
     void Function(FutureOr<void> Function())? guard,
@@ -66,6 +67,7 @@ class ServerRunner {
       'run',
       if (!release) ...['--enable-vm-service', '--enable-asserts'] else '-Djaspr.flags.release=true',
       '-Djaspr.flags.verbose=$debug',
+      for (final experiment in experiments) '--enable-experiment=$experiment',
       for (final define in userDefines.entries) '-D${define.key}=${define.value}',
     ];
 
@@ -209,6 +211,7 @@ class ServerRunner {
     required Map<String, String> serverDefines,
     required Logger logger,
     required Completer<void> serverStartedCompleter,
+    List<String> experiments = const [],
     void Function(FutureOr<void> Function())? guard,
   }) async {
     logger.write('Starting server for static rendering...', tag: Tag.server, progress: ProgressState.running);
@@ -221,6 +224,7 @@ class ServerRunner {
         '-Djaspr.flags.release=true',
         '-Djaspr.flags.generate=true',
         '-Djaspr.dev.web=build/jaspr',
+        for (final experiment in experiments) '--enable-experiment=$experiment',
         for (final define in serverDefines.entries) '-D${define.key}=${define.value}',
         entryPoint,
       ],
