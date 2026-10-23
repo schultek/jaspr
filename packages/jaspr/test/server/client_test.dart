@@ -106,6 +106,31 @@ class AppWithMultipleServerComponents extends StatelessComponent {
 }
 
 void main() {
+  group('with a client entrypoint', () {
+    setUp(() => Jaspr.initializeApp(options: ServerOptions(clientId: 'main.client.dart.js')));
+
+    testServer('adds the client script without @client components', (tester) async {
+      tester.pumpComponent(p([.text('No clients')]));
+
+      final response = await tester.request('/');
+
+      final scripts = response.document!.querySelectorAll('script');
+      expect(scripts.map((element) => element.attributes['src']), ['/main.client.dart.js']);
+    });
+  });
+
+  group('without a client entrypoint', () {
+    setUp(() => Jaspr.initializeApp(options: ServerOptions()));
+
+    testServer('adds no script', (tester) async {
+      tester.pumpComponent(p([.text('No clients')]));
+
+      final response = await tester.request('/');
+
+      expect(response.document!.querySelectorAll('script'), isEmpty);
+    });
+  });
+
   group('@client', () {
     setUpAll(() {
       Jaspr.initializeApp(

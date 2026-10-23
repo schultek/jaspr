@@ -24,6 +24,9 @@ import 'package:flutter_multi_view/app.dart' deferred as _app;
 ///   runApp(...);
 /// }
 /// ```
-ClientOptions get defaultClientOptions => ClientOptions(
-  clients: {'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary)},
-);
+ClientOptions get defaultClientOptions => ClientOptions(clients: _$clients);
+
+// A top-level function, so hot reload picks up added or removed clients.
+Map<String, ClientLoader> _$clients() => {
+  'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary),
+};

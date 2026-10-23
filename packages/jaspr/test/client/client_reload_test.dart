@@ -79,7 +79,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'reload_app': ClientLoader((params) {
               return SyncReloadComponent(name: params.get<String>('name'));
             }),
@@ -139,7 +139,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'dynamic_app': ClientLoader((params) {
               return DynamicClientApp(title: params.get<String>('title'));
             }),

@@ -31,10 +31,9 @@ class ClientComponentRegistryElement extends ObserverElement {
       return;
     }
 
+    // The binding adds the client script when an entrypoint exists.
     if (!_didHandleClientScript) {
-      if (binding.options.clientId case final clientId?) {
-        binding.addRenderAdapter(ClientScriptAdapter(clientId));
-      } else if (kDebugMode) {
+      if (kDebugMode && binding.options.clientId == null) {
         binding.addRenderAdapter(NoClientScriptAdapter());
       }
       _didHandleClientScript = true;

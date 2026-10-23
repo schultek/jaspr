@@ -24,11 +24,12 @@ import 'package:example_server/components/counter.dart' deferred as _counter;
 ///   runApp(...);
 /// }
 /// ```
-ClientOptions get defaultClientOptions => ClientOptions(
-  clients: {
-    'counter': ClientLoader(
-      (p) => _counter.Counter(),
-      loader: _counter.loadLibrary,
-    ),
-  },
-);
+ClientOptions get defaultClientOptions => ClientOptions(clients: _$clients);
+
+// A top-level function, so hot reload picks up added or removed clients.
+Map<String, ClientLoader> _$clients() => {
+  'counter': ClientLoader(
+    (p) => _counter.Counter(),
+    loader: _counter.loadLibrary,
+  ),
+};
