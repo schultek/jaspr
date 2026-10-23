@@ -28,17 +28,105 @@ When you annotate a component with `@client`, Jaspr renders its initial HTML on 
 ### Passing Data to `@client` Components
 
 Use parameters of `@client` components to pass data from the server to the client. These are automatically serialized on the server and deserialized in the browser.
-- **Rule 1:** All parameters MUST be initializing fields (e.g., `const MyClientComponent({required this.title});`).
-- **Rule 2:** All parameters MUST be serializable. They must be primitive types (`int`, `String`, `double`, `bool`, `List`, `Map`) OR custom types that define `@encoder` and `@decoder` methods.
-  - Parameters MUST NOT be functions, components, or any other non-serializable types.
+- **Rule 1:** All parameters MUST be initializing fields (e.g., `const MyClientComponent({required this.title});`) or primary constructor field parameters (e.g., `class MyClientComponent({required final String title})`).
+- **Rule 2:** Data parameters MUST be serializable:
+  - Primitive types: `int`, `double`, `String`, `bool`.
+  - Collections: `List`, `List<dynamic>`, `List<Object?>`, or `List<T>` (where `T` is serializable); `Map<String, dynamic>`, `Map<String, Object?>`, or `Map<String, V>` (where `V` is serializable). Map keys MUST be `String`.
+  - Enums or custom types: MUST define `@encoder` and `@decoder` methods.
+- **Rule 3:** Components CAN be passed as parameters (`Component` or `List<Component>`). When a component is passed to a `@client` component, it becomes a **Server Component** (see below).
+- **Rule 4:** Parameters MUST NOT be functions or other non-serializable, non-component types.
+
+---
+
+## Server Components (Surgical Hydration)
+
+Server Components allow `@client` components to accept child components as constructor parameters, rendering them exclusively on the server and avoiding compiling or shipping their code to the browser.
+
+### Benefits of Server Components
+1. **Zero Client Footprint:** Static content inside interactive wrappers is not compiled to JS/Wasm. Only the wrapper shell is shipped to the client.
+2. **Surgical Hydration:** The client app hydrates only the interactive boundary and mounts pre-rendered server DOM nodes into position (`<!--s@...-->` markers).
+3. **Access to Server APIs:** The server component can use `dart:io`, query databases, or read the filesystem, even while visually hosted inside an interactive client component.
+4. **Nested Islands:** Server components can in turn contain nested `@client` components, enabling clean alternating scopes (Server -> Client -> Server -> Client).
+
+### Crucial Server Component Rules
+- **Rule 1 (SSR Visibility):** Server components MUST be rendered during the initial server-side build. You MUST NOT conditionally exclude them using Dart `if` branches in the `@client` component's build method (e.g. `if (isOpen) component.child`), because the client does not possess the code to construct them later. Instead, always render the child and toggle visibility using CSS (e.g., `display: none` or `.hidden` class).
+- **Rule 2 (Styling Server Content):** If a client component needs to style or augment server-rendered children, use `Component.apply(classes: '...', styles: ..., child: component.child)`.
+
+### Example: Expandable Card with Server Component Content
+
+```dart title="lib/components/expandable_card.dart"
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
+
+// Interactive client-side wrapper
+@client
+class ExpandableCard extends StatefulComponent {
+  const ExpandableCard({required this.title, required this.content, super.key});
+
+  final String title;
+  // Child component rendered entirely on the server
+  final Component content;
+
+  @override
+  State<ExpandableCard> createState() => _ExpandableCardState();
+}
+
+class _ExpandableCardState extends State<ExpandableCard> {
+  bool isExpanded = false;
+
+  @override
+  Component build(BuildContext context) {
+    return div(classes: 'card', [
+      div(classes: 'card-header', [
+        h3([.text(component.title)]),
+        button(
+          onClick: () => setState(() => isExpanded = !isExpanded),
+          [.text(isExpanded ? 'Collapse' : 'Expand')],
+        ),
+      ]),
+      // CRITICAL: Always include component.content in the tree so it is rendered during SSR!
+      // Toggle visibility on the client via CSS classes rather than Dart if-checks.
+      div(
+        classes: 'card-content ${isExpanded ? 'expanded' : 'collapsed'}',
+        [component.content],
+      ),
+    ]);
+  }
+}
+```
+
+Usage on the server:
+
+```dart title="lib/main.server.dart"
+import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
+import 'components/expandable_card.dart';
+import 'main.server.options.dart';
+
+void main() {
+  Jaspr.initializeApp(options: defaultServerOptions);
+
+  runApp(Document(
+    body: ExpandableCard(
+      title: 'Server Details',
+      // This div and its children are NEVER shipped to the client bundle!
+      content: div([
+        p([.text('Rendered statically on the server.')]),
+      ]),
+    ),
+  ));
+}
+```
+
+---
 
 ### Fetching Data on the Server (Async Components)
 
-When pre-rendering in `server` or `static` mode, you often need to fetch data asynchronously (e.g., from a database or API) *before* rendering the HTML. Jaspr provides special server-only components to delay the build phase until the data is ready.
+When pre-rendering in `server` or `static` mode, fetch data asynchronously (e.g., from a database or API) *before* rendering the HTML using Jaspr's server-only async components.
 
 - **Rule 1:** You MUST use `AsyncStatelessComponent` or `AsyncBuilder` to perform async work during the build phase.
 - **Rule 2:** These components MUST ONLY be used on the server (import `package:jaspr/server.dart`).
-- **Rule 3:** Once the data is fetched on the server, you should pass it to a `@client` component as a parameter if you need that data to be available for client-side interactivity.
+- **Rule 3:** Once data is fetched on the server, pass it to `@client` components as serialized parameters (primitives or `@encoder`/`@decoder` types), or wrap server-only content in a server component child.
 
 **Example Usage:**
 
@@ -58,7 +146,7 @@ class MyServerComponent extends AsyncStatelessComponent {
     final databaseCount = await loadCountFromDatabase();
 
     return div([
-      .text('This is static.'),
+      .text('This is static server content.'),
       // 2. Pass the fetched data to the client component
       MyInteractiveButton(initialCount: databaseCount), 
     ]);
@@ -93,3 +181,4 @@ class _MyInteractiveButtonState extends State<MyInteractiveButton> {
   }
 }
 ```
+
