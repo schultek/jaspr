@@ -14,8 +14,6 @@ void main() {
     final options = ClientOptions();
     Jaspr.initializeApp(options: options);
 
-    Jaspr.reloadOptions();
-
     expect(Jaspr.options, same(options));
     expect(Jaspr.clients, isEmpty);
   });
@@ -72,7 +70,7 @@ void main() {
 
       version = 1;
       expect(Jaspr.clients, isNot(contains('added')));
-      Jaspr.reloadOptions();
+      Jaspr.invalidateClients();
       expect(loaded, isNot(contains('added')), reason: 'New deferred components should still load on demand.');
 
       await _reload(tester, _body(hasExistingClient: hasExistingClient, hasAddedClient: true));
@@ -85,7 +83,7 @@ void main() {
 
       // A later reload also removes obsolete registrations and preserves state.
       version = 2;
-      Jaspr.reloadOptions();
+      Jaspr.invalidateClients();
       expect(Jaspr.clients, isNot(contains('added')));
       await _reload(tester, _body(hasExistingClient: hasExistingClient, hasAddedClient: false));
       if (hasExistingClient) {

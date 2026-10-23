@@ -90,7 +90,7 @@ class ClientOptionsBuilder implements Builder {
       );
 
       // A top-level function, so hot reload picks up added or removed clients.
-      Map<String, ClientLoader> _\$clients() => {${buildClientEntries(clients, package)}};
+      Map<String, ClientLoader> _\$clients() => ${buildClientEntries(clients, package)};
     ''';
 
     source = ImportsWriter().resolve(source);
@@ -111,13 +111,13 @@ class ClientOptionsBuilder implements Builder {
   String buildClientEntries(List<ClientModule> clients, String package) {
     final compressed = compressPaths(clients.map((c) => c.id.path).toList());
 
-    return clients.map((c) {
+    return '{${clients.map((c) {
       final id = compressed[c.id.path]!;
       final fullId = c.id.package != package ? '${c.id.package}:$id' : id;
       return '''
         '$fullId': ClientLoader((p) => ${c.componentFactory()}, loader: [[=${c.import}]].loadLibrary),
       ''';
-    }).join();
+    }).join()}}';
   }
 }
 

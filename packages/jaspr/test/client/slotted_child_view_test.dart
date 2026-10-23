@@ -5,7 +5,6 @@ import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/src/client/dom_render_object.dart' show RootDomRenderObject;
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart';
 
@@ -712,14 +711,10 @@ void main() {
   });
 }
 
-/// Reloads the app with fresh server-rendered [html],
-/// following the same sequence as the client's reload handler.
+/// Reloads the app with fresh server-rendered [html].
 Future<void> _reload(ClientTester tester, String html) async {
   final newBody = window.document.createElement('body') as HTMLBodyElement;
   newBody.innerHTML = html.toJS;
-  final rootElement = tester.binding.rootElement!;
-  (rootElement.renderObject as RootDomRenderObject).setRootNode(newBody);
-  rootElement.owner.performReload(rootElement);
-  window.document.body!.replaceWith(newBody);
+  await tester.binding.reloadBody(newBody);
   await pumpEventQueue();
 }

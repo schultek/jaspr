@@ -28,7 +28,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   ClientAppBinding._() {
     assert(() {
       registerExtension('ext.jaspr.reassemble', (method, parameters) async {
-        Jaspr.reloadOptions();
+        Jaspr.invalidateClients();
         // ignore: invalid_use_of_protected_member
         rootElement?.visitChildren((element) => element.reassemble());
         return ServiceExtensionResponse.result('{}');

@@ -106,24 +106,30 @@ class AppWithMultipleServerComponents extends StatelessComponent {
 }
 
 void main() {
-  for (final clientId in [null, 'main.client.dart.js']) {
-    group('client entrypoint: $clientId', () {
-      setUp(() => Jaspr.initializeApp(options: ServerOptions(clientId: clientId)));
+  group('with a client entrypoint', () {
+    setUp(() => Jaspr.initializeApp(options: ServerOptions(clientId: 'main.client.dart.js')));
 
-      testServer('includes only configured scripts on pages without client registrations', (tester) async {
-        tester.pumpComponent(p([.text('No clients')]));
+    testServer('adds the client script without @client components', (tester) async {
+      tester.pumpComponent(p([.text('No clients')]));
 
-        final response = await tester.request('/');
-        final scripts = response.document!.querySelectorAll('script');
-        if (clientId != null) {
-          expect(scripts, hasLength(1));
-          expect(scripts.single.attributes['src'], '/$clientId');
-        } else {
-          expect(scripts, isEmpty);
-        }
-      });
+      final response = await tester.request('/');
+
+      final scripts = response.document!.querySelectorAll('script');
+      expect(scripts.map((element) => element.attributes['src']), ['/main.client.dart.js']);
     });
-  }
+  });
+
+  group('without a client entrypoint', () {
+    setUp(() => Jaspr.initializeApp(options: ServerOptions()));
+
+    testServer('adds no script', (tester) async {
+      tester.pumpComponent(p([.text('No clients')]));
+
+      final response = await tester.request('/');
+
+      expect(response.document!.querySelectorAll('script'), isEmpty);
+    });
+  });
 
   group('@client', () {
     setUpAll(() {

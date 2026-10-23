@@ -12,7 +12,7 @@ import 'component_anchors.dart';
 abstract final class Jaspr {
   static void initializeApp({ClientOptions options = const ClientOptions()}) {
     _options = options;
-    _clients = null;
+    invalidateClients();
     options.initialize?.call();
   }
 
@@ -26,9 +26,9 @@ abstract final class Jaspr {
   static Map<String, ClientLoader> get clients => _clients ??= options.clients?.call() ?? const {};
   static Map<String, ClientLoader>? _clients;
 
-  /// Invalidates cached client registrations after hot reload, without rerunning initialization.
+  /// Invalidates cached client registrations, such as after hot reload.
   @internal
-  static void reloadOptions() {
+  static void invalidateClients() {
     _clients = null;
   }
 }
