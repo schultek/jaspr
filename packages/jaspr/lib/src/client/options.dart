@@ -12,7 +12,8 @@ import 'component_anchors.dart';
 abstract final class Jaspr {
   static void initializeApp({ClientOptions options = const ClientOptions()}) {
     _options = options;
-    invalidateClients();
+    _clients = null;
+    _staleClients = null;
     options.initialize?.call();
   }
 
@@ -21,15 +22,34 @@ abstract final class Jaspr {
   static ClientOptions get options => _options ?? const ClientOptions();
   static ClientOptions? _options;
 
-  /// The client registrations, cached so preloading and hydration share loaders.
+  /// The client registrations, cached so all anchors share loaders.
+  ///
+  /// After [invalidateClients] is called,
+  /// recreated loaders keep the loaded state of the loaders they replace.
   @internal
-  static Map<String, ClientLoader> get clients => _clients ??= options.clients?.call() ?? const {};
+  static Map<String, ClientLoader> get clients {
+    if (_clients case final clients?) return clients;
+
+    final clients = options.clients?.call() ?? const <String, ClientLoader>{};
+    if (_staleClients case final staleClients?) {
+      for (final MapEntry(key: name, value: loader) in clients.entries) {
+        loader._keepLoadedFrom(staleClients[name]);
+      }
+      _staleClients = null;
+    }
+    return _clients = clients;
+  }
+
   static Map<String, ClientLoader>? _clients;
+  static Map<String, ClientLoader>? _staleClients;
 
   /// Invalidates cached client registrations, such as after hot reload.
   @internal
   static void invalidateClients() {
-    _clients = null;
+    if (_clients case final clients?) {
+      _staleClients = clients;
+      _clients = null;
+    }
   }
 }
 
@@ -82,6 +102,17 @@ final class ClientLoader {
     }
 
     return _loadedBuilder = newLoadedBuilder;
+  }
+
+  /// Marks this loader as loaded if [previous] already loaded the same [loader],
+  /// so existing components resolve synchronously and keep their state after hot reload.
+  ///
+  /// Names can move to a different library when clients are added,
+  /// so matching names alone don't mean the library is loaded.
+  void _keepLoadedFrom(ClientLoader? previous) {
+    if (previous != null && previous.loader == loader && previous._loadedBuilder is ClientBuilder) {
+      _loadedBuilder = builder;
+    }
   }
 }
 

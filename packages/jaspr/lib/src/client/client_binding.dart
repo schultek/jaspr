@@ -235,11 +235,14 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   Future<void> reloadBody(web.HTMLElement body) async {
     final newNode = _attachTarget == 'body' ? body : body.querySelector(_attachTarget)!;
 
-    // Load the page's client components before reloading,
-    // so existing ones resolve synchronously and keep their state.
+    // Load new client components before reloading.
+    // An anchor only resolves synchronously once its nested clients do,
+    // so an existing client that gained a deferred descendant would
+    // otherwise remount and lose its state.
     // Loading errors are reported when the client app loads its slots.
     await [
-      for (final anchor in extractAnchors(nodes: [newNode])) anchor.resolve().catchError((_) {}),
+      for (final anchor in extractAnchors(nodes: [newNode]))
+        if (!anchor.isResolved) anchor.resolve().catchError((_) {}),
     ].wait;
 
     final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;

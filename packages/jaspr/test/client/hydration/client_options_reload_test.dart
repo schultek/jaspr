@@ -29,11 +29,70 @@ void main() {
     expect(Jaspr.clients, isEmpty);
   });
 
+  test('keeps loaded state across invalidation only for the same loader', () async {
+    Future<void> loadFirst() async {}
+    Future<void> loadSecond() async {}
+    var loader = loadFirst;
+    Jaspr.initializeApp(
+      options: ClientOptions(
+        clients: () => {'counter': ClientLoader((_) => const _Counter('counter', 'Initial'), loader: loader)},
+      ),
+    );
+
+    expect(Jaspr.clients['counter']!.loadedBuilder, isA<Future<Object?>>());
+    await Jaspr.clients['counter']!.loadedBuilder;
+
+    Jaspr.invalidateClients();
+    expect(Jaspr.clients['counter']!.loadedBuilder, isNot(isA<Future<Object?>>()));
+
+    // Names can move to another library, which then still needs to load.
+    loader = loadSecond;
+    Jaspr.invalidateClients();
+    expect(Jaspr.clients['counter']!.loadedBuilder, isA<Future<Object?>>());
+  });
+
+  testClient('keeps parent state when a reload adds a deferred client in its server child', (tester) async {
+    final marker = DomValidator.clientMarkerPrefix;
+    web.HTMLElement shellBody({required bool withChild}) {
+      final child = withChild ? '<!--${marker}added--><button id="added">Server</button><!--/${marker}added-->' : '';
+      final html =
+          '<!--${marker}shell data={"child":"s${marker}1"}-->'
+          '<div><button id="shell">Server</button>'
+          '<!--s${marker}1--><div>$child</div><!--/s${marker}1--></div>'
+          '<!--/${marker}shell-->';
+      return web.DOMParser().parseFromString('<body>$html</body>'.toJS, 'text/html').body!;
+    }
+
+    Future<void> loadAdded() => Future<void>.delayed(Duration.zero);
+    var hasAdded = false;
+    web.document.body!.replaceWith(shellBody(withChild: false));
+    Jaspr.initializeApp(
+      options: ClientOptions(
+        clients: () => {
+          'shell': ClientLoader((params) => _Shell(child: params.mount(params.get<String>('child')))),
+          if (hasAdded) 'added': ClientLoader((_) => const _Counter('added', 'Added'), loader: loadAdded),
+        },
+      ),
+    );
+    tester.pumpComponent(const ClientApp());
+    await pumpEventQueue();
+    await _click('shell', 'Shell: 1');
+
+    hasAdded = true;
+    Jaspr.invalidateClients();
+    await _reload(tester, shellBody(withChild: true));
+
+    expect(_button('shell').textContent, 'Shell: 1');
+    await _click('added', 'Added: 1');
+  });
+
   for (final hasExistingClient in [false, true]) {
     testClient('reloads new client registrations with existing client: $hasExistingClient', (tester) async {
       var version = 0;
       var initializations = 0;
       final loaded = <String>[];
+      // Stand in for the generated `loadLibrary` tear-offs, which are the same for each client.
+      final loaders = <String, Future<void> Function()>{};
 
       final options = ClientOptions(
         initialize: () => initializations++,
@@ -45,10 +104,13 @@ void main() {
           final label = 'Version $version';
           ClientLoader loader(String id) => ClientLoader(
             (_) => _Counter(id, label),
-            loader: () async {
-              await Future<void>.delayed(Duration.zero);
-              loaded.add(id);
-            },
+            loader: loaders.putIfAbsent(
+              id,
+              () => () async {
+                await Future<void>.delayed(Duration.zero);
+                loaded.add(id);
+              },
+            ),
           );
           return {
             if (hasExistingClient) 'existing': loader('existing'),
@@ -89,11 +151,8 @@ void main() {
       if (hasExistingClient) {
         await _click('existing', 'Version 2: 3');
       }
-      expect(loaded, [
-        if (hasExistingClient) ...['existing', 'existing'],
-        'added',
-        if (hasExistingClient) 'existing',
-      ]);
+      // Reloads load only new clients, so existing ones resolve synchronously and keep their state.
+      expect(loaded, [if (hasExistingClient) 'existing', 'added']);
       expect(Jaspr.options, same(options));
       expect(initializations, 1);
     });
@@ -120,6 +179,25 @@ Future<void> _click(String id, String text) async {
   _button(id).click();
   await pumpEventQueue();
   expect(_button(id).textContent, text);
+}
+
+class _Shell extends StatefulComponent {
+  const _Shell({required this.child});
+
+  final Component child;
+
+  @override
+  State<_Shell> createState() => _ShellState();
+}
+
+class _ShellState extends State<_Shell> {
+  int count = 0;
+
+  @override
+  Component build(BuildContext context) => div([
+    button(id: 'shell', onClick: () => setState(() => count++), [.text('Shell: $count')]),
+    component.child,
+  ]);
 }
 
 class _Counter extends StatefulComponent {
