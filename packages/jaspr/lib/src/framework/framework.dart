@@ -424,6 +424,7 @@ abstract class Element implements BuildContext {
         }
         if (owner._isReload) {
           child.onReload();
+          child.rebuild();
         }
         newChild = child;
       } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
@@ -1225,7 +1226,6 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void onReload() {
     _dirty = true;
-    rebuild();
   }
 }
 
