@@ -5,6 +5,14 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 plugins:
   jaspr_lints:
