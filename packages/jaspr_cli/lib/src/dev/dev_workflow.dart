@@ -138,28 +138,25 @@ class DevWorkflow {
         .listen(null);
   }
 
+  /// Hot reloads all connected clients, then reloads any changed stylesheets.
   Future<void> reloadClients() async {
     flutter?.reload();
     final cssFuture = css.reload();
     await server?.reload();
 
-    for (final clientConnection in clients.connections) {
+    await clients.forEachConnection('Hot reload', (clientConnection) async {
       await clientConnection.performHotReload();
       await clientConnection.reassemble();
       await clientConnection.reloadHtml();
-    }
+    });
 
-    final changedCssFiles = await cssFuture;
-    if (changedCssFiles.isNotEmpty) {
-      for (final clientConnection in clients.connections) {
-        await clientConnection.reloadStylesheets(changedCssFiles);
-      }
-      for (final file in changedCssFiles) {
-        logger.write('Reloaded $file', tag: Tag.css);
-      }
-    }
+    await _reloadStylesheets(cssFuture);
   }
 
+  /// Hot restarts all connected clients, then reloads any changed stylesheets.
+  ///
+  /// If [incremental] is `true`, the Flutter and CSS runners are only
+  /// reloaded instead of fully restarted.
   Future<void> restartClients({bool incremental = false}) async {
     final Future<List<String>> cssFuture;
     if (incremental) {
@@ -172,22 +169,15 @@ class DevWorkflow {
 
     await server?.reload();
 
-    for (final clientConnection in clients.connections) {
+    await clients.forEachConnection('Hot restart', (clientConnection) async {
       await clientConnection.restart();
       await clientConnection.reloadHtml();
-    }
+    });
 
-    final changedCssFiles = await cssFuture;
-    if (changedCssFiles.isNotEmpty) {
-      for (final clientConnection in clients.connections) {
-        await clientConnection.reloadStylesheets(changedCssFiles);
-      }
-      for (final file in changedCssFiles) {
-        logger.write('Reloaded $file', tag: Tag.css);
-      }
-    }
+    await _reloadStylesheets(cssFuture);
   }
 
+  /// Fully reloads the page in all connected clients.
   Future<void> refreshClients() async {
     flutter?.reload();
     final cssFuture = css.reload();
@@ -199,8 +189,21 @@ class DevWorkflow {
       }
     }
 
-    for (final client in clients.connections) {
-      await client.refreshPage();
+    await clients.forEachConnection('Refresh', (client) => client.refreshPage());
+  }
+
+  /// Waits for [cssFuture] and, if any stylesheets changed,
+  /// reloads them in all connected clients.
+  Future<void> _reloadStylesheets(Future<List<String>> cssFuture) async {
+    final changedCssFiles = await cssFuture;
+    if (changedCssFiles.isEmpty) return;
+
+    await clients.forEachConnection(
+      'Stylesheet reload',
+      (clientConnection) => clientConnection.reloadStylesheets(changedCssFiles),
+    );
+    for (final file in changedCssFiles) {
+      logger.write('Reloaded $file', tag: Tag.css);
     }
   }
 
