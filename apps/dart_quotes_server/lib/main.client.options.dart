@@ -26,6 +26,7 @@ import 'package:dart_quotes_server/web/components/quote_like_button.dart'
 /// }
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
+  reload: () => defaultClientOptions,
   clients: {
     'quote_like_button': ClientLoader(
       (p) => _quote_like_button.QuoteLikeButton(

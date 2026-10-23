@@ -35,6 +35,7 @@ import 'package:website/pages/home/5_community/components/sponsors_list.dart'
 /// }
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
+  reload: () => defaultClientOptions,
   clients: {
     'header': ClientLoader(
       (p) => _header.Header(showHome: p.get<bool>('showHome')),

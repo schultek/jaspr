@@ -39,5 +39,6 @@ ClientOptions get defaultClientOptions => ClientOptions(
     _shared_preferences_web.SharedPreferencesPlugin.registerWith(registrar);
     registrar.registerMessageHandler();
   },
+  reload: () => defaultClientOptions,
   clients: {'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary)},
 );

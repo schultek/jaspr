@@ -26,6 +26,7 @@ import 'package:backend_dart_frog/components/hello.dart' deferred as _hello;
 /// }
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
+  reload: () => defaultClientOptions,
   clients: {
     'counter': ClientLoader(
       (p) => _counter.Counter(),

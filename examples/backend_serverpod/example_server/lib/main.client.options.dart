@@ -25,6 +25,7 @@ import 'package:example_server/components/counter.dart' deferred as _counter;
 /// }
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
+  reload: () => defaultClientOptions,
   clients: {
     'counter': ClientLoader(
       (p) => _counter.Counter(),

@@ -26,6 +26,7 @@ import 'package:backend_shelf/components/hello.dart' deferred as _hello;
 /// }
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
+  reload: () => defaultClientOptions,
   clients: {
     'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary),
     'hello': ClientLoader((p) => _hello.Hello(), loader: _hello.loadLibrary),

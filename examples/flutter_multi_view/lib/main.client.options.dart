@@ -25,5 +25,6 @@ import 'package:flutter_multi_view/app.dart' deferred as _app;
 /// }
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
+  reload: () => defaultClientOptions,
   clients: {'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary)},
 );

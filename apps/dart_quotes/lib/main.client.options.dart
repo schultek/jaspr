@@ -37,6 +37,7 @@ ClientOptions get defaultClientOptions => ClientOptions(
     _cloud_firestore_web.FirebaseFirestoreWeb.registerWith(registrar);
     registrar.registerMessageHandler();
   },
+  reload: () => defaultClientOptions,
   clients: {
     'quote_like_button': ClientLoader(
       (p) => _quote_like_button.QuoteLikeButton(

@@ -31,5 +31,6 @@ ClientOptions get defaultClientOptions => ClientOptions(
     _firebase_core_web.FirebaseCoreWeb.registerWith(registrar);
     registrar.registerMessageHandler();
   },
+  reload: () => defaultClientOptions,
   clients: {'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary)},
 );

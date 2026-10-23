@@ -35,6 +35,7 @@ ClientOptions get defaultClientOptions => ClientOptions(
     _shared_preferences_web.SharedPreferencesPlugin.registerWith(registrar);
     registrar.registerMessageHandler();
   },
+  reload: () => defaultClientOptions,
   clients: {
     'like_button': ClientLoader(
       (p) => _like_button.LikeButton(
