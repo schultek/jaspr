@@ -30,6 +30,17 @@ void main() {
         hasOuterHtml('<meta name="c" content="d">'),
       ]);
     });
+
+    testClient('should release the head of a page nested in a fragment', (tester) async {
+      tester.pumpComponent(const SwappingApp());
+      expect(web.document.title, 'first');
+
+      await tester.click(find.tag('button'));
+      expect(web.document.title, 'second');
+
+      await tester.click(find.tag('button'));
+      expect(web.document.title, 'first');
+    });
   });
 }
 
