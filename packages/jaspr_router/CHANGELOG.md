@@ -1,3 +1,7 @@
+## Unreleased 0.10.0-beta.1
+
+- `redirect` preserves the query string on server-side redirects.
+
 ## 0.10.0-beta.0
 
 - Require Dart 3.13 or later.
