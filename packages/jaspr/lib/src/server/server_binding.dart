@@ -58,13 +58,9 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   void attachRootComponent(Component app) async {
-    if (kDebugMode) {
-      // Development pages need the client runtime even before
-      // their first @client component is added,
-      // so they can receive hot reloads.
-      if (options.clientId case final clientId?) {
-        addRenderAdapter(ClientScriptAdapter(clientId));
-      }
+    // Client entrypoints can also run code without any @client components.
+    if (options.clientId case final clientId?) {
+      addRenderAdapter(ClientScriptAdapter(clientId));
     }
     super.attachRootComponent(ClientComponentRegistry(child: app));
   }

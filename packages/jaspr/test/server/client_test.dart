@@ -106,6 +106,25 @@ class AppWithMultipleServerComponents extends StatelessComponent {
 }
 
 void main() {
+  for (final clientId in [null, 'main.client.dart.js']) {
+    group('client entrypoint: $clientId', () {
+      setUp(() => Jaspr.initializeApp(options: ServerOptions(clientId: clientId)));
+
+      testServer('includes only configured scripts on pages without client registrations', (tester) async {
+        tester.pumpComponent(p([.text('No clients')]));
+
+        final response = await tester.request('/');
+        final scripts = response.document!.querySelectorAll('script');
+        if (clientId != null) {
+          expect(scripts, hasLength(1));
+          expect(scripts.single.attributes['src'], '/$clientId');
+        } else {
+          expect(scripts, isEmpty);
+        }
+      });
+    });
+  }
+
   group('@client', () {
     setUpAll(() {
       Jaspr.initializeApp(
@@ -145,15 +164,6 @@ void main() {
           '',
         ),
       );
-    });
-
-    testServer('loads the client runtime on pages without clients only in debug mode', (tester) async {
-      tester.pumpComponent(p([.text('No clients yet')]));
-
-      final response = await tester.request('/');
-
-      const script = '<script src="/main.clients.dart.js" defer></script>';
-      expect(response.body, kDebugMode ? contains(script) : isNot(contains(script)));
     });
 
     testServer('adds parameters as data', (tester) async {
