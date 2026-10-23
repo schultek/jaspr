@@ -12,6 +12,7 @@ import 'component_anchors.dart';
 abstract final class Jaspr {
   static void initializeApp({ClientOptions options = const ClientOptions()}) {
     _options = options;
+    _clients = null;
     options.initialize?.call();
   }
 
@@ -20,12 +21,15 @@ abstract final class Jaspr {
   static ClientOptions get options => _options ?? const ClientOptions();
   static ClientOptions? _options;
 
-  /// Refreshes generated options after hot reload, without rerunning initialization.
+  /// The client registrations, cached so preloading and hydration share loaders.
+  @internal
+  static Map<String, ClientLoader> get clients => _clients ??= options.clients?.call() ?? const {};
+  static Map<String, ClientLoader>? _clients;
+
+  /// Invalidates cached client registrations after hot reload, without rerunning initialization.
   @internal
   static void reloadOptions() {
-    if (_options?.reload?.call() case final updated?) {
-      _options = updated;
-    }
+    _clients = null;
   }
 }
 
@@ -34,17 +38,18 @@ abstract final class Jaspr {
 /// **DO NOT USE DIRECTLY.**
 /// Use the generated `defaultClientOptions` instead.
 final class ClientOptions {
-  const ClientOptions({this.initialize, this.clients = const {}, this.reload});
+  const ClientOptions({this.initialize, this.clients});
 
   final void Function()? initialize;
-  final Map<String, ClientLoader> clients;
 
-  /// Recreates the options from the updated generated code during hot reload.
+  /// Creates client registrations from the current generated code.
   ///
-  /// This must call a top-level member like `defaultClientOptions`.
+  /// The result is cached by [Jaspr] until initialization or hot reload.
+  ///
+  /// This must be or call a top-level function, like the generated `_$clients`.
   /// Closures created before a hot reload keep running their old body,
-  /// so only calls to top-level members pick up the new code.
-  final ClientOptions Function()? reload;
+  /// so a closure that returns a map literal never picks up new clients.
+  final Map<String, ClientLoader> Function()? clients;
 }
 
 /// The loader configuration for a @client component.

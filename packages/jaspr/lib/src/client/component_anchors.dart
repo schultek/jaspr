@@ -153,7 +153,7 @@ final _serverStartRegex = RegExp('^s${DomValidator.clientMarkerPrefixRegex}(\\d+
 final _serverEndRegex = RegExp('^/s${DomValidator.clientMarkerPrefixRegex}(\\d+)\$');
 
 FutureOr<ClientBuilder> getClientByName(String name) {
-  final clients = Jaspr.options.clients;
+  final clients = Jaspr.clients;
   assert(clients.containsKey(name), "No client component registered with name '$name'.");
   return clients[name]!.loadedBuilder;
 }

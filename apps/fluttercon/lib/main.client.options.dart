@@ -35,17 +35,19 @@ ClientOptions get defaultClientOptions => ClientOptions(
     _shared_preferences_web.SharedPreferencesPlugin.registerWith(registrar);
     registrar.registerMessageHandler();
   },
-  reload: () => defaultClientOptions,
-  clients: {
-    'like_button': ClientLoader(
-      (p) => _like_button.LikeButton(
-        session: _session.SessionCodex.decode(p.get<String>('session')),
-      ),
-      loader: _like_button.loadLibrary,
-    ),
-    'favorites': ClientLoader(
-      (p) => _favorites.FavoritesPage(),
-      loader: _favorites.loadLibrary,
-    ),
-  },
+  clients: _$clients,
 );
+
+// A top-level function, so hot reload picks up added or removed clients.
+Map<String, ClientLoader> _$clients() => {
+  'like_button': ClientLoader(
+    (p) => _like_button.LikeButton(
+      session: _session.SessionCodex.decode(p.get<String>('session')),
+    ),
+    loader: _like_button.loadLibrary,
+  ),
+  'favorites': ClientLoader(
+    (p) => _favorites.FavoritesPage(),
+    loader: _favorites.loadLibrary,
+  ),
+};

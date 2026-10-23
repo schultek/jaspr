@@ -25,15 +25,15 @@ import 'package:dart_quotes_server/web/components/quote_like_button.dart'
 ///   runApp(...);
 /// }
 /// ```
-ClientOptions get defaultClientOptions => ClientOptions(
-  reload: () => defaultClientOptions,
-  clients: {
-    'quote_like_button': ClientLoader(
-      (p) => _quote_like_button.QuoteLikeButton(
-        id: p.get<int>('id'),
-        initialCount: p.get<int>('initialCount'),
-      ),
-      loader: _quote_like_button.loadLibrary,
+ClientOptions get defaultClientOptions => ClientOptions(clients: _$clients);
+
+// A top-level function, so hot reload picks up added or removed clients.
+Map<String, ClientLoader> _$clients() => {
+  'quote_like_button': ClientLoader(
+    (p) => _quote_like_button.QuoteLikeButton(
+      id: p.get<int>('id'),
+      initialCount: p.get<int>('initialCount'),
     ),
-  },
-);
+    loader: _quote_like_button.loadLibrary,
+  ),
+};

@@ -10,13 +10,25 @@ import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart' as web;
 
 void main() {
-  test('keeps manually supplied options without a reload callback', () {
+  test('supports options without client registrations', () {
     final options = ClientOptions();
     Jaspr.initializeApp(options: options);
 
     Jaspr.reloadOptions();
 
     expect(Jaspr.options, same(options));
+    expect(Jaspr.clients, isEmpty);
+  });
+
+  test('clears cached registrations when initialized again', () {
+    Jaspr.initializeApp(
+      options: ClientOptions(clients: () => {'counter': ClientLoader((_) => const _Counter('counter', 'Initial'))}),
+    );
+    expect(Jaspr.clients, contains('counter'));
+
+    Jaspr.initializeApp();
+
+    expect(Jaspr.clients, isEmpty);
   });
 
   for (final hasExistingClient in [false, true]) {
@@ -25,32 +37,32 @@ void main() {
       var initializations = 0;
       final loaded = <String>[];
 
-      ClientOptions options() {
-        // Capture each generated factory's version,
-        // so retaining the old loader can't silently
-        // pass the test by observing a changed variable.
-        final label = 'Version $version';
-        ClientLoader loader(String id) => ClientLoader(
-          (_) => _Counter(id, label),
-          loader: () async {
-            await Future<void>.delayed(Duration.zero);
-            loaded.add(id);
-          },
-        );
-
-        return ClientOptions(
-          initialize: () => initializations++,
-          reload: options,
-          clients: {
+      final options = ClientOptions(
+        initialize: () => initializations++,
+        // Stands in for the generated top-level `_$clients` function,
+        // whose body hot reload replaces with the current registrations.
+        clients: () {
+          // Capture each generated factory's version, so retaining old loaders
+          // cannot pass the test by observing a changed variable.
+          final label = 'Version $version';
+          ClientLoader loader(String id) => ClientLoader(
+            (_) => _Counter(id, label),
+            loader: () async {
+              await Future<void>.delayed(Duration.zero);
+              loaded.add(id);
+            },
+          );
+          return {
             if (hasExistingClient) 'existing': loader('existing'),
             if (version == 1) 'added': loader('added'),
             if (hasExistingClient) 'unused': loader('unused'),
-          },
-        );
-      }
+          };
+        },
+      );
 
       web.document.body!.replaceWith(_body(hasExistingClient: hasExistingClient, hasAddedClient: false));
-      Jaspr.initializeApp(options: options());
+      Jaspr.initializeApp(options: options);
+      expect(Jaspr.clients.keys, hasExistingClient ? ['existing', 'unused'] : isEmpty);
       tester.pumpComponent(const ClientApp());
       await pumpEventQueue();
 
@@ -59,6 +71,7 @@ void main() {
       }
 
       version = 1;
+      expect(Jaspr.clients, isNot(contains('added')));
       Jaspr.reloadOptions();
       expect(loaded, isNot(contains('added')), reason: 'New deferred components should still load on demand.');
 
@@ -73,7 +86,7 @@ void main() {
       // A later reload also removes obsolete registrations and preserves state.
       version = 2;
       Jaspr.reloadOptions();
-      expect(Jaspr.options.clients, isNot(contains('added')));
+      expect(Jaspr.clients, isNot(contains('added')));
       await _reload(tester, _body(hasExistingClient: hasExistingClient, hasAddedClient: false));
       if (hasExistingClient) {
         await _click('existing', 'Version 2: 3');
@@ -83,6 +96,7 @@ void main() {
         'added',
         if (hasExistingClient) 'existing',
       ]);
+      expect(Jaspr.options, same(options));
       expect(initializations, 1);
     });
   }

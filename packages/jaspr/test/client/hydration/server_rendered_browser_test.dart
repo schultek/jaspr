@@ -140,7 +140,7 @@ web.HTMLElement _parseBody(String html) => web.DOMParser().parseFromString(html.
 Future<void> _hydrate(ClientTester tester, {Map<int, Key> keys = const {}}) async {
   Jaspr.initializeApp(
     options: ClientOptions(
-      clients: {
+      clients: () => {
         'shell': ClientLoader((params) => HydrationShell(child: params.mount(params.get<String>('child')))),
         'counter': ClientLoader((params) {
           final id = params.get<int>('id');

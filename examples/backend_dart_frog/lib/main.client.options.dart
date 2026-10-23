@@ -25,16 +25,16 @@ import 'package:backend_dart_frog/components/hello.dart' deferred as _hello;
 ///   runApp(...);
 /// }
 /// ```
-ClientOptions get defaultClientOptions => ClientOptions(
-  reload: () => defaultClientOptions,
-  clients: {
-    'counter': ClientLoader(
-      (p) => _counter.Counter(),
-      loader: _counter.loadLibrary,
-    ),
-    'hello': ClientLoader(
-      (p) => _hello.Hello(name: p.get<String>('name')),
-      loader: _hello.loadLibrary,
-    ),
-  },
-);
+ClientOptions get defaultClientOptions => ClientOptions(clients: _$clients);
+
+// A top-level function, so hot reload picks up added or removed clients.
+Map<String, ClientLoader> _$clients() => {
+  'counter': ClientLoader(
+    (p) => _counter.Counter(),
+    loader: _counter.loadLibrary,
+  ),
+  'hello': ClientLoader(
+    (p) => _hello.Hello(name: p.get<String>('name')),
+    loader: _hello.loadLibrary,
+  ),
+};

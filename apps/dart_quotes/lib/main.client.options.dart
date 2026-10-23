@@ -37,14 +37,16 @@ ClientOptions get defaultClientOptions => ClientOptions(
     _cloud_firestore_web.FirebaseFirestoreWeb.registerWith(registrar);
     registrar.registerMessageHandler();
   },
-  reload: () => defaultClientOptions,
-  clients: {
-    'quote_like_button': ClientLoader(
-      (p) => _quote_like_button.QuoteLikeButton(
-        id: p.get<String>('id'),
-        initialCount: p.get<int>('initialCount'),
-      ),
-      loader: _quote_like_button.loadLibrary,
-    ),
-  },
+  clients: _$clients,
 );
+
+// A top-level function, so hot reload picks up added or removed clients.
+Map<String, ClientLoader> _$clients() => {
+  'quote_like_button': ClientLoader(
+    (p) => _quote_like_button.QuoteLikeButton(
+      id: p.get<String>('id'),
+      initialCount: p.get<int>('initialCount'),
+    ),
+    loader: _quote_like_button.loadLibrary,
+  ),
+};

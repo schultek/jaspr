@@ -39,7 +39,10 @@ void main() {
         {...clientOptionsSources, 'site|lib/clients.bundle.json': '[]'},
         outputs: {
           'site|lib/main.client.options.dart': decodedMatches(
-            allOf(contains('reload: () => defaultClientOptions'), isNot(contains('clients:'))),
+            allOf(
+              contains(r'ClientOptions(clients: _$clients)'),
+              contains(r'Map<String, ClientLoader> _$clients() => {};'),
+            ),
           ),
         },
         readerWriter: reader,
