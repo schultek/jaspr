@@ -70,12 +70,12 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       web.document.body!.innerHTML =
           '<div>'
-          '  <!--${marker}reload_app data={"name": "Alpha"}-->'
-          '  <!--\${"count": 10}-->'
-          '  <p>Fallback</p>'
-          '  <!--/${marker}reload_app-->'
-          '</div>'
-          .toJS;
+                  '  <!--${marker}reload_app data={"name": "Alpha"}-->'
+                  '  <!--\${"count": 10}-->'
+                  '  <p>Fallback</p>'
+                  '  <!--/${marker}reload_app-->'
+                  '</div>'
+              .toJS;
 
       Jaspr.initializeApp(
         options: ClientOptions(
@@ -97,12 +97,12 @@ void main() {
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
       newBody.innerHTML =
           '<div>'
-          '  <!--${marker}reload_app data={"name": "Beta"}-->'
-          '  <!--\${"count": 20}-->'
-          '  <p>Fallback</p>'
-          '  <!--/${marker}reload_app-->'
-          '</div>'
-          .toJS;
+                  '  <!--${marker}reload_app data={"name": "Beta"}-->'
+                  '  <!--\${"count": 20}-->'
+                  '  <p>Fallback</p>'
+                  '  <!--/${marker}reload_app-->'
+                  '</div>'
+              .toJS;
 
       final rootElement = tester.binding.rootElement!;
       final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
@@ -126,14 +126,16 @@ void main() {
       expect(newP.textContent, equals('Hello Beta, Count: 21'));
     });
 
-    testClient('should not duplicate nodes in client component when child triggers rebuild during reload', (tester) async {
+    testClient('should not duplicate nodes in client component when child triggers rebuild during reload', (
+      tester,
+    ) async {
       final marker = DomValidator.clientMarkerPrefix;
       web.document.body!.innerHTML =
           '<div id="container">'
-          '  <!--${marker}dynamic_app data={"title": "V1"}-->'
-          '  <!--/${marker}dynamic_app-->'
-          '</div>'
-          .toJS;
+                  '  <!--${marker}dynamic_app data={"title": "V1"}-->'
+                  '  <!--/${marker}dynamic_app-->'
+                  '</div>'
+              .toJS;
 
       Jaspr.initializeApp(
         options: ClientOptions(
@@ -155,10 +157,10 @@ void main() {
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
       newBody.innerHTML =
           '<div id="container">'
-          '  <!--${marker}dynamic_app data={"title": "V2"}-->'
-          '  <!--/${marker}dynamic_app-->'
-          '</div>'
-          .toJS;
+                  '  <!--${marker}dynamic_app data={"title": "V2"}-->'
+                  '  <!--/${marker}dynamic_app-->'
+                  '</div>'
+              .toJS;
 
       final rootElement = tester.binding.rootElement!;
       final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
