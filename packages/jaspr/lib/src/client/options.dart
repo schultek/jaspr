@@ -40,6 +40,10 @@ final class ClientOptions {
   final Map<String, ClientLoader> clients;
 
   /// Recreates the options from the updated generated code during hot reload.
+  ///
+  /// This must call a top-level member like `defaultClientOptions`.
+  /// Closures created before a hot reload keep running their old body,
+  /// so only calls to top-level members pick up the new code.
   final ClientOptions Function()? reload;
 }
 

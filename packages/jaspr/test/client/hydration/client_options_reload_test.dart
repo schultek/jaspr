@@ -78,7 +78,11 @@ void main() {
       if (hasExistingClient) {
         await _click('existing', 'Version 2: 3');
       }
-      expect(loaded, isNot(contains('unused')));
+      expect(loaded, [
+        if (hasExistingClient) ...['existing', 'existing'],
+        'added',
+        if (hasExistingClient) 'existing',
+      ]);
       expect(initializations, 1);
     });
   }
