@@ -122,13 +122,12 @@ class _ChildSlotElement extends MultiChildRenderObjectElement {
 
   @override
   ChildSlotRenderObject createRenderObject() {
-    final slot = component as ChildSlot;
-    final parent = parentRenderObjectElement!.renderObject as DomRenderObject;
+    final parent = parentRenderObjectElement;
     assert(
-      parent is SlottedDomRenderObject,
+      parent is _SlottedChildViewElement,
       'ChildSlot must be used as a direct child of SlottedChildView.',
     );
-    return slot.createRenderObject(parent as SlottedDomRenderObject);
+    return (parent as _SlottedChildViewElement)._createSlotRenderObject(component as ChildSlot);
   }
 
   @override
@@ -242,8 +241,34 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
   final Map<web.HTMLElement, _AppliedParams> _appliedParams = nodeMap();
 
+  /// Whether the inherited params might have changed since they were last applied.
+  ///
+  /// This is set whenever this view is marked to render again,
+  /// even if the params themselves stayed the same.
+  bool _paramsChanged = false;
+
+  @override
+  void markNeedsRender() {
+    super.markNeedsRender();
+    _paramsChanged = true;
+  }
+
+  /// Creates the render object for [slot] within this view's nodes.
+  ///
+  /// New slots are created while this view rebuilds, before it applies its latest params,
+  /// so any pending params are applied first in case the slot's query depends on them.
+  ChildSlotRenderObject _createSlotRenderObject(ChildSlot slot) {
+    final renderObject = this.renderObject as SlottedDomRenderObject;
+    // Range slots target their given nodes directly, so they can't depend on the params.
+    if (slot is! _RangeChildSlot && _paramsChanged) {
+      updateRenderObject(renderObject);
+    }
+    return slot.createRenderObject(renderObject);
+  }
+
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
+    _paramsChanged = false;
     for (final element in _appliedParams.keys) {
       _resetElementParams(element);
     }
