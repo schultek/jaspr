@@ -17,6 +17,8 @@ dynamic CustomEvent;
 typedef CustomEventOrStubbed = dynamic;
 dynamic MouseEvent;
 typedef MouseEventOrStubbed = dynamic;
+dynamic KeyboardEvent;
+typedef KeyboardEventOrStubbed = dynamic;
 dynamic Event;
 typedef EventOrStubbed = dynamic;
 dynamic InputElement;
