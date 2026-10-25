@@ -55,17 +55,17 @@ class _SwappingAppState extends State<SwappingApp> {
 
   @override
   Component build(BuildContext context) {
-    return Component.fragment([
+    return div([
       if (second)
-        Component.fragment([
+        Component.fragment(key: const ValueKey('second'), [
           Document.head(title: 'second'),
           div([Component.text('second')]),
-        ], key: const ValueKey('second'))
+        ])
       else
-        Component.fragment([
+        Component.fragment(key: const ValueKey('first'), [
           Document.head(title: 'first'),
           div([Component.text('first')]),
-        ], key: const ValueKey('first')),
+        ]),
       button(onClick: () => setState(() => second = !second), [Component.text('Swap')]),
     ]);
   }

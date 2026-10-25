@@ -32,14 +32,18 @@ void main() {
     });
 
     testClient('should release the head of a page nested in a fragment', (tester) async {
+      final initialNodes = _headElements().toSet();
       tester.pumpComponent(const SwappingApp());
-      expect(web.document.title, 'first');
+
+      List<web.Element> added() => _headElements().where((node) => !initialNodes.contains(node)).toList();
+
+      expect(added(), [hasOuterHtml('<title>first</title>')]);
 
       await tester.click(find.tag('button'));
-      expect(web.document.title, 'second');
+      expect(added(), [hasOuterHtml('<title>second</title>')]);
 
       await tester.click(find.tag('button'));
-      expect(web.document.title, 'first');
+      expect(added(), [hasOuterHtml('<title>first</title>')]);
     });
   });
 }
