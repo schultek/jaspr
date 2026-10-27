@@ -1,5 +1,7 @@
 ## Unreleased 0.24.0-beta.1
 
+- With `--skip-server`, `jaspr serve` and `jaspr daemon` run the proxy on `--port` when it is passed, so the
+  server can be started with `JASPR_PROXY_PORT` up front.
 - Fixed issue with hot-reload in client mode.
 - Fixed styles hot-reload recompiling all dependencies on every change on Windows.
 - `kReleaseMode` is now also true in product builds of the Dart VM, such as `dart compile exe` or `dart build cli`,
