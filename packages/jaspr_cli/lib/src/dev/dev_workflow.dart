@@ -18,6 +18,7 @@ import 'client_manager.dart';
 import 'client_runner.dart';
 import 'css_runner.dart';
 import 'flutter_runner.dart';
+import 'reloaded_sources.dart';
 import 'server_runner.dart';
 import 'util.dart';
 
@@ -40,11 +41,7 @@ class DevWorkflow {
   final ExpressionCompilerService? ddcService;
   final Logger logger;
 
-  /// Modules changed since the last hot reload, keyed by module id.
-  ///
-  /// Accumulates across builds, so a build that starts while a reload is
-  /// still running does not discard the changes of the previous build.
-  final Map<String, Map<String, Object>> _reloadedSources;
+  final ReloadedSources _reloadedSources;
 
   late final ClientManager clients;
   late final ChromeRunner chrome;
@@ -147,31 +144,28 @@ class DevWorkflow {
         .listen(null);
   }
 
-  /// Removes the entries of [consumed] from [_reloadedSources], unless a
-  /// newer build has changed the module again in the meantime.
-  void _removeConsumedSources(Map<String, Map<String, Object>> consumed) {
-    consumed.forEach((module, source) {
-      if (identical(_reloadedSources[module], source)) {
-        _reloadedSources.remove(module);
-      }
-    });
-  }
-
   /// Hot reloads all connected clients, then reloads any changed stylesheets.
   Future<void> reloadClients() async {
-    final consumedSources = Map.of(_reloadedSources);
+    final deliveredSources = _reloadedSources.snapshot();
     flutter?.reload();
     final cssFuture = css.reload();
     await server?.reload();
 
+    var allReloaded = true;
     await clients.forEachConnection('Hot reload', (clientConnection) async {
-      await clientConnection.performHotReload();
+      if (!await clientConnection.performHotReload()) {
+        allReloaded = false;
+        // Skip reassemble and html reload if client hot-reload fails.
+        return;
+      }
       await clientConnection.reassemble();
       if (project.requireMode != JasprMode.client) {
         await clientConnection.reloadHtml();
       }
     });
-    _removeConsumedSources(consumedSources);
+    if (allReloaded) {
+      _reloadedSources.removeDelivered(deliveredSources);
+    }
 
     await _reloadStylesheets(cssFuture);
   }
@@ -181,7 +175,7 @@ class DevWorkflow {
   /// If [incremental] is `true`, the Flutter and CSS runners are only
   /// reloaded instead of fully restarted.
   Future<void> restartClients({bool incremental = false}) async {
-    final consumedSources = Map.of(_reloadedSources);
+    final deliveredSources = _reloadedSources.snapshot();
     final Future<List<String>> cssFuture;
     if (incremental) {
       flutter?.reload();
@@ -193,20 +187,27 @@ class DevWorkflow {
 
     await server?.reload();
 
+    var allRestarted = true;
     await clients.forEachConnection('Hot restart', (clientConnection) async {
-      await clientConnection.restart();
+      if (await clientConnection.restart() == null) {
+        allRestarted = false;
+        // Skip html reload if client restart fails.
+        return;
+      }
       if (project.requireMode != JasprMode.client) {
         await clientConnection.reloadHtml();
       }
     });
-    _removeConsumedSources(consumedSources);
+    if (allRestarted) {
+      _reloadedSources.removeDelivered(deliveredSources);
+    }
 
     await _reloadStylesheets(cssFuture);
   }
 
   /// Fully reloads the page in all connected clients.
   Future<void> refreshClients() async {
-    final consumedSources = Map.of(_reloadedSources);
+    final deliveredSources = _reloadedSources.snapshot();
     flutter?.reload();
     final cssFuture = css.reload();
     await server?.reload();
@@ -217,8 +218,15 @@ class DevWorkflow {
       }
     }
 
-    await clients.forEachConnection('Refresh', (client) => client.refreshPage());
-    _removeConsumedSources(consumedSources);
+    var allRefreshed = true;
+    await clients.forEachConnection('Refresh', (client) async {
+      if (await client.refreshPage() == null) {
+        allRefreshed = false;
+      }
+    });
+    if (allRefreshed) {
+      _reloadedSources.removeDelivered(deliveredSources);
+    }
   }
 
   /// Waits for [cssFuture] and, if any stylesheets changed,
@@ -278,7 +286,7 @@ class DevWorkflow {
     }
 
     const target = 'web';
-    final reloadedSources = <String, Map<String, Object>>{};
+    final reloadedSources = ReloadedSources();
     var pipeline = const Pipeline();
 
     // Only provide relevant build results as a broadcast stream.
@@ -287,11 +295,11 @@ class DevWorkflow {
         results.changedAssets?.forEach((uri) {
           if (uri.path.endsWith('.ddc.js')) {
             final libraryId = ddcUriToLibraryId(uri);
-            reloadedSources[libraryId] = {
+            reloadedSources.add(libraryId, {
               'src': ddcUriToSourceUrl('', target, uri),
               'module': libraryId,
               'libraries': [libraryId],
-            };
+            });
           }
         });
       }
@@ -448,7 +456,7 @@ class DevWorkflow {
       cascade = cascade.add((Request req) {
         if (req.url.path == 'reloaded_sources.json') {
           return Response.ok(
-            jsonEncode(reloadedSources.values.toList()),
+            jsonEncode(reloadedSources.toJson()),
             headers: {'content-type': 'application/json'},
           );
         }
