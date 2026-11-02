@@ -1,6 +1,8 @@
 ## Unreleased 0.24.0-beta.1
 
 - Fixed issue with hot-reload in client mode.
+- `RequestLike` is exported from `package:jaspr/server.dart`, and its `headers` are a `Map<String, List<String>>`
+  instead of shelf's internal `Headers` class.
 
 ## 0.24.0-beta.0
 
