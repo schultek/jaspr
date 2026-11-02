@@ -321,25 +321,26 @@ class DomRenderFragment extends DomRenderObject
   DomRenderObject? _firstChild;
   DomRenderObject? _lastChild;
 
-  web.Node? get firstChildNode {
-    if (_firstChild case final firstChild?) {
-      if (firstChild is DomRenderFragment) {
-        return firstChild.firstChildNode;
-      }
+  // A child fragment without nodes of its own (such as `Component.empty()`) has no first or last node,
+  // so both getters skip over it to the next child that has one.
 
-      return firstChild.node;
+  web.Node? get firstChildNode {
+    for (var child = _firstChild; child != null; child = child.nextSibling) {
+      final node = child is DomRenderFragment ? child.firstChildNode : child.node;
+      if (node != null || child == _lastChild) {
+        return node;
+      }
     }
 
     return null;
   }
 
   web.Node? get lastChildNode {
-    if (_lastChild case final lastChild?) {
-      if (lastChild is DomRenderFragment) {
-        return lastChild.lastChildNode;
+    for (var child = _lastChild; child != null; child = child.previousSibling) {
+      final node = child is DomRenderFragment ? child.lastChildNode : child.node;
+      if (node != null || child == _firstChild) {
+        return node;
       }
-
-      return lastChild.node;
     }
 
     return null;
