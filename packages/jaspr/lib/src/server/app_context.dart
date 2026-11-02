@@ -18,7 +18,7 @@ extension AppContext on BuildContext {
   /// by concatenating them with a comma.
   ///
   /// The returned map is unmodifiable.
-  Map<String, String> get headers => _binding.request.headers.singleValues;
+  Map<String, String> get headers => _binding.headers.singleValues;
 
   /// The HTTP headers of the current request with multiple values with case-insensitive keys.
   ///
@@ -27,7 +27,7 @@ extension AppContext on BuildContext {
   /// for that occurrence.
   ///
   /// The returned map and the lists it contains are unmodifiable.
-  Map<String, List<String>> get headersAll => _binding.request.headers;
+  Map<String, List<String>> get headersAll => _binding.headers;
 
   /// The cookies sent with the current request.
   Map<String, String> get cookies => _binding.cookies;
