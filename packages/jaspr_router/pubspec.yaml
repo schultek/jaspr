@@ -19,6 +19,7 @@ resolution: workspace
 
 dependencies:
   jaspr: ^0.24.0-beta.0
+  universal_web: ^1.1.0
   web: ^1.0.0
 
 dev_dependencies:

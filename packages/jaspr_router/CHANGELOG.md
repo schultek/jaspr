@@ -1,3 +1,7 @@
+## Unreleased 0.10.0-beta.1
+
+- Fixed `Link` navigating client-side on clicks the browser should handle: Ctrl/Cmd-, Shift- and Alt-clicks, non-primary buttons, already prevented clicks, and links with a `target` other than `_self` or a `download` attribute.
+
 ## 0.10.0-beta.0
 
 - Require Dart 3.13 or later.
