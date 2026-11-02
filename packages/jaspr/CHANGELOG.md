@@ -1,7 +1,7 @@
 ## Unreleased 0.24.0-beta.1
 
 - Fixed issue with hot-reload in client mode.
-- Fixed the nodes of a fragment staying in the DOM after the fragment is removed when its first or last child renders nothing, such as `Component.empty()`. New siblings after such a fragment are now also inserted after its nodes instead of before them.
+- Fixed a fragment staying in the DOM after it is removed or replaced when its first or last child renders nothing, such as `Component.empty()`.
 
 ## 0.24.0-beta.0
 

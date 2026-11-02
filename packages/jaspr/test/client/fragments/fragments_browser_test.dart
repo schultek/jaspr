@@ -311,6 +311,80 @@ void main() {
           expect(divElement.innerHTML.toString(), equals('<p>P</p>$fragmentHtml'));
         });
       }
+
+      final updates = <String, (List<Component>, List<Component>)>{
+        'added first': (
+          [
+            h1([Component.text('A')]),
+          ],
+          [
+            const Component.empty(),
+            h1([Component.text('A')]),
+          ],
+        ),
+        'added last': (
+          [
+            h1([Component.text('A')]),
+          ],
+          [
+            h1([Component.text('A')]),
+            const Component.empty(),
+          ],
+        ),
+        'moved first': (
+          [
+            h1(key: ValueKey('h'), [Component.text('A')]),
+            Component.fragment(key: ValueKey('e'), []),
+          ],
+          [
+            Component.fragment(key: ValueKey('e'), []),
+            h1(key: ValueKey('h'), [Component.text('A')]),
+          ],
+        ),
+        'moved last': (
+          [
+            Component.fragment(key: ValueKey('e'), []),
+            h1(key: ValueKey('h'), [Component.text('A')]),
+          ],
+          [
+            h1(key: ValueKey('h'), [Component.text('A')]),
+            Component.fragment(key: ValueKey('e'), []),
+          ],
+        ),
+      };
+
+      for (final MapEntry(key: name, value: (before, after)) in updates.entries) {
+        testClient('should place and remove fragment children after the empty fragment was $name', (tester) async {
+          final component = FakeComponent(child: div([Component.fragment(before)]));
+          tester.pumpComponent(component);
+
+          final divElement = window.document.querySelector('body div')!;
+
+          component.updateChild(div([Component.fragment(after)]));
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('<h1>A</h1>'));
+
+          component.updateChild(
+            div([
+              Component.fragment(after),
+              p([Component.text('End')]),
+            ]),
+          );
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('<h1>A</h1><p>End</p>'));
+
+          component.updateChild(
+            div([
+              p([Component.text('Replacement')]),
+            ]),
+          );
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('<p>Replacement</p>'));
+        });
+      }
     });
   });
 }

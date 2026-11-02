@@ -318,9 +318,6 @@ class DomRenderFragment extends DomRenderObject
   final web.DocumentFragment node;
   bool isAttached = false;
 
-  DomRenderObject? _firstChild;
-  DomRenderObject? _lastChild;
-
   // A child fragment without nodes of its own (such as `Component.empty()`) has no first or last node,
   // so both getters skip over it to the next child that has one.
 
@@ -349,13 +346,6 @@ class DomRenderFragment extends DomRenderObject
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
     attachChild(child, after, startNode: firstChildNode?.previousSibling);
-
-    if (after == null) {
-      _firstChild = child;
-    }
-    if (after == _lastChild) {
-      _lastChild = child;
-    }
   }
 
   void move(DomRenderObject parent, web.Node targetNode, web.Node? afterNode) {
@@ -442,15 +432,11 @@ class DomRenderFragment extends DomRenderObject
 
   @override
   void remove(DomRenderObject child) {
-    if (child == _firstChild) {
-      _firstChild = child.nextSibling;
-    }
-    if (child == _lastChild) {
-      _lastChild = child.previousSibling;
-    }
     if (!isAttached) {
       removeChild(child);
     } else {
+      // The parent removes the child's nodes, but only this fragment can unlink it from its children.
+      _unlinkChild(child);
       parent!.remove(child);
     }
   }
@@ -488,6 +474,11 @@ class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject
 }
 
 mixin MultiChildDomRenderObject on DomRenderObject {
+  /// The first and last child, which link to the others in order through
+  /// [DomRenderObject.previousSibling] and [DomRenderObject.nextSibling].
+  DomRenderObject? _firstChild;
+  DomRenderObject? _lastChild;
+
   web.Node get attachTargetNode {
     if (this case DomRenderFragment(isAttached: true)) {
       return (parent as MultiChildDomRenderObject).attachTargetNode;
@@ -517,6 +508,10 @@ mixin MultiChildDomRenderObject on DomRenderObject {
 
     final targetNode = attachTargetNode;
     final afterNode = getRealNodeOf(after) ?? startNode;
+
+    // Link the child on every path below, including when its nodes are already in place,
+    // so that the links follow the order of the children after a move.
+    _linkChild(child, after);
 
     if (child case DomRenderFragment(isAttached: true)) {
       child.move(this, targetNode, afterNode);
@@ -550,12 +545,6 @@ mixin MultiChildDomRenderObject on DomRenderObject {
           'Fragment first child should have been placed after the specified node.',
         );
       }
-
-      final next = after?.nextSibling;
-      child.previousSibling = after;
-      after?.nextSibling = child;
-      child.nextSibling = next;
-      next?.previousSibling = child;
     } finally {
       child.finalize();
     }
@@ -577,14 +566,47 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       node.removeChild(child.node);
     }
 
-    // Unlink the removed child from its siblings.
-    final oldPreviousSibling = child.previousSibling;
-    final oldNextSibling = child.nextSibling;
-    oldPreviousSibling?.nextSibling = oldNextSibling;
-    oldNextSibling?.previousSibling = oldPreviousSibling;
+    _unlinkChild(child);
+    child.parent = null;
+  }
+
+  void _linkChild(DomRenderObject child, DomRenderObject? after) {
+    if (child.previousSibling == after && (after == null ? _firstChild : after.nextSibling) == child) {
+      return;
+    }
+
+    _unlinkChild(child);
+
+    final next = after == null ? _firstChild : after.nextSibling;
+    child.previousSibling = after;
+    child.nextSibling = next;
+    if (after == null) {
+      _firstChild = child;
+    } else {
+      after.nextSibling = child;
+    }
+    if (next == null) {
+      _lastChild = child;
+    } else {
+      next.previousSibling = child;
+    }
+  }
+
+  void _unlinkChild(DomRenderObject child) {
+    final previous = child.previousSibling;
+    final next = child.nextSibling;
+    if (previous != null) {
+      previous.nextSibling = next;
+    } else if (_firstChild == child) {
+      _firstChild = next;
+    }
+    if (next != null) {
+      next.previousSibling = previous;
+    } else if (_lastChild == child) {
+      _lastChild = previous;
+    }
     child.previousSibling = null;
     child.nextSibling = null;
-    child.parent = null;
   }
 }
 
