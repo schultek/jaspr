@@ -373,7 +373,7 @@ class DomRenderFragment extends DomRenderObject
 
     // Move nodes in reverse order for efficient insertion.
     while (currentNode != null) {
-      final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
+      final prevNode = currentNode != originalFirstChildNode ? currentNode.previousSibling : null;
 
       // Attach to new parent.
       targetNode.insertBefore(currentNode, beforeNode);
@@ -396,7 +396,8 @@ class DomRenderFragment extends DomRenderObject
       print('Remove fragment $node from ${parent.node}');
     }
 
-    if (firstChildNode == null) {
+    final firstNode = firstChildNode;
+    if (firstNode == null) {
       // If fragment is empty, nothing to remove.
       return;
     }
@@ -407,7 +408,7 @@ class DomRenderFragment extends DomRenderObject
     web.Node? beforeNode;
 
     while (currentNode != null) {
-      final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
+      final prevNode = currentNode != firstNode ? currentNode.previousSibling : null;
 
       assert(currentNode.parentNode == parent.node, 'Fragment child must be a child of the parent.');
 
@@ -507,11 +508,15 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     child.parent = this;
 
     final targetNode = attachTargetNode;
-    final afterNode = getRealNodeOf(after) ?? startNode;
 
     // Link the child on every path below, including when its nodes are already in place,
-    // so that the links follow the order of the children after a move.
+    // so that the links follow the order of the children after a move. This happens before
+    // resolving the node to attach after: a sibling whose slot did not change is not
+    // attached again, so its links can still point at the child's old position until the
+    // child is linked.
     _linkChild(child, after);
+
+    final afterNode = getRealNodeOf(after) ?? startNode;
 
     if (child case DomRenderFragment(isAttached: true)) {
       child.move(this, targetNode, afterNode);

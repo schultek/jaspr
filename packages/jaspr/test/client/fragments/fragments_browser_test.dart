@@ -386,5 +386,49 @@ void main() {
         });
       }
     });
+
+    testClient('should place a moved child after empty fragments that keep their slot', (tester) async {
+      Component empty(int key) => Component.fragment(key: ValueKey(key), []);
+
+      final component = FakeComponent(
+        child: div([
+          b(key: ValueKey('start'), [Component.text('S')]),
+          span(key: ValueKey('moved'), [Component.text('X')]),
+          empty(1),
+          empty(2),
+          empty(3),
+          b(key: ValueKey('end'), [Component.text('E')]),
+        ]),
+      );
+      tester.pumpComponent(component);
+
+      final divElement = document.querySelector('body div')!;
+      expect(divElement.innerHTML.toString(), equals('<b>S</b><span>X</span><b>E</b>'));
+
+      // The fragment with key 2 keeps its slot (same index, same previous sibling),
+      // so it is not attached again while the span moves behind it.
+      component.updateChild(
+        div([
+          b(key: ValueKey('start'), [Component.text('S')]),
+          empty(3),
+          empty(1),
+          empty(2),
+          span(key: ValueKey('moved'), [Component.text('X')]),
+          b(key: ValueKey('end'), [Component.text('E')]),
+        ]),
+      );
+      await pumpEventQueue();
+
+      expect(divElement.innerHTML.toString(), equals('<b>S</b><span>X</span><b>E</b>'));
+
+      component.updateChild(
+        div([
+          p([Component.text('Replacement')]),
+        ]),
+      );
+      await pumpEventQueue();
+
+      expect(divElement.innerHTML.toString(), equals('<p>Replacement</p>'));
+    });
   });
 }
