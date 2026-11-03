@@ -1,6 +1,8 @@
 @TestOn('browser')
 library;
 
+import 'dart:js_interop';
+
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -385,6 +387,73 @@ void main() {
           expect(divElement.innerHTML.toString(), equals('<p>Replacement</p>'));
         });
       }
+
+      testClient('should remove hydrated fragment children when replaced', (tester) async {
+        window.document.body!.innerHTML = '<div><h1>A</h1><p>B</p></div>'.toJS;
+
+        final component = FakeComponent(
+          child: div([
+            Component.fragment([
+              const Component.empty(),
+              h1([Component.text('A')]),
+              p([Component.text('B')]),
+              const Component.empty(),
+            ]),
+          ]),
+        );
+        tester.pumpComponent(component);
+
+        final divElement = window.document.querySelector('body div')!;
+        expect(divElement.innerHTML.toString(), equals('<h1>A</h1><p>B</p>'));
+
+        component.updateChild(
+          div([
+            b([Component.text('Replacement')]),
+          ]),
+        );
+        await pumpEventQueue();
+
+        expect(divElement.innerHTML.toString(), equals('<b>Replacement</b>'));
+      });
+
+      testClient('should move fragment children with a global key to a new parent', (tester) async {
+        final key = GlobalKey();
+        Component fragment() => Component.fragment(key: key, [
+          const Component.empty(),
+          h1([Component.text('A')]),
+          const Component.empty(),
+        ]);
+
+        final component = FakeComponent(
+          child: div([
+            section([fragment()]),
+            article([]),
+          ]),
+        );
+        tester.pumpComponent(component);
+
+        final divElement = window.document.querySelector('body div')!;
+
+        component.updateChild(
+          div([
+            section([]),
+            article([Component.text('Start'), fragment()]),
+          ]),
+        );
+        await pumpEventQueue();
+
+        expect(divElement.innerHTML.toString(), equals('<section></section><article>Start<h1>A</h1></article>'));
+
+        component.updateChild(
+          div([
+            section([]),
+            article([Component.text('Start')]),
+          ]),
+        );
+        await pumpEventQueue();
+
+        expect(divElement.innerHTML.toString(), equals('<section></section><article>Start</article>'));
+      });
     });
 
     testClient('should place a moved child after empty fragments that keep their slot', (tester) async {
