@@ -686,6 +686,143 @@ void main() {
         });
       }
 
+      for (final filtered in [false, true]) {
+        test('invalidates dependent page when ${filtered ? 'an excluded' : 'an ignored'} partial changes', () async {
+          // Arrange the file system layout and content.
+          final fileSystem = MemoryFileSystem();
+          final pagesDir = fileSystem.directory('pages')..createSync();
+          final loader = FilesystemLoader(
+            'pages',
+            filterExtensions: filtered ? {'.md'} : const {},
+            ignorePattern: filtered ? null : RegExp(r'(.*/)?README\.md$'),
+            fileSystem: fileSystem,
+            watcherFactory: (_) => mockWatcher,
+          );
+
+          final partialPath = filtered ? 'pages/header.html' : 'pages/README.md';
+          fileSystem.file(partialPath)
+            ..createSync()
+            ..writeAsStringSync('Old');
+          pagesDir.childFile('index.md')
+            ..createSync()
+            ..writeAsStringSync('Page content');
+
+          // Initial load to activate the watcher.
+          await loader.loadRoutes((_) => PageConfig(), false);
+          final pageSource = loader.sources.single;
+          await pageSource.load();
+
+          // Establish dependency by reading the partial.
+          expect(loader.readPartialSync(partialPath, pageSource.page!), equals('Old'));
+
+          // Act: Simulate a modify event on the partial.
+          eventController.add(WatchEvent(ChangeType.MODIFY, partialPath));
+          await Future<void>.delayed(Duration.zero);
+
+          // Assert: The page was invalidated.
+          expect(pageSource.page, isNull);
+        });
+
+        test(
+          'invalidates dependent page when ${filtered ? 'an excluded' : 'an ignored'} partial changes on windows',
+          () async {
+            // Arrange the file system layout and content.
+            final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+            final pagesDir = fileSystem.directory('pages')..createSync();
+            final loader = FilesystemLoader(
+              'pages',
+              filterExtensions: filtered ? {'.md'} : const {},
+              ignorePattern: filtered ? null : RegExp(r'(.*/)?README\.md$'),
+              fileSystem: fileSystem,
+              watcherFactory: (_) => mockWatcher,
+            );
+
+            final partialPath = filtered ? r'pages\header.html' : r'pages\README.md';
+            fileSystem.file(partialPath)
+              ..createSync()
+              ..writeAsStringSync('Old');
+            pagesDir.childFile('index.md')
+              ..createSync()
+              ..writeAsStringSync('Page content');
+
+            // Initial load to activate the watcher.
+            await loader.loadRoutes((_) => PageConfig(), false);
+            final pageSource = loader.sources.single;
+            await pageSource.load();
+
+            // Establish dependency by reading the partial.
+            expect(loader.readPartialSync(partialPath, pageSource.page!), equals('Old'));
+
+            // Act: Simulate a modify event on the partial.
+            eventController.add(WatchEvent(ChangeType.MODIFY, partialPath));
+            await Future<void>.delayed(Duration.zero);
+
+            // Assert: The page was invalidated.
+            expect(pageSource.page, isNull);
+          },
+        );
+      }
+
+      test('keeps a page that did not read a changed partial that is not a page source', () async {
+        // Arrange the file system layout and content.
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        final loader = FilesystemLoader(
+          'pages',
+          ignorePattern: RegExp(r'(.*/)?README\.md$'),
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
+        fileSystem.file('pages/README.md')
+          ..createSync()
+          ..writeAsStringSync('Old');
+        pagesDir.childFile('index.md')
+          ..createSync()
+          ..writeAsStringSync('Page content');
+
+        // Initial load to activate the watcher. The page never reads the partial.
+        await loader.loadRoutes((_) => PageConfig(), false);
+        final pageSource = loader.sources.single;
+        await pageSource.load();
+
+        // Act: Simulate a modify event on the partial.
+        eventController.add(WatchEvent(ChangeType.MODIFY, 'pages/README.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The page was not invalidated.
+        expect(pageSource.page, isNotNull);
+      });
+
+      test('keeps a page that did not read a changed partial that is not a page source on windows', () async {
+        // Arrange the file system layout and content.
+        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        final loader = FilesystemLoader(
+          'pages',
+          ignorePattern: RegExp(r'(.*/)?README\.md$'),
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
+        fileSystem.file(r'pages\README.md')
+          ..createSync()
+          ..writeAsStringSync('Old');
+        pagesDir.childFile('index.md')
+          ..createSync()
+          ..writeAsStringSync('Page content');
+
+        // Initial load to activate the watcher. The page never reads the partial.
+        await loader.loadRoutes((_) => PageConfig(), false);
+        final pageSource = loader.sources.single;
+        await pageSource.load();
+
+        // Act: Simulate a modify event on the partial.
+        eventController.add(WatchEvent(ChangeType.MODIFY, r'pages\README.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The page was not invalidated.
+        expect(pageSource.page, isNotNull);
+      });
+
       for (final eager in [false, true]) {
         test('invalidates dependent page when '
             'partial is removed (${eager ? 'eager' : 'lazy'})', () async {

@@ -192,6 +192,10 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
     final source = sources.where((source) => source.file.path == path).firstOrNull;
     if (source != null) {
       invalidateSource(source, rebuild: rebuild);
+    } else {
+      // Partials excluded by filterExtensions or ignorePattern are not page sources,
+      // but might still have dependents registered through readPartial.
+      _invalidateDependentSources(path, rebuild: rebuild);
     }
   }
 
