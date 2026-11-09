@@ -168,6 +168,127 @@ void main() {
         expect(sources, hasLength(1));
         expect(sources, equals([pageSource('index.md', '/', private: false)]));
       });
+
+      test('loads README files when no ignore pattern is set', () async {
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        pagesDir.childFile('index.md').createSync();
+        pagesDir.childFile('README.md').createSync();
+
+        final loader = FilesystemLoader('pages', fileSystem: fileSystem);
+
+        final sources = await loader.loadPageSources();
+
+        expect(
+          sources,
+          unorderedEquals([
+            pageSource('index.md', '/', private: false),
+            pageSource('README.md', '/README', private: false),
+          ]),
+        );
+      });
+
+      test('skips files that match the ignore pattern at any depth', () async {
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        pagesDir.childFile('index.md').createSync();
+        pagesDir.childFile('README.md').createSync();
+        fileSystem.directory('pages/blog').createSync();
+        fileSystem.file('pages/blog/post-1.md').createSync();
+        fileSystem.file('pages/blog/README.md').createSync();
+        fileSystem.directory('pages/blog/2026').createSync();
+        fileSystem.file('pages/blog/2026/recap.md').createSync();
+        fileSystem.file('pages/blog/2026/README.md').createSync();
+
+        final loader = FilesystemLoader(
+          'pages',
+          fileSystem: fileSystem,
+          ignorePattern: RegExp(r'(.*/)?README\.md$'),
+        );
+
+        final sources = await loader.loadPageSources();
+
+        expect(
+          sources,
+          unorderedEquals([
+            pageSource('index.md', '/', private: false),
+            pageSource('blog/post-1.md', '/blog/post-1', private: false),
+            pageSource('blog/2026/recap.md', '/blog/2026/recap', private: false),
+          ]),
+        );
+      });
+
+      test('matches the ignore pattern from the start of the path only', () async {
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        pagesDir.childFile('README.md').createSync();
+        fileSystem.directory('pages/blog/drafts').createSync(recursive: true);
+        fileSystem.file('pages/blog/README.md').createSync();
+        fileSystem.file('pages/blog/drafts/wip.md').createSync();
+        fileSystem.directory('pages/notes').createSync();
+        fileSystem.file('pages/notes/a.md').createSync();
+
+        // The last alternative matches only the first part of notes/a.md.
+        final loader = FilesystemLoader(
+          'pages',
+          fileSystem: fileSystem,
+          ignorePattern: RegExp(r'README\.md$|drafts/.*|notes/'),
+        );
+
+        final sources = await loader.loadPageSources();
+
+        expect(
+          sources,
+          unorderedEquals([
+            pageSource('blog/README.md', '/blog/README', private: false),
+            pageSource('blog/drafts/wip.md', '/blog/drafts/wip', private: false),
+          ]),
+        );
+      });
+
+      test('skips every file below an ignored directory', () async {
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        pagesDir.childFile('index.md').createSync();
+        fileSystem.directory('pages/drafts/old').createSync(recursive: true);
+        fileSystem.file('pages/drafts/wip.md').createSync();
+        fileSystem.file('pages/drafts/old/idea.md').createSync();
+
+        final loader = FilesystemLoader(
+          'pages',
+          fileSystem: fileSystem,
+          ignorePattern: RegExp(r'drafts/.*'),
+        );
+
+        final sources = await loader.loadPageSources();
+
+        expect(sources, equals([pageSource('index.md', '/', private: false)]));
+      });
+
+      test('matches the ignore pattern against forward slash paths on windows', () async {
+        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        pagesDir.childFile('index.md').createSync();
+        fileSystem.directory(r'pages\blog').createSync();
+        fileSystem.file(r'pages\blog\post-1.md').createSync();
+        fileSystem.file(r'pages\blog\README.md').createSync();
+
+        final loader = FilesystemLoader(
+          'pages',
+          fileSystem: fileSystem,
+          ignorePattern: RegExp(r'blog/README\.md$'),
+        );
+
+        final sources = await loader.loadPageSources();
+
+        expect(
+          sources,
+          unorderedEquals([
+            pageSource('index.md', '/', private: false),
+            pageSource('blog/post-1.md', '/blog/post-1', private: false),
+          ]),
+        );
+      });
     });
 
     group('File Watching', () {
@@ -215,6 +336,60 @@ void main() {
         // Assert
         expect(loader.sources, hasLength(1));
         expect(loader.sources.first.url, equals('/about'));
+      });
+
+      test('does not add a source for an ignored file on file add event', () async {
+        // Arrange
+        final fileSystem = MemoryFileSystem();
+        fileSystem.directory('pages').createSync();
+        loader = FilesystemLoader(
+          'pages',
+          fileSystem: fileSystem,
+          ignorePattern: RegExp(r'(.*/)?README\.md$|drafts/'),
+          watcherFactory: (_) => mockWatcher,
+        );
+        await loader.loadRoutes((_) => PageConfig(), false);
+
+        // Act
+        fileSystem.file('pages/README.md').createSync();
+        eventController.add(WatchEvent(ChangeType.ADD, 'pages/README.md'));
+        fileSystem.file('pages/blog/README.md').createSync(recursive: true);
+        eventController.add(WatchEvent(ChangeType.ADD, 'pages/blog/README.md'));
+        fileSystem.file('pages/drafts/wip.md').createSync(recursive: true);
+        eventController.add(WatchEvent(ChangeType.ADD, 'pages/drafts/wip.md'));
+        fileSystem.file('pages/about.md').createSync();
+        eventController.add(WatchEvent(ChangeType.ADD, 'pages/about.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert
+        expect(loader.sources.map((source) => source.url), equals(['/about']));
+      });
+
+      test('does not add a source for an ignored file on file add event on windows', () async {
+        // Arrange
+        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+        fileSystem.directory('pages').createSync();
+        loader = FilesystemLoader(
+          'pages',
+          fileSystem: fileSystem,
+          ignorePattern: RegExp(r'(.*/)?README\.md$|drafts/'),
+          watcherFactory: (_) => mockWatcher,
+        );
+        await loader.loadRoutes((_) => PageConfig(), false);
+
+        // Act
+        fileSystem.file(r'pages\README.md').createSync();
+        eventController.add(WatchEvent(ChangeType.ADD, r'pages\README.md'));
+        fileSystem.file(r'pages\blog\README.md').createSync(recursive: true);
+        eventController.add(WatchEvent(ChangeType.ADD, r'pages\blog\README.md'));
+        fileSystem.file(r'pages\drafts\wip.md').createSync(recursive: true);
+        eventController.add(WatchEvent(ChangeType.ADD, r'pages\drafts\wip.md'));
+        fileSystem.file(r'pages\about.md').createSync();
+        eventController.add(WatchEvent(ChangeType.ADD, r'pages\about.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert
+        expect(loader.sources.map((source) => source.url), equals(['/about']));
       });
 
       test('removes source on file remove event', () async {
@@ -374,6 +549,88 @@ void main() {
 
         // The dependent page is rebuilt instead of serving the cached result.
         expect(await pageSource.load(), isNot(same(cachedComponent)));
+      });
+
+      test('invalidates dependent page when an ignored partial is added', () async {
+        // Arrange the file system layout and content.
+        final fileSystem = MemoryFileSystem();
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        final loader = FilesystemLoader(
+          'pages',
+          ignorePattern: RegExp(r'(.*/)?README\.md$'),
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
+        pagesDir.childFile('index.md')
+          ..createSync()
+          ..writeAsStringSync('Page content');
+
+        // Initial load to activate the watcher.
+        await loader.loadRoutes((_) => PageConfig(), false);
+        final pageSource = loader.sources.single;
+        await pageSource.load();
+
+        // The page reads the partial while it is missing.
+        expect(
+          () => loader.readPartialSync('pages/README.md', pageSource.page!),
+          throwsA(isA<FileSystemException>()),
+        );
+
+        // Act: Create the partial and simulate its add event.
+        fileSystem.file('pages/README.md')
+          ..createSync()
+          ..writeAsStringSync('Readme');
+        eventController.add(WatchEvent(ChangeType.ADD, 'pages/README.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The page is invalidated, and the partial is not a page source.
+        expect(pageSource.page, isNull);
+        expect(loader.sources, hasLength(1));
+
+        // The rebuilt page can read the partial.
+        await pageSource.load();
+        expect(loader.readPartialSync('pages/README.md', pageSource.page!), equals('Readme'));
+      });
+
+      test('invalidates dependent page when an ignored partial is added on windows', () async {
+        // Arrange the file system layout and content.
+        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
+        final pagesDir = fileSystem.directory('pages')..createSync();
+        final loader = FilesystemLoader(
+          'pages',
+          ignorePattern: RegExp(r'(.*/)?README\.md$'),
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
+        pagesDir.childFile('index.md')
+          ..createSync()
+          ..writeAsStringSync('Page content');
+
+        // Initial load to activate the watcher.
+        await loader.loadRoutes((_) => PageConfig(), false);
+        final pageSource = loader.sources.single;
+        await pageSource.load();
+
+        // The page reads the partial while it is missing.
+        expect(
+          () => loader.readPartialSync(r'pages\README.md', pageSource.page!),
+          throwsA(isA<FileSystemException>()),
+        );
+
+        // Act: Create the partial and simulate its add event.
+        fileSystem.file(r'pages\README.md')
+          ..createSync()
+          ..writeAsStringSync('Readme');
+        eventController.add(WatchEvent(ChangeType.ADD, r'pages\README.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The page is invalidated, and the partial is not a page source.
+        expect(pageSource.page, isNull);
+        expect(loader.sources, hasLength(1));
+
+        // The rebuilt page can read the partial.
+        await pageSource.load();
+        expect(loader.readPartialSync(r'pages\README.md', pageSource.page!), equals('Readme'));
       });
 
       for (final filtered in [false, true]) {
