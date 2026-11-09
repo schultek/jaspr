@@ -22,6 +22,7 @@ import 'server_runner.dart';
 import 'util.dart';
 
 class DevWorkflow {
+  final Project project;
   final ClientRunner clientRunner;
   final CssRunner css;
   final http.Client client;
@@ -76,6 +77,7 @@ class DevWorkflow {
   String? get serverDevToolsUri => server?.devToolsUri;
 
   DevWorkflow._({
+    required this.project,
     required this.clientRunner,
     required this.css,
     required this.client,
@@ -146,7 +148,9 @@ class DevWorkflow {
     for (final clientConnection in clients.connections) {
       await clientConnection.performHotReload();
       await clientConnection.reassemble();
-      await clientConnection.reloadHtml();
+      if (project.requireMode != JasprMode.client) {
+        await clientConnection.reloadHtml();
+      }
     }
 
     final changedCssFiles = await cssFuture;
@@ -174,7 +178,9 @@ class DevWorkflow {
 
     for (final clientConnection in clients.connections) {
       await clientConnection.restart();
-      await clientConnection.reloadHtml();
+      if (project.requireMode != JasprMode.client) {
+        await clientConnection.reloadHtml();
+      }
     }
 
     final changedCssFiles = await cssFuture;
@@ -431,6 +437,7 @@ class DevWorkflow {
     cascade = cascade.add(assetHandler);
 
     workflow = DevWorkflow._(
+      project: project,
       clientRunner: clientRunner,
       css: css,
       client: client,
