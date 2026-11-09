@@ -1,3 +1,7 @@
+## Unreleased 0.24.0-beta.1
+
+- Fixed issue with hot-reload in client mode.
+
 ## 0.24.0-beta.0
 
 ### Core Features
