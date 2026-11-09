@@ -1,3 +1,8 @@
+## Unreleased minor
+
+- Added `ignorePattern` parameter to `FilesystemLoader`, which skips the files whose path it matches from the start. This can be used to leave files such as `README.md` out of the pages.
+- Fixed pages not being rebuilt when a partial that is not a page source, such as a file excluded by `filterExtensions`, is edited while serving.
+
 ## 0.6.0-beta.0
 
 - Require Dart 3.13 or later.
