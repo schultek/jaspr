@@ -8,6 +8,8 @@ import 'package:dwds/dwds.dart';
 import 'package:jaspr_cli/src/command_runner.dart';
 import 'package:jaspr_cli/src/commands/serve_command.dart';
 import 'package:jaspr_cli/src/dev/dev_workflow.dart';
+import 'package:jaspr_cli/src/dev/server_runner.dart';
+import 'package:jaspr_cli/src/project.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:vm_service/vm_service.dart' as vm;
@@ -17,61 +19,66 @@ import '../fakes/fake_io.dart';
 import '../fakes/fake_project.dart';
 import '../fakes/fake_socket.dart';
 
+const String _reloadHtmlCall = 'ext.jaspr.reload_html';
+
+/// Expected RPCs in client mode.
+/// Other modes follow these with `_reloadHtmlCall`.
 const List<String> _reloadCalls = [
   'getVM',
   'reloadSources',
   'ext.jaspr.reassemble',
-  'ext.jaspr.reload_html',
 ];
+
 const List<String> _restartCalls = [
   'hotRestart',
-  'ext.jaspr.reload_html',
 ];
 
 void main() {
-  for (final (auto, shortcut, failingRpc, expectedCalls) in [
-    ('reload', null, 'getVM', _reloadCalls),
-    ('reload', null, 'reloadSources', _reloadCalls),
-    ('restart', null, 'hotRestart', _restartCalls),
-    (null, 'r', 'reloadSources', _reloadCalls),
-    (null, 'R', 'hotRestart', _restartCalls),
-  ]) {
-    final trigger = shortcut == null ? 'automatic $auto' : 'keyboard $shortcut';
-    test('$trigger survives a browser disconnect during $failingRpc', () async {
-      await _withWorkflow(auto, (fixture) async {
-        final closing = await fixture.connectBrowser('closing');
-        final healthy = await fixture.connectBrowser('healthy');
+  for (final mode in JasprMode.values) {
+    for (final (auto, shortcut, failingRpc, baseCalls) in [
+      ('reload', null, 'getVM', _reloadCalls),
+      ('reload', null, 'reloadSources', _reloadCalls),
+      ('restart', null, 'hotRestart', _restartCalls),
+      (null, 'r', 'reloadSources', _reloadCalls),
+      (null, 'R', 'hotRestart', _restartCalls),
+    ]) {
+      final trigger = shortcut == null ? 'automatic $auto' : 'keyboard $shortcut';
+      final expectedCalls = [...baseCalls, if (mode != JasprMode.client) _reloadHtmlCall];
+      test('$trigger survives a browser disconnect during $failingRpc in ${mode.name} mode', () async {
+        await _withWorkflow(auto, mode: mode, (fixture) async {
+          Future<void> update({String? warning}) =>
+              fixture.update(expectedCalls.last, shortcut: shortcut, warning: warning);
 
-        // Establish that both browsers were connected and receiving updates.
-        await fixture.update(healthy, shortcut: shortcut);
-        expect(closing.calls, expectedCalls);
-        expect(healthy.calls, expectedCalls);
-        closing.calls.clear();
-        healthy.calls.clear();
+          final closing = await fixture.connectBrowser('closing');
+          final healthy = await fixture.connectBrowser('healthy');
 
-        // An in-flight VM request can fail before DWDS reports `onDone`.
-        closing.failingRpc = failingRpc;
-        await fixture.update(
-          healthy,
-          shortcut: shortcut,
-          warning: 'client closing: Bad state: VM service disconnected',
-        );
-        expect(closing.calls, expectedCalls.take(expectedCalls.indexOf(failingRpc) + 1).toList());
-        expect(healthy.calls, expectedCalls);
-        expect(fixture.workflow.isShuttingDown, isFalse);
+          // Establish that both browsers were connected and receiving updates.
+          await update();
+          expect(closing.calls, expectedCalls);
+          expect(healthy.calls, expectedCalls);
+          closing.calls.clear();
+          healthy.calls.clear();
 
-        // Complete disconnect cleanup and reconnect the app.
-        // The next update must still reach both clients
-        // through the original build listener.
-        await closing.disconnect();
-        expect(fixture.workflow.clients.getConnection('closing'), isNull);
-        final reconnected = await fixture.connectBrowser('closing');
-        healthy.calls.clear();
-        await fixture.update(healthy, shortcut: shortcut);
-        expect(healthy.calls, expectedCalls);
-        expect(reconnected.calls, expectedCalls);
+          // An in-flight VM request can fail before DWDS reports `onDone`.
+          closing.failingRpc = failingRpc;
+          await update(warning: 'client closing: Bad state: VM service disconnected');
+          expect(closing.calls, expectedCalls.take(expectedCalls.indexOf(failingRpc) + 1).toList());
+          expect(healthy.calls, expectedCalls);
+          expect(fixture.workflow.isShuttingDown, isFalse);
+
+          // Complete disconnect cleanup and reconnect the app.
+          // The next update must still reach both clients
+          // through the original build listener.
+          await closing.disconnect();
+          expect(fixture.workflow.clients.getConnection('closing'), isNull);
+          final reconnected = await fixture.connectBrowser('closing');
+          healthy.calls.clear();
+          await update();
+          expect(healthy.calls, expectedCalls);
+          expect(reconnected.calls, expectedCalls);
+        });
       });
-    });
+    }
   }
 
   for (final (action, Future<void> Function(DevWorkflow) runUpdate, firstRpc, expectedCalls) in [
@@ -123,17 +130,47 @@ void main() {
       });
     });
   }
+
+  for (final (action, Future<void> Function(DevWorkflow) runUpdate, expectedCalls) in [
+    ('reload', (DevWorkflow w) => w.reloadClients(), [..._reloadCalls, _reloadHtmlCall]),
+    ('restart', (DevWorkflow w) => w.restartClients(), [..._restartCalls, _reloadHtmlCall]),
+    ('refresh', (DevWorkflow w) => w.refreshClients(), ['fullReload']),
+  ]) {
+    test('$action waits for the server to reload before updating browsers', () async {
+      await _withWorkflow(null, mode: JasprMode.server, (fixture) async {
+        final browser = await fixture.connectBrowser('browser');
+        final serverReload = Completer<void>();
+        final server = _Server();
+        when(() => server.reload()).thenAnswer((_) => serverReload.future);
+        when(() => server.stop()).thenAnswer((_) async {});
+        fixture.workflow.server = server;
+
+        final pendingUpdate = runUpdate(fixture.workflow);
+        await pumpEventQueue();
+        verify(() => server.reload()).called(1);
+        expect(browser.calls, isEmpty, reason: 'Browsers should wait for the server to finish reloading.');
+
+        serverReload.complete();
+        await pendingUpdate;
+        expect(browser.calls, expectedCalls);
+      });
+    });
+  }
 }
 
 /// Runs [test] against a `jaspr serve` workflow started with the
-/// optional `--auto` mode [auto], stopping it afterwards.
-Future<void> _withWorkflow(String? auto, Future<void> Function(_WorkflowFixture) test) async {
+/// optional `--auto` mode [auto] in the rendering [mode], stopping it afterwards.
+Future<void> _withWorkflow(
+  String? auto,
+  Future<void> Function(_WorkflowFixture) test, {
+  JasprMode mode = JasprMode.client,
+}) async {
   final io = FakeIO();
   addTearDown(io.tearDown);
   await io.runZoned(() async {
     final fixture = _WorkflowFixture(io);
     try {
-      await fixture.start(auto);
+      await fixture.start(auto, mode);
       await test(fixture);
     } finally {
       await fixture.stop();
@@ -159,15 +196,17 @@ class _WorkflowFixture {
   DevWorkflow get workflow => command.workflow;
 
   /// Starts `jaspr serve` and waits until it's serving and listening for apps.
-  Future<void> start(String? auto) async {
+  ///
+  /// Modes other than client skip starting the server process.
+  Future<void> start(String? auto, JasprMode mode) async {
     io.stdin.hasTerminalOverride = true;
-    io.setupFakeProject('myapp', mode: 'client');
+    io.setupFakeProject('myapp', mode: mode.name);
     io.stubDartSDK();
     buildDaemon = io.setupFakeBuildDaemon();
     final runner = JasprCommandRunner(false, false);
     command = runner.commands['serve']! as ServeCommand;
     serve = runner
-        .run(['serve', '--verbose', if (auto != null) '--auto=$auto'])
+        .run(['serve', '--verbose', if (auto != null) '--auto=$auto', if (mode != JasprMode.client) '--skip-server'])
         .then<void>(
           (_) => serveFinished = true,
           onError: (Object error, StackTrace stack) {
@@ -179,7 +218,12 @@ class _WorkflowFixture {
     await expectLater(io.stdout.queue, emitsWithTimeout(emitsThrough('[BUILDER] Starting initial build...')));
     await io.runInitialBuild(buildDaemon);
     await expectLater(io.serverSockets.next, completion(isA<FakeServerSocket>()));
-    await expectLater(io.stdout.queue, emitsWithTimeout(emitsThrough('[LOG] Serving at http://localhost:8080')));
+    await expectLater(
+      io.stdout.queue,
+      emitsWithTimeout(
+        emitsThrough(mode == JasprMode.client ? '[LOG] Serving at http://localhost:8080' : contains('Skipping server')),
+      ),
+    );
 
     when(() => dwds.connectedApps).thenAnswer((_) => apps.stream);
     workflow.clients.listenTo(dwds);
@@ -217,11 +261,15 @@ class _WorkflowFixture {
 
   /// Triggers an update with the keyboard [shortcut],
   /// or a successful build if `null`,
-  /// and waits until the [healthy] browser has reloaded its HTML.
+  /// and waits until each browser
+  /// without a [_Browser.failingRpc] has completed [lastRpc].
   ///
   /// If [warning] is provided, also waits for it to be logged.
-  Future<void> update(_Browser healthy, {String? shortcut, String? warning}) async {
-    final updated = healthy.htmlUpdates.stream.first;
+  Future<void> update(String lastRpc, {String? shortcut, String? warning}) async {
+    final updated = [
+      for (final browser in browsers)
+        if (browser.failingRpc == null) browser.completedRpcs.stream.firstWhere((method) => method == lastRpc),
+    ].wait;
     if (shortcut != null) {
       io.stdin.addBytes(utf8.encode(shortcut));
     } else {
@@ -262,7 +310,7 @@ class _WorkflowFixture {
     await apps.close();
     for (final browser in browsers) {
       await browser.loggingSocket.close();
-      await browser.htmlUpdates.close();
+      await browser.completedRpcs.close();
     }
     await buildDaemon.close();
   }
@@ -294,7 +342,6 @@ class _Browser {
     when(() => service.callServiceExtension(any(), args: any(named: 'args'))).thenAnswer((invocation) async {
       final method = invocation.positionalArguments.first as String;
       await _rpc(method);
-      if (method == 'ext.jaspr.reload_html') htmlUpdates.add(null);
       return vm.Success();
     });
   }
@@ -304,7 +351,7 @@ class _Browser {
   final service = _Vm();
   final started = Completer<void>();
   final done = Completer<void>();
-  final htmlUpdates = StreamController<void>.broadcast();
+  final completedRpcs = StreamController<String>.broadcast();
 
   /// The VM service methods called on this browser, in order.
   final calls = <String>[];
@@ -320,6 +367,7 @@ class _Browser {
     calls.add(method);
     await beforeRpc?.call(method);
     if (method == failingRpc) throw StateError('VM service disconnected');
+    completedRpcs.add(method);
   }
 
   /// Closes the debug connection and waits for the client to be cleaned up.
@@ -336,3 +384,5 @@ class _App extends Mock implements AppConnection {}
 class _Debug extends Mock implements DebugConnection {}
 
 class _Vm extends Mock implements vm.VmService {}
+
+class _Server extends Mock implements ServerRunner {}
