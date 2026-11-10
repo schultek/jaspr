@@ -157,6 +157,72 @@ void main() {
       });
     });
 
+    test('handles keyboard shortcuts with Windows terminal mode constraints', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.stdin.windowsTerminalModes = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        expect(io.stdin.echoMode, isFalse);
+        expect(io.stdin.lineMode, isFalse);
+
+        // Press 'r' for reload
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Reloading...',
+            '[CLIENT] Reload complete.',
+          ]),
+        );
+
+        // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+
+        expect(io.stdin.lineMode, isTrue);
+        expect(io.stdin.echoMode, isTrue);
+      });
+    });
+
     test('queues reload and restart shortcuts when build is in progress', () async {
       await io.runZoned(() async {
         io.stdin.hasTerminalOverride = true;

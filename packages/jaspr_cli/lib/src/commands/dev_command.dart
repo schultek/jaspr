@@ -391,8 +391,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
     final originalEchoMode = stdin.echoMode;
 
     try {
-      stdin.lineMode = false;
       stdin.echoMode = false;
+      stdin.lineMode = false;
     } catch (_) {
       return;
     }

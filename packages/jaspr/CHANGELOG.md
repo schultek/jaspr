@@ -4,6 +4,7 @@
 - `kReleaseMode` is now also true in product builds of the Dart VM, such as `dart compile exe` or `dart build cli`,
   not only with `-Djaspr.flags.release=true`. A server that embeds Jaspr and is built without `jaspr build`
   no longer renders in debug mode. This matches what `kDebugMode` was already documented to do.
+- Fixed key shortcuts in `jaspr serve` not working on Windows.
 
 ## 0.24.0-beta.0
 

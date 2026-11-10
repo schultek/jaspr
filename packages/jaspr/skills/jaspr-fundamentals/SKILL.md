@@ -16,10 +16,12 @@ Jaspr uses a component-based architecture very similar to Flutter's widgets. Con
 Building UIs in Jaspr requires you to return a single `Component` from `build()`.
 
 - **Rule 1:** You MUST NOT use `Iterable<Component> build(BuildContext context) sync*`. This is legacy code.
-- **Rule 2:** You MUST use dot-shorthands instead of capitalized component names for fragments, text, and empty nodes.
+- **Rule 2:** You MUST use dot-shorthands instead of capitalized component names for fragments, text, and empty nodes:
   - Use `.fragment([...])` (Do NOT use `Fragment([...])` or `fragment([...])`).
   - Use `.text('...')` (Do NOT use `Text('...')` or `text('...')`).
   - Use `.empty()` to return an empty space safely.
+  - Use `.apply(...)` to apply styles, classes, attributes, or events to matching elements of a child component (including server components inside client components).
+- **Rule 3:** Dart primary constructors are fully supported for components (e.g. `class MyComponent({this.title}) extends StatelessComponent`).
 
 **Example Usage:**
 ```dart
@@ -80,6 +82,13 @@ class MyHtmlComponent extends StatelessComponent {
 
 Jaspr has built-in support for styling components using CSS-in-Dart. 
 See the [jaspr-styling](../jaspr-styling/SKILL.md) skill for more information.
+
+### Server Components vs. Client Components (@client)
+
+In Jaspr's server and static modes, your application uses a hybrid architecture:
+- **Server Components (Default):** Components rendered in server scope, as well as components passed as `Component` constructor parameters from the server into `@client` components. They are rendered exclusively on the server, are NOT compiled to JavaScript/Wasm, have zero client bundle footprint, and can access server resources (`dart:io`, databases).
+- **Client Islands (`@client`) & Descendants:** Components annotated with `@client`, along with any ordinary components constructed *inside* their client build methods, are compiled to JavaScript/Wasm and run in the browser. Because client components are also pre-rendered on the server during SSR, they can access server APIs during pre-rendering when using `@Import.onServer` or conditional imports. However, you must be careful to handle the browser environment where those APIs are unavailable, and avoid direct imports of server-only libraries (`dart:io`) that would fail client compilation.
+- **Surgical Hydration with Server Components:** When building interactive wrappers (such as expandable panels, tabs, or dialog shells), pass static inner content as `Component` constructor parameters to the `@client` component from the outer server scope. Those child components remain Server Components and will not bloat the client bundle! (See `jaspr-pre-rendering-and-hydration` for details).
 
 ## Interactivity and Events
 
@@ -166,11 +175,35 @@ class _MyInputState extends State<MyInput> {
 }
 ```
 
+### 4. Reactivity with `package:listen` and `ListenableBuilder`
+
+Jaspr re-exports `Listenable`, `ValueListenable`, `ChangeNotifier`, and `ValueNotifier` from `package:listen`.
+Use `ListenableBuilder` to rebuild only the targeted parts of the component tree when a value changes:
+
+```dart
+final counter = ValueNotifier<int>(0);
+
+class CounterDisplay extends StatelessComponent {
+  const CounterDisplay({super.key});
+
+  @override
+  Component build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: counter,
+      builder: (context) => p([.text('Count: ${counter.value}')]),
+    );
+  }
+}
+```
+
 ---
 
 ## Further Resources
 
-- For information on pre-rendering, async data fetching, hydration, and the `@client` annotation see the related skill: [jaspr-pre-rendering-and-hydration](../jaspr-pre-rendering-and-hydration/SKILL.md).
-- For information on styling components see the related skill: [jaspr-styling](../jaspr-styling/SKILL.md).
-- For information on how to convert HTML to Jaspr code, see the related skill: [jaspr-convert-html](../jaspr-convert-html/SKILL.md).
+- For comprehensive guidelines on performance, server components, and architecture, see [jaspr-best-practices](../jaspr-best-practices/SKILL.md).
+- For web interface guidelines, accessibility, focus states, and interaction standards, see [jaspr-web-design-guidelines](../jaspr-web-design-guidelines/SKILL.md).
+- For building content-driven sites (documentation, blogs) with markdown and frontmatter, see [jaspr-content](../jaspr-content/SKILL.md).
+- For information on pre-rendering, server components, async data fetching, and hydration, see [jaspr-pre-rendering-and-hydration](../jaspr-pre-rendering-and-hydration/SKILL.md).
+- For information on styling components see [jaspr-styling](../jaspr-styling/SKILL.md).
+- For information on how to convert HTML to Jaspr code, see [jaspr-convert-html](../jaspr-convert-html/SKILL.md).
 - An index of all available documentation can be found at [https://jaspr.site/llms.txt](https://jaspr.site/llms.txt).
