@@ -2,6 +2,11 @@
 
 - Fixed issue with hot-reload in client mode.
 - Fixed styles hot-reload recompiling all dependencies on every change on Windows.
+- `kReleaseMode` is now also true in product builds of the Dart VM, such as `dart compile exe` or `dart build cli`,
+  not only with `-Djaspr.flags.release=true`. A server that embeds Jaspr and is built without `jaspr build`
+  no longer renders in debug mode. This matches what `kDebugMode` was already documented to do.
+- Fixed key shortcuts in `jaspr serve` not working on Windows.
+- Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
 
 ## 0.24.0-beta.0
 
