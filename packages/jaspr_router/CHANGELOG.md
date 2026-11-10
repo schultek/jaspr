@@ -1,6 +1,7 @@
 ## Unreleased 0.10.0-beta.1
 
 - `redirect` preserves the query string on server-side redirects.
+- Fixed `RouterState.preload()` running the top-level and route-level `redirect` callbacks. Preloading a route (for example when hovering a `Link`) is not a navigation, so redirects now only run on actual navigation.
 
 ## 0.10.0-beta.0
 
