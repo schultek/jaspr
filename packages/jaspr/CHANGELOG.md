@@ -1,6 +1,7 @@
 ## Unreleased 0.24.0-beta.1
 
 - Fixed issue with hot-reload in client mode.
+- Fixed key shortcuts in `jaspr serve` not working on Windows.
 
 ## 0.24.0-beta.0
 
