@@ -183,6 +183,35 @@ void main() {
     });
   }
 
+  test('delivers missed stylesheets once a browser responds again', () async {
+    await _withWorkflow(null, (fixture) async {
+      fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+      final hanging = await fixture.connectBrowser('hanging');
+      final respond = Completer<void>();
+      hanging.beforeRpc = (method) async {
+        if (method == 'reloadSources') await respond.future;
+      };
+
+      await fixture.workflow.reloadClients().timeout(const Duration(seconds: 5));
+      final connection = fixture.workflow.clients.getConnection('hanging')!;
+      expect(await connection.reloadStylesheets(['main.css']), isNull, reason: 'The browser is skipped.');
+      expect(hanging.calls, isNot(contains('ext.jaspr.reload_stylesheets')));
+
+      hanging.beforeRpc = null;
+      respond.complete();
+      await pumpEventQueue();
+      expect(hanging.calls, contains('ext.jaspr.reload_stylesheets'));
+      verify(
+        () => hanging.service.callServiceExtension(
+          'ext.jaspr.reload_stylesheets',
+          args: {
+            'urls': jsonEncode(['main.css']),
+          },
+        ),
+      ).called(1);
+    });
+  });
+
   for (final (action, Future<void> Function(DevWorkflow) runUpdate, expectedCalls) in [
     ('reload', (DevWorkflow w) => w.reloadClients(), [..._reloadCalls, _reloadHtmlCall]),
     ('restart', (DevWorkflow w) => w.restartClients(), [..._restartCalls, _reloadHtmlCall]),

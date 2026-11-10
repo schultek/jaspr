@@ -21,6 +21,18 @@ void main() {
       expect(guard.isUnresponsive, isFalse);
     });
 
+    test('forwards a TimeoutException thrown by the call itself', () async {
+      var unresponsiveCalls = 0;
+      final guard = ClientCallGuard(timeout: timeout, onUnresponsive: () => unresponsiveCalls++);
+
+      await expectLater(
+        guard.run<void>(() async => throw TimeoutException('from the call')),
+        throwsA(isA<TimeoutException>()),
+      );
+      expect(guard.isUnresponsive, isFalse);
+      expect(unresponsiveCalls, equals(0));
+    });
+
     test('returns null and marks the client unresponsive when a call times out', () async {
       var unresponsiveCalls = 0;
       final guard = ClientCallGuard(timeout: timeout, onUnresponsive: () => unresponsiveCalls++);
@@ -58,6 +70,30 @@ void main() {
       expect(guard.isUnresponsive, isFalse);
       expect(responsiveCalls, equals(1));
       expect(await guard.run(() async => 'ok'), equals('ok'));
+    });
+
+    test('stays unresponsive until all overlapping timed out calls complete', () async {
+      var unresponsiveCalls = 0;
+      var responsiveCalls = 0;
+      final guard = ClientCallGuard(
+        timeout: timeout,
+        onUnresponsive: () => unresponsiveCalls++,
+        onResponsive: () => responsiveCalls++,
+      );
+      final first = Completer<String>();
+      final second = Completer<String>();
+      await Future.wait([guard.run(() => first.future), guard.run(() => second.future)]);
+      expect(unresponsiveCalls, equals(1));
+
+      first.complete('late');
+      await pumpEventQueue();
+      expect(guard.isUnresponsive, isTrue);
+      expect(responsiveCalls, equals(0));
+
+      second.complete('late');
+      await pumpEventQueue();
+      expect(guard.isUnresponsive, isFalse);
+      expect(responsiveCalls, equals(1));
     });
 
     test('is responsive again once the timed out call fails', () async {

@@ -125,11 +125,20 @@ class ClientConnection {
       tag: .client,
       level: .warning,
     ),
-    onResponsive: () => manager.workflow.logger.write(
-      'Client ${appConnection.request.appId} is responding again, it may show outdated content until the next reload.',
-      tag: .client,
-    ),
+    onResponsive: () {
+      manager.workflow.logger.write(
+        'Client ${appConnection.request.appId} is responding again, it may show outdated content until the next reload.',
+        tag: .client,
+      );
+      // Changed stylesheets aren't part of the next reload, so deliver them now.
+      if (_pendingStylesheets.isNotEmpty && !_isDisposed) {
+        unawaited(reloadStylesheets(const []));
+      }
+    },
   );
+
+  /// Stylesheets that changed while this client didn't receive them.
+  final Set<String> _pendingStylesheets = {};
 
   void start() async {
     final appId = appConnection.request.appId;
@@ -269,7 +278,18 @@ class ClientConnection {
     return false;
   }
 
-  Future<vm.Response?> reloadStylesheets(List<String> urls) => _callGuard.run(() async {
+  /// Reloads the stylesheets at [urls], together with any stylesheets this client missed before.
+  Future<vm.Response?> reloadStylesheets(List<String> urls) async {
+    _pendingStylesheets.addAll(urls);
+    final pending = _pendingStylesheets.toList();
+    final response = await _callGuard.run(() => _reloadStylesheets(pending));
+    if (response != null) {
+      _pendingStylesheets.removeAll(pending);
+    }
+    return response;
+  }
+
+  Future<vm.Response?> _reloadStylesheets(List<String> urls) async {
     final reloadMethod = _registeredMethodsForService['ext.jaspr.reload_stylesheets'] ?? 'ext.jaspr.reload_stylesheets';
     for (var i = 0; i < 5; i++) {
       try {
@@ -283,7 +303,7 @@ class ClientConnection {
       }
     }
     return null;
-  });
+  }
 
   Future<vm.Response?> reassemble() => _callGuard.run(() async {
     final reassembleMethod = _registeredMethodsForService['ext.jaspr.reassemble'] ?? 'ext.jaspr.reassemble';
