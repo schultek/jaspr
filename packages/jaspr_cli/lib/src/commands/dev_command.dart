@@ -202,11 +202,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       onMessage: (message) async {
         if (message case {'reload': final Object reload}) {
           final String? route = reload is String ? reload : null;
-          for (final connection in workflow.clients.connections) {
-            try {
-              await connection.reloadHtml(route);
-            } catch (_) {}
-          }
+          await workflow.clients.forEachConnection(
+            'HTML reload',
+            (connection) => connection.reloadHtml(route),
+          );
         }
       },
     );

@@ -18,13 +18,39 @@ class ClientManager {
   final StreamController<Map<String, Object?>> _clientEvents = StreamController.broadcast();
 
   Stream<Map<String, Object?>> get clientEvents => _clientEvents.stream;
-  Iterable<ClientConnection> get connections => _clientConnections.values;
 
   String? get clientDevToolsUri => _clientConnections.values.firstOrNull?.devToolsUri;
 
   ClientConnection? getConnection(String? appId) {
     if (appId == null) return null;
     return _clientConnections[appId];
+  }
+
+  /// Runs [action] sequentially for each currently connected client.
+  ///
+  /// Clients that connect while this is running aren't included,
+  /// and clients that are disposed before their turn are skipped.
+  ///
+  /// If [action] throws for a client, the error is logged as a warning
+  /// prefixed with [actionName] and the remaining clients are still updated,
+  /// so one disconnecting browser can't interrupt the others or later builds.
+  Future<void> forEachConnection(String actionName, Future<void> Function(ClientConnection) action) async {
+    // Connections can be added or removed while an action is awaiting an RPC.
+    final connections = _clientConnections.values.toList(growable: false);
+    for (final connection in connections) {
+      if (connection._isDisposed) continue;
+
+      try {
+        await action(connection);
+      } catch (error, stackTrace) {
+        workflow.logger.write(
+          '$actionName failed for client ${connection.appConnection.request.appId}: $error',
+          tag: .client,
+          level: .warning,
+        );
+        workflow.logger.write(stackTrace.toString(), tag: .client, level: .verbose);
+      }
+    }
   }
 
   StreamSubscription<AppConnection>? _appsSubscription;
