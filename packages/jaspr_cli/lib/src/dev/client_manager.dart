@@ -205,7 +205,8 @@ class ClientConnection {
     return response;
   }
 
-  Future<void> performHotReload() async {
+  /// Performs a hot reload and returns whether it succeeded.
+  Future<bool> performHotReload() async {
     final vmService = this.vmService;
     if (vmService == null) {
       manager.workflow.logger.write(
@@ -213,7 +214,7 @@ class ClientConnection {
         tag: Tag.client,
         level: Level.warning,
       );
-      return;
+      return false;
     }
 
     final isolateId = (await vmService.getVM()).isolates?.firstOrNull?.id;
@@ -223,23 +224,22 @@ class ClientConnection {
         tag: Tag.client,
         level: Level.warning,
       );
-      return;
+      return false;
     }
 
     vm.ReloadReport? response;
     for (var i = 0; i < 5; i++) {
       response = await vmService.reloadSources(isolateId);
       if (response.success ?? false) {
-        break;
+        return true;
       }
     }
-    if (!(response?.success ?? false)) {
-      manager.workflow.logger.write(
-        'Hot reload failed after 5 attempts for unknown reason.',
-        tag: Tag.client,
-        level: Level.warning,
-      );
-    }
+    manager.workflow.logger.write(
+      'Hot reload failed after 5 attempts for unknown reason.',
+      tag: Tag.client,
+      level: Level.warning,
+    );
+    return false;
   }
 
   Future<vm.Response?> reloadStylesheets(List<String> urls) async {
