@@ -335,10 +335,47 @@ final String dartExecutable =
 /// The path to the root directory of the Dart SDK.
 final String dartSdkDir =
     cli_util.sdkPath ??
+    findSnapFlutterSdkPath() ??
     (throw Exception(
       'Could not find Dart SDK. '
       'Make sure Dart is installed and added to your PATH.',
     ));
+
+/// Probes the Snap package layout of Flutter for its bundled Dart SDK.
+///
+/// When Flutter is installed as a Snap package, the `dart` executable found
+/// on PATH is a shim at `/snap/bin/dart` that does not live inside an SDK
+/// directory, so the SDK cannot be located from the executable path. The SDK
+/// is bundled inside the snap at
+/// `<snap root>/flutter/current/flutter/bin/cache/dart-sdk`.
+///
+/// Returns the path if it is a valid Dart SDK directory, or `null` if no
+/// Snap installation of Flutter is present on PATH.
+String? findSnapFlutterSdkPath({String? pathEnv}) {
+  final envPath = pathEnv ?? Platform.environment['PATH'];
+  if (envPath == null) {
+    return null;
+  }
+  for (final entry in envPath.split(Platform.isWindows ? ';' : ':')) {
+    // Only consider the bin directory of a snap root, e.g. /snap/bin.
+    if (path.basename(entry) != 'bin' || path.basename(path.dirname(entry)) != 'snap') {
+      continue;
+    }
+    final sdkPath = path.join(
+      path.dirname(entry),
+      'flutter',
+      'current',
+      'flutter',
+      'bin',
+      'cache',
+      'dart-sdk',
+    );
+    if (cli_util.isValidSdkPath(sdkPath)) {
+      return sdkPath;
+    }
+  }
+  return null;
+}
 
 final dartSdkVersion = () {
   final result = ProcessRunner.instance.runSync(dartExecutable, ['--version']);

@@ -1,5 +1,7 @@
 ## Unreleased 0.24.0-beta.1
 
+- Fixed the cli failing to find the Dart SDK when Flutter is installed as a Snap package on Linux,
+  where the `dart` executable on PATH is a shim at `/snap/bin/dart` outside the SDK directory.
 - Fixed issue with hot-reload in client mode.
 - Fixed styles hot-reload recompiling all dependencies on every change on Windows.
 - `kReleaseMode` is now also true in product builds of the Dart VM, such as `dart compile exe` or `dart build cli`,
