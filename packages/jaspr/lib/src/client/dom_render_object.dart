@@ -63,7 +63,17 @@ class DomRenderElement extends DomRenderObject
 
   Map<String, EventBinding>? events;
 
+  /// Whether this is a `dialog` or `details` element, whose `open` attribute the browser also sets
+  /// (`showModal()`, `show()`, or the user toggling the details).
+  late final bool _hasOpenState;
+
+  /// Whether the last [update] rendered the `open` attribute, or for a hydrated node, whether the
+  /// server rendered it.
+  bool _renderedOpen = false;
+
   void _createNode(String tag) {
+    _hasOpenState = tag == 'dialog' || tag == 'details';
+
     var namespace = _xmlns[tag];
     if (namespace == null && (parent?.node.isElement ?? false)) {
       namespace = (parent?.node as web.Element).namespaceURI;
@@ -77,6 +87,7 @@ class DomRenderElement extends DomRenderObject
         print('Hydrate html node: $retakeNode');
       }
       node = retakeNode as web.Element;
+      _renderedOpen = node.hasAttribute('open');
 
       toHydrate = retakeNode.childNodes.toIterable().toList();
       return;
@@ -181,6 +192,15 @@ class DomRenderElement extends DomRenderObject
     }
 
     final attributesToRemove = originalAttributes.difference({'id', 'class', 'style', ...?attributes?.keys});
+    if (_hasOpenState) {
+      // Removing an `open` the browser set hides the element without closing it: a modal dialog
+      // stays in the top layer and keeps the page inert. Only remove what an earlier build rendered.
+      final rendersOpen = attributes?.containsKey('open') ?? false;
+      if (!rendersOpen && !_renderedOpen) {
+        attributesToRemove.remove('open');
+      }
+      _renderedOpen = rendersOpen;
+    }
     for (final name in attributesToRemove) {
       node.removeAttribute(name);
       if (kVerboseMode) {
