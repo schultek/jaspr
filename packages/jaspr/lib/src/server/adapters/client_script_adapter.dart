@@ -2,6 +2,7 @@ import 'dart:io';
 
 import '../markup_render_object.dart';
 import 'client_component_adapter.dart';
+import 'document_structure_helper.dart';
 import 'head_scope_adapter.dart';
 
 /// Adds the script of the client entrypoint to the document's head.
@@ -20,10 +21,7 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
       return false;
     }
 
-    // Only the first base with an href sets the document's base URL.
-    final base = head.children.findWhere<MarkupRenderElement>(
-      (element) => element.tag == 'base' && element.attributes?['href'] != null,
-    );
+    final base = findBaseWithHref(head);
     // Emit a src relative to the base URL if one is set, otherwise from the root.
     final scriptSrc = base != null ? clientId : '/$clientId';
     final baseHref = base == null ? null : Uri.tryParse(base.attributes!['href']!.trim());

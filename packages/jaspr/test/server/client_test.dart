@@ -176,6 +176,55 @@ void main() {
       final response = await tester.request('/blog/post');
       expect(_scriptSources(response), ['/main.client.dart.js']);
     });
+
+    testServer('keeps an explicit client script added with Document.head', (tester) async {
+      tester.pumpComponent(
+        Document(
+          body: .fragment([
+            Document.head(children: [script(src: '/main.client.dart.js', defer: true)]),
+            p([]),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/blog/post');
+      expect(_scriptSources(response), ['/main.client.dart.js']);
+    });
+
+    group('and a stylesheet', () {
+      setUp(() {
+        Jaspr.initializeApp(
+          options: ServerOptions(clientId: 'main.client.dart.js', stylesId: 'styles.css'),
+        );
+      });
+
+      String? stylesheetHref(DocumentResponse response) =>
+          response.document!.querySelector('link[rel="stylesheet"]')!.attributes['href'];
+
+      testServer('links both relative to the base URL', (tester) async {
+        tester.pumpComponent(Document(base: '/app/', body: p([])));
+
+        final response = await tester.request('/app/page');
+        expect(_scriptSources(response), ['main.client.dart.js']);
+        expect(stylesheetHref(response), 'styles.css');
+      });
+
+      testServer('links both from the root when no base sets a URL', (tester) async {
+        tester.pumpComponent(
+          Document(
+            base: null,
+            head: [
+              .element(tag: 'base', attributes: {'target': '_blank'}),
+            ],
+            body: p([]),
+          ),
+        );
+
+        final response = await tester.request('/blog/post');
+        expect(_scriptSources(response), ['/main.client.dart.js']);
+        expect(stylesheetHref(response), '/styles.css');
+      });
+    });
   });
 
   group('without a client entrypoint', () {

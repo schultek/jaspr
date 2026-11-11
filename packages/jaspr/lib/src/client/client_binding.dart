@@ -57,7 +57,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
           }
         }
         if (stylesheetUrls != null) {
-          await _reloadStylesheets(stylesheetUrls);
+          await reloadStylesheets(stylesheetUrls);
         }
         return ServiceExtensionResponse.result('{}');
       });
@@ -124,16 +124,19 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     web.console.error('Error while building ${element.component.runtimeType}:\n$error\n\n$stackTrace'.toJS);
   }
 
-  Future<void> _reloadStylesheets(List<String> urls) async {
+  /// Reloads the linked stylesheets with the given [urls], which are relative to the root.
+  @visibleForTesting
+  Future<void> reloadStylesheets(List<String> urls) async {
     Future<void> performReload() async {
-      final futures = <Future<void>>[];
+      // The server links a stylesheet relative to the base URL if one is set, otherwise from the root.
+      final hasBaseUrl = web.document.querySelector('base[href]') != null;
+      final baseUri = Uri.parse(web.document.baseURI);
 
-      for (final url in urls) {
-        final link = web.document.querySelector('link[rel="stylesheet"][href^="$url"]');
-        if (link != null) {
-          futures.add(_reloadStylesheet(link, url));
-        }
-      }
+      final futures = [
+        for (final url in urls)
+          if (_findStylesheetLink(baseUri.resolve(hasBaseUrl ? url : '/$url')) case final link?)
+            _reloadStylesheet(link),
+      ];
 
       if (futures.isEmpty) return;
 
@@ -154,11 +157,33 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     }
   }
 
-  Future<void> _reloadStylesheet(web.Element oldLink, String url, {int retries = 5}) {
+  /// Returns the first link to the stylesheet at [url].
+  ///
+  /// The query is ignored, as it holds the version of a reloaded stylesheet.
+  web.Element? _findStylesheetLink(Uri url) {
+    final links = web.document.querySelectorAll('link[rel="stylesheet"][href]');
+    for (var i = 0; i < links.length; i++) {
+      final link = links.item(i) as web.HTMLLinkElement;
+      final linkedUrl = Uri.tryParse(link.href);
+      if (linkedUrl != null &&
+          linkedUrl.scheme == url.scheme &&
+          linkedUrl.authority == url.authority &&
+          linkedUrl.path == url.path) {
+        return link;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _reloadStylesheet(web.Element oldLink, {int retries = 5}) {
     final completer = Completer<void>();
+    // Keep the link as it was written and only set its version,
+    // so it resolves to the same stylesheet from any page.
+    final url = Uri.parse(oldLink.getAttribute('href')!);
+    final version = '${DateTime.now().millisecondsSinceEpoch}';
     final newLink = web.document.createElement('link') as web.HTMLLinkElement;
     newLink.rel = 'stylesheet';
-    newLink.href = '$url?v=${DateTime.now().millisecondsSinceEpoch}';
+    newLink.href = '${url.replace(queryParameters: {...url.queryParametersAll, 'v': version})}';
 
     StreamSubscription<void>? loadSub;
     StreamSubscription<void>? errorSub;
@@ -181,14 +206,14 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
       newLink.remove();
       if (retries > 0) {
         Future.delayed(const Duration(milliseconds: 500), () {
-          _reloadStylesheet(oldLink, url, retries: retries - 1).then((_) {
+          _reloadStylesheet(oldLink, retries: retries - 1).then((_) {
             if (!completer.isCompleted) {
               completer.complete();
             }
           });
         });
       } else {
-        print('Failed to reload stylesheet $url after 5 retries.');
+        print('Failed to reload stylesheet ${url.path} after 5 retries.');
         if (!completer.isCompleted) {
           completer.complete();
         }
@@ -212,6 +237,9 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   Future<void> _fetchAndReloadPage(String? path) async {
+    // The page can navigate to another path while this reload waits for earlier ones.
+    if (path != null && path != web.window.location.pathname) return;
+
     final response = await http.get(
       Uri.parse(web.window.location.href).replace(path: path),
       headers: {'X-Jaspr-Reload': 'true'},

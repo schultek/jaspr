@@ -5,7 +5,6 @@ import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/src/client/dom_render_object.dart' show RootDomRenderObject;
 import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart';
@@ -369,12 +368,7 @@ void main() {
                   '</div>'
               .toJS;
 
-      final rootElement = tester.binding.rootElement!;
-      final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
-      rootRenderObject.setRootNode(newBody);
-      rootElement.owner.performReload(rootElement);
-
-      window.document.body!.replaceWith(newBody);
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       final pElementReloaded = window.document.querySelector('body p')!;

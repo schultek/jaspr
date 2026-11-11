@@ -5,7 +5,6 @@ import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/src/client/dom_render_object.dart' show RootDomRenderObject;
 import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart' as web;
@@ -28,11 +27,7 @@ void main() {
       // Simulate client reload with an empty body as returned in client mode
       final oldButton = web.document.querySelector('button')!;
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
-      final root = tester.binding.rootElement!;
-      (root.renderObject as RootDomRenderObject).setRootNode(newBody);
-      root.owner.performReload(root);
-      web.document.body!.replaceWith(newBody);
-      tester.binding.completeInitialFrame();
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       // Check for duplicated DOM nodes after reload
@@ -56,11 +51,7 @@ void main() {
       expect(web.document.querySelectorAll('.main > div').length, equals(1));
 
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
-      final root = tester.binding.rootElement!;
-      (root.renderObject as RootDomRenderObject).setRootNode(newBody);
-      root.owner.performReload(root);
-      web.document.body!.replaceWith(newBody);
-      tester.binding.completeInitialFrame();
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       expect(web.document.querySelectorAll('.main > div').length, equals(1));
@@ -104,13 +95,7 @@ void main() {
                   '</div>'
               .toJS;
 
-      final rootElement = tester.binding.rootElement!;
-      final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
-      rootRenderObject.setRootNode(newBody);
-      rootElement.owner.performReload(rootElement);
-
-      web.document.body!.replaceWith(newBody);
-      tester.binding.completeInitialFrame();
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       final newP = web.document.querySelector('body p')!;
@@ -162,13 +147,7 @@ void main() {
                   '</div>'
               .toJS;
 
-      final rootElement = tester.binding.rootElement!;
-      final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
-      rootRenderObject.setRootNode(newBody);
-      rootElement.owner.performReload(rootElement);
-
-      web.document.body!.replaceWith(newBody);
-      tester.binding.completeInitialFrame();
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       expect(web.document.querySelectorAll('#container .nested-card').length, equals(1));
