@@ -59,13 +59,23 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   @override
   void attachRootComponent(Component app) async {
     // Client entrypoints can also run code without any @client components.
+    // Standalone fragments are the exception, see [ClientScriptAdapter].
     if (options.clientId case final clientId?) {
       addRenderAdapter(ClientScriptAdapter(clientId));
     }
     super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 
+  /// Whether the current render is of a standalone fragment, without a document structure.
+  ///
+  /// Read this in [RenderAdapter.prepare] or [RenderAdapter.apply].
+  /// Components can build before [render] sets this value.
+  @internal
+  bool get isStandalone => _isStandalone;
+  bool _isStandalone = false;
+
   Future<Uint8List> render({bool standalone = false}) async {
+    _isStandalone = standalone;
     final rootElement = this.rootElement;
     if (rootElement == null) return _emptyResponse;
 
@@ -137,6 +147,10 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     if (_adapters.contains(adapter)) return;
     _adapters.add(adapter..binding = this);
   }
+
+  /// Whether a render adapter of type [T] was added to this binding.
+  @internal
+  bool hasRenderAdapter<T extends RenderAdapter>() => _adapters.any((adapter) => adapter is T);
 
   ServerOptions get options => _options!;
   ServerOptions? _options;

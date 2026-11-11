@@ -1,6 +1,8 @@
 @TestOn('vm')
 library;
 
+import 'dart:convert';
+
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
@@ -151,6 +153,24 @@ void main() {
             ),
           },
         ),
+      );
+    });
+
+    test('omits the client script from a standalone fragment without client components', () async {
+      final response = await renderComponent(div(id: 'fragment', []), standalone: true);
+
+      expect(utf8.decode(response.body), '<div id="fragment"></div>\n');
+    });
+
+    test('includes the client script in a standalone fragment that renders a client component', () async {
+      final response = await renderComponent(App1(), standalone: true);
+
+      expect(
+        utf8.decode(response.body),
+        '<head><script src="/main.clients.dart.js" defer></script></head>\n'
+        '<!--@app1-->\n'
+        '<div data-app="1"></div>\n'
+        '<!--/@app1-->\n',
       );
     });
 
