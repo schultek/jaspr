@@ -20,12 +20,13 @@ typedef FileLoader = Future<String?> Function(String);
 
 /// Global component binding for the server.
 class ServerAppBinding extends AppBinding with ComponentsBinding {
-  ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile {
+  ServerAppBinding(this.request, {required FileLoader loadFile, this._requestedUri}) : _fileLoader = loadFile {
     addRenderAdapter(GlobalStylesAdapter());
   }
 
   final RequestLike request;
   final FileLoader _fileLoader;
+  final Uri? _requestedUri;
 
   @override
   bool get isClient => false;
@@ -61,7 +62,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     // Client entrypoints can also run code without any @client components.
     // Standalone fragments are the exception, see [ClientScriptAdapter].
     if (options.clientId case final clientId?) {
-      addRenderAdapter(ClientScriptAdapter(clientId));
+      addRenderAdapter(ClientScriptAdapter(clientId, _requestedUri ?? Uri.parse(currentUrl)));
     }
     super.attachRootComponent(ClientComponentRegistry(child: app));
   }

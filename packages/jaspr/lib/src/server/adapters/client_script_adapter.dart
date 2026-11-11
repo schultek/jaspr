@@ -9,9 +9,10 @@ import 'head_scope_adapter.dart';
 /// A standalone fragment only gets the script if it renders a @client component,
 /// as it is otherwise embedded in a page that the fragment knows nothing about.
 final class ClientScriptAdapter extends HeadScopeAdapter {
-  ClientScriptAdapter(this.clientId);
+  ClientScriptAdapter(this.clientId, this.documentUri);
 
   final String clientId;
+  final Uri documentUri;
 
   @override
   bool applyHead(MarkupRenderObject head) {
@@ -19,13 +20,30 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
       return false;
     }
 
-    var scriptSrc = clientId;
-
-    // Use absolute path if no base tag is present, otherwise relative to the base.
-    final base = head.children.findWhere<MarkupRenderElement>((c) => c.tag == 'base');
-    if (base == null) {
-      scriptSrc = '/$scriptSrc';
-    }
+    // Emit a relative src for documents with a base. Only the first base with an href sets the URL.
+    var hasBase = false;
+    final base = head.children.findWhere<MarkupRenderElement>((element) {
+      if (element.tag != 'base') return false;
+      hasBase = true;
+      return element.attributes?['href'] != null;
+    });
+    final scriptSrc = hasBase ? clientId : '/$clientId';
+    final baseHref = Uri.tryParse(base?.attributes?['href']?.trim() ?? '');
+    final baseUri = baseHref == null ? documentUri : documentUri.resolveUri(baseHref);
+    final entrypoint = baseUri.resolve(scriptSrc);
+    final existingScript = head.children.findWhere<MarkupRenderElement>((element) {
+      if (element.tag != 'script') return false;
+      final src = element.attributes?['src']?.trim();
+      if (src == null || src.isEmpty) return false;
+      final uri = Uri.tryParse(src);
+      if (uri == null) return false;
+      final target = baseUri.resolveUri(uri);
+      // Keep the author's attributes and any cache-busting query on the entrypoint.
+      return target.scheme == entrypoint.scheme &&
+          target.authority == entrypoint.authority &&
+          target.path == entrypoint.path;
+    });
+    if (existingScript != null) return false;
 
     head.children.insertBefore(
       head.createChildRenderElement('script')..update(null, null, null, {'src': scriptSrc, 'defer': ''}, null),

@@ -119,6 +119,45 @@ void main() {
       final scripts = response.document!.querySelectorAll('script');
       expect(scripts.map((element) => element.attributes['src']), ['/main.client.dart.js']);
     });
+
+    testServer('keeps an explicit client script and its attributes', (tester) async {
+      tester.pumpComponent(
+        Document(
+          base: null,
+          head: [
+            .element(tag: 'base', attributes: {'target': '_self'}),
+            .element(tag: 'base', attributes: {'href': '/app/'}),
+            script(src: 'http://test.server/app/./main.client.dart.js?v=1', async: true),
+          ],
+          body: p([]),
+        ),
+      );
+
+      final response = await tester.request('/other/page');
+      final scriptTag = response.document!.head!.querySelectorAll('script').single;
+      expect(scriptTag.attributes['src'], 'http://test.server/app/./main.client.dart.js?v=1');
+      expect(scriptTag.attributes.containsKey('async'), isTrue);
+    });
+
+    testServer('adds the entrypoint alongside scripts from a different directory or origin', (tester) async {
+      tester.pumpComponent(
+        Document(
+          base: null,
+          head: [
+            script(src: 'main.client.dart.js'),
+            script(src: '//cdn.example/main.client.dart.js'),
+          ],
+          body: p([]),
+        ),
+      );
+
+      final response = await tester.request('/app/page', handlerPath: '/app');
+      expect(response.document!.head!.querySelectorAll('script').map((element) => element.attributes['src']), [
+        'main.client.dart.js',
+        '//cdn.example/main.client.dart.js',
+        '/main.client.dart.js',
+      ]);
+    });
   });
 
   group('without a client entrypoint', () {
