@@ -13,7 +13,6 @@ abstract final class Jaspr {
   static void initializeApp({ClientOptions options = const ClientOptions()}) {
     _options = options;
     _clients = null;
-    if (kDebugMode) _staleClients = null;
     options.initialize?.call();
   }
 
@@ -23,35 +22,20 @@ abstract final class Jaspr {
   static ClientOptions? _options;
 
   /// The client registrations, cached so all anchors share loaders.
-  ///
-  /// After [invalidateClients] is called,
-  /// recreated loaders keep the loaded state of the loaders they replace.
   @internal
-  static Map<String, ClientLoader> get clients {
-    if (_clients case final clients?) return clients;
-
-    final clients = options.clients?.call() ?? const <String, ClientLoader>{};
-    if (kDebugMode) {
-      if (_staleClients case final staleClients?) {
-        for (final MapEntry(key: name, value: loader) in clients.entries) {
-          loader._keepLoadedFrom(staleClients[name]);
-        }
-        _staleClients = null;
-      }
-    }
-    return _clients = clients;
-  }
-
+  static Map<String, ClientLoader> get clients => _clients ??= options.clients?.call() ?? const {};
   static Map<String, ClientLoader>? _clients;
-  static Map<String, ClientLoader>? _staleClients;
 
-  /// Invalidates cached client registrations, such as after hot reload.
+  /// Recreates cached client registrations, such as after hot reload.
+  ///
+  /// Recreated loaders keep the loaded state of the loaders they replace.
   @internal
   static void invalidateClients() {
-    if (_clients case final clients?) {
-      if (kDebugMode) _staleClients = clients;
-      _clients = null;
-    }
+    final staleClients = _clients;
+    if (staleClients == null) return;
+
+    _clients = null;
+    clients.forEach((name, loader) => loader._keepLoadedFrom(staleClients[name]));
   }
 }
 

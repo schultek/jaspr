@@ -107,6 +107,10 @@ class AppWithMultipleServerComponents extends StatelessComponent {
   }
 }
 
+/// The `src` of each script in the document of [response].
+Iterable<String?> _scriptSources(DocumentResponse response) =>
+    response.document!.querySelectorAll('script').map((element) => element.attributes['src']);
+
 void main() {
   group('with a client entrypoint', () {
     setUp(() => Jaspr.initializeApp(options: ServerOptions(clientId: 'main.client.dart.js')));
@@ -116,8 +120,7 @@ void main() {
 
       final response = await tester.request('/');
 
-      final scripts = response.document!.querySelectorAll('script');
-      expect(scripts.map((element) => element.attributes['src']), ['/main.client.dart.js']);
+      expect(_scriptSources(response), ['/main.client.dart.js']);
     });
 
     testServer('keeps an explicit client script and its attributes', (tester) async {
@@ -152,7 +155,7 @@ void main() {
       );
 
       final response = await tester.request('/app/page', handlerPath: '/app');
-      expect(response.document!.head!.querySelectorAll('script').map((element) => element.attributes['src']), [
+      expect(_scriptSources(response), [
         'main.client.dart.js',
         '//cdn.example/main.client.dart.js',
         '/main.client.dart.js',
@@ -171,9 +174,7 @@ void main() {
       );
 
       final response = await tester.request('/blog/post');
-      expect(response.document!.head!.querySelectorAll('script').map((element) => element.attributes['src']), [
-        '/main.client.dart.js',
-      ]);
+      expect(_scriptSources(response), ['/main.client.dart.js']);
     });
   });
 
@@ -185,7 +186,7 @@ void main() {
 
       final response = await tester.request('/');
 
-      expect(response.document!.querySelectorAll('script'), isEmpty);
+      expect(_scriptSources(response), isEmpty);
     });
   });
 

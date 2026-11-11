@@ -199,22 +199,16 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     return completer.future;
   }
 
-  Future<void> _lastPageReload = Future.value();
+  Future<void>? _lastPageReload;
 
   /// Reloads the page with its current server-rendered content.
   ///
   /// Reloads run one at a time in the order they were requested,
   /// so an earlier reload that is still loading clients can't replace the page after a later one.
   Future<void> _reloadPage([String? path]) {
-    final previousReload = _lastPageReload;
-    return _lastPageReload = () async {
-      try {
-        await previousReload;
-      } catch (_) {
-        // The previous reload already reported its error to its caller.
-      }
-      await _fetchAndReloadPage(path);
-    }();
+    // A failed reload already reported its error to its own caller.
+    final previousReload = _lastPageReload?.catchError((_) {}) ?? Future.value();
+    return _lastPageReload = previousReload.then((_) => _fetchAndReloadPage(path));
   }
 
   Future<void> _fetchAndReloadPage(String? path) async {

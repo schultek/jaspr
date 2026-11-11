@@ -53,15 +53,12 @@ void main() {
 
   testClient('keeps parent state when a reload adds a deferred client in its server child', (tester) async {
     final marker = DomValidator.clientMarkerPrefix;
-    web.HTMLElement shellBody({required bool withChild}) {
-      final child = withChild ? '<!--${marker}added--><button id="added">Server</button><!--/${marker}added-->' : '';
-      final html =
-          '<!--${marker}shell data={"child":"s${marker}1"}-->'
-          '<div><button id="shell">Server</button>'
-          '<!--s${marker}1--><div>$child</div><!--/s${marker}1--></div>'
-          '<!--/${marker}shell-->';
-      return web.DOMParser().parseFromString('<body>$html</body>'.toJS, 'text/html').body!;
-    }
+    web.HTMLElement shellBody({required bool withChild}) => _parseBody(
+      '<!--${marker}shell data={"child":"s${marker}1"}-->'
+      '<div><button id="shell">Server</button>'
+      '<!--s${marker}1--><div>${withChild ? _client('added') : ''}</div><!--/s${marker}1--></div>'
+      '<!--/${marker}shell-->',
+    );
 
     Future<void> loadAdded() => Future<void>.delayed(Duration.zero);
     var hasAdded = false;
@@ -184,14 +181,17 @@ void main() {
   }
 }
 
-web.HTMLElement _body({required bool hasExistingClient, required bool hasAddedClient}) {
+web.HTMLElement _body({required bool hasExistingClient, required bool hasAddedClient}) =>
+    _parseBody([if (hasExistingClient) _client('existing'), if (hasAddedClient) _client('added')].join());
+
+/// The server-rendered markup of a client component that renders a button with the same [id].
+String _client(String id) {
   final marker = DomValidator.clientMarkerPrefix;
-  final html = [
-    for (final id in [if (hasExistingClient) 'existing', if (hasAddedClient) 'added'])
-      '<!--$marker$id--><button id="$id">Server</button><!--/$marker$id-->',
-  ].join();
-  return web.DOMParser().parseFromString('<body>$html</body>'.toJS, 'text/html').body!;
+  return '<!--$marker$id--><button id="$id">Server</button><!--/$marker$id-->';
 }
+
+web.HTMLElement _parseBody(String html) =>
+    web.DOMParser().parseFromString('<body>$html</body>'.toJS, 'text/html').body!;
 
 Future<void> _failToLoad() async => throw StateError('Failed to load the client library.');
 
