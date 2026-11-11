@@ -16,16 +16,18 @@ void main() {
     const stylesheetName = 'stylesheet_reload_test.css';
     final stylesheetUrl = '${directory.substring(1)}$stylesheetName';
 
+    // Removes the linked stylesheets, including the ones reloads added.
+    tearDown(() {
+      for (final link in web.document.querySelectorAll('link[rel="stylesheet"]').toIterable()) {
+        (link as web.Element).remove();
+      }
+    });
+
     /// Links the stylesheet at [href], and waits for it to load if it [exists].
     Future<web.Element> linkStylesheet(String href, {bool exists = true}) async {
       final link = web.document.createElement('link') as web.HTMLLinkElement
         ..rel = 'stylesheet'
         ..href = href;
-      addTearDown(() {
-        for (final link in web.document.querySelectorAll('link[rel="stylesheet"]').toIterable()) {
-          (link as web.Element).remove();
-        }
-      });
 
       final loaded = web.EventStreamProvider<web.Event>('load').forElement(link).first;
       web.document.head!.append(link);

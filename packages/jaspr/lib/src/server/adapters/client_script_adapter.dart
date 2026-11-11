@@ -15,14 +15,6 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
   final String clientId;
   final Uri documentUri;
 
-  late MarkupRenderObject _root;
-
-  @override
-  void apply(MarkupRenderObject root) {
-    _root = root;
-    super.apply(root);
-  }
-
   @override
   bool applyHead(MarkupRenderObject head) {
     if (binding.isStandalone && !binding.hasRenderAdapter<ClientComponentAdapter>()) {
@@ -37,7 +29,11 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
     final entrypoint = baseUri.resolve(scriptSrc);
     // Keep a script for the entrypoint that is already anywhere in the document,
     // with the author's attributes and any cache-busting query.
-    if (_loadsScript(_root, entrypoint, baseUri)) return false;
+    var root = head;
+    for (var parent = head.parent; parent != null; parent = parent.parent) {
+      root = parent;
+    }
+    if (_loadsScript(root, entrypoint, baseUri)) return false;
 
     head.children.insertBefore(
       head.createChildRenderElement('script')..update(null, null, null, {'src': scriptSrc, 'defer': ''}, null),
@@ -64,7 +60,10 @@ bool _loadsScript(MarkupRenderObject object, Uri url, Uri baseUri) {
     }
     if (tag == 'noscript' || (tag == 'template' && attributes?['shadowrootmode'] == null)) return false;
   }
-  return object.children.any((child) => _loadsScript(child, url, baseUri));
+  for (final child in object.children) {
+    if (_loadsScript(child, url, baseUri)) return true;
+  }
+  return false;
 }
 
 final class NoClientScriptAdapter extends HeadScopeAdapter {

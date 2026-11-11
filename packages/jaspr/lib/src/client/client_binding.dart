@@ -16,6 +16,7 @@ import '../framework/framework.dart';
 import 'component_anchors.dart';
 import 'dom_render_object.dart';
 import 'options.dart';
+import 'utils.dart';
 
 /// Global component binding for the client.
 class ClientAppBinding extends AppBinding with ComponentsBinding {
@@ -164,8 +165,8 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     final links = web.document.querySelectorAll('link[rel="stylesheet"][href]');
 
     for (final stylesheetUrl in [if (!hasBaseUrl) baseUri.resolve('/$url'), baseUri.resolve(url)]) {
-      for (var i = 0; i < links.length; i++) {
-        final link = links.item(i) as web.HTMLLinkElement;
+      for (final node in links.toIterable()) {
+        final link = node as web.HTMLLinkElement;
         final linkedUrl = Uri.tryParse(link.href);
         if (linkedUrl != null &&
             linkedUrl.scheme == stylesheetUrl.scheme &&
@@ -227,7 +228,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     return completer.future;
   }
 
-  Future<void>? _lastPageReload;
+  Future<void> _lastPageReload = Future.value();
 
   /// Reloads the page with its current server-rendered content.
   ///
@@ -235,8 +236,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   /// so an earlier reload that is still loading clients can't replace the page after a later one.
   Future<void> _reloadPage([String? path]) {
     // A failed reload already reported its error to its own caller.
-    final previousReload = _lastPageReload?.catchError((_) {}) ?? Future.value();
-    return _lastPageReload = previousReload.then((_) => _fetchAndReloadPage(path));
+    return _lastPageReload = _lastPageReload.catchError((_) {}).then((_) => _fetchAndReloadPage(path));
   }
 
   /// The path and query of the current page, which identify its server-rendered content.
@@ -247,10 +247,7 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     if (path != null && path != web.window.location.pathname) return;
 
     final pageLocation = _pageLocation;
-    final response = await http.get(
-      Uri.parse(web.window.location.href).replace(path: path),
-      headers: {'X-Jaspr-Reload': 'true'},
-    );
+    final response = await http.get(Uri.parse(web.window.location.href), headers: {'X-Jaspr-Reload': 'true'});
     // The page can also navigate while its content is fetched, which then belongs to another page.
     if (_pageLocation != pageLocation) return;
     if (response.statusCode != 200) {

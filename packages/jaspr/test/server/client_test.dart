@@ -107,12 +107,9 @@ class AppWithMultipleServerComponents extends StatelessComponent {
   }
 }
 
-/// The `src` of each script in the document of [response].
-Iterable<String?> _scriptSources(DocumentResponse response) =>
-    response.document!.querySelectorAll('script').map((element) => element.attributes['src']);
-
-Iterable<String?> _headScriptSources(DocumentResponse response) =>
-    response.document!.head!.querySelectorAll('script').map((element) => element.attributes['src']);
+/// The `src` of each script in the document of [response] that matches [selector].
+Iterable<String?> _scriptSources(DocumentResponse response, [String selector = 'script']) =>
+    response.document!.querySelectorAll(selector).map((element) => element.attributes['src']);
 
 void main() {
   group('with a client entrypoint', () {
@@ -226,7 +223,7 @@ void main() {
         // The browser never runs that script, so the client would not start.
         // The added script is relative to the base URL that the document sets by default.
         final response = await tester.request('/blog/post');
-        expect(_headScriptSources(response), ['main.client.dart.js']);
+        expect(_scriptSources(response, 'head script'), ['main.client.dart.js']);
       });
     }
 
@@ -245,7 +242,7 @@ void main() {
 
       // The browser attaches the content of that template to the page, where its script runs.
       final response = await tester.request('/blog/post');
-      expect(_headScriptSources(response), isEmpty);
+      expect(_scriptSources(response, 'head script'), isEmpty);
     });
 
     group('and a stylesheet', () {

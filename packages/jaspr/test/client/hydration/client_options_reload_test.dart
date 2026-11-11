@@ -63,17 +63,16 @@ void main() {
 
     Future<void> loadAdded() => Future<void>.delayed(Duration.zero);
     var hasAdded = false;
-    web.document.body!.replaceWith(shellBody(withChild: false));
-    Jaspr.initializeApp(
-      options: ClientOptions(
+    await _start(
+      tester,
+      shellBody(withChild: false),
+      ClientOptions(
         clients: () => {
           'shell': ClientLoader((params) => _Shell(child: params.mount(params.get<String>('child')))),
           if (hasAdded) 'added': ClientLoader((_) => const _Counter('added', 'Added'), loader: loadAdded),
         },
       ),
     );
-    tester.pumpComponent(const ClientApp());
-    await pumpEventQueue();
     await _click('shell', 'Shell: 1');
 
     hasAdded = true;
@@ -86,17 +85,16 @@ void main() {
 
   testClient('still reloads when a new client fails to load', (tester) async {
     var hasAdded = false;
-    web.document.body!.replaceWith(_body(hasExistingClient: true, hasAddedClient: false));
-    Jaspr.initializeApp(
-      options: ClientOptions(
+    await _start(
+      tester,
+      _body(hasExistingClient: true, hasAddedClient: false),
+      ClientOptions(
         clients: () => {
           'existing': ClientLoader((_) => const _Counter('existing', 'Existing')),
           if (hasAdded) 'added': ClientLoader((_) => const _Counter('added', 'Added'), loader: _failToLoad),
         },
       ),
     );
-    tester.pumpComponent(const ClientApp());
-    await pumpEventQueue();
     await _click('existing', 'Existing: 1');
 
     hasAdded = true;
@@ -111,16 +109,15 @@ void main() {
 
   testClient('keeps the page when it navigates while a new client loads', (tester) async {
     final loading = Completer<void>();
-    web.document.body!.replaceWith(_parseBody('<p id="page">Current</p>'));
-    Jaspr.initializeApp(
-      options: ClientOptions(
+    await _start(
+      tester,
+      _parseBody('<p id="page">Current</p>'),
+      ClientOptions(
         clients: () => {
           'added': ClientLoader((_) => const _Counter('added', 'Added'), loader: () => loading.future),
         },
       ),
     );
-    tester.pumpComponent(const ClientApp());
-    await pumpEventQueue();
 
     final reload = tester.binding.reloadBody(_parseBody('<p id="page">Reloaded</p>${_client('added')}'));
     await pumpEventQueue();
@@ -170,11 +167,8 @@ void main() {
         },
       );
 
-      web.document.body!.replaceWith(_body(hasExistingClient: hasExistingClient, hasAddedClient: false));
-      Jaspr.initializeApp(options: options);
+      await _start(tester, _body(hasExistingClient: hasExistingClient, hasAddedClient: false), options);
       expect(Jaspr.clients.keys, hasExistingClient ? ['existing', 'unused'] : isEmpty);
-      tester.pumpComponent(const ClientApp());
-      await pumpEventQueue();
 
       if (hasExistingClient) {
         await _click('existing', 'Version 0: 1');
@@ -222,6 +216,14 @@ web.HTMLElement _parseBody(String html) =>
     web.DOMParser().parseFromString('<body>$html</body>'.toJS, 'text/html').body!;
 
 Future<void> _failToLoad() async => throw StateError('Failed to load the client library.');
+
+/// Starts the client app on [body] with [options].
+Future<void> _start(ClientTester tester, web.HTMLElement body, ClientOptions options) async {
+  web.document.body!.replaceWith(body);
+  Jaspr.initializeApp(options: options);
+  tester.pumpComponent(const ClientApp());
+  await pumpEventQueue();
+}
 
 Future<void> _reload(ClientTester tester, web.HTMLElement body) async {
   await tester.binding.reloadBody(body);
