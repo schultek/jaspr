@@ -13,7 +13,7 @@ abstract final class Jaspr {
   static void initializeApp({ClientOptions options = const ClientOptions()}) {
     _options = options;
     _clients = null;
-    _staleClients = null;
+    if (kDebugMode) _staleClients = null;
     options.initialize?.call();
   }
 
@@ -31,11 +31,13 @@ abstract final class Jaspr {
     if (_clients case final clients?) return clients;
 
     final clients = options.clients?.call() ?? const <String, ClientLoader>{};
-    if (_staleClients case final staleClients?) {
-      for (final MapEntry(key: name, value: loader) in clients.entries) {
-        loader._keepLoadedFrom(staleClients[name]);
+    if (kDebugMode) {
+      if (_staleClients case final staleClients?) {
+        for (final MapEntry(key: name, value: loader) in clients.entries) {
+          loader._keepLoadedFrom(staleClients[name]);
+        }
+        _staleClients = null;
       }
-      _staleClients = null;
     }
     return _clients = clients;
   }
@@ -47,7 +49,7 @@ abstract final class Jaspr {
   @internal
   static void invalidateClients() {
     if (_clients case final clients?) {
-      _staleClients = clients;
+      if (kDebugMode) _staleClients = clients;
       _clients = null;
     }
   }
