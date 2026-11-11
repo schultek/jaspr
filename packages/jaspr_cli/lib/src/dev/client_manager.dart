@@ -18,13 +18,39 @@ class ClientManager {
   final StreamController<Map<String, Object?>> _clientEvents = StreamController.broadcast();
 
   Stream<Map<String, Object?>> get clientEvents => _clientEvents.stream;
-  Iterable<ClientConnection> get connections => _clientConnections.values;
 
   String? get clientDevToolsUri => _clientConnections.values.firstOrNull?.devToolsUri;
 
   ClientConnection? getConnection(String? appId) {
     if (appId == null) return null;
     return _clientConnections[appId];
+  }
+
+  /// Runs [action] sequentially for each currently connected client.
+  ///
+  /// Clients that connect while this is running aren't included,
+  /// and clients that are disposed before their turn are skipped.
+  ///
+  /// If [action] throws for a client, the error is logged as a warning
+  /// prefixed with [actionName] and the remaining clients are still updated,
+  /// so one disconnecting browser can't interrupt the others or later builds.
+  Future<void> forEachConnection(String actionName, Future<void> Function(ClientConnection) action) async {
+    // Connections can be added or removed while an action is awaiting an RPC.
+    final connections = _clientConnections.values.toList(growable: false);
+    for (final connection in connections) {
+      if (connection._isDisposed) continue;
+
+      try {
+        await action(connection);
+      } catch (error, stackTrace) {
+        workflow.logger.write(
+          '$actionName failed for client ${connection.appConnection.request.appId}: $error',
+          tag: .client,
+          level: .warning,
+        );
+        workflow.logger.write(stackTrace.toString(), tag: .client, level: .verbose);
+      }
+    }
   }
 
   StreamSubscription<AppConnection>? _appsSubscription;
@@ -179,7 +205,8 @@ class ClientConnection {
     return response;
   }
 
-  Future<void> performHotReload() async {
+  /// Performs a hot reload and returns whether it succeeded.
+  Future<bool> performHotReload() async {
     final vmService = this.vmService;
     if (vmService == null) {
       manager.workflow.logger.write(
@@ -187,7 +214,7 @@ class ClientConnection {
         tag: Tag.client,
         level: Level.warning,
       );
-      return;
+      return false;
     }
 
     final isolateId = (await vmService.getVM()).isolates?.firstOrNull?.id;
@@ -197,23 +224,22 @@ class ClientConnection {
         tag: Tag.client,
         level: Level.warning,
       );
-      return;
+      return false;
     }
 
     vm.ReloadReport? response;
     for (var i = 0; i < 5; i++) {
       response = await vmService.reloadSources(isolateId);
       if (response.success ?? false) {
-        break;
+        return true;
       }
     }
-    if (!(response?.success ?? false)) {
-      manager.workflow.logger.write(
-        'Hot reload failed after 5 attempts for unknown reason.',
-        tag: Tag.client,
-        level: Level.warning,
-      );
-    }
+    manager.workflow.logger.write(
+      'Hot reload failed after 5 attempts for unknown reason.',
+      tag: Tag.client,
+      level: Level.warning,
+    );
+    return false;
   }
 
   Future<vm.Response?> reloadStylesheets(List<String> urls) async {
