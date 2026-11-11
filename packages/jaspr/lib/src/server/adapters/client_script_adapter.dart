@@ -20,15 +20,13 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
       return false;
     }
 
-    // Emit a relative src for documents with a base. Only the first base with an href sets the URL.
-    var hasBase = false;
-    final base = head.children.findWhere<MarkupRenderElement>((element) {
-      if (element.tag != 'base') return false;
-      hasBase = true;
-      return element.attributes?['href'] != null;
-    });
-    final scriptSrc = hasBase ? clientId : '/$clientId';
-    final baseHref = Uri.tryParse(base?.attributes?['href']?.trim() ?? '');
+    // Only the first base with an href sets the document's base URL.
+    final base = head.children.findWhere<MarkupRenderElement>(
+      (element) => element.tag == 'base' && element.attributes?['href'] != null,
+    );
+    // Emit a src relative to the base URL if one is set, otherwise from the root.
+    final scriptSrc = base != null ? clientId : '/$clientId';
+    final baseHref = base == null ? null : Uri.tryParse(base.attributes!['href']!.trim());
     final baseUri = baseHref == null ? documentUri : documentUri.resolveUri(baseHref);
     final entrypoint = baseUri.resolve(scriptSrc);
     final existingScript = head.children.findWhere<MarkupRenderElement>((element) {

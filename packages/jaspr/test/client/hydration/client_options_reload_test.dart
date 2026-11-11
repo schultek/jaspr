@@ -86,6 +86,31 @@ void main() {
     await _click('added', 'Added: 1');
   });
 
+  testClient('still reloads when a new client fails to load', (tester) async {
+    var hasAdded = false;
+    web.document.body!.replaceWith(_body(hasExistingClient: true, hasAddedClient: false));
+    Jaspr.initializeApp(
+      options: ClientOptions(
+        clients: () => {
+          'existing': ClientLoader((_) => const _Counter('existing', 'Existing')),
+          if (hasAdded) 'added': ClientLoader((_) => const _Counter('added', 'Added'), loader: _failToLoad),
+        },
+      ),
+    );
+    tester.pumpComponent(const ClientApp());
+    await pumpEventQueue();
+    await _click('existing', 'Existing: 1');
+
+    hasAdded = true;
+    Jaspr.invalidateClients();
+    await _reload(tester, _body(hasExistingClient: true, hasAddedClient: true));
+
+    // The new body is applied and the existing client keeps its state,
+    // while the client that failed to load keeps its server-rendered content.
+    expect(_button('added').textContent, 'Server');
+    await _click('existing', 'Existing: 2');
+  });
+
   for (final hasExistingClient in [false, true]) {
     testClient('reloads new client registrations with existing client: $hasExistingClient', (tester) async {
       var version = 0;
@@ -167,6 +192,8 @@ web.HTMLElement _body({required bool hasExistingClient, required bool hasAddedCl
   ].join();
   return web.DOMParser().parseFromString('<body>$html</body>'.toJS, 'text/html').body!;
 }
+
+Future<void> _failToLoad() async => throw StateError('Failed to load the client library.');
 
 Future<void> _reload(ClientTester tester, web.HTMLElement body) async {
   await tester.binding.reloadBody(body);

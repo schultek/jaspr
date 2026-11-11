@@ -8,6 +8,10 @@
 - Fixed key shortcuts in `jaspr serve` not working on Windows.
 - Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
 - Fixed hot reload when adding new `@client` components, including the first client on a page.
+  - Pages now include the client script whenever a client entrypoint exists, even without `@client` components.
+    Standalone fragments still only include it when they render a `@client` component.
+  - **Breaking:** `ClientOptions.clients` is now a function that returns the client registrations.
+    Regenerate `*.client.options.dart` files with `jaspr_builder` if they don't update automatically.
 
 ## 0.24.0-beta.0
 

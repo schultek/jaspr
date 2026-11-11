@@ -199,7 +199,25 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     return completer.future;
   }
 
-  Future<void> _reloadPage([String? path]) async {
+  Future<void> _lastPageReload = Future.value();
+
+  /// Reloads the page with its current server-rendered content.
+  ///
+  /// Reloads run one at a time in the order they were requested,
+  /// so an earlier reload that is still loading clients can't replace the page after a later one.
+  Future<void> _reloadPage([String? path]) {
+    final previousReload = _lastPageReload;
+    return _lastPageReload = () async {
+      try {
+        await previousReload;
+      } catch (_) {
+        // The previous reload already reported its error to its caller.
+      }
+      await _fetchAndReloadPage(path);
+    }();
+  }
+
+  Future<void> _fetchAndReloadPage(String? path) async {
     final response = await http.get(
       Uri.parse(web.window.location.href).replace(path: path),
       headers: {'X-Jaspr-Reload': 'true'},
@@ -240,10 +258,14 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     // so an existing client that gained a deferred descendant would
     // otherwise remount and lose its state.
     // Loading errors are reported when the client app loads its slots.
-    await [
-      for (final anchor in extractAnchors(nodes: [newNode]))
-        if (!anchor.isResolved) anchor.resolve().catchError((_) {}),
-    ].wait;
+    // Outside debug mode, extracting anchors strips their data from the markers,
+    // which the client app still needs to read when it extracts them again.
+    if (kDebugMode) {
+      await [
+        for (final anchor in extractAnchors(nodes: [newNode]))
+          if (!anchor.isResolved) anchor.resolve().catchError((_) {}),
+      ].wait;
+    }
 
     final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;
     rootRenderObject.setRootNode(newNode);

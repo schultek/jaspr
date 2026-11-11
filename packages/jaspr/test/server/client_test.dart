@@ -158,6 +158,23 @@ void main() {
         '/main.client.dart.js',
       ]);
     });
+
+    testServer('adds an absolute entrypoint when no base sets a URL', (tester) async {
+      tester.pumpComponent(
+        Document(
+          base: null,
+          head: [
+            .element(tag: 'base', attributes: {'target': '_blank'}),
+          ],
+          body: p([]),
+        ),
+      );
+
+      final response = await tester.request('/blog/post');
+      expect(response.document!.head!.querySelectorAll('script').map((element) => element.attributes['src']), [
+        '/main.client.dart.js',
+      ]);
+    });
   });
 
   group('without a client entrypoint', () {
