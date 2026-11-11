@@ -128,19 +128,14 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   @visibleForTesting
   Future<void> reloadStylesheets(List<String> urls) async {
     Future<void> performReload() async {
-      // The server links a stylesheet relative to the base URL if one is set, otherwise from the root.
-      final hasBaseUrl = web.document.querySelector('base[href]') != null;
-      final baseUri = Uri.parse(web.document.baseURI);
-
       final futures = [
         for (final url in urls)
-          if (_findStylesheetLink(baseUri.resolve(hasBaseUrl ? url : '/$url')) case final link?)
-            _reloadStylesheet(link),
+          if (_findStylesheetLink(url) case final link?) _reloadStylesheet(link),
       ];
 
       if (futures.isEmpty) return;
 
-      await Future.wait(futures);
+      await futures.wait;
 
       if (web.document.has('fonts')) {
         try {
@@ -157,19 +152,27 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     }
   }
 
-  /// Returns the first link to the stylesheet at [url].
+  /// Returns the first link to the stylesheet with the given [url], which is relative to the root.
   ///
+  /// The server links a stylesheet relative to the base URL if one is set, otherwise from the root.
+  /// A stylesheet linked by hand, such as in an HTML file, can also be relative to the page.
   /// The query is ignored, as it holds the version of a reloaded stylesheet.
-  web.Element? _findStylesheetLink(Uri url) {
+  web.Element? _findStylesheetLink(String url) {
+    final hasBaseUrl = web.document.querySelector('base[href]') != null;
+    // Without a base URL, this is the URL of the page.
+    final baseUri = Uri.parse(web.document.baseURI);
     final links = web.document.querySelectorAll('link[rel="stylesheet"][href]');
-    for (var i = 0; i < links.length; i++) {
-      final link = links.item(i) as web.HTMLLinkElement;
-      final linkedUrl = Uri.tryParse(link.href);
-      if (linkedUrl != null &&
-          linkedUrl.scheme == url.scheme &&
-          linkedUrl.authority == url.authority &&
-          linkedUrl.path == url.path) {
-        return link;
+
+    for (final stylesheetUrl in [if (!hasBaseUrl) baseUri.resolve('/$url'), baseUri.resolve(url)]) {
+      for (var i = 0; i < links.length; i++) {
+        final link = links.item(i) as web.HTMLLinkElement;
+        final linkedUrl = Uri.tryParse(link.href);
+        if (linkedUrl != null &&
+            linkedUrl.scheme == stylesheetUrl.scheme &&
+            linkedUrl.authority == stylesheetUrl.authority &&
+            linkedUrl.path == stylesheetUrl.path) {
+          return link;
+        }
       }
     }
     return null;
@@ -236,14 +239,20 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     return _lastPageReload = previousReload.then((_) => _fetchAndReloadPage(path));
   }
 
+  /// The path and query of the current page, which identify its server-rendered content.
+  static String get _pageLocation => web.window.location.pathname + web.window.location.search;
+
   Future<void> _fetchAndReloadPage(String? path) async {
     // The page can navigate to another path while this reload waits for earlier ones.
     if (path != null && path != web.window.location.pathname) return;
 
+    final pageLocation = _pageLocation;
     final response = await http.get(
       Uri.parse(web.window.location.href).replace(path: path),
       headers: {'X-Jaspr-Reload': 'true'},
     );
+    // The page can also navigate while its content is fetched, which then belongs to another page.
+    if (_pageLocation != pageLocation) return;
     if (response.statusCode != 200) {
       web.console.error('[Jaspr] Failed to reload page: ${response.statusCode} ${response.reasonPhrase}'.toJS);
       return;
@@ -271,6 +280,9 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
   }
 
   /// Replaces the page with the server-rendered [body] and reloads the app against it.
+  ///
+  /// Does nothing if the page navigates while the new client components in [body] load,
+  /// as [body] is the content of the page it navigated away from.
   @visibleForTesting
   Future<void> reloadBody(web.HTMLElement body) async {
     final newNode = _attachTarget == 'body' ? body : body.querySelector(_attachTarget)!;
@@ -283,10 +295,12 @@ class ClientAppBinding extends AppBinding with ComponentsBinding {
     // Outside debug mode, extracting anchors strips their data from the markers,
     // which the client app still needs to read when it extracts them again.
     if (kDebugMode) {
+      final pageLocation = _pageLocation;
       await [
         for (final anchor in extractAnchors(nodes: [newNode]))
           if (!anchor.isResolved) anchor.resolve().catchError((_) {}),
       ].wait;
+      if (_pageLocation != pageLocation) return;
     }
 
     final rootRenderObject = rootElement!.renderObject as RootDomRenderObject;

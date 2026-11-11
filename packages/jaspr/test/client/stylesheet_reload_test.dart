@@ -84,6 +84,14 @@ void main() {
       expect(linkedHrefs(), [reloaded(stylesheetUrl)]);
     });
 
+    test('reloads a stylesheet linked relative to the page', () async {
+      // As linked in an HTML file of an app that is served from the directory of this test.
+      await linkStylesheet(stylesheetName);
+
+      await reloadStylesheet(stylesheetName);
+      expect(linkedHrefs(), [reloaded(stylesheetName)]);
+    });
+
     test('keeps the other query parameters of a reloaded stylesheet', () async {
       await linkStylesheet('/$stylesheetUrl?theme=dark');
       final withVersion = matches('^${RegExp.escape('/$stylesheetUrl?theme=dark')}&v=\\d+\$');

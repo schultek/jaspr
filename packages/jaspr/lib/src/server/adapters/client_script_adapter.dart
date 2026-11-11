@@ -15,6 +15,14 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
   final String clientId;
   final Uri documentUri;
 
+  late MarkupRenderObject _root;
+
+  @override
+  void apply(MarkupRenderObject root) {
+    _root = root;
+    super.apply(root);
+  }
+
   @override
   bool applyHead(MarkupRenderObject head) {
     if (binding.isStandalone && !binding.hasRenderAdapter<ClientComponentAdapter>()) {
@@ -27,19 +35,9 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
     final baseHref = base == null ? null : Uri.tryParse(base.attributes!['href']!.trim());
     final baseUri = baseHref == null ? documentUri : documentUri.resolveUri(baseHref);
     final entrypoint = baseUri.resolve(scriptSrc);
-    final existingScript = head.children.findWhere<MarkupRenderElement>((element) {
-      if (element.tag != 'script') return false;
-      final src = element.attributes?['src']?.trim();
-      if (src == null || src.isEmpty) return false;
-      final uri = Uri.tryParse(src);
-      if (uri == null) return false;
-      final target = baseUri.resolveUri(uri);
-      // Keep the author's attributes and any cache-busting query on the entrypoint.
-      return target.scheme == entrypoint.scheme &&
-          target.authority == entrypoint.authority &&
-          target.path == entrypoint.path;
-    });
-    if (existingScript != null) return false;
+    // Keep a script for the entrypoint that is already anywhere in the document,
+    // with the author's attributes and any cache-busting query.
+    if (_loadsScript(_root, entrypoint, baseUri)) return false;
 
     head.children.insertBefore(
       head.createChildRenderElement('script')..update(null, null, null, {'src': scriptSrc, 'defer': ''}, null),
@@ -47,6 +45,26 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
 
     return true;
   }
+}
+
+/// Whether [object] or one of its descendants is a script that loads [url].
+///
+/// A relative `src` is resolved against [baseUri], and its query is ignored.
+/// Scripts that the browser never runs are not counted, which are those in a `<noscript>`
+/// or in a `<template>` that doesn't declare a shadow root.
+bool _loadsScript(MarkupRenderObject object, Uri url, Uri baseUri) {
+  if (object is MarkupRenderText) return false;
+  if (object case MarkupRenderElement(:final tag, :final attributes)) {
+    if (tag == 'script') {
+      final src = attributes?['src']?.trim();
+      final uri = src == null || src.isEmpty ? null : Uri.tryParse(src);
+      if (uri == null) return false;
+      final target = baseUri.resolveUri(uri);
+      return target.scheme == url.scheme && target.authority == url.authority && target.path == url.path;
+    }
+    if (tag == 'noscript' || (tag == 'template' && attributes?['shadowrootmode'] == null)) return false;
+  }
+  return object.children.any((child) => _loadsScript(child, url, baseUri));
 }
 
 final class NoClientScriptAdapter extends HeadScopeAdapter {

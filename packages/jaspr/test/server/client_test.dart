@@ -111,6 +111,9 @@ class AppWithMultipleServerComponents extends StatelessComponent {
 Iterable<String?> _scriptSources(DocumentResponse response) =>
     response.document!.querySelectorAll('script').map((element) => element.attributes['src']);
 
+Iterable<String?> _headScriptSources(DocumentResponse response) =>
+    response.document!.head!.querySelectorAll('script').map((element) => element.attributes['src']);
+
 void main() {
   group('with a client entrypoint', () {
     setUp(() => Jaspr.initializeApp(options: ServerOptions(clientId: 'main.client.dart.js')));
@@ -189,6 +192,60 @@ void main() {
 
       final response = await tester.request('/blog/post');
       expect(_scriptSources(response), ['/main.client.dart.js']);
+    });
+
+    testServer('keeps an explicit client script in the body', (tester) async {
+      tester.pumpComponent(
+        Document(
+          body: div([
+            p([]),
+            script(src: '/main.client.dart.js', defer: true),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/blog/post');
+      expect(_scriptSources(response), ['/main.client.dart.js']);
+    });
+
+    for (final tag in ['template', 'noscript']) {
+      testServer('adds the entrypoint when its only script is in a $tag', (tester) async {
+        tester.pumpComponent(
+          Document(
+            body: div([
+              .element(
+                tag: tag,
+                children: [
+                  div([script(src: '/main.client.dart.js', defer: true)]),
+                ],
+              ),
+            ]),
+          ),
+        );
+
+        // The browser never runs that script, so the client would not start.
+        // The added script is relative to the base URL that the document sets by default.
+        final response = await tester.request('/blog/post');
+        expect(_headScriptSources(response), ['main.client.dart.js']);
+      });
+    }
+
+    testServer('keeps an explicit client script in a declarative shadow root', (tester) async {
+      tester.pumpComponent(
+        Document(
+          body: div([
+            .element(
+              tag: 'template',
+              attributes: {'shadowrootmode': 'open'},
+              children: [script(src: '/main.client.dart.js', defer: true)],
+            ),
+          ]),
+        ),
+      );
+
+      // The browser attaches the content of that template to the page, where its script runs.
+      final response = await tester.request('/blog/post');
+      expect(_headScriptSources(response), isEmpty);
     });
 
     group('and a stylesheet', () {

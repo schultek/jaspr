@@ -1,6 +1,7 @@
 @TestOn('browser')
 library;
 
+import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
@@ -106,6 +107,33 @@ void main() {
     // while the client that failed to load keeps its server-rendered content.
     expect(_button('added').textContent, 'Server');
     await _click('existing', 'Existing: 2');
+  });
+
+  testClient('keeps the page when it navigates while a new client loads', (tester) async {
+    final loading = Completer<void>();
+    web.document.body!.replaceWith(_parseBody('<p id="page">Current</p>'));
+    Jaspr.initializeApp(
+      options: ClientOptions(
+        clients: () => {
+          'added': ClientLoader((_) => const _Counter('added', 'Added'), loader: () => loading.future),
+        },
+      ),
+    );
+    tester.pumpComponent(const ClientApp());
+    await pumpEventQueue();
+
+    final reload = tester.binding.reloadBody(_parseBody('<p id="page">Reloaded</p>${_client('added')}'));
+    await pumpEventQueue();
+
+    // The body being reloaded is the content of the page that is navigated away from.
+    web.window.history.pushState(null, '', '/other');
+    addTearDown(() => web.window.history.replaceState(null, '', '/'));
+    loading.complete();
+    await reload;
+    await pumpEventQueue();
+
+    expect(web.document.getElementById('page')!.textContent, 'Current');
+    expect(web.document.getElementById('added'), isNull);
   });
 
   for (final hasExistingClient in [false, true]) {
