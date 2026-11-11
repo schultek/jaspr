@@ -157,6 +157,72 @@ void main() {
       });
     });
 
+    test('handles keyboard shortcuts with Windows terminal mode constraints', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.stdin.windowsTerminalModes = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        expect(io.stdin.echoMode, isFalse);
+        expect(io.stdin.lineMode, isFalse);
+
+        // Press 'r' for reload
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Reloading...',
+            '[CLIENT] Reload complete.',
+          ]),
+        );
+
+        // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+
+        expect(io.stdin.lineMode, isTrue);
+        expect(io.stdin.echoMode, isTrue);
+      });
+    });
+
     test('queues reload and restart shortcuts when build is in progress', () async {
       await io.runZoned(() async {
         io.stdin.hasTerminalOverride = true;
@@ -412,6 +478,103 @@ void main() {
         );
 
         // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('keeps changed modules for hot reload when the next build starts before the reload', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        final devServer = FakeProxyConnection(await io.serverSockets.next, io);
+        expect(devServer.socket.port, equals(8080));
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        void sendBuildResult(BuildStatus status, [List<Uri> changedAssets = const []]) {
+          buildDaemon.sendMessage(
+            BuildResults((b) {
+              b.results.add(
+                DefaultBuildResult((b) {
+                  b.target = 'web';
+                  b.status = status;
+                }),
+              );
+              if (changedAssets.isNotEmpty) {
+                b.changedAssets.addAll(changedAssets);
+              }
+            }),
+          );
+        }
+
+        // Build #2 changes a module.
+        sendBuildResult(BuildStatus.started);
+        await expectLater(io.stdout.queue, emitsWithTimeout('[BUILDER] Rebuilding web assets...'));
+        sendBuildResult(BuildStatus.succeeded, [Uri.parse('package:myapp/main.ddc.js')]);
+        await expectLater(io.stdout.queue, emitsWithTimeout('[BUILDER] Rebuilt web assets.'));
+
+        // Build #3 starts before any hot reload consumed the change and writes no outputs.
+        sendBuildResult(BuildStatus.started);
+        await expectLater(io.stdout.queue, emitsWithTimeout('[BUILDER] Rebuilding web assets...'));
+        sendBuildResult(BuildStatus.succeeded);
+        await expectLater(io.stdout.queue, emitsWithTimeout('[BUILDER] Rebuilt web assets.'));
+
+        expect(
+          jsonDecode(await devServer.getFakeRequest('/reloaded_sources.json')),
+          equals([
+            {
+              'src': '/packages/myapp/main.ddc.js',
+              'module': 'package:myapp/main.dart',
+              'libraries': ['package:myapp/main.dart'],
+            },
+          ]),
+        );
+
+        // A hot reload consumes the change.
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Reloading...',
+            '[CLIENT] Reload complete.',
+          ]),
+        );
+
+        expect(jsonDecode(await devServer.getFakeRequest('/reloaded_sources.json')), isEmpty);
+
         io.stdin.addBytes([utf8.encode('q').first]);
 
         expect(
