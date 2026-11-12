@@ -236,6 +236,43 @@ void main() {
       expect(clicks, 1);
     });
 
+    testClient('removes applied params when toggled off even if initially present in html', (tester) async {
+      window.document.body!.innerHTML = '<section><button id="applied-id" class="original applied" style="color: red;" data-applied="true">Static</button></section>'
+          .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              id: hasParams ? 'applied-id' : null,
+              classes: hasParams ? 'applied' : null,
+              styles: hasParams ? const Styles(color: Colors.red) : null,
+              attributes: hasParams ? const {'data-applied': 'true'} : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'applied-id');
+      expect(btn.className, 'original applied');
+      expect(btn.style.color, 'red');
+      expect(btn.getAttribute('data-applied'), 'true');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.hasAttribute('id'), isFalse);
+      expect(btn.className, 'original');
+      expect(btn.hasAttribute('style'), isFalse);
+      expect(btn.hasAttribute('data-applied'), isFalse);
+    });
+
     testClient('applies direct child params to root range slot', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Click me</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;

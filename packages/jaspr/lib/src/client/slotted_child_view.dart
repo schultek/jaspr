@@ -369,14 +369,16 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
       if (element.id.isEmpty) {
         element.id = newId;
         appliedId = newId;
+      } else if (element.id == newId && (appliedId == null || appliedId == newId)) {
+        appliedId = newId;
       }
     }
 
     if (newParams.classes case final newClasses?) {
       appliedClasses ??= [];
       for (final c in newClasses) {
-        if (!element.classList.contains(c)) {
-          element.classList.add(c);
+        element.classList.add(c);
+        if (!appliedClasses.contains(c)) {
           appliedClasses.add(c);
         }
       }
@@ -388,6 +390,8 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
         if (element.style.getPropertyValue(e.key).isEmpty) {
           element.style.setProperty(e.key, e.value);
           appliedStyles[e.key] = e.value;
+        } else if (element.style.getPropertyValue(e.key) == e.value && !appliedStyles.containsKey(e.key)) {
+          appliedStyles[e.key] = e.value;
         }
       }
     }
@@ -397,6 +401,8 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
       for (final e in newAttributes.entries) {
         if (!element.hasAttribute(e.key)) {
           element.setAttribute(e.key, e.value);
+          appliedAttributes[e.key] = e.value;
+        } else if (element.getAttribute(e.key) == e.value && !appliedAttributes.containsKey(e.key)) {
           appliedAttributes[e.key] = e.value;
         }
       }
