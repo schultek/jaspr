@@ -56,6 +56,7 @@ class ImportsModuleBuilder implements Builder {
       }
 
       final entries = <ImportEntry>[];
+      Map<Uri, LibraryElement>? sdkLibs;
 
       for (final annotation in annotations) {
         final url = annotation.getField('import')!.toStringValue()!;
@@ -67,13 +68,15 @@ class ImportsModuleBuilder implements Builder {
         try {
           final libUri = Uri.parse(url);
           if (libUri.scheme == 'dart') {
-            LibraryElement? lib;
-            await for (final l in buildStep.resolver.libraries) {
-              if (l.isInSdk && l.uri == libUri) {
-                lib = l;
-                break;
+            if (sdkLibs == null) {
+              sdkLibs = {};
+              await for (final l in buildStep.resolver.libraries) {
+                if (l.isInSdk) {
+                  sdkLibs[l.uri] = l;
+                }
               }
             }
+            final lib = sdkLibs[libUri];
             if (lib == null) {
               throw NonLibraryAssetException(AssetId('', url));
             }
