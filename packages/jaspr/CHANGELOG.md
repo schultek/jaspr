@@ -1,6 +1,8 @@
 ## Unreleased 0.24.0-beta.1
 
 - Fixed issue with hot-reload in client mode.
+- Added `ServerApp.reassemble()` for servers that render Jaspr and reload code themselves.
+  It notifies `ServerApp.onReassemble` listeners, such as the caches in `jaspr_content`.
 - Fixed styles hot-reload recompiling all dependencies on every change on Windows.
 - `kReleaseMode` is now also true in product builds of the Dart VM, such as `dart compile exe` or `dart build cli`,
   not only with `-Djaspr.flags.release=true`. A server that embeds Jaspr and is built without `jaspr build`
