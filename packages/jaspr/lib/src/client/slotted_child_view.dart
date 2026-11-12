@@ -286,9 +286,10 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   List<web.Element> _findMatchingElements(web.Element root, ApplyTarget target) {
-    final elements = <web.Element>[];
     final selector = _selectorFor(target);
+    if (selector == null) return const [];
 
+    final elements = <web.Element>[];
     if (root.matches(selector)) {
       elements.add(root);
     }
@@ -303,13 +304,16 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     return elements;
   }
 
-  /// Builds a CSS selector that matches the elements selected by [target].
-  String _selectorFor(ApplyTarget target) {
+  /// Builds a CSS selector for [target], or returns `null` if no element can match.
+  String? _selectorFor(ApplyTarget target) {
+    if (target.tag == '' || (target.classes?.contains('') ?? false)) return null;
+
     final cssUtils = web.CSS;
     // Target fields are literal names, so escape them before using CSS selector syntax.
     final selector = [
       if (target.tag case final tag?) cssUtils.escape(tag),
-      if (target.id case final id?) '#${cssUtils.escape(id)}',
+      // Element.id is empty for both a missing and an explicitly empty id attribute.
+      if (target.id case final id?) id.isEmpty ? ':is(:not([id]), [id=""])' : '#${cssUtils.escape(id)}',
       if (target.classes case final classes?)
         for (final c in classes) '.${cssUtils.escape(c)}',
     ].join();

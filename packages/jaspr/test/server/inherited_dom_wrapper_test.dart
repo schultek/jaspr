@@ -207,6 +207,28 @@ void main() {
       );
     });
 
+    test('empty target id matches missing and empty ids', () async {
+      final result = await renderComponent(
+        Component.apply(
+          target: ApplyTarget.descendantWith(tag: 'button', id: ''),
+          classes: 'example',
+          child: div([
+            button([]),
+            button(id: '', []),
+            button(id: 'named', []),
+          ]),
+        ),
+        standalone: true,
+      );
+
+      expect(
+        result.body,
+        decodedMatches(
+          '<div><button class="example"></button><button id="" class="example"></button><button id="named"></button></div>\n',
+        ),
+      );
+    });
+
     test('can target descendants by class', () async {
       final result = await renderComponent(
         Component.apply(

@@ -166,6 +166,49 @@ void main() {
       }
     });
 
+    for (final (description, target, expected) in const <(String, ApplyTarget, List<String>)>[
+      ('child with an empty ID', .childWith(tag: 'button', id: ''), ['Missing', 'Empty']),
+      ('descendant with an empty ID', .descendantWith(tag: 'button', id: ''), ['Missing', 'Empty', 'Nested']),
+      ('child with an empty tag', .childWith(tag: ''), []),
+      ('descendant with an empty tag', .descendantWith(tag: '', classes: {'selected'}), []),
+      ('child with an empty class name', .childWith(classes: {''}), []),
+      ('descendant with an empty class name', .descendantWith(classes: {'selected', ''}), []),
+      (
+        'descendant with an empty class set',
+        .descendantWith(tag: 'button', classes: {}),
+        [
+          'Missing',
+          'Empty',
+          'Named',
+          'Nested',
+          'Other',
+        ],
+      ),
+    ]) {
+      testClient('matches a $description', (tester) async {
+        window.document.body!.innerHTML =
+            '<button>Missing</button>'
+                    '<button id="">Empty</button>'
+                    '<button id="named">Named</button>'
+                    '<section class="selected">'
+                    '<button class="selected">Nested</button>'
+                    '<button id="other">Other</button>'
+                    '</section>'
+                .toJS;
+
+        tester.pumpComponent(
+          .apply(
+            target: target,
+            attributes: const {'data-applied': 'true'},
+            child: SlottedChildView(slots: const []),
+          ),
+        );
+
+        final matches = window.document.querySelectorAll('[data-applied]');
+        expect([for (var i = 0; i < matches.length; i++) matches.item(i)!.textContent], expected);
+      });
+    }
+
     testClient('ignores whitespace between applied class names', (tester) async {
       window.document.body!.innerHTML = '<div>Content</div>'.toJS;
 

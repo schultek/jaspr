@@ -93,7 +93,8 @@ class DomElement extends DomRenderObjectElement {
 
       for (final param in inheritedDomParams.reversed) {
         if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
-        if (param.target.id case final expectedId? when expectedId != id) continue;
+        // Like Element.id in the DOM, treat a missing id as empty so an empty target id matches both.
+        if (param.target.id case final expectedId? when expectedId != (id ?? '')) continue;
         if (param.target.classes case final expectedClasses?
             when !expectedClasses.every((c) => classesSet.contains(c))) {
           continue;
