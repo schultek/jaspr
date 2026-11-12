@@ -1,6 +1,8 @@
 @TestOn('vm')
 library;
 
+import 'dart:convert';
+
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_test/server_test.dart';
@@ -105,7 +107,192 @@ class AppWithMultipleServerComponents extends StatelessComponent {
   }
 }
 
+/// The `src` of each script in the document of [response] that matches [selector].
+Iterable<String?> _scriptSources(DocumentResponse response, [String selector = 'script']) =>
+    response.document!.querySelectorAll(selector).map((element) => element.attributes['src']);
+
 void main() {
+  group('with a client entrypoint', () {
+    setUp(() => Jaspr.initializeApp(options: ServerOptions(clientId: 'main.client.dart.js')));
+
+    testServer('adds the client script without @client components', (tester) async {
+      tester.pumpComponent(p([.text('No clients')]));
+
+      final response = await tester.request('/');
+
+      expect(_scriptSources(response), ['/main.client.dart.js']);
+    });
+
+    testServer('keeps an explicit client script and its attributes', (tester) async {
+      tester.pumpComponent(
+        Document(
+          base: null,
+          head: [
+            .element(tag: 'base', attributes: {'target': '_self'}),
+            .element(tag: 'base', attributes: {'href': '/app/'}),
+            script(src: 'http://test.server/app/./main.client.dart.js?v=1', async: true),
+          ],
+          body: p([]),
+        ),
+      );
+
+      final response = await tester.request('/other/page');
+      final scriptTag = response.document!.head!.querySelectorAll('script').single;
+      expect(scriptTag.attributes['src'], 'http://test.server/app/./main.client.dart.js?v=1');
+      expect(scriptTag.attributes.containsKey('async'), isTrue);
+    });
+
+    testServer('adds the entrypoint alongside scripts from a different directory or origin', (tester) async {
+      tester.pumpComponent(
+        Document(
+          base: null,
+          head: [
+            script(src: 'main.client.dart.js'),
+            script(src: '//cdn.example/main.client.dart.js'),
+          ],
+          body: p([]),
+        ),
+      );
+
+      final response = await tester.request('/app/page', handlerPath: '/app');
+      expect(_scriptSources(response), [
+        'main.client.dart.js',
+        '//cdn.example/main.client.dart.js',
+        '/main.client.dart.js',
+      ]);
+    });
+
+    testServer('adds an absolute entrypoint when no base sets a URL', (tester) async {
+      tester.pumpComponent(
+        Document(
+          base: null,
+          head: [
+            .element(tag: 'base', attributes: {'target': '_blank'}),
+          ],
+          body: p([]),
+        ),
+      );
+
+      final response = await tester.request('/blog/post');
+      expect(_scriptSources(response), ['/main.client.dart.js']);
+    });
+
+    testServer('keeps an explicit client script added with Document.head', (tester) async {
+      tester.pumpComponent(
+        Document(
+          body: .fragment([
+            Document.head(children: [script(src: '/main.client.dart.js', defer: true)]),
+            p([]),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/blog/post');
+      expect(_scriptSources(response), ['/main.client.dart.js']);
+    });
+
+    testServer('keeps an explicit client script in the body', (tester) async {
+      tester.pumpComponent(
+        Document(
+          body: div([
+            p([]),
+            script(src: '/main.client.dart.js', defer: true),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/blog/post');
+      expect(_scriptSources(response), ['/main.client.dart.js']);
+    });
+
+    for (final tag in ['template', 'noscript']) {
+      testServer('adds the entrypoint when its only script is in a $tag', (tester) async {
+        tester.pumpComponent(
+          Document(
+            body: div([
+              .element(
+                tag: tag,
+                children: [
+                  div([script(src: '/main.client.dart.js', defer: true)]),
+                ],
+              ),
+            ]),
+          ),
+        );
+
+        // The browser never runs that script, so the client would not start.
+        // The added script is relative to the base URL that the document sets by default.
+        final response = await tester.request('/blog/post');
+        expect(_scriptSources(response, 'head script'), ['main.client.dart.js']);
+      });
+    }
+
+    testServer('keeps an explicit client script in a declarative shadow root', (tester) async {
+      tester.pumpComponent(
+        Document(
+          body: div([
+            .element(
+              tag: 'template',
+              attributes: {'shadowrootmode': 'open'},
+              children: [script(src: '/main.client.dart.js', defer: true)],
+            ),
+          ]),
+        ),
+      );
+
+      // The browser attaches the content of that template to the page, where its script runs.
+      final response = await tester.request('/blog/post');
+      expect(_scriptSources(response, 'head script'), isEmpty);
+    });
+
+    group('and a stylesheet', () {
+      setUp(() {
+        Jaspr.initializeApp(
+          options: ServerOptions(clientId: 'main.client.dart.js', stylesId: 'styles.css'),
+        );
+      });
+
+      String? stylesheetHref(DocumentResponse response) =>
+          response.document!.querySelector('link[rel="stylesheet"]')!.attributes['href'];
+
+      testServer('links both relative to the base URL', (tester) async {
+        tester.pumpComponent(Document(base: '/app/', body: p([])));
+
+        final response = await tester.request('/app/page');
+        expect(_scriptSources(response), ['main.client.dart.js']);
+        expect(stylesheetHref(response), 'styles.css');
+      });
+
+      testServer('links both from the root when no base sets a URL', (tester) async {
+        tester.pumpComponent(
+          Document(
+            base: null,
+            head: [
+              .element(tag: 'base', attributes: {'target': '_blank'}),
+            ],
+            body: p([]),
+          ),
+        );
+
+        final response = await tester.request('/blog/post');
+        expect(_scriptSources(response), ['/main.client.dart.js']);
+        expect(stylesheetHref(response), '/styles.css');
+      });
+    });
+  });
+
+  group('without a client entrypoint', () {
+    setUp(() => Jaspr.initializeApp(options: ServerOptions()));
+
+    testServer('adds no script', (tester) async {
+      tester.pumpComponent(p([.text('No clients')]));
+
+      final response = await tester.request('/');
+
+      expect(_scriptSources(response), isEmpty);
+    });
+  });
+
   group('@client', () {
     setUpAll(() {
       Jaspr.initializeApp(
@@ -126,6 +313,24 @@ void main() {
             ),
           },
         ),
+      );
+    });
+
+    test('omits the client script from a standalone fragment without client components', () async {
+      final response = await renderComponent(div(id: 'fragment', []), standalone: true);
+
+      expect(utf8.decode(response.body), '<div id="fragment"></div>\n');
+    });
+
+    test('includes the client script in a standalone fragment that renders a client component', () async {
+      final response = await renderComponent(App1(), standalone: true);
+
+      expect(
+        utf8.decode(response.body),
+        '<head><script src="/main.clients.dart.js" defer></script></head>\n'
+        '<!--@app1-->\n'
+        '<div data-app="1"></div>\n'
+        '<!--/@app1-->\n',
       );
     });
 

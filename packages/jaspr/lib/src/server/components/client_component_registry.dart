@@ -14,8 +14,6 @@ class ClientComponentRegistry extends ObserverComponent {
 class ClientComponentRegistryElement extends ObserverElement {
   ClientComponentRegistryElement(super.component);
 
-  bool _didHandleClientScript = false;
-
   final Map<Element, ClientTarget> clientElements = {};
 
   int serverElementNum = 1;
@@ -31,13 +29,10 @@ class ClientComponentRegistryElement extends ObserverElement {
       return;
     }
 
-    if (!_didHandleClientScript) {
-      if (binding.options.clientId case final clientId?) {
-        binding.addRenderAdapter(ClientScriptAdapter(clientId));
-      } else if (kDebugMode) {
-        binding.addRenderAdapter(NoClientScriptAdapter());
-      }
-      _didHandleClientScript = true;
+    // The first client checks for a manually added client script if there is no entrypoint.
+    // With an entrypoint, the binding already added its script.
+    if (kDebugMode && clientElements.isEmpty && binding.options.clientId == null) {
+      binding.addRenderAdapter(NoClientScriptAdapter());
     }
 
     clientElements[element] = entry;

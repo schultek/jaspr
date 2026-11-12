@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:meta/meta.dart';
+
 import '../../jaspr.dart';
 import '../dom/validator.dart';
 import 'component_anchors.dart';
@@ -10,6 +12,7 @@ import 'component_anchors.dart';
 abstract final class Jaspr {
   static void initializeApp({ClientOptions options = const ClientOptions()}) {
     _options = options;
+    _clients = null;
     options.initialize?.call();
   }
 
@@ -17,6 +20,23 @@ abstract final class Jaspr {
 
   static ClientOptions get options => _options ?? const ClientOptions();
   static ClientOptions? _options;
+
+  /// The client registrations, cached so all anchors share loaders.
+  @internal
+  static Map<String, ClientLoader> get clients => _clients ??= options.clients?.call() ?? const {};
+  static Map<String, ClientLoader>? _clients;
+
+  /// Recreates cached client registrations, such as after hot reload.
+  ///
+  /// Recreated loaders keep the loaded state of the loaders they replace.
+  @internal
+  static void invalidateClients() {
+    final staleClients = _clients;
+    if (staleClients == null) return;
+
+    _clients = null;
+    clients.forEach((name, loader) => loader._keepLoadedFrom(staleClients[name]));
+  }
 }
 
 /// Global options for configuring Jaspr on the client.
@@ -24,10 +44,18 @@ abstract final class Jaspr {
 /// **DO NOT USE DIRECTLY.**
 /// Use the generated `defaultClientOptions` instead.
 final class ClientOptions {
-  const ClientOptions({this.initialize, this.clients = const {}});
+  const ClientOptions({this.initialize, this.clients});
 
   final void Function()? initialize;
-  final Map<String, ClientLoader> clients;
+
+  /// Creates client registrations from the current generated code.
+  ///
+  /// The result is cached by [Jaspr] until initialization or hot reload.
+  ///
+  /// This must be or call a top-level function, like the generated `_$clients`.
+  /// Closures created before a hot reload keep running their old body,
+  /// so a closure that returns a map literal never picks up new clients.
+  final Map<String, ClientLoader> Function()? clients;
 }
 
 /// The loader configuration for a @client component.
@@ -60,6 +88,17 @@ final class ClientLoader {
     }
 
     return _loadedBuilder = newLoadedBuilder;
+  }
+
+  /// Marks this loader as loaded if [previous] already loaded the same [loader],
+  /// so existing components resolve synchronously and keep their state after hot reload.
+  ///
+  /// Names can move to a different library when clients are added,
+  /// so matching names alone don't mean the library is loaded.
+  void _keepLoadedFrom(ClientLoader? previous) {
+    if (previous != null && previous.loader == loader && previous._loadedBuilder is ClientBuilder) {
+      _loadedBuilder = builder;
+    }
   }
 }
 

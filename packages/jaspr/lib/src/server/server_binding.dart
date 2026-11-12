@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../jaspr.dart';
+import 'adapters/client_script_adapter.dart';
 import 'adapters/document_structure_helper.dart';
 import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
@@ -19,12 +20,13 @@ typedef FileLoader = Future<String?> Function(String);
 
 /// Global component binding for the server.
 class ServerAppBinding extends AppBinding with ComponentsBinding {
-  ServerAppBinding(this.request, {required FileLoader loadFile}) : _fileLoader = loadFile {
+  ServerAppBinding(this.request, {required FileLoader loadFile, this._requestedUri}) : _fileLoader = loadFile {
     addRenderAdapter(GlobalStylesAdapter());
   }
 
   final RequestLike request;
   final FileLoader _fileLoader;
+  final Uri? _requestedUri;
 
   @override
   bool get isClient => false;
@@ -57,10 +59,24 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   void attachRootComponent(Component app) async {
+    // Client entrypoints can also run code without any @client components.
+    // Standalone fragments are the exception, see [ClientScriptAdapter].
+    if (options.clientId case final clientId?) {
+      addRenderAdapter(ClientScriptAdapter(clientId, _requestedUri ?? Uri.parse(currentUrl)));
+    }
     super.attachRootComponent(ClientComponentRegistry(child: app));
   }
 
+  /// Whether the current render is of a standalone fragment, without a document structure.
+  ///
+  /// Read this in [RenderAdapter.prepare] or [RenderAdapter.apply].
+  /// Components can build before [render] sets this value.
+  @internal
+  bool get isStandalone => _isStandalone;
+  bool _isStandalone = false;
+
   Future<Uint8List> render({bool standalone = false}) async {
+    _isStandalone = standalone;
     final rootElement = this.rootElement;
     if (rootElement == null) return _emptyResponse;
 
@@ -132,6 +148,10 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
     if (_adapters.contains(adapter)) return;
     _adapters.add(adapter..binding = this);
   }
+
+  /// Whether a render adapter of type [T] was added to this binding.
+  @internal
+  bool hasRenderAdapter<T extends RenderAdapter>() => _adapters.any((adapter) => adapter is T);
 
   ServerOptions get options => _options!;
   ServerOptions? _options;

@@ -31,7 +31,7 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
   );
 
   if (!Jaspr.useIsolates) {
-    final binding = ServerAppBinding(r, loadFile: loadFile);
+    final binding = ServerAppBinding(r, loadFile: loadFile, requestedUri: request.requestedUri);
     setup(binding);
     final body = await binding.render(standalone: standalone);
     return (statusCode: binding.responseStatusCode, body: body, headers: binding.responseHeaders);
@@ -57,7 +57,7 @@ Future<ResponseLike> render(SetupFunction setup, Request request, FileLoader loa
   });
 
   try {
-    final message = _RenderMessage(setup, r, standalone, port.sendPort);
+    final message = _RenderMessage(setup, r, request.requestedUri, standalone, port.sendPort);
     await Isolate.spawn(_render, message, onError: errorPort.sendPort);
 
     return await resultCompleter.future;
@@ -74,6 +74,7 @@ void _render(_RenderMessage message) async {
 
   final binding = ServerAppBinding(
     message.request,
+    requestedUri: message.requestedUri,
     loadFile: (name) {
       receivePort ??= ReceivePort();
       message.sendPort.send(_LoadFileRequest(name, receivePort!.sendPort));
@@ -90,10 +91,11 @@ void _render(_RenderMessage message) async {
 class _RenderMessage {
   final SetupFunction setup;
   final RequestLike request;
+  final Uri requestedUri;
   final bool standalone;
   final SendPort sendPort;
 
-  _RenderMessage(this.setup, this.request, this.standalone, this.sendPort);
+  _RenderMessage(this.setup, this.request, this.requestedUri, this.standalone, this.sendPort);
 }
 
 class _LoadFileRequest {

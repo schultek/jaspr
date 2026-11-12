@@ -5,7 +5,6 @@ import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/src/client/dom_render_object.dart' show RootDomRenderObject;
 import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart';
@@ -69,7 +68,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'app': ClientLoader((_) => p([Component.text('C')])),
           },
         ),
@@ -110,7 +109,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'app': ClientLoader((params) => p([Component.text('Hello ${params.get<String>('name')}')])),
           },
         ),
@@ -151,7 +150,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'app': ClientLoader((params) {
               return p(classes: 'hydrated', [
                 params.mount(params.get<String>('child')),
@@ -205,7 +204,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'app': ClientLoader((params) {
               return div(classes: 'hydrated', [params.mount(params.get<String>('child'))]);
             }),
@@ -256,7 +255,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'app': ClientLoader((params) {
               return div(classes: 'hydrated', [params.mount(params.get<String>('child'))]);
             }),
@@ -300,7 +299,7 @@ void main() {
 
         Jaspr.initializeApp(
           options: ClientOptions(
-            clients: {
+            clients: () => {
               'outer': ClientLoader((params) {
                 return Component.apply(
                   classes: 'highlighted',
@@ -344,7 +343,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'app': ClientLoader((params) {
               return ReloadTestComponent(name: params.get<String>('name'));
             }),
@@ -369,12 +368,7 @@ void main() {
                   '</div>'
               .toJS;
 
-      final rootElement = tester.binding.rootElement!;
-      final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
-      rootRenderObject.setRootNode(newBody);
-      rootElement.owner.performReload(rootElement);
-
-      window.document.body!.replaceWith(newBody);
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       final pElementReloaded = window.document.querySelector('body p')!;
@@ -399,7 +393,7 @@ void main() {
 
         Jaspr.initializeApp(
           options: ClientOptions(
-            clients: {
+            clients: () => {
               'app': ClientLoader((params) {
                 final child = params.get<String>('child');
                 return div([
@@ -442,7 +436,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'app': ClientLoader((params) {
               final child = params.get<String>('child');
               return div([

@@ -32,6 +32,10 @@ class ClientComponentAnchor extends ComponentAnchor {
     return const {};
   }
 
+  /// Whether this component can be built synchronously.
+  ///
+  /// This requires both its own [builder] to be loaded and
+  /// the client components nested in its [serverAnchors] to be resolved.
   bool get isResolved => builder is ClientBuilder && serverAnchors.every((a) => a.isResolved);
 
   Future<void> resolve() async {
@@ -153,7 +157,7 @@ final _serverStartRegex = RegExp('^s${DomValidator.clientMarkerPrefixRegex}(\\d+
 final _serverEndRegex = RegExp('^/s${DomValidator.clientMarkerPrefixRegex}(\\d+)\$');
 
 FutureOr<ClientBuilder> getClientByName(String name) {
-  final clients = Jaspr.options.clients;
+  final clients = Jaspr.clients;
   assert(clients.containsKey(name), "No client component registered with name '$name'.");
   return clients[name]!.loadedBuilder;
 }
