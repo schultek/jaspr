@@ -77,3 +77,49 @@ const modelWithInvalidMountSources = {
     }
   ''',
 };
+
+const modelWithIncompatibleReturnMountSources = {
+  'site|lib/model_incompatible_return_mount.dart': '''
+    import 'package:jaspr/jaspr.dart';
+
+    class ModelIncompatibleReturnMount {
+      ModelIncompatibleReturnMount(this.child);
+
+      final StatelessComponent child;
+
+      @decoder
+      factory ModelIncompatibleReturnMount.fromRaw(
+        Map<String, dynamic> raw,
+        StatelessComponent Function(String) mount,
+      ) {
+        return ModelIncompatibleReturnMount(mount(raw['child'] as String));
+      }
+
+      @encoder
+      Map<String, dynamic> toRaw() => {'child': child};
+    }
+  ''',
+};
+
+const modelWithIncompatibleParamMountSources = {
+  'site|lib/model_incompatible_param_mount.dart': '''
+    import 'package:jaspr/jaspr.dart';
+
+    class ModelIncompatibleParamMount {
+      ModelIncompatibleParamMount(this.child);
+
+      final Component child;
+
+      @decoder
+      factory ModelIncompatibleParamMount.fromRaw(
+        Map<String, dynamic> raw,
+        Component Function(String?) mount,
+      ) {
+        return ModelIncompatibleParamMount(mount(raw['child'] as String?));
+      }
+
+      @encoder
+      Map<String, dynamic> toRaw() => {'child': child};
+    }
+  ''',
+};

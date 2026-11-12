@@ -85,6 +85,54 @@ void main() {
           ),
         );
       });
+
+      test('mount parameter with incompatible return type throws error', () async {
+        final errorLogs = <String>[];
+
+        await testBuilder(
+          CodecModuleBuilder(BuilderOptions({})),
+          modelWithIncompatibleReturnMountSources,
+          outputs: {},
+          readerWriter: reader,
+          onLog: (log) {
+            if (log.level.name == 'SEVERE') {
+              errorLogs.add(log.message);
+            }
+          },
+        );
+
+        expect(
+          errorLogs,
+          contains(
+            'CodecModuleBuilder on lib/model_incompatible_return_mount.dart:\n'
+            'The second parameter of @decoder must be a function matching "ComponentMount". Failing element: ModelIncompatibleReturnMount.fromRaw() in library /site/lib/model_incompatible_return_mount.dart.',
+          ),
+        );
+      });
+
+      test('mount parameter with incompatible parameter type throws error', () async {
+        final errorLogs = <String>[];
+
+        await testBuilder(
+          CodecModuleBuilder(BuilderOptions({})),
+          modelWithIncompatibleParamMountSources,
+          outputs: {},
+          readerWriter: reader,
+          onLog: (log) {
+            if (log.level.name == 'SEVERE') {
+              errorLogs.add(log.message);
+            }
+          },
+        );
+
+        expect(
+          errorLogs,
+          contains(
+            'CodecModuleBuilder on lib/model_incompatible_param_mount.dart:\n'
+            'The second parameter of @decoder must be a function matching "ComponentMount". Failing element: ModelIncompatibleParamMount.fromRaw() in library /site/lib/model_incompatible_param_mount.dart.',
+          ),
+        );
+      });
     });
 
     test('generates bundle', () async {

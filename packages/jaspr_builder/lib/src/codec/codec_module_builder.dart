@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
@@ -328,11 +329,15 @@ bool _isValidMountParameter(FormalParameterElement param) {
   if (type is! FunctionType) {
     return false;
   }
-  if (!componentChecker.isAssignableFromType(type.returnType)) {
+  final returnType = type.returnType;
+  if (returnType.element == null ||
+      !componentChecker.isExactly(returnType.element!) ||
+      returnType.nullabilitySuffix == NullabilitySuffix.question) {
     return false;
   }
   if (type.normalParameterTypes.length != 1 ||
       !type.normalParameterTypes.first.isDartCoreString ||
+      type.normalParameterTypes.first.nullabilitySuffix == NullabilitySuffix.question ||
       type.optionalParameterTypes.isNotEmpty ||
       type.namedParameterTypes.isNotEmpty) {
     return false;
