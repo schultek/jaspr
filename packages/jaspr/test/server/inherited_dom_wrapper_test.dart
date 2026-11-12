@@ -216,6 +216,8 @@ void main() {
             button([]),
             button(id: '', []),
             button(id: 'named', []),
+            button(attributes: {'id': ''}, []),
+            button(attributes: {'id': 'from-attributes'}, []),
           ]),
         ),
         standalone: true,
@@ -224,8 +226,33 @@ void main() {
       expect(
         result.body,
         decodedMatches(
-          '<div><button class="example"></button><button id="" class="example"></button><button id="named"></button></div>\n',
+          '<div>\n'
+          '  <button class="example"></button>\n'
+          '  <button id="" class="example"></button>\n'
+          '  <button id="named"></button>\n'
+          '  <button class="example" id></button>\n'
+          '  <button id="from-attributes"></button>\n'
+          '</div>\n',
         ),
+      );
+    });
+
+    test('can target an id supplied by an inner apply attribute', () async {
+      final result = await renderComponent(
+        Component.apply(
+          target: ApplyTarget.childWith(id: 'named'),
+          classes: 'example',
+          child: Component.apply(
+            attributes: {'id': 'named'},
+            child: button([]),
+          ),
+        ),
+        standalone: true,
+      );
+
+      expect(
+        result.body,
+        decodedMatches('<button class="example" id="named"></button>\n'),
       );
     });
 
