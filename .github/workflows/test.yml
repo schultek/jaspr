@@ -34,19 +34,18 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          cache: true
 
       - name: Bootstrap
         run: |
-          flutter doctor
+          flutter --version
           dart pub get
-          dart run melos bootstrap
-          jaspr --disable-analytics
 
       - name: Check formatting
         run: dart run melos run format
 
       - name: Check linting
-        run: dart run melos analyze --fatal-infos
+        run: dart run melos analyze --fatal-infos --concurrency=4
 
   test:
     name: Test Packages
@@ -58,13 +57,14 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          cache: true
 
       - name: Bootstrap
         run: |
+          flutter --version
           dart pub global activate coverage
           dart pub get
-          dart run melos bootstrap --no-private
-          jaspr --disable-analytics
+          mkdir -p coverage
 
       - name: Run Unit tests
         run: dart run melos run coverage --no-select
