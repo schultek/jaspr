@@ -5,6 +5,7 @@ import 'package:jaspr_builder/src/imports/imports_builder.dart';
 import 'package:jaspr_builder/src/imports/stubs_builder.dart';
 import 'package:test/test.dart';
 
+import '../test_helper.dart';
 import 'sources/imports.dart';
 
 void main() {
@@ -12,8 +13,7 @@ void main() {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'models');
-      await reader.testing.loadIsolateSources();
+      reader = await createTestReaderWriter();
     });
 
     test('generates json module', () async {
@@ -30,7 +30,6 @@ void main() {
         ImportsOutputBuilder(BuilderOptions({})),
         {...importsSources, ...importsModuleOutput},
         outputs: importsOutput,
-        readerWriter: reader,
       );
     });
 
@@ -39,7 +38,6 @@ void main() {
         ImportsStubsBuilder(BuilderOptions({})),
         {...importsSources, ...importsModuleOutput},
         outputs: importsStubsOutput,
-        readerWriter: reader,
       );
     });
 
@@ -52,7 +50,6 @@ void main() {
           ...importsModuleOutput,
           ...conflictingImportsModuleOutput,
         },
-        readerWriter: reader,
       );
 
       expect(result.succeeded, isFalse);
@@ -65,5 +62,5 @@ void main() {
         ),
       );
     });
-  });
+  }, timeout: Timeout(Duration(minutes: 2)));
 }

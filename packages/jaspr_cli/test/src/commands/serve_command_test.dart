@@ -157,6 +157,72 @@ void main() {
       });
     });
 
+    test('handles keyboard shortcuts with Windows terminal mode constraints', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.stdin.windowsTerminalModes = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 8080)),
+        );
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        expect(io.stdin.echoMode, isFalse);
+        expect(io.stdin.lineMode, isFalse);
+
+        // Press 'r' for reload
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Reloading...',
+            '[CLIENT] Reload complete.',
+          ]),
+        );
+
+        // Press 'q' for quit
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+
+        expect(io.stdin.lineMode, isTrue);
+        expect(io.stdin.echoMode, isTrue);
+      });
+    });
+
     test('queues reload and restart shortcuts when build is in progress', () async {
       await io.runZoned(() async {
         io.stdin.hasTerminalOverride = true;
@@ -425,6 +491,103 @@ void main() {
       });
     });
 
+    test('keeps changed modules for hot reload when the next build starts before the reload', () async {
+      await io.runZoned(() async {
+        io.stdin.hasTerminalOverride = true;
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        final devServer = FakeProxyConnection(await io.serverSockets.next, io);
+        expect(devServer.socket.port, equals(8080));
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        void sendBuildResult(BuildStatus status, [List<Uri> changedAssets = const []]) {
+          buildDaemon.sendMessage(
+            BuildResults((b) {
+              b.results.add(
+                DefaultBuildResult((b) {
+                  b.target = 'web';
+                  b.status = status;
+                }),
+              );
+              if (changedAssets.isNotEmpty) {
+                b.changedAssets.addAll(changedAssets);
+              }
+            }),
+          );
+        }
+
+        // Build #2 changes a module.
+        sendBuildResult(BuildStatus.started);
+        await expectLater(io.stdout.queue, emitsWithTimeout('[BUILDER] Rebuilding web assets...'));
+        sendBuildResult(BuildStatus.succeeded, [Uri.parse('package:myapp/main.ddc.js')]);
+        await expectLater(io.stdout.queue, emitsWithTimeout('[BUILDER] Rebuilt web assets.'));
+
+        // Build #3 starts before any hot reload consumed the change and writes no outputs.
+        sendBuildResult(BuildStatus.started);
+        await expectLater(io.stdout.queue, emitsWithTimeout('[BUILDER] Rebuilding web assets...'));
+        sendBuildResult(BuildStatus.succeeded);
+        await expectLater(io.stdout.queue, emitsWithTimeout('[BUILDER] Rebuilt web assets.'));
+
+        expect(
+          jsonDecode(await devServer.getFakeRequest('/reloaded_sources.json')),
+          equals([
+            {
+              'src': '/packages/myapp/main.ddc.js',
+              'module': 'package:myapp/main.dart',
+              'libraries': ['package:myapp/main.dart'],
+            },
+          ]),
+        );
+
+        // A hot reload consumes the change.
+        io.stdin.addBytes([utf8.encode('r').first]);
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[CLIENT] Reloading...',
+            '[CLIENT] Reload complete.',
+          ]),
+        );
+
+        expect(jsonDecode(await devServer.getFakeRequest('/reloaded_sources.json')), isEmpty);
+
+        io.stdin.addBytes([utf8.encode('q').first]);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
     test('serves project with server mode', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'server');
@@ -434,6 +597,52 @@ void main() {
         final server = io.stubFakeServer();
 
         final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        expect(io.stdout.queue, emits('[BUILDER] Done building web assets.'));
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', int.parse(serverProxyPort))),
+        );
+
+        await io.expectServerStarted(server);
+
+        server.exit(0);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('passes --enable-experiment on to build_runner and the server', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [...buildRunnerDartArgs, '--enable-experiment=primary-constructors'],
+        );
+        final server = io.stubFakeServer(experiments: ['primary-constructors']);
+
+        final serveResult = runner.run(['serve', '--verbose', '--enable-experiment=primary-constructors']);
 
         await expectLater(
           io.stdout.queue,
@@ -611,6 +820,85 @@ void main() {
       });
     });
 
+    test('serves the proxy on explicit --port with --skip-server', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose', '--skip-server', '--port', '5600']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 5600)),
+        );
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('JASPR_PROXY_PORT=5600')));
+
+        await io.shutdownBuildDaemon(buildDaemon);
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('serves the proxy on the default proxy port with --skip-server and no --port', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        io.inUsePorts.add(8080);
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose', '--skip-server']);
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', int.parse(serverProxyPort))),
+        );
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('JASPR_PROXY_PORT=$serverProxyPort')));
+
+        await io.shutdownBuildDaemon(buildDaemon);
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('fails when explicit --port is in use with --skip-server', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        io.inUsePorts.add(5600);
+
+        final serveResult = runner.run(['serve', '--skip-server', '--port', '5600']);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Port 5600 is already in use.'),
+        );
+
+        expect(await serveResult, equals(1));
+      });
+    });
+
     test('fails when explicit --port is in use', () async {
       await io.runZoned(() async {
         final stderr = io.stderr.queue;
@@ -694,7 +982,11 @@ const buildRunnerFlutterArgs = [
 ];
 
 extension FakeServerIO on FakeIO {
-  FakeProcess stubFakeServer({String port = '8080', String proxyPort = '5567'}) {
+  FakeProcess stubFakeServer({
+    String port = '8080',
+    String proxyPort = '5567',
+    List<String> experiments = const [],
+  }) {
     final serverProcess = FakeProcess();
 
     when(
@@ -705,6 +997,7 @@ extension FakeServerIO on FakeIO {
           '--enable-vm-service',
           '--enable-asserts',
           '-Djaspr.flags.verbose=false',
+          for (final experiment in experiments) '--enable-experiment=$experiment',
           '/root/myapp/.dart_tool/jaspr/server_target.dart',
         ],
         workingDirectory: '/root/myapp',

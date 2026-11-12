@@ -4,10 +4,12 @@ import 'dart:io';
 
 import 'package:dwds/data/build_result.dart';
 import 'package:dwds/dwds.dart';
+import 'package:meta/meta.dart';
 import 'package:vm_service/vm_service.dart' as vm;
 import 'package:vm_service/vm_service_io.dart';
 
 import '../logging.dart';
+import 'client_call_guard.dart';
 import 'dev_workflow.dart';
 
 class ClientManager {
@@ -17,14 +19,46 @@ class ClientManager {
   final Map<String, ClientConnection> _clientConnections = {};
   final StreamController<Map<String, Object?>> _clientEvents = StreamController.broadcast();
 
+  /// How long to wait for a single client call before skipping the client.
+  ///
+  /// Only applies to clients that connect after it is changed.
+  @visibleForTesting
+  Duration callTimeout = const Duration(seconds: 10);
+
   Stream<Map<String, Object?>> get clientEvents => _clientEvents.stream;
-  Iterable<ClientConnection> get connections => _clientConnections.values;
 
   String? get clientDevToolsUri => _clientConnections.values.firstOrNull?.devToolsUri;
 
   ClientConnection? getConnection(String? appId) {
     if (appId == null) return null;
     return _clientConnections[appId];
+  }
+
+  /// Runs [action] sequentially for each currently connected client.
+  ///
+  /// Clients that connect while this is running aren't included,
+  /// and clients that are disposed before their turn are skipped.
+  ///
+  /// If [action] throws for a client, the error is logged as a warning
+  /// prefixed with [actionName] and the remaining clients are still updated,
+  /// so one disconnecting browser can't interrupt the others or later builds.
+  Future<void> forEachConnection(String actionName, Future<void> Function(ClientConnection) action) async {
+    // Connections can be added or removed while an action is awaiting an RPC.
+    final connections = _clientConnections.values.toList(growable: false);
+    for (final connection in connections) {
+      if (connection._isDisposed) continue;
+
+      try {
+        await action(connection);
+      } catch (error, stackTrace) {
+        workflow.logger.write(
+          '$actionName failed for client ${connection.appConnection.request.appId}: $error',
+          tag: .client,
+          level: .warning,
+        );
+        workflow.logger.write(stackTrace.toString(), tag: .client, level: .verbose);
+      }
+    }
   }
 
   StreamSubscription<AppConnection>? _appsSubscription;
@@ -83,6 +117,28 @@ class ClientConnection {
   String? devToolsUri;
 
   vm.VmService? get vmService => _debugConnection?.vmService;
+
+  late final _callGuard = ClientCallGuard(
+    timeout: manager.callTimeout,
+    onUnresponsive: () => manager.workflow.logger.write(
+      'Client ${appConnection.request.appId} did not respond, skipping it until it responds again.',
+      tag: .client,
+      level: .warning,
+    ),
+    onResponsive: () {
+      manager.workflow.logger.write(
+        'Client ${appConnection.request.appId} is responding again, it may show outdated content until the next reload.',
+        tag: .client,
+      );
+      // Changed stylesheets aren't part of the next reload, so deliver them now.
+      if (_pendingStylesheets.isNotEmpty && !_isDisposed) {
+        unawaited(reloadStylesheets(const []));
+      }
+    },
+  );
+
+  /// Stylesheets that changed while this client didn't receive them.
+  final Set<String> _pendingStylesheets = {};
 
   void start() async {
     final appId = appConnection.request.appId;
@@ -173,13 +229,20 @@ class ClientConnection {
     }
   }
 
-  Future<vm.Response?> restart() async {
+  Future<vm.Response?> restart() => _callGuard.run(() async {
     final restartMethod = _registeredMethodsForService['hotRestart'] ?? 'hotRestart';
     final response = await vmService?.callServiceExtension(restartMethod);
     return response;
+  });
+
+  /// Performs a hot reload and returns whether it succeeded.
+  ///
+  /// Returns `false` if the client didn't respond in time.
+  Future<bool> performHotReload() async {
+    return await _callGuard.run(_performHotReload) ?? false;
   }
 
-  Future<void> performHotReload() async {
+  Future<bool> _performHotReload() async {
     final vmService = this.vmService;
     if (vmService == null) {
       manager.workflow.logger.write(
@@ -187,7 +250,7 @@ class ClientConnection {
         tag: Tag.client,
         level: Level.warning,
       );
-      return;
+      return false;
     }
 
     final isolateId = (await vmService.getVM()).isolates?.firstOrNull?.id;
@@ -197,26 +260,36 @@ class ClientConnection {
         tag: Tag.client,
         level: Level.warning,
       );
-      return;
+      return false;
     }
 
     vm.ReloadReport? response;
     for (var i = 0; i < 5; i++) {
       response = await vmService.reloadSources(isolateId);
       if (response.success ?? false) {
-        break;
+        return true;
       }
     }
-    if (!(response?.success ?? false)) {
-      manager.workflow.logger.write(
-        'Hot reload failed after 5 attempts for unknown reason.',
-        tag: Tag.client,
-        level: Level.warning,
-      );
-    }
+    manager.workflow.logger.write(
+      'Hot reload failed after 5 attempts for unknown reason.',
+      tag: Tag.client,
+      level: Level.warning,
+    );
+    return false;
   }
 
+  /// Reloads the stylesheets at [urls], together with any stylesheets this client missed before.
   Future<vm.Response?> reloadStylesheets(List<String> urls) async {
+    _pendingStylesheets.addAll(urls);
+    final pending = _pendingStylesheets.toList();
+    final response = await _callGuard.run(() => _reloadStylesheets(pending));
+    if (response != null) {
+      _pendingStylesheets.removeAll(pending);
+    }
+    return response;
+  }
+
+  Future<vm.Response?> _reloadStylesheets(List<String> urls) async {
     final reloadMethod = _registeredMethodsForService['ext.jaspr.reload_stylesheets'] ?? 'ext.jaspr.reload_stylesheets';
     for (var i = 0; i < 5; i++) {
       try {
@@ -232,7 +305,7 @@ class ClientConnection {
     return null;
   }
 
-  Future<vm.Response?> reassemble() async {
+  Future<vm.Response?> reassemble() => _callGuard.run(() async {
     final reassembleMethod = _registeredMethodsForService['ext.jaspr.reassemble'] ?? 'ext.jaspr.reassemble';
     for (var i = 0; i < 5; i++) {
       try {
@@ -243,9 +316,9 @@ class ClientConnection {
       }
     }
     return null;
-  }
+  });
 
-  Future<vm.Response?> reloadHtml([String? path]) async {
+  Future<vm.Response?> reloadHtml([String? path]) => _callGuard.run(() async {
     final reloadMethod = _registeredMethodsForService['ext.jaspr.reload_html'] ?? 'ext.jaspr.reload_html';
     final args = path != null ? {'path': path} : <String, String>{};
     for (var i = 0; i < 5; i++) {
@@ -257,9 +330,9 @@ class ClientConnection {
       }
     }
     return null;
-  }
+  });
 
-  Future<vm.Response?> refreshPage() async {
+  Future<vm.Response?> refreshPage() => _callGuard.run(() async {
     final reloadMethod =
         _registeredMethodsForService['fullReload'] ?? _registeredMethodsForService['ext.dwds.reload'] ?? 'fullReload';
     try {
@@ -268,7 +341,7 @@ class ClientConnection {
     } catch (_) {
       return null;
     }
-  }
+  });
 
   int? _buildProgressEventId;
   var _progressEventId = 0;

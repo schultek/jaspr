@@ -14,6 +14,7 @@ import '../dev/dev_workflow.dart';
 import '../dev/flutter_runner.dart';
 import '../dev/server_runner.dart';
 import '../helpers/dart_define_helpers.dart';
+import '../helpers/experiment_helpers.dart';
 import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
@@ -62,11 +63,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
     );
     argParser.addFlag(
       'skip-server',
-      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
+      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable. Pass --port to choose the proxy port.',
       negatable: false,
       defaultsTo: false,
     );
     addDartDefineArgs();
+    addExperimentArgs();
   }
 
   @override
@@ -135,7 +137,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         );
         return 1;
       }
-      if (shouldCheckPort && !await isPortAvailable(parsed)) {
+      if (!await isPortAvailable(parsed)) {
         logger.write(
           'Port $explicitPort is already in use.\nPlease quit the running process or choose a different port.',
           tag: Tag.cli,
@@ -149,7 +151,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       port = shouldCheckPort ? await findAvailablePort(defaultPort) : defaultPort;
     }
 
-    final proxyPort = project.requireMode == JasprMode.client
+    final proxyPort = project.requireMode == JasprMode.client || (skipServer && explicitPort != null)
         ? port
         : await findAvailablePort(int.parse(serverProxyPort), exclude: [port]);
 
@@ -202,11 +204,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       onMessage: (message) async {
         if (message case {'reload': final Object reload}) {
           final String? route = reload is String ? reload : null;
-          for (final connection in workflow.clients.connections) {
-            try {
-              await connection.reloadHtml(route);
-            } catch (_) {}
-          }
+          await workflow.clients.forEachConnection(
+            'HTML reload',
+            (connection) => connection.reloadHtml(route),
+          );
         }
       },
     );
@@ -234,6 +235,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         project: project,
         logger: logger,
         userDefines: getServerDartDefines(),
+        experiments: experiments,
         restArgs: argResults!.rest,
         release: release,
         debug: debug,
@@ -391,8 +393,8 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
     final originalEchoMode = stdin.echoMode;
 
     try {
-      stdin.lineMode = false;
       stdin.echoMode = false;
+      stdin.lineMode = false;
     } catch (_) {
       return;
     }
@@ -670,11 +672,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         },
         if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
       ],
+      ...experimentArgs,
     ];
 
     final workflow = await DevWorkflow.start(
       proxyPort: proxyPort,
       buildArgs: buildArgs,
+      experiments: experiments,
       project: project,
       logger: logger,
       guard: guardResource,
