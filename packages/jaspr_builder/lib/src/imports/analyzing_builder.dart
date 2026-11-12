@@ -67,9 +67,13 @@ class ImportsModuleBuilder implements Builder {
         try {
           final libUri = Uri.parse(url);
           if (libUri.scheme == 'dart') {
-            final lib = (await buildStep.resolver.libraries.where((lib) {
-              return lib.isInSdk && lib.uri == libUri;
-            }).toList()).firstOrNull;
+            LibraryElement? lib;
+            await for (final l in buildStep.resolver.libraries) {
+              if (l.isInSdk && l.uri == libUri) {
+                lib = l;
+                break;
+              }
+            }
             if (lib == null) {
               throw NonLibraryAssetException(AssetId('', url));
             }

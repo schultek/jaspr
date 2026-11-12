@@ -1,5 +1,6 @@
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
+import 'package:glob/glob.dart';
 import 'package:jaspr_builder/src/imports/analyzing_builder.dart';
 import 'package:jaspr_builder/src/imports/imports_builder.dart';
 import 'package:jaspr_builder/src/imports/stubs_builder.dart';
@@ -11,9 +12,12 @@ void main() {
   group('import annotation', () {
     late TestReaderWriter reader;
 
-    setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'models');
-      await reader.testing.loadIsolateSources();
+    setUpAll(() async {
+      reader = TestReaderWriter(rootPackage: 'site');
+      final assetReader = await PackageAssetReader.currentIsolate();
+      await for (final id in assetReader.findAssets(Glob('**'), package: 'jaspr')) {
+        reader.testing.writeBytes(id, await assetReader.readAsBytes(id));
+      }
     });
 
     test('generates json module', () async {
@@ -30,7 +34,6 @@ void main() {
         ImportsOutputBuilder(BuilderOptions({})),
         {...importsSources, ...importsModuleOutput},
         outputs: importsOutput,
-        readerWriter: reader,
       );
     });
 
@@ -39,7 +42,6 @@ void main() {
         ImportsStubsBuilder(BuilderOptions({})),
         {...importsSources, ...importsModuleOutput},
         outputs: importsStubsOutput,
-        readerWriter: reader,
       );
     });
 
@@ -52,7 +54,6 @@ void main() {
           ...importsModuleOutput,
           ...conflictingImportsModuleOutput,
         },
-        readerWriter: reader,
       );
 
       expect(result.succeeded, isFalse);
