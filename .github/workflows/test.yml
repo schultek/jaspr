@@ -48,19 +48,8 @@ jobs:
         run: dart run melos analyze --fatal-infos --concurrency=4
 
   test:
-    name: Test (${{ matrix.package }})
+    name: Test Packages
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - jaspr
-          - jaspr_builder
-          - jaspr_cli
-          - jaspr_content
-          - jaspr_lints
-          - jaspr_riverpod
-          - jaspr_router
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -78,10 +67,10 @@ jobs:
           mkdir -p coverage
 
       - name: Run Unit tests
-        run: dart run melos run coverage --scope=${{ matrix.package }}
+        run: dart run melos run coverage --no-select
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
         with:
-          files: coverage/${{ matrix.package }}_lcov.info
+          files: coverage/*_lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
