@@ -1,6 +1,11 @@
 ## Unreleased 0.10.0-beta.1
 
 - Fixed `Link` navigating client-side on clicks the browser should handle: Ctrl/Cmd-, Shift- and Alt-clicks, non-primary buttons, already prevented clicks, and links with a `target` other than `_self` or a `download` attribute.
+- A path segment that merely looks like a parameter (`/:27017`) is escaped as a
+  literal instead of building an invalid named capture group and failing the
+  response with a 500.
+- `redirect` preserves the query string on server-side redirects.
+- Fixed `RouterState.preload()` running the top-level and route-level `redirect` callbacks. Preloading a route (for example when hovering a `Link`) is not a navigation, so redirects now only run on actual navigation.
 
 ## 0.10.0-beta.0
 
