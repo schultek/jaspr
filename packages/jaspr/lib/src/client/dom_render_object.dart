@@ -461,6 +461,11 @@ class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject
   void setRootNode(web.Element newNode) {
     _node = newNode;
     toHydrate = [...newNode.childNodes.toIterable()];
+
+    // The children were rendered into the previous node. A reload replaces their render objects
+    // without removing them here, so forget them, or they stay linked behind the new children.
+    _firstChild = null;
+    _lastChild = null;
   }
 
   @override
