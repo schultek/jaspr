@@ -25,5 +25,16 @@ void main() {
       expect(response.statusCode, equals(200));
       expect(response.body, contains('Unknown (/unknown)'));
     });
+
+    testServer('should render the error page for a colon-prefixed segment', (
+      tester,
+    ) async {
+      tester.pumpComponent(App());
+
+      final response = await tester.request('/:27017');
+
+      expect(response.statusCode, equals(200));
+      expect(response.body, contains('Unknown (/:27017)'));
+    });
   });
 }

@@ -1,6 +1,17 @@
 ## Unreleased 0.24.0-beta.1
 
+- With `--skip-server`, `jaspr serve` and `jaspr daemon` run the proxy on `--port` when it is passed, so the
+  server can be started with `JASPR_PROXY_PORT` up front.
 - Fixed issue with hot-reload in client mode.
+- Added `ServerApp.reassemble()` for servers that render Jaspr and reload code themselves.
+  It notifies `ServerApp.onReassemble` listeners, such as the caches in `jaspr_content`.
+- Fixed styles hot-reload recompiling all dependencies on every change on Windows.
+- `kReleaseMode` is now also true in product builds of the Dart VM, such as `dart compile exe` or `dart build cli`,
+  not only with `-Djaspr.flags.release=true`. A server that embeds Jaspr and is built without `jaspr build`
+  no longer renders in debug mode. This matches what `kDebugMode` was already documented to do.
+- Fixed key shortcuts in `jaspr serve` not working on Windows.
+- Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
+- Fixed `jaspr serve` blocking all following reloads when a connected browser stops responding (e.g. a phone with the screen turned off).
 - Fixed a fragment staying in the DOM after it is removed or replaced when its first or last child renders nothing, such as `Component.empty()`.
 
 ## 0.24.0-beta.0

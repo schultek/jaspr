@@ -6,6 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:frontend_server_client/frontend_server_client.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
@@ -165,7 +166,7 @@ class CssRunner {
 
       if (compilerResult.dillOutput != null) {
         client!.accept();
-        sources.addAll(compilerResult.newSources.whereNot(_uriInPubCache));
+        sources.addAll(compilerResult.newSources.whereNot(uriInPubCache));
         await _startProcess(cssFiles);
       } else {
         await client!.reject();
@@ -306,7 +307,7 @@ class CssRunner {
       } else {
         client!.accept();
         sources.removeAll(compilerResult.removedSources);
-        sources.addAll(compilerResult.newSources.whereNot(_uriInPubCache));
+        sources.addAll(compilerResult.newSources.whereNot(uriInPubCache));
       }
 
       if (compilerResult.dillOutput != null) {
@@ -526,6 +527,9 @@ class CssRunner {
   }
 }
 
-bool _uriInPubCache(Uri uri) {
-  return Platform.isWindows ? uri.path.contains('\\Pub\\Cache\\') : uri.path.contains('/.pub-cache/');
+@visibleForTesting
+bool uriInPubCache(Uri uri) {
+  // [Uri.path] always uses forward slashes, also on Windows (e.g. `/C:/Users/.../Pub/Cache/...`).
+  final path = uri.path.toLowerCase();
+  return path.contains('/pub/cache/') || path.contains('/.pub-cache/');
 }
