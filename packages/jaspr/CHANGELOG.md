@@ -1,5 +1,7 @@
 ## Unreleased 0.24.0-beta.1
 
+- With `--skip-server`, `jaspr serve` and `jaspr daemon` run the proxy on `--port` when it is passed, so the
+  server can be started with `JASPR_PROXY_PORT` up front.
 - Fixed issue with hot-reload in client mode.
 - Added `ServerApp.reassemble()` for servers that render Jaspr and reload code themselves.
   It notifies `ServerApp.onReassemble` listeners, such as the caches in `jaspr_content`.

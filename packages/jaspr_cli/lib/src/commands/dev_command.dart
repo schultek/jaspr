@@ -62,7 +62,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
     );
     argParser.addFlag(
       'skip-server',
-      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
+      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable. Pass --port to choose the proxy port.',
       negatable: false,
       defaultsTo: false,
     );
@@ -135,7 +135,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         );
         return 1;
       }
-      if (shouldCheckPort && !await isPortAvailable(parsed)) {
+      if (!await isPortAvailable(parsed)) {
         logger.write(
           'Port $explicitPort is already in use.\nPlease quit the running process or choose a different port.',
           tag: Tag.cli,
@@ -149,7 +149,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       port = shouldCheckPort ? await findAvailablePort(defaultPort) : defaultPort;
     }
 
-    final proxyPort = project.requireMode == JasprMode.client
+    final proxyPort = project.requireMode == JasprMode.client || (skipServer && explicitPort != null)
         ? port
         : await findAvailablePort(int.parse(serverProxyPort), exclude: [port]);
 
