@@ -76,7 +76,15 @@ class ImportsModuleBuilder implements Builder {
                 }
               }
             }
-            final lib = sdkLibs[libUri];
+            var lib = sdkLibs[libUri];
+            if (lib == null) {
+              await for (final l in buildStep.resolver.libraries) {
+                if (l.isInSdk) {
+                  sdkLibs[l.uri] = l;
+                }
+              }
+              lib = sdkLibs[libUri];
+            }
             if (lib == null) {
               throw NonLibraryAssetException(AssetId('', url));
             }
