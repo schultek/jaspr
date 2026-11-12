@@ -4,6 +4,7 @@ import 'package:jaspr_builder/src/codec/codec_bundle_builder.dart';
 import 'package:jaspr_builder/src/codec/codec_module_builder.dart';
 import 'package:test/test.dart';
 
+import '../test_helper.dart';
 import 'sources/bundle.dart';
 import 'sources/model_class.dart';
 import 'sources/model_enum.dart';
@@ -14,8 +15,7 @@ void main() {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'site');
-      await reader.testing.loadIsolateSources();
+      reader = await createTestReaderWriter();
     });
 
     group('on model class', () {
@@ -56,7 +56,6 @@ void main() {
         CodecBundleBuilder(BuilderOptions({})),
         {...modelClassOutputs, ...modelEnumOutputs, ...modelExtensionOutputs},
         outputs: codecBundleOutputs,
-        readerWriter: reader,
       );
     });
   });

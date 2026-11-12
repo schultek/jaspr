@@ -1,23 +1,19 @@
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
-import 'package:glob/glob.dart';
 import 'package:jaspr_builder/src/imports/analyzing_builder.dart';
 import 'package:jaspr_builder/src/imports/imports_builder.dart';
 import 'package:jaspr_builder/src/imports/stubs_builder.dart';
 import 'package:test/test.dart';
 
+import '../test_helper.dart';
 import 'sources/imports.dart';
 
 void main() {
   group('import annotation', () {
     late TestReaderWriter reader;
 
-    setUpAll(() async {
-      reader = TestReaderWriter(rootPackage: 'site');
-      final assetReader = await PackageAssetReader.currentIsolate();
-      await for (final id in assetReader.findAssets(Glob('**'), package: 'jaspr')) {
-        reader.testing.writeBytes(id, await assetReader.readAsBytes(id));
-      }
+    setUp(() async {
+      reader = await createTestReaderWriter();
     });
 
     test('generates json module', () async {
