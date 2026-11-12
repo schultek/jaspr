@@ -277,10 +277,10 @@ packages:
     dependency: transitive
     description:
       name: cli_launcher
-      sha256: "96883f87648524292e24e2cc6a369fbdf64883473fe3e3ddadd3d857bf16a484"
+      sha256: ff37bcc6d5fa25ab7ddcf255a60900b28e4e1712d34495e5f7952e0982933913
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.3+2"
+    version: "0.3.4+1"
   cli_util:
     dependency: transitive
     description:
@@ -1219,10 +1219,10 @@ packages:
     dependency: "direct dev"
     description:
       name: melos
-      sha256: f1fc649d6dc4d17a2f1573654446495b9758b926372d54bf219cd7b586877a02
+      sha256: d0d9f8b8d566daf9b7a9bccd0b151d640c2d4b9c552b6fabf354328b5ad97080
       url: "https://pub.dev"
     source: hosted
-    version: "8.7.0"
+    version: "8.10.1"
   meta:
     dependency: transitive
     description:
@@ -1467,10 +1467,10 @@ packages:
     dependency: transitive
     description:
       name: pubspec_parse
-      sha256: c38b81cbf34450b67e0265d73433569d12e34782e30ed769c9cc99c9d5f2e796
+      sha256: "9ac81c01ffd6a9cf9b2713288834fbaaf6aebde05ffdf02d380e68b8e06f27d8"
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.0"
+    version: "1.7.0"
   quiver:
     dependency: transitive
     description:
