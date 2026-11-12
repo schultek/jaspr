@@ -174,16 +174,28 @@ class DomRenderElement extends DomRenderObject
               continue;
             }
           }
-        } else if (attrName == 'open') {
-          if (node.isHtmlDialogElement || node.isHtmlDetailsElement) {
-            // `dialog()` and `details()` pass 'true' or 'false' when their `open` parameter is set.
-            if (attrValue == 'true') {
-              node.clearOrSetAttribute('open', '');
-              continue;
-            } else if (attrValue == 'false') {
-              node.clearOrSetAttribute('open', null);
-              continue;
+        } else if (attrName == 'open' && (attrValue == 'true' || attrValue == 'false')) {
+          // `dialog()` and `details()` pass 'true' or 'false' when their `open` parameter is set.
+          final shouldBeOpen = attrValue == 'true';
+          if (node.isHtmlDialogElement) {
+            final nodeAsDialogElement = node as web.HTMLDialogElement;
+            if (nodeAsDialogElement.open != shouldBeOpen) {
+              if (kVerboseMode) {
+                print('Set dialog open: $shouldBeOpen');
+              }
+              nodeAsDialogElement.open = shouldBeOpen;
             }
+            continue;
+          }
+          if (node.isHtmlDetailsElement) {
+            final nodeAsDetailsElement = node as web.HTMLDetailsElement;
+            if (nodeAsDetailsElement.open != shouldBeOpen) {
+              if (kVerboseMode) {
+                print('Set details open: $shouldBeOpen');
+              }
+              nodeAsDetailsElement.open = shouldBeOpen;
+            }
+            continue;
           }
         }
 
