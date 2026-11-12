@@ -16,10 +16,12 @@ by Jaspr for both:
 To enable custom serialization for your data class use the annotations in the following way:
 
 - The `@decoder` annotation must be used on a **constructor** or **static method** that returns an instance of the class
-  and has exactly one parameter of any primitive serializable type (`bool`, `int`, `String`, etc.).
+  and has either:
+  - Exactly one parameter of any primitive serializable type (`bool`, `int`, `String`, `Map<String, dynamic>`, etc.).
+  - Two parameters, where the second parameter is a `ComponentMount` function (`Component Function(String)`) to decode [Server Components](/going_further/server_components) in `@client` components (see below).
 
-- The `@encoder` annotation must be used on an **instance method** that returns the same type that the
-  `@decoder` method takes in.
+- The `@encoder` annotation must be used on an **instance method** that returns the same raw type that the
+  `@decoder` method takes in as its first parameter.
 
 - Both methods can have any name.
 
@@ -102,3 +104,73 @@ extension type ModelOverride(Model model) implements Model {
 
 Custom overrides are defined as [extension types](https://dart.dev/language/extension-types) which wrap and implement
 the original type. You must always implement the original type in your extension type.
+
+## Decoding models with Component fields (Server Components)
+
+When passing custom data classes into `@client` components, your models can also have `Component` fields (such as tabs, cards, or custom layouts).
+
+On the server, when a `@client` component is rendered during SSR, Jaspr automatically encodes any nested `Component` inside your `@encoder` output into a Server Component marker ID (e.g. `"s@1"`).
+
+To decode these components on the client, your `@decoder` function can accept a `ComponentMount` parameter:
+
+```dart title="tab_item.dart"
+import 'package:jaspr/jaspr.dart';
+
+class TabItem {
+  final String label;
+  final Component content;
+
+  const TabItem({required this.label, required this.content});
+
+  @decoder
+  factory TabItem.fromJson(Map<String, dynamic> json, ComponentMount mount) {
+    return TabItem(
+      label: json['label'] as String,
+      content: mount(json['content'] as String),
+    );
+  }
+
+  @encoder
+  Map<String, dynamic> toJson() => {
+    'label': label,
+    'content': content,
+  };
+}
+```
+
+During client-side hydration, Jaspr automatically detects that your `@decoder` function expects `ComponentMount` and provides the mount function to resolve the server component markers back into `Component`s.
+
+### Parameter format: Positional or Named
+
+The mount parameter can be either positional or named:
+
+```dart
+// Positional (required or optional):
+@decoder
+static CardData decode(Map<String, dynamic> data, ComponentMount mount) => ...
+
+// Named (required or optional):
+@decoder
+static CardData decode(Map<String, dynamic> data, {ComponentMount? mount}) => ...
+```
+
+### Optional / Nullable Components
+
+For nullable `Component?` fields:
+
+```dart
+header: json['header'] case String id ? mount(id) : null,
+```
+
+### Collections of Components
+
+For lists or maps of components inside custom models:
+
+```dart
+items: (json['items'] as List).cast<String>().map(mount).toList(),
+```
+
+<Info>
+`ComponentMount` is only supported across `@client` component boundaries. It cannot be used with `@sync` fields, as state synchronization does not support Server Components.
+</Info>
+

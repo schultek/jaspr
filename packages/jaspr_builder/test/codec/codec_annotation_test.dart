@@ -81,7 +81,7 @@ void main() {
           errorLogs,
           contains(
             'CodecModuleBuilder on lib/model_invalid_mount.dart:\n'
-            'The second parameter of @decoder must be a function matching "Component Function(String)". Failing element: ModelInvalidMount.fromRaw() in library /site/lib/model_invalid_mount.dart.',
+            'The second parameter of @decoder must be a function matching "ComponentMount". Failing element: ModelInvalidMount.fromRaw() in library /site/lib/model_invalid_mount.dart.',
           ),
         );
       });

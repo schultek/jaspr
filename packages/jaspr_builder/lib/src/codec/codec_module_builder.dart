@@ -106,7 +106,7 @@ class CodecModuleBuilder implements Builder {
       }
       if (candidate.formalParameters.isEmpty || candidate.formalParameters.length > 2) {
         log.severe(
-          'Members annotated with @decoder must have either one parameter or two parameters (with the second being a Component Function(String) mount function). Failing element: ${element.name}.${candidate.name}() in library $libName.',
+          'Members annotated with @decoder must have either one parameter or two parameters (with the second being a ComponentMount mount function). Failing element: ${element.name}.${candidate.name}() in library $libName.',
         );
         return null;
       }
@@ -120,7 +120,7 @@ class CodecModuleBuilder implements Builder {
         final mountParam = candidate.formalParameters[1];
         if (!_isValidMountParameter(mountParam)) {
           log.severe(
-            'The second parameter of @decoder must be a function matching "Component Function(String)". Failing element: ${element.name}.${candidate.name}() in library $libName.',
+            'The second parameter of @decoder must be a function matching "ComponentMount". Failing element: ${element.name}.${candidate.name}() in library $libName.',
           );
           return null;
         }
