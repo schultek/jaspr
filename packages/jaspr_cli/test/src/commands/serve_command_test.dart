@@ -632,6 +632,52 @@ void main() {
       });
     });
 
+    test('passes --enable-experiment on to build_runner and the server', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [...buildRunnerDartArgs, '--enable-experiment=primary-constructors'],
+        );
+        final server = io.stubFakeServer(experiments: ['primary-constructors']);
+
+        final serveResult = runner.run(['serve', '--verbose', '--enable-experiment=primary-constructors']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        expect(io.stdout.queue, emits('[BUILDER] Done building web assets.'));
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', int.parse(serverProxyPort))),
+        );
+
+        await io.expectServerStarted(server);
+
+        server.exit(0);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
     test('serves project with flutter embedding', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'server', flutterEmbedding: true);
@@ -774,6 +820,85 @@ void main() {
       });
     });
 
+    test('serves the proxy on explicit --port with --skip-server', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose', '--skip-server', '--port', '5600']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', 5600)),
+        );
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('JASPR_PROXY_PORT=5600')));
+
+        await io.shutdownBuildDaemon(buildDaemon);
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('serves the proxy on the default proxy port with --skip-server and no --port', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        io.inUsePorts.add(8080);
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose', '--skip-server']);
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.serverSockets.next,
+          completion(isA<FakeServerSocket>().having((s) => s.port, 'port', int.parse(serverProxyPort))),
+        );
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('JASPR_PROXY_PORT=$serverProxyPort')));
+
+        await io.shutdownBuildDaemon(buildDaemon);
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    test('fails when explicit --port is in use with --skip-server', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        io.inUsePorts.add(5600);
+
+        final serveResult = runner.run(['serve', '--skip-server', '--port', '5600']);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Port 5600 is already in use.'),
+        );
+
+        expect(await serveResult, equals(1));
+      });
+    });
+
     test('fails when explicit --port is in use', () async {
       await io.runZoned(() async {
         final stderr = io.stderr.queue;
@@ -857,7 +982,11 @@ const buildRunnerFlutterArgs = [
 ];
 
 extension FakeServerIO on FakeIO {
-  FakeProcess stubFakeServer({String port = '8080', String proxyPort = '5567'}) {
+  FakeProcess stubFakeServer({
+    String port = '8080',
+    String proxyPort = '5567',
+    List<String> experiments = const [],
+  }) {
     final serverProcess = FakeProcess();
 
     when(
@@ -868,6 +997,7 @@ extension FakeServerIO on FakeIO {
           '--enable-vm-service',
           '--enable-asserts',
           '-Djaspr.flags.verbose=false',
+          for (final experiment in experiments) '--enable-experiment=$experiment',
           '/root/myapp/.dart_tool/jaspr/server_target.dart',
         ],
         workingDirectory: '/root/myapp',

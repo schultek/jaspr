@@ -275,6 +275,7 @@ class DevWorkflow {
     required Project project,
     required Logger logger,
     required void Function(FutureOr<void> Function()) guard,
+    List<String> experiments = const [],
     bool enableDebugging = true,
     bool launchInChrome = false,
     ReloadConfiguration reload = ReloadConfiguration.hotRestart,
@@ -377,6 +378,7 @@ class DevWorkflow {
     final css = await CssRunner.watch(
       project: project,
       logger: logger,
+      experiments: experiments,
     );
 
     var cascade = Cascade();
@@ -391,7 +393,7 @@ class DevWorkflow {
     final buildSettings = BuildSettings(
       canaryFeatures: moduleFormat == 'ddc',
       isFlutterApp: false,
-      experiments: [],
+      experiments: experiments,
     );
 
     final reloadedSourcesUri = Uri.parse('/reloaded_sources.json');
