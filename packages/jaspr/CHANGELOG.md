@@ -12,6 +12,7 @@
 - Fixed key shortcuts in `jaspr serve` not working on Windows.
 - Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
 - Fixed `jaspr serve` blocking all following reloads when a connected browser stops responding (e.g. a phone with the screen turned off).
+- Fixed a fragment staying in the DOM after it is removed or replaced when its first or last child renders nothing, such as `Component.empty()`.
 
 ## 0.24.0-beta.0
 
