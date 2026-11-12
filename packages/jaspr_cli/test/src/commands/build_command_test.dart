@@ -97,6 +97,64 @@ void main() {
       });
     });
 
+    test('passes --enable-experiment on to build_runner and the server compile', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [...buildRunnerBuildArgs, '--enable-experiment=primary-constructors'],
+        );
+
+        final serverProcess = FakeProcess();
+        when(
+          () => io.process.start(
+            '/fake/bin/dart',
+            any(that: containsAllInOrder(['compile', 'exe'])),
+            workingDirectory: '/root/myapp',
+          ),
+        ).thenAnswer((inv) async {
+          expect(
+            inv.positionalArguments[1],
+            equals([
+              'compile',
+              'exe',
+              '--enable-experiment=primary-constructors',
+              'lib/main.server.dart',
+              '-o',
+              './build/jaspr/app',
+              '-Djaspr.flags.release=true',
+            ]),
+          );
+
+          return serverProcess;
+        });
+
+        final buildResult = runner.run(['build', '--verbose', '--enable-experiment=primary-constructors']);
+
+        await expectLater(
+          io.stdout.queue,
+          emits('Building myapp in server rendering mode.'),
+        );
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[SERVER] Building server app...',
+            'Compiling server executable.',
+          ]),
+        );
+
+        serverProcess.exit(0);
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
+
+        expect(await buildResult, equals(0));
+      });
+    });
+
     test('builds project with static mode', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'static');
