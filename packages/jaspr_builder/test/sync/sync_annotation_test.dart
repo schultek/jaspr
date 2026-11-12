@@ -110,6 +110,30 @@ void main() {
           ),
         );
       });
+
+      test('model with mount parameter throws error', () async {
+        String? errorLog;
+
+        await testBuilder(
+          SyncMixinsBuilder(BuilderOptions({})),
+          syncInvalidMountSources,
+          outputs: {},
+          readerWriter: reader,
+          onLog: (log) {
+            if (log.level.name == 'SEVERE') {
+              errorLog = log.message;
+            }
+          },
+        );
+
+        expect(
+          errorLog,
+          equals(
+            'SyncMixinsBuilder on lib/component.dart:\nComponentMount is not supported for sync fields.\n'
+            'Failing field: [ModelWithMountPositional model] in ComponentState',
+          ),
+        );
+      });
     });
   });
 }

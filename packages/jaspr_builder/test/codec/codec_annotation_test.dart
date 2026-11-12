@@ -9,6 +9,7 @@ import 'sources/bundle.dart';
 import 'sources/model_class.dart';
 import 'sources/model_enum.dart';
 import 'sources/model_extension.dart';
+import 'sources/model_with_mount.dart';
 
 void main() {
   group('codec annotation', () {
@@ -47,6 +48,41 @@ void main() {
           modelExtensionSources,
           outputs: modelExtensionOutputs,
           readerWriter: reader,
+        );
+      });
+    });
+
+    group('on model with mount parameter', () {
+      test('generates json module with hasMount and mountParam', () async {
+        await testBuilder(
+          CodecModuleBuilder(BuilderOptions({})),
+          modelWithMountSources,
+          outputs: modelWithMountOutputs,
+          readerWriter: reader,
+        );
+      });
+
+      test('invalid mount parameter throws error', () async {
+        final errorLogs = <String>[];
+
+        await testBuilder(
+          CodecModuleBuilder(BuilderOptions({})),
+          modelWithInvalidMountSources,
+          outputs: {},
+          readerWriter: reader,
+          onLog: (log) {
+            if (log.level.name == 'SEVERE') {
+              errorLogs.add(log.message);
+            }
+          },
+        );
+
+        expect(
+          errorLogs,
+          contains(
+            'CodecModuleBuilder on lib/model_invalid_mount.dart:\n'
+            'The second parameter of @decoder must be a function matching "Component Function(String)". Failing element: ModelInvalidMount.fromRaw() in library /site/lib/model_invalid_mount.dart.',
+          ),
         );
       });
     });
