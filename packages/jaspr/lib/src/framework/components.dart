@@ -43,6 +43,14 @@ List<String>? _splitClasses(String? classes) {
   return classNames.isEmpty ? null : classNames;
 }
 
+/// Returns the names an apply added after the first [ownCount] of [names].
+///
+/// The collections preserve insertion order.
+/// Values added by an apply come after the component's own values,
+/// which always win for the same key.
+List<String> _addedNames(Iterable<String> names, int ownCount) =>
+    names.length == ownCount ? const [] : names.skip(ownCount).toList(growable: false);
+
 class DomElement extends DomRenderObjectElement {
   DomElement(DomComponent super.component);
 
@@ -77,6 +85,12 @@ class DomElement extends DomRenderObjectElement {
     return renderObject;
   }
 
+  /// The values supplied by inherited params in the last render.
+  /// A removed child slot can leave its DOM in place,
+  /// so it releases these before the view takes over.
+  @internal
+  ({String? id, List<String> classes, List<String> styles, List<String> attributes})? inheritedDomValues;
+
   @override
   void updateRenderObject(RenderElement renderObject) {
     var id = component.id;
@@ -85,11 +99,15 @@ class DomElement extends DomRenderObjectElement {
     var attributes = component.attributes;
     var events = component.events;
 
+    inheritedDomValues = null;
     if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
       final classesSet = {...?_splitClasses(classes)};
       styles = Map.of(styles ?? {});
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
+      final ownClassCount = classesSet.length;
+      final ownStyleCount = styles.length;
+      final ownAttributeCount = attributes.length;
 
       for (final param in inheritedDomParams.reversed) {
         if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
@@ -124,6 +142,18 @@ class DomElement extends DomRenderObjectElement {
         }
       }
 
+      if (binding.isClient &&
+          (id != component.id ||
+              classesSet.length != ownClassCount ||
+              styles.length != ownStyleCount ||
+              attributes.length != ownAttributeCount)) {
+        inheritedDomValues = (
+          id: id != component.id && attributes['id'] == null ? id : null,
+          classes: attributes['class'] == null ? _addedNames(classesSet, ownClassCount) : const [],
+          styles: attributes['style'] == null ? _addedNames(styles.keys, ownStyleCount) : const [],
+          attributes: _addedNames(attributes.keys, ownAttributeCount),
+        );
+      }
       classes = classesSet.join(' ');
     }
 

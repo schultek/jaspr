@@ -413,6 +413,127 @@ void main() {
       });
     }
 
+    testClient('hands applied params to the child hydrating a new query slot', (tester) async {
+      window.document.body!.innerHTML =
+          '<section><main><div><button></button></div></main><button></button></section>'.toJS;
+      final slotted = window.document.querySelector('main button')! as HTMLElement;
+      final outside = window.document.querySelector('main + button')! as HTMLElement;
+      var showSlot = false;
+      var enabled = false;
+      var ownClicks = 0;
+      var appliedClicks = 0;
+      late void Function(void Function()) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: const .descendantWith(tag: 'button'),
+              classes: enabled ? 'shared' : null,
+              styles: enabled ? const Styles(color: Colors.red) : null,
+              attributes: enabled ? const {'data-target': 'true'} : null,
+              events: enabled ? {'click': (_) => appliedClicks++} : null,
+              child: SlottedChildView(
+                slots: [
+                  if (showSlot)
+                    .fromQuery(
+                      'main:has(button[data-target="true"])',
+                      child: div([
+                        button(
+                          classes: 'shared',
+                          styles: const Styles(color: Colors.blue),
+                          attributes: const {'data-target': 'own'},
+                          events: {'click': (_) => ownClicks++},
+                          [],
+                        ),
+                      ]),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      setState(() {
+        showSlot = true;
+        enabled = true;
+      });
+      await pumpEventQueue();
+
+      expect(window.document.querySelector('main button'), equals(slotted));
+      expect(slotted.getAttribute('data-target'), 'own');
+      expect(slotted.style.color, 'blue');
+      expect(outside.getAttribute('data-target'), 'true');
+      slotted.click();
+      expect(ownClicks, 1);
+      expect(appliedClicks, 0);
+      outside.click();
+      expect(appliedClicks, 1);
+
+      setState(() => enabled = false);
+      await pumpEventQueue();
+      expect(slotted.className, 'shared');
+      expect(slotted.getAttribute('data-target'), 'own');
+      expect(slotted.style.color, 'blue');
+      expect(outside.hasAttribute('data-target'), isFalse);
+
+      // Once the slot is removed, the view can bind the remaining button again.
+      setState(() {
+        showSlot = false;
+        enabled = true;
+      });
+      await pumpEventQueue();
+      expect(window.document.querySelector('main button'), equals(slotted));
+      expect(slotted.getAttribute('data-target'), 'own');
+      slotted.click();
+      expect(ownClicks, 1);
+      expect(appliedClicks, 2);
+    });
+
+    testClient('hands applied params to a keyed slot moved into a new view', (tester) async {
+      final section = window.document.createElement('section')..innerHTML = '<main><button></button></main>'.toJS;
+      final nodes = [section];
+      final btn = section.querySelector('button')!;
+      final slotKey = GlobalKey();
+      var moved = false;
+      late void Function(void Function()) setState;
+
+      Component view() => .apply(
+        target: const .descendantWith(tag: 'button'),
+        attributes: moved ? const {'data-target': 'true'} : null,
+        child: SlottedChildView.withNodes(
+          nodes: nodes,
+          slots: [
+            .fromQuery(
+              'main',
+              key: slotKey,
+              child: button(attributes: moved ? const {'data-target': 'own'} : null, []),
+            ),
+          ],
+        ),
+      );
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .fragment([
+              div(id: 'source', [if (!moved) view()]),
+              div(id: 'destination', [if (moved) view()]),
+            ]);
+          },
+        ),
+      );
+
+      expect(window.document.querySelector('#source button'), equals(btn));
+      setState(() => moved = true);
+      await pumpEventQueue();
+      expect(window.document.querySelector('#destination button'), equals(btn));
+      expect(btn.getAttribute('data-target'), 'own');
+    });
+
     testClient('keeps the state of form elements in a removed slot', (tester) async {
       window.document.body!.innerHTML = '<section><main><input value="Initial"></main></section>'.toJS;
       final field = window.document.querySelector('input')! as HTMLInputElement;
