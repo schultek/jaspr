@@ -3,6 +3,7 @@ import 'package:build_test/build_test.dart';
 import 'package:jaspr_builder/src/sync/sync_mixins_builder.dart';
 import 'package:test/test.dart';
 
+import '../test_helper.dart';
 import 'sources/sync_basic.dart';
 import 'sources/sync_invalid.dart';
 import 'sources/sync_model_class.dart';
@@ -14,8 +15,7 @@ void main() {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'site');
-      await reader.testing.loadIsolateSources();
+      reader = await createTestReaderWriter();
     });
 
     group('on basic component', () {

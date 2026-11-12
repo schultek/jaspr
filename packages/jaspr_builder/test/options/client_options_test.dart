@@ -3,6 +3,7 @@ import 'package:build_test/build_test.dart';
 import 'package:jaspr_builder/src/options/client_options_builder.dart';
 import 'package:test/test.dart';
 
+import '../test_helper.dart';
 import 'sources/client_options.dart';
 import 'sources/client_options_other.dart';
 
@@ -11,8 +12,7 @@ void main() {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'models');
-      await reader.testing.loadIsolateSources();
+      reader = await createTestReaderWriter();
     });
 
     test('generates options', () async {

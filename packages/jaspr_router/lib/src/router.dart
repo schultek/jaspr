@@ -99,8 +99,12 @@ class RouterState extends State<Router> with PreloadStateMixin {
   }
 
   /// Preloads the route for faster navigation. Works with [LazyRoute]s.
+  ///
+  /// Preloading is not a navigation, so no redirects are evaluated for the
+  /// given [location]. Redirects only run when the route is actually
+  /// navigated to.
   Future<void> preload(String location) {
-    return _matchRoute(location).then(_preload);
+    return _matchRoute(location, applyRedirects: false).then(_preload);
   }
 
   /// Pushes a new route onto the history stack.
@@ -214,8 +218,13 @@ class RouterState extends State<Router> with PreloadStateMixin {
     return RouteLoader.wait(loaders).then((_) => match);
   }
 
-  Future<RouteMatchList> _matchRoute(String location, {Object? extra}) {
-    return component._parser.parseRouteInformation(location, context, extra: extra);
+  Future<RouteMatchList> _matchRoute(String location, {Object? extra, bool applyRedirects = true}) {
+    return component._parser.parseRouteInformation(
+      location,
+      context,
+      extra: extra,
+      applyRedirects: applyRedirects,
+    );
   }
 
   String _normalizeUrl(String location) {

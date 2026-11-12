@@ -1,6 +1,17 @@
 ## Unreleased 0.24.0-beta.1
 
+- With `--skip-server`, `jaspr serve` and `jaspr daemon` run the proxy on `--port` when it is passed, so the
+  server can be started with `JASPR_PROXY_PORT` up front.
 - Fixed issue with hot-reload in client mode.
+- Added `ServerApp.reassemble()` for servers that render Jaspr and reload code themselves.
+  It notifies `ServerApp.onReassemble` listeners, such as the caches in `jaspr_content`.
+- Fixed styles hot-reload recompiling all dependencies on every change on Windows.
+- `kReleaseMode` is now also true in product builds of the Dart VM, such as `dart compile exe` or `dart build cli`,
+  not only with `-Djaspr.flags.release=true`. A server that embeds Jaspr and is built without `jaspr build`
+  no longer renders in debug mode. This matches what `kDebugMode` was already documented to do.
+- Fixed key shortcuts in `jaspr serve` not working on Windows.
+- Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
+- Fixed `jaspr serve` blocking all following reloads when a connected browser stops responding (e.g. a phone with the screen turned off).
 
 ## 0.24.0-beta.0
 
@@ -76,6 +87,7 @@
 - Require Dart 3.13 or later.
 - Updated `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
 - Added `@Target` meta annotation to `@client`, `@encoder`, `@decoder`, and `@Import` annotations to indicate where they are allowed to be used.
+- Added `--enable-experiment` to `jaspr build` and `jaspr serve` for Dart language experiments. It is passed on to `build_runner`, the server and the stylesheet generation.
 - Fixed DOM nodes sometimes staying in place after their component is removed, keeping the component's event listeners, which could make handlers fire more than once.
 - Fixed style generation in `standalone` mode when importing web libraries like `package:web` or `dart:js_interop`.
 - Fixed hydration of nullable `@client` parameters that use custom codecs when their value is `null`.
