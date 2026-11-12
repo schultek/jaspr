@@ -142,7 +142,7 @@ class TabItem {
 ```
 
 - Parameter can be positional (`ComponentMount mount`) or named (`{ComponentMount? mount}`).
-- For nullable components, use pattern matching: `header: json['header'] case String id ? mount(id) : null`.
+- For nullable components, use a null check: `header: json['header'] != null ? mount(json['header'] as String) : null` (or a switch expression).
 - `ComponentMount` is only supported across `@client` boundaries, NOT for `@sync` fields.
 
 ---

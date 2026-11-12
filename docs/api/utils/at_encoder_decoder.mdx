@@ -159,7 +159,9 @@ static CardData decode(Map<String, dynamic> data, {ComponentMount? mount}) => ..
 For nullable `Component?` fields:
 
 ```dart
-header: json['header'] case String id ? mount(id) : null,
+header: json['header'] != null ? mount(json['header'] as String) : null,
+// or using a switch expression:
+header: switch (json['header']) { String id => mount(id), _ => null },
 ```
 
 ### Collections of Components
