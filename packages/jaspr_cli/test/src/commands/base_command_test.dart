@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:file/memory.dart';
 import 'package:jaspr_cli/src/commands/base_command.dart';
 import 'package:test/test.dart';
@@ -73,6 +75,62 @@ void main() {
       });
     });
   });
+  group('error handling and cleanup', () {
+    late FakeIO io;
+
+    setUp(() {
+      io = FakeIO();
+      io.setupFakeProject('myapp');
+    });
+
+    test('cleans up guards and watched processes when uncaught async error occurs', () async {
+      await io.runZoned(() async {
+        bool guardExecuted = false;
+        final fakeProcess = FakeProcess();
+
+        final command = _ErrorCommand(
+          onRun: (cmd) {
+            cmd.guardResource(() {
+              guardExecuted = true;
+            });
+            cmd.watchProcess('fake', fakeProcess);
+
+            // Trigger an uncaught asynchronous error in the zone
+            scheduleMicrotask(() {
+              throw StateError('Simulated uncaught async crash');
+            });
+          },
+        );
+
+        await expectLater(command.run(), throwsA(isA<StateError>()));
+        expect(guardExecuted, isTrue);
+        expect(fakeProcess.killed, isTrue);
+      });
+    });
+
+    test('cleans up guards and watched processes when runCommand throws synchronously/asynchronously', () async {
+      await io.runZoned(() async {
+        bool guardExecuted = false;
+        final fakeProcess = FakeProcess();
+
+        final command = _ErrorCommand(
+          onRun: (cmd) {
+            cmd.guardResource(() {
+              guardExecuted = true;
+            });
+            cmd.watchProcess('fake', fakeProcess);
+            throw Exception('Sync command failure');
+          },
+        );
+
+        expect(command.run(), throwsA(isA<Exception>()));
+        await pumpEventQueue();
+
+        expect(guardExecuted, isTrue);
+        expect(fakeProcess.killed, isTrue);
+      });
+    });
+  });
 }
 
 class _TestCommand extends BaseCommand {
@@ -87,5 +145,25 @@ class _TestCommand extends BaseCommand {
 
   Future<void> copy(String from, [List<String> targets = const ['']]) {
     return copyToBuildDir(from, targets);
+  }
+}
+
+class _ErrorCommand extends BaseCommand {
+  _ErrorCommand({required this.onRun});
+
+  final FutureOr<void> Function(_ErrorCommand) onRun;
+
+  @override
+  String get description => 'Error test command';
+
+  @override
+  String get name => 'error_test';
+
+  @override
+  Future<int> runCommand() async {
+    await onRun(this);
+    // Completer to keep command running if waiting for async error
+    final completer = Completer<int>();
+    return completer.future;
   }
 }

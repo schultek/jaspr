@@ -1,15 +1,14 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
+import 'package:http/retry.dart' as retry;
+import 'package:path/path.dart' as path;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_gzip/shelf_gzip.dart';
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
-import 'package:sse/server/sse_handler.dart';
 
 import '../foundation/constants.dart';
 import 'options.dart';
@@ -19,17 +18,32 @@ import 'server_app.dart';
 final String? jasprProxyPort = Platform.environment['JASPR_PROXY_PORT'];
 const String kDevWeb = String.fromEnvironment('jaspr.dev.web');
 
-final String webDir = kDevWeb.isNotEmpty ? kDevWeb : join(_findRootProjectDir(), 'web');
+/// The directory that static web assets are served from.
+///
+/// Defaults to the `web` directory of the root project,
+/// unless overridden with the `jaspr.dev.web` environment declaration.
+final String webDir = kDevWeb.isNotEmpty ? kDevWeb : path.join(_findRootProjectDir(), 'web');
 
 String _findRootProjectDir() {
-  final executableDir = dirname(Platform.script.toFilePath());
-  final workingDir = Directory.current.path;
+  final script = Platform.script;
+  // The script has no file path when it's not a file,
+  // such as the data uri of a hybrid isolate spawned by `package:test`.
+  final scriptPath = script.scheme.isEmpty || script.isScheme('file') ? script.toFilePath() : null;
 
-  if (Platform.resolvedExecutable == Platform.script.toFilePath()) {
-    return executableDir;
+  // When running as a compiled executable,
+  // the script is the executable itself,
+  // so its directory is the project directory.
+  if (scriptPath != null && Platform.resolvedExecutable == scriptPath) {
+    return path.dirname(scriptPath);
   }
 
-  final foundDir = _tryFindRootProjectDir(executableDir) ?? _tryFindRootProjectDir(workingDir);
+  // Otherwise search upwards for a `pubspec.yaml`,
+  // starting from the script's directory when it has one,
+  // then fall back to looking from the current working directory.
+  final workingDir = Directory.current.path;
+  final foundDir = scriptPath != null
+      ? _tryFindRootProjectDir(path.dirname(scriptPath)) ?? _tryFindRootProjectDir(workingDir)
+      : _tryFindRootProjectDir(workingDir);
 
   if (foundDir == null) {
     throw Exception('Could not resolve project directory containing pubspec.yaml');
@@ -39,11 +53,11 @@ String _findRootProjectDir() {
 }
 
 String? _tryFindRootProjectDir(String startingDir) {
-  if (File(join(startingDir, 'pubspec.yaml')).existsSync()) {
+  if (File(path.join(startingDir, 'pubspec.yaml')).existsSync()) {
     return startingDir;
   }
 
-  final parentDir = dirname(startingDir);
+  final parentDir = path.dirname(startingDir);
   if (startingDir == parentDir) {
     return null;
   }
@@ -69,30 +83,24 @@ Handler createHandler(
 
   var cascade = Cascade();
 
-  if (kDebugMode) {
-    final sseHandler = SseHandler(Uri(path: r'/$jasprEventsHandler'));
-    sseHandler.connections.rest.listen(
-      (connection) => ClientConnection._initialize(connection),
-      onDone: () {},
-    );
-
-    cascade = cascade.add(sseHandler.handler);
-  }
-
   if (jasprProxyPort != null) {
     cascade = cascade.add(_sseProxyHandler(client, jasprProxyPort!));
   }
 
   // We skip static file handling in generate mode to always generate fresh content on the server.
   if (!kGenerateMode) {
-    cascade = cascade.add(gzipMiddleware(staticHandler));
+    cascade = cascade.add(gzipMiddleware(_drainingHandler(_dropUnparsableConditional(staticHandler))));
   }
 
   cascade = cascade.add((request) async {
     var isAllowedPath = false;
     final segment = request.url.pathSegments.lastOrNull ?? '';
     if (!segment.contains('.')) {
-      isAllowedPath = true;
+      if (kDebugMode) {
+        isAllowedPath = !request.url.path.startsWith(r'$dwds') && !request.url.path.startsWith(r'$jaspr');
+      } else {
+        isAllowedPath = true;
+      }
     } else {
       final suffix = segment.split('.').last;
       if (Jaspr.allowedPathSuffixes.contains(suffix)) {
@@ -113,6 +121,25 @@ Handler createHandler(
   return cascade.handler;
 }
 
+/// Drops an `If-Modified-Since` header that is not a date.
+///
+/// `shelf_static` reads the header through `Request.ifModifiedSince`, which
+/// throws a `FormatException` on anything it cannot parse, and the request
+/// then fails with a 500 — over a header the client sent. RFC 9110 says a
+/// recipient must ignore an `If-Modified-Since` field value that is not a
+/// valid date, so it is dropped and the file is served as if it had not been
+/// there.
+Handler _dropUnparsableConditional(Handler handler) {
+  return (Request request) {
+    try {
+      request.ifModifiedSince;
+    } on FormatException {
+      return handler(request.change(headers: {'if-modified-since': null}));
+    }
+    return handler(request);
+  };
+}
+
 Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandler) {
   return (name) async {
     final indexRequest = Request(
@@ -124,14 +151,39 @@ Future<String?> Function(String) proxyFileLoader(Request req, Handler proxyHandl
       protocolVersion: req.protocolVersion,
     );
     final response = await proxyHandler(indexRequest);
-    return response.statusCode == 200 ? response.readAsString() : null;
+    if (response.statusCode == 200) {
+      return response.readAsString();
+    }
+    await response.read().drain<void>().catchError((_) {});
+    return null;
   };
 }
 
 Handler createProxyHandler(http.Client? client) {
-  final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: client);
-  // Determine and pass the base path to the proxy handler so it can rewrite DWDS handler paths correctly.
-  return (req) => handler(req.change(headers: {'jaspr_base_path': req.handlerPath}));
+  final c = retry.RetryClient(client ?? http.Client(), whenError: (e, _) => e is http.ClientException);
+  final handler = proxyHandler('http://localhost:$jasprProxyPort/', client: c);
+  return (req) async {
+    try {
+      return await handler(req);
+    } on http.ClientException {
+      return Response(503, headers: {'Retry-After': '1'});
+    } on SocketException {
+      return Response(503, headers: {'Retry-After': '1'});
+    }
+  };
+}
+
+/// Drains the response body for cascading status codes (404/405) before
+/// [Cascade] drops the response, preventing connection leaks when proxying.
+Handler _drainingHandler(Handler handler) {
+  return (request) async {
+    final response = await handler(request);
+    if (response.statusCode case 404 || 405) {
+      await response.read().drain<void>().catchError((_) {});
+      return response.change(body: '');
+    }
+    return response;
+  };
 }
 
 // coverage:ignore-start
@@ -196,34 +248,3 @@ Handler _sseProxyHandler(http.Client client, String webPort) {
 }
 
 // coverage:ignore-end
-
-class ClientConnection {
-  ClientConnection._(this._connection) {
-    _connection.stream.listen(
-      (event) {
-        final message = jsonDecode(event);
-        if (message case ['RouteInfo', final String route]) {
-          currentRoute = route;
-        }
-      },
-      onDone: () {
-        _connections.remove(this);
-      },
-    );
-  }
-
-  final SseConnection _connection;
-  String? currentRoute;
-
-  static void _initialize(SseConnection connection) {
-    final client = ClientConnection._(connection);
-    _connections.add(client);
-  }
-
-  static List<ClientConnection> get connections => UnmodifiableListView(_connections);
-  static final List<ClientConnection> _connections = [];
-
-  void reload() {
-    _connection.sink.add(jsonEncode(['ReloadRequest']));
-  }
-}

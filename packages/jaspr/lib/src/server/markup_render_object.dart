@@ -1,18 +1,21 @@
 import 'dart:convert';
 
+import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../../server.dart';
 import '../dom/validator.dart';
-import 'child_nodes.dart';
 
-abstract class MarkupRenderObject extends RenderObject implements RawableRenderObject {
+part 'child_nodes.dart';
+
+abstract final class MarkupRenderObject extends ChildNode implements RawableRenderObject {
   @override
   MarkupRenderObject? parent;
   @override
   web.Node? get node => null;
 
-  late final ChildList children = ChildList(this);
+  /// The entries rendered as the children of this render object.
+  late final ChildList children = ChildList._(this);
 
   @override
   MarkupRenderElement createChildRenderElement(String tag) {
@@ -31,8 +34,8 @@ abstract class MarkupRenderObject extends RenderObject implements RawableRenderO
 
   @override
   void attach(MarkupRenderObject child, {MarkupRenderObject? after}) {
-    child.parent = this;
     children.insertAfter(child, after: after);
+    child.parent = this;
   }
 
   @override
@@ -40,6 +43,9 @@ abstract class MarkupRenderObject extends RenderObject implements RawableRenderO
     children.remove(child);
     child.parent = null;
   }
+
+  @override
+  void dispose() {}
 
   String renderToHtml() {
     return _renderAndFormat().$1;
@@ -155,7 +161,7 @@ abstract class MarkupRenderObject extends RenderObject implements RawableRenderO
   }
 }
 
-class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
+final class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
   MarkupRenderElement(this.tag);
 
   final String tag;
@@ -234,7 +240,7 @@ class MarkupRenderElement extends MarkupRenderObject implements RenderElement {
   }
 }
 
-class MarkupRenderText extends MarkupRenderObject implements RawableRenderText {
+final class MarkupRenderText extends MarkupRenderObject implements RawableRenderText {
   MarkupRenderText(this.text, this.rawHtml);
 
   String text;
@@ -270,7 +276,7 @@ class MarkupRenderText extends MarkupRenderObject implements RawableRenderText {
   }
 }
 
-class MarkupRenderFragment extends MarkupRenderObject implements RenderFragment {
+final class MarkupRenderFragment extends MarkupRenderObject implements RenderFragment {
   @override
   (String, bool, bool) _renderAndFormat([
     bool strictFormatting = false,
@@ -282,7 +288,7 @@ class MarkupRenderFragment extends MarkupRenderObject implements RenderFragment 
   }
 }
 
-class RootMarkupRenderObject extends MarkupRenderObject {
+final class RootMarkupRenderObject extends MarkupRenderObject {
   @override
   (String, bool, bool) _renderAndFormat([
     bool strictFormatting = false,

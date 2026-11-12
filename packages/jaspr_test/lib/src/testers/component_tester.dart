@@ -119,6 +119,7 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   final String basePath;
 
   @override
+  @protected
   void scheduleFrame(VoidCallback frameCallback) {
     Future.microtask(frameCallback);
   }
@@ -142,7 +143,7 @@ class TestComponentsBinding extends AppBinding with ComponentsBinding {
   }
 }
 
-class TestRenderObject extends RenderObject implements RawableRenderObject {
+class TestRenderObject implements RawableRenderObject {
   List<TestRenderObject> children = [];
 
   @override
@@ -183,6 +184,9 @@ class TestRenderObject extends RenderObject implements RawableRenderObject {
     children.remove(child);
     child.parent = null;
   }
+
+  @override
+  void dispose() {}
 }
 
 class TestRenderElement extends TestRenderObject implements RenderElement {

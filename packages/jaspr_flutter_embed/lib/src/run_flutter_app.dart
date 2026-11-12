@@ -18,13 +18,14 @@ Future<FlutterApp> _flutterApp = Future(() {
   final completer = Completer<FlutterApp>();
 
   flutter!.loader!.didCreateEngineInitializer = (EngineInitializer engineInitializer) {
-    return Future(() async {
+    return (() async {
       final engine = await engineInitializer
           .initializeEngine(InitializeEngineOptions(multiViewEnabled: true, renderer: 'canvaskit'))
           .toDart;
       final app = await engine.runApp().toDart;
       completer.complete(app);
-    }).toJS;
+      return app;
+    })().toJS;
   }.toJS;
 
   ui_web.bootstrapEngine(
@@ -48,6 +49,7 @@ Future<int> addView(Element target, ViewConstraints? constraints, flt.Widget wid
 Future<void> removeView(int viewId) async {
   final app = await _flutterApp;
   app.removeView(viewId);
+  _viewWidgets.remove(viewId);
 }
 
 /// Handle to the [_flutter] object defined by the 'flutter.js' script.

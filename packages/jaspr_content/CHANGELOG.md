@@ -1,3 +1,7 @@
+## 0.6.0-beta.0
+
+- Require Dart 3.13 or later.
+
 ## 0.5.4
 
 - Invalidate dependents of deleted partials while serving.

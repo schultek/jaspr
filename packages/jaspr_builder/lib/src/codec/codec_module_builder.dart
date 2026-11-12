@@ -123,7 +123,7 @@ class CodecModuleBuilder implements Builder {
       return candidate;
     }
 
-    final annotated = [...library.classes, ...library.extensionTypes]
+    final annotated = [...library.classes, ...library.enums, ...library.extensionTypes]
         .map<(InterfaceElement, ExecutableElement, MethodElement)?>((element) {
           final decoder = findDecoderForElement(element);
           final encoder = findEncoderForElement(element);

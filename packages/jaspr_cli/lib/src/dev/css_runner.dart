@@ -1,0 +1,546 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:collection/collection.dart';
+import 'package:frontend_server_client/frontend_server_client.dart';
+import 'package:glob/glob.dart';
+import 'package:glob/list_local_fs.dart';
+import 'package:meta/meta.dart';
+import 'package:path/path.dart' as p;
+import 'package:vm_service/vm_service.dart';
+import 'package:vm_service/vm_service_io.dart';
+
+import '../logging.dart';
+import '../process_runner.dart';
+import '../project.dart';
+import '../utils.dart';
+
+class CssRunner {
+  CssRunner(this.project, this.logger, {this.experiments = const []});
+
+  final Project project;
+  final Logger logger;
+
+  /// The Dart language experiments the styles are compiled with.
+  final List<String> experiments;
+
+  // Tracks the *.styles.dart files generated from `@css` declarations.
+  List<String> stylesFiles = [];
+
+  final librariesFile = File('.dart_tool/jaspr/css/libraries.json').absolute;
+  final runnerFile = File('.dart_tool/jaspr/css/css_runner.dart').absolute;
+  final packageConfigFile = File('.dart_tool/jaspr/css/package_config.json').absolute;
+
+  FrontendServerClient? client;
+  Process? process;
+
+  final Set<Uri> sources = {};
+  VmService? vmService;
+  String? isolateId;
+
+  List<String> cssFiles = [];
+  final List<String> _changedFiles = [];
+  Completer<void>? _generationCompleter;
+
+  final Completer<void> _initialGenerationCompleter = Completer<void>();
+  Future<void> get initialGenerationComplete => process != null ? _initialGenerationCompleter.future : Future.value();
+
+  bool _disposed = false;
+  bool _restarting = false;
+
+  /// Starts the CSS runner in watch mode for development.
+  static Future<CssRunner> watch({
+    required Project project,
+    required Logger logger,
+    List<String> experiments = const [],
+  }) async {
+    final runner = CssRunner(project, logger, experiments: experiments)..prepare();
+    await runner.start();
+    return runner;
+  }
+
+  /// Runs the CSS runner once to compile CSS for production builds.
+  static Future<int> build({
+    required Project project,
+    required Logger logger,
+    List<String> experiments = const [],
+  }) async {
+    final runner = CssRunner(project, logger, experiments: experiments)..prepare();
+    return await runner._build();
+  }
+
+  void prepare() {
+    final generatedDir = Directory('.dart_tool/jaspr/generated');
+    if (generatedDir.existsSync()) {
+      generatedDir.deleteSync(recursive: true);
+    }
+    generatedDir.createSync(recursive: true);
+
+    String? jasprPath;
+
+    final (packagesPath, packagesConfig) = getPackagesFile(logger: logger);
+    if (packagesPath == null || packagesConfig == null) return;
+
+    jasprPath = getJasprPackagePath(packagesPath, packagesConfig, logger: logger);
+    if (jasprPath == null) return;
+
+    if (packagesConfig case {'packages': final List<Object?> configPackages}) {
+      for (final package in configPackages) {
+        package as Map<String, Object?>;
+
+        if (package case {'name': 'universal_web'}) {
+          package['rootUri'] = Uri.file(p.join(jasprPath, 'lib/src/stub')).toString();
+          package['packageUri'] = 'web/';
+        }
+
+        // Make all relative paths absolute
+        final rootUri = Uri.parse(package['rootUri'] as String);
+        if (!rootUri.isAbsolute) {
+          package['rootUri'] = Uri.file(p.canonicalize(p.join(p.dirname(packagesPath), rootUri.path))).toString();
+        }
+      }
+    }
+
+    packageConfigFile.createSync(recursive: true);
+    packageConfigFile.writeAsStringSync(JsonEncoder.withIndent('  ').convert(packagesConfig));
+
+    final mockJSInteropUri = Uri.file(p.absolute(p.join(jasprPath, 'lib/src/stub/js/js_interop.dart'))).toString();
+    final mockJSInteropUnsafeUri = Uri.file(
+      p.absolute(p.join(jasprPath, 'lib/src/stub/js/js_interop_unsafe.dart')),
+    ).toString();
+
+    final defaultLibrariesJson = File(p.join(dartSdkDir, 'lib', 'libraries.json'));
+    if (!defaultLibrariesJson.existsSync()) return;
+
+    final librariesJsonStr = defaultLibrariesJson.readAsStringSync();
+    final libraries = jsonDecode(librariesJsonStr) as Map<String, Object?>;
+
+    if (libraries['vm_common'] case {'libraries': final Map<String, Object?> libs}) {
+      const supportConditionalImportKey = 'support_conditional_import';
+      if (project.modeOrNull == JasprMode.client) {
+        libs['js_interop'] = {'uri': mockJSInteropUri};
+        libs['js_interop_unsafe'] = {'uri': mockJSInteropUnsafeUri};
+
+        if (libs['io'] case final Map<String, Object?> io) io[supportConditionalImportKey] = false;
+        if (libs['ffi'] case final Map<String, Object?> ffi) ffi[supportConditionalImportKey] = false;
+        if (libs['isolate'] case final Map<String, Object?> isolate) isolate[supportConditionalImportKey] = false;
+      } else {
+        libs['js_interop'] = {'uri': mockJSInteropUri, supportConditionalImportKey: false};
+        libs['js_interop_unsafe'] = {'uri': mockJSInteropUnsafeUri, supportConditionalImportKey: false};
+      }
+    }
+
+    librariesFile.createSync(recursive: true);
+    librariesFile.writeAsStringSync(JsonEncoder.withIndent('  ').convert(libraries));
+  }
+
+  Future<void> start() async {
+    assert(client == null);
+    assert(process == null);
+
+    _changedFiles.clear();
+    try {
+      final cssFiles = stylesFiles = await _generateRunner(watch: true);
+      if (cssFiles.isEmpty) return;
+      this.cssFiles = cssFiles;
+
+      final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
+
+      if (!_initialGenerationCompleter.isCompleted) {
+        logger.write('Starting CSS generation...', tag: Tag.css);
+      }
+
+      client = await FrontendServerClient.start(
+        runnerFile.path,
+        Directory.current.absolute.uri.resolve('.dart_tool/jaspr/css/css_runner.dill').toFilePath(),
+        platformKernel,
+        target: 'vm',
+        sdkRoot: dartSdkDir,
+        librariesSpec: librariesFile.uri.toString(),
+        packagesJson: packageConfigFile.uri.toString(),
+        enabledExperiments: experiments,
+        printIncrementalDependencies: true,
+      );
+
+      final compilerResult = await client!.compile();
+
+      if (compilerResult.errorCount > 0) {
+        logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
+        logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
+      }
+
+      if (compilerResult.dillOutput != null) {
+        client!.accept();
+        sources.addAll(compilerResult.newSources.whereNot(uriInPubCache));
+        await _startProcess(cssFiles);
+      } else {
+        await client!.reject();
+        sources.clear();
+      }
+    } catch (e) {
+      logger.write('Failed to start CSS runner: $e', tag: Tag.css, level: Level.warning);
+      if (!_initialGenerationCompleter.isCompleted) {
+        _initialGenerationCompleter.complete();
+      }
+      if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+        _generationCompleter!.complete();
+        _generationCompleter = null;
+      }
+    }
+  }
+
+  Future<void> _startProcess(List<String> cssFiles) async {
+    final completer = _generationCompleter = Completer<void>();
+
+    final Process currentProcess;
+    try {
+      currentProcess = process = await Process.start(dartExecutable, [
+        'run',
+        '--enable-vm-service=0',
+        '.dart_tool/jaspr/css/css_runner.dill',
+      ], workingDirectory: Directory.current.absolute.path);
+    } catch (_) {
+      if (!_initialGenerationCompleter.isCompleted) {
+        _initialGenerationCompleter.complete();
+      }
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+      _generationCompleter = null;
+      rethrow;
+    }
+
+    currentProcess.stdout.transform(utf8.decoder).transform(LineSplitter()).listen((line) {
+      _processCssOutput(
+        line,
+        onVmServiceUri: (vmServiceUri) async {
+          try {
+            vmService = await vmServiceConnectUri(vmServiceUri);
+            final vm = await vmService!.getVM();
+            isolateId = vm.isolates!.first.id;
+          } catch (e) {
+            logger.write(
+              'Failed to connect to CSS runner, styles will not be hot-reloaded: $e',
+              tag: Tag.css,
+              level: Level.warning,
+            );
+          }
+        },
+        onDone: () {
+          if (!_initialGenerationCompleter.isCompleted) {
+            _initialGenerationCompleter.complete();
+          }
+          if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+            _generationCompleter!.complete();
+            _generationCompleter = null;
+          }
+        },
+      );
+    });
+
+    currentProcess.stderr.transform(utf8.decoder).transform(LineSplitter()).listen((line) async {
+      logger.write('[Runner] $line', tag: Tag.css, level: Level.error);
+    });
+
+    currentProcess.exitCode.then((value) {
+      if (_disposed || _restarting || currentProcess != process) return;
+      if (value != 0) {
+        logger.write('CSS runner exited with code $value', tag: Tag.css, level: Level.error);
+      }
+      process = null;
+      vmService = null;
+      isolateId = null;
+      if (!_initialGenerationCompleter.isCompleted) {
+        _initialGenerationCompleter.complete();
+      }
+      if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+        _generationCompleter!.complete();
+        _generationCompleter = null;
+      }
+    });
+
+    await completer.future;
+  }
+
+  Future<List<String>> restart() async {
+    _changedFiles.clear();
+    if (stylesFiles.isNotEmpty) {
+      logger.write('Restarting CSS runner...', tag: Tag.css);
+    }
+    _restarting = true;
+    try {
+      client?.kill();
+      client = null;
+      process?.kill();
+      process = null;
+      vmService?.dispose();
+      vmService = null;
+      isolateId = null;
+      sources.clear();
+    } finally {
+      _restarting = false;
+    }
+
+    try {
+      prepare();
+      await start();
+    } catch (e) {
+      logger.write('Failed to restart CSS runner: $e', tag: Tag.css, level: Level.warning);
+    }
+    return List.unmodifiable(_changedFiles);
+  }
+
+  Future<List<String>> reload() async {
+    _changedFiles.clear();
+    try {
+      final cssFiles = stylesFiles = await _generateRunner(watch: true);
+      if (cssFiles.isEmpty) return const [];
+      this.cssFiles = cssFiles;
+
+      if (client == null) {
+        await start();
+        return List.unmodifiable(_changedFiles);
+      }
+
+      final compilerResult = await client!.compile([Uri.file(runnerFile.path), ...sources]);
+
+      if (compilerResult.errorCount > 0) {
+        logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
+        logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
+
+        await client!.reject();
+      } else {
+        client!.accept();
+        sources.removeAll(compilerResult.removedSources);
+        sources.addAll(compilerResult.newSources.whereNot(uriInPubCache));
+      }
+
+      if (compilerResult.dillOutput != null) {
+        if (process == null) {
+          await _startProcess(cssFiles);
+        } else if (vmService != null && isolateId != null) {
+          final completer = _generationCompleter = Completer<void>();
+          await vmService!.reloadSources(
+            isolateId!,
+            rootLibUri: Uri.file(p.absolute(compilerResult.dillOutput!)).toString(),
+          );
+          process!.stdin.writeln(jsonEncode({'command': 'run'}));
+          await completer.future;
+        }
+      }
+    } catch (e) {
+      logger.write('Failed to hot-reload CSS runner: $e', tag: Tag.css, level: Level.warning);
+    }
+
+    return List.unmodifiable(_changedFiles);
+  }
+
+  Future<int> _build() async {
+    final cssFiles = stylesFiles = await _generateRunner(watch: false);
+    if (cssFiles.isEmpty) return 0;
+
+    String stdoutOutput;
+    String stderrOutput;
+    int exitCode;
+
+    if (!ProcessRunner.isDefault) {
+      // In unit/command tests, we cannot run FrontendServerClient because the SDK root is fake.
+      // We run the generated runner file directly using ProcessRunner.
+      final result = await ProcessRunner.instance.run(dartExecutable, [
+        'run',
+        for (final experiment in experiments) '--enable-experiment=$experiment',
+        runnerFile.path,
+      ]);
+      exitCode = result.exitCode;
+      stdoutOutput = result.stdout.toString();
+      stderrOutput = result.stderr.toString();
+    } else {
+      final platformKernel = Uri.file(p.join(dartSdkDir, 'lib', '_internal', 'vm_platform_strong.dill')).toString();
+
+      final client = await FrontendServerClient.start(
+        runnerFile.path,
+        '.dart_tool/jaspr/css/css_runner.dill',
+        platformKernel,
+        target: 'vm',
+        sdkRoot: dartSdkDir,
+        librariesSpec: librariesFile.uri.toString(),
+        packagesJson: packageConfigFile.uri.toString(),
+        enabledExperiments: experiments,
+        printIncrementalDependencies: false,
+      );
+      final compilerResult = await client.compile();
+      client.accept();
+      client.kill();
+
+      if (compilerResult.errorCount > 0) {
+        logger.write('Failed to compile CSS runner', tag: Tag.css, level: Level.error);
+        logger.write(compilerResult.compilerOutputLines.join('\n'), tag: Tag.css, level: Level.error);
+      }
+
+      if (compilerResult.dillOutput == null) {
+        return 1;
+      }
+
+      final result = await ProcessRunner.instance.run(dartExecutable, ['run', '.dart_tool/jaspr/css/css_runner.dill']);
+      exitCode = result.exitCode;
+      stdoutOutput = result.stdout.toString();
+      stderrOutput = result.stderr.toString();
+    }
+
+    if (exitCode != 0) {
+      logger.write('Failed to generate css:\n$stderrOutput', tag: Tag.css, level: Level.error);
+      return exitCode;
+    }
+
+    final lines = stdoutOutput.split('\n');
+    for (final line in lines) {
+      _processCssOutput(line);
+    }
+    return 0;
+  }
+
+  Future<List<String>> _generateRunner({required bool watch}) async {
+    final projectName = project.requirePubspecYaml['name'] as String;
+    final buildDir = Directory('.dart_tool/build/generated/$projectName/lib').absolute;
+    if (!buildDir.existsSync()) {
+      return <String>[];
+    }
+
+    final runnerFiles = await Glob('${buildDir.path.replaceAll(r'\', '/')}/**.styles.dart').list().toList();
+    final validRunnerFiles = runnerFiles.where((f) {
+      return f.path.endsWith('.server.styles.dart') || f.path.endsWith('.client.styles.dart');
+    }).toList();
+
+    if (validRunnerFiles.isEmpty) {
+      return <String>[];
+    }
+
+    final runnerCode = _getRunnerCode(validRunnerFiles, watch: watch);
+
+    runnerFile.createSync(recursive: true);
+    runnerFile.writeAsStringSync(runnerCode.toString());
+
+    return [
+      for (final f in validRunnerFiles)
+        p.setExtension(p.withoutExtension(p.withoutExtension(p.relative(f.path, from: buildDir.path))), '.css'),
+    ];
+  }
+
+  String _getRunnerCode(List<FileSystemEntity> validRunnerFiles, {bool watch = false}) {
+    final runnerCode = StringBuffer();
+    runnerCode.writeln(
+      "import 'dart:convert';\n"
+      "import 'dart:io';\n"
+      "import 'dart:isolate';\n"
+      "import 'dart:developer';",
+    );
+
+    for (int i = 0; i < validRunnerFiles.length; i++) {
+      final relative = p.relative(
+        validRunnerFiles[i].path,
+        from: Directory.current.absolute.uri.resolve('.dart_tool/jaspr/css/').path,
+      );
+      final relativeUri = relative.replaceAll(r'\', '/');
+      runnerCode.writeln("import '$relativeUri' as s$i;");
+    }
+    runnerCode.writeln('\nvoid main() async {');
+    runnerCode.writeln(
+      '  final info = await Service.controlWebServer(enable: true, silenceOutput: true);\n'
+      '  final serverUri = info.serverWebSocketUri;\n'
+      '  stdout.writeln(jsonEncode({"event": "init", "vmServiceUri": serverUri?.toString()}));\n',
+    );
+
+    if (watch) {
+      runnerCode.writeln(
+        '  stdin.transform(utf8.decoder).transform(LineSplitter()).listen((line) {\n'
+        '    try {\n'
+        '      final json = jsonDecode(line);\n'
+        "      if (json['command'] == 'run') run();\n"
+        '    } catch (_) {}\n'
+        '  });',
+      );
+    }
+
+    runnerCode.writeln(
+      '  run();\n'
+      '}\n\n'
+      'Future<void> run() async {\n'
+      '  stdout.writeln(jsonEncode({"event": "start"}));\n'
+      '  await Isolate.run(() {\n'
+      '${validRunnerFiles.indexed.map((i) => '    s${i.$1}.run();\n').join()}'
+      '  });\n'
+      '  stdout.writeln(jsonEncode({"event": "done"}));\n'
+      '}',
+    );
+    return runnerCode.toString();
+  }
+
+  void _processCssOutput(String line, {void Function(String uri)? onVmServiceUri, void Function()? onDone}) {
+    while (line.startsWith('Running build hooks...')) {
+      line = line.substring('Running build hooks...'.length);
+    }
+    if (line.isEmpty) return;
+    if (!line.trim().startsWith('{')) {
+      logger.write('[Runner] $line', tag: Tag.css, level: Level.verbose);
+      return;
+    }
+
+    try {
+      final json = jsonDecode(line);
+      if (json case {'event': 'init', 'vmServiceUri': final String uri} when vmService == null) {
+        onVmServiceUri?.call(uri);
+      } else if (json case {'event': 'css', 'file': final String file, 'data': {'css': final String cssValue}}) {
+        final outputFile = File('.dart_tool/jaspr/generated/$file').absolute;
+        final exists = outputFile.existsSync();
+
+        if (exists && outputFile.readAsStringSync() == cssValue) {
+          return;
+        }
+
+        outputFile.createSync(recursive: true);
+        outputFile.writeAsStringSync(cssValue);
+        if (!_changedFiles.contains(file)) {
+          _changedFiles.add(file);
+        }
+        if (!_initialGenerationCompleter.isCompleted) {
+          logger.write('Generated $file', tag: Tag.css);
+        }
+      } else if (json case {'event': 'done'}) {
+        onDone?.call();
+      }
+    } catch (_) {}
+  }
+
+  Future<void> stop() async {
+    if (_disposed) return;
+    if (stylesFiles.isNotEmpty) {
+      logger.write('Stopping CSS runner...', level: Level.debug);
+    }
+    dispose();
+  }
+
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+    try {
+      client?.kill();
+    } catch (_) {}
+    process?.kill();
+    vmService?.dispose();
+    if (!_initialGenerationCompleter.isCompleted) {
+      _initialGenerationCompleter.complete();
+    }
+    if (_generationCompleter != null && !_generationCompleter!.isCompleted) {
+      _generationCompleter!.complete();
+      _generationCompleter = null;
+    }
+  }
+}
+
+@visibleForTesting
+bool uriInPubCache(Uri uri) {
+  // [Uri.path] always uses forward slashes, also on Windows (e.g. `/C:/Users/.../Pub/Cache/...`).
+  final path = uri.path.toLowerCase();
+  return path.contains('/pub/cache/') || path.contains('/.pub-cache/');
+}

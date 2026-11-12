@@ -23,23 +23,50 @@ extension on ContentTypography {
   StyleRule build() {
     return css('.content', [
       css('&').styles(color: ContentColors.text).combine(styles),
-      ..._scopeContent([..._contentStyles, ...rules]),
+      ...scopeContent([..._contentStyles, ...rules]),
     ]);
   }
 }
 
-List<StyleRule> _scopeContent(List<StyleRule> rules) {
-  return rules.expand((rule) => rule.resolve('')).map((rule) {
-    if (rule is BlockStyleRule) {
-      return BlockStyleRule(
-        selector: Selector(
-          ':where(${rule.selector.selector}):not(:where([class~=not-content],[class~=not-content] *))',
-        ),
-        styles: rule.styles,
-      );
-    }
-    return rule;
-  }).toList();
+@visibleForTesting
+List<StyleRule> scopeContent(List<StyleRule> rules) {
+  return rules.map(scopeRule).toList();
+}
+
+@visibleForTesting
+StyleRule scopeRule(StyleRule rule) {
+  return switch (rule) {
+    NestedStyleRule(:final selector, :final ownStyles, :final children) => NestedStyleRule(
+      _scopeSelector(selector),
+      ownStyles,
+      children.map(scopeRule).toList(),
+    ),
+    BlockStyleRule(:final selector, :final styles) => BlockStyleRule(
+      selector: _scopeSelector(selector),
+      styles: styles,
+    ),
+    // Recurse into at-rules because they don't have a selector of their own
+    MediaStyleRule(:final query, :final rules) => MediaStyleRule(
+      query: query,
+      styles: rules.map(scopeRule).toList(),
+    ),
+    SupportsStyleRule(:final condition, :final rules) => SupportsStyleRule(
+      condition: condition,
+      styles: rules.map(scopeRule).toList(),
+    ),
+    LayerStyleRule(:final name, :final rules) => LayerStyleRule(
+      name: name,
+      styles: rules.map(scopeRule).toList(),
+    ),
+    _ => rule,
+  };
+}
+
+Selector _scopeSelector(Selector selector) {
+  if (selector.selector == '&' || selector.selector.isEmpty) {
+    return selector;
+  }
+  return Selector(':where(${selector.selector}):not(:where([class~=not-content],[class~=not-content] *))');
 }
 
 final List<StyleRule> _contentStyles = [

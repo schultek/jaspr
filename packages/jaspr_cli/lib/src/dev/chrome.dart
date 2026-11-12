@@ -56,6 +56,25 @@ class Chrome {
     await chrome.close();
   }
 
+  Future<bool> focus() async {
+    try {
+      final tabs = await chrome.chromeConnection.getTabs();
+      final tab = tabs.firstWhere(
+        (t) => t.type == 'page' && !t.isChromeExtension,
+        orElse: () => tabs.first,
+      );
+      await chrome.chromeConnection.getUrl('/json/activate/${tab.id}');
+      if (Platform.isMacOS) {
+        try {
+          await Process.run('osascript', ['-e', 'tell application "Google Chrome" to activate']);
+        } catch (_) {}
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<Chrome> start(List<String> urls, {required int port, required Directory? chromeUserDir}) async {
     final browser = await browser_launcher.Chrome.startWithDebugPort(
       urls,
@@ -75,7 +94,7 @@ class Chrome {
 
   static Future<Chrome> _connect(Chrome chrome) async {
     if (_currentCompleter.isCompleted) {
-      throw ChromeError('Only one instance of chrome can be started.');
+      _currentCompleter = Completer<Chrome>();
     }
     // The connection is lazy. Try a simple call to make sure the provided
     // connection is valid.

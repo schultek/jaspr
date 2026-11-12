@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../dev/util.dart' as util;
 import '../process_runner.dart';
 import '../project.dart';
 import 'base_command.dart';
@@ -38,6 +39,7 @@ class CleanCommand extends BaseCommand {
         buildDir.deleteSync(recursive: true);
       }
 
+      await util.stopDaemon(Directory.current.path);
       logger.write("Running 'dart run build_runner clean'...");
       await ProcessRunner.instance.run(dartExecutable, ['run', 'build_runner', 'clean']);
     }

@@ -58,9 +58,9 @@ class AddStyles extends ResolvedCorrectionProducer {
         .where((m) => m.metadata.where((a) => a.name.name == 'css').isNotEmpty)
         .map(
           (m) => switch (m) {
-            MethodDeclaration(body: final BlockFunctionBody body) =>
+            MethodDeclaration(:final BlockFunctionBody body) =>
               body.block.statements.whereType<ReturnStatement>().firstOrNull?.expression,
-            MethodDeclaration(body: final ExpressionFunctionBody body) => body.expression,
+            MethodDeclaration(:final ExpressionFunctionBody body) => body.expression,
             FieldDeclaration() => m.fields.variables.first.initializer,
             _ => null,
           },

@@ -10,35 +10,28 @@ import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:shelf_static/shelf_static.dart';
 
 import '../commands/base_command.dart';
-import '../dev/dev_proxy.dart';
+import '../dev/dev_workflow.dart';
 import '../logging.dart';
 
 mixin ProxyHelper on BaseCommand {
   Future<HttpServer> startProxy(
-    String port, {
-    DevProxy? devProxy,
-    required String serverPort,
-    String? flutterPort,
+    int port, {
+    DevWorkflow? devWorkflow,
+    int? flutterPort,
     bool redirectNotFound = false,
     void Function(Object?)? onMessage,
   }) async {
-    final client = devProxy?.client ?? http.Client();
+    final client = devWorkflow?.client ?? http.Client();
     final flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
     Directory('.dart_tool/jaspr/generated').createSync(recursive: true);
     final generatedHandler = noCachingHandler(createStaticHandler('.dart_tool/jaspr/generated'));
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
-    final webdevHandler = devProxy?.handler ?? (req) => Response.notFound(null);
+    final webdevHandler = devWorkflow?.handler ?? (req) => Response.notFound(null);
 
-    final cascade = Cascade().add(generatedHandler).add((req) async {
-      if (req.url.path == r'$jasprMessageHandler') {
-        onMessage?.call(jsonDecode(await req.readAsString()));
-        return Response.ok(null);
-      }
-
+    Future<Response> handleRequest(Request req, {Stream<List<int>>? body, int retries = 0}) async {
       // Each proxyHandler will read the body, so we have to duplicate the stream beforehand,
       // or else this will throw.
-      // This is also the reason why Cascade() won't work here.
-      final body = req.read().asBroadcastStream();
+      body ??= req.read().asBroadcastStream();
 
       if (flutterHandler != null && req.url.path == 'flutter_bootstrap.js') {
         return await flutterHandler(req.change(body: body));
@@ -46,17 +39,6 @@ mixin ProxyHelper on BaseCommand {
       try {
         // First try to load the resource from the webdev handler.
         var res = await webdevHandler(req.change(body: body));
-
-        // The bootstrap script hardcodes the host:port url for the dwds handler endpoint,
-        // so we have to change it to our server url to be able to intercept it.
-        if (res.statusCode == 200 && req.url.path.endsWith('.dart.bootstrap.js')) {
-          var basePath = req.headers['jaspr_base_path'] ?? '/';
-          if (!basePath.endsWith('/')) basePath += '/';
-          if (!basePath.startsWith('/')) basePath = '/$basePath';
-          final body = await res.readAsString();
-          // Target line: 'window.$dwdsDevHandlerPath = "http://localhost:<port>/$dwdsSseHandler";'
-          return res.change(body: body.replaceAll('http://localhost:$port/', 'http://localhost:$serverPort$basePath'));
-        }
 
         // Temporary fix for Safari until build_web_compilers is fixed.
         if (res.statusCode == 200 && req.url.path.endsWith('.dart.js')) {
@@ -71,10 +53,16 @@ mixin ProxyHelper on BaseCommand {
 
         // Second try to load the resource from the flutter process.
         if (flutterHandler != null && res.statusCode == 404 && allowedFlutterPaths.hasMatch(req.url.path)) {
+          await res.read().drain<void>().catchError((_) {});
           res = await flutterHandler(req.change(body: body));
         }
 
-        if (res.statusCode == 404 && redirectNotFound && path.extension(req.url.path).isEmpty) {
+        if (res.statusCode == 404 &&
+            redirectNotFound &&
+            path.extension(req.url.path).isEmpty &&
+            !req.url.path.startsWith(r'$dwds') &&
+            !req.url.path.startsWith(r'$jaspr')) {
+          await res.read().drain<void>().catchError((_) {});
           return await webdevHandler(
             Request(
               req.method,
@@ -92,10 +80,15 @@ mixin ProxyHelper on BaseCommand {
         if (e is HijackException) {
           rethrow;
         }
-        final isConnectionError =
-            e is SocketException ||
-            (e is http.ClientException &&
-                (e.message.contains('Connection closed') || e.message.contains('Connection refused')));
+        final isConnectionError = e is SocketException || e is http.ClientException;
+        if (isConnectionError && retries < 2 && (req.method == 'GET' || req.method == 'HEAD')) {
+          // The backend connection may have been closed due to keep-alive idle timeout or rebuild.
+          // Retry on a fresh connection.
+          if (retries > 0) {
+            await Future<void>.delayed(const Duration(milliseconds: 100));
+          }
+          return await handleRequest(req, body: body, retries: retries + 1);
+        }
         if (isConnectionError) {
           logger.write('Proxy connection to backend failed: $e', tag: Tag.cli, level: Level.verbose);
           return Response(
@@ -107,16 +100,25 @@ mixin ProxyHelper on BaseCommand {
         } else {
           logger.write('Failed to proxy request: $e', tag: Tag.cli, level: Level.error);
           logger.write(st.toString(), tag: Tag.cli, level: Level.verbose);
-          return Response.internalServerError();
+          return Response.internalServerError(body: 'Failed to proxy request: $e');
         }
       }
+    }
+
+    final cascade = Cascade().add(generatedHandler).add((req) async {
+      if (req.url.path == r'$jasprMessageHandler') {
+        onMessage?.call(jsonDecode(await req.readAsString()));
+        return Response.ok(null);
+      }
+
+      return await handleRequest(req);
     });
 
     final Completer<HttpServer> completer = Completer<HttpServer>();
     runZonedGuarded(
       () async {
         try {
-          final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, int.parse(port));
+          final server = await shelf_io.serve(cascade.handler, InternetAddress.anyIPv4, port);
           completer.complete(server);
         } catch (e, st) {
           completer.completeError(e, st);
@@ -142,6 +144,16 @@ mixin ProxyHelper on BaseCommand {
 
 Handler noCachingHandler(Handler handler) {
   return (request) async {
+    // `Request.ifModifiedSince` throws on a value it cannot parse and
+    // takes the request down with a 500 — over a header the client sent. RFC
+    // 9110 says such a value must be ignored, so it is dropped here and the
+    // file is served as if it had not been there.
+    try {
+      request.ifModifiedSince;
+    } on FormatException {
+      request = request.change(headers: {'if-modified-since': null});
+    }
+
     final res = await handler(request);
     if (res.statusCode == 200) {
       final newHeaders = Map<String, String>.from(res.headers)

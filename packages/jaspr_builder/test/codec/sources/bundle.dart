@@ -10,6 +10,13 @@ final codecBundleOutputs = {
       'import': 'package:site/model_class.dart',
     },
     {
+      'name': 'ModelC',
+      'decoder': 'fromRaw',
+      'encoder': 'toRaw',
+      'rawType': 'String',
+      'import': 'package:site/model_enum.dart',
+    },
+    {
       'name': 'ModelB',
       'extension': 'ModelBCodec',
       'decoder': 'fromRaw',

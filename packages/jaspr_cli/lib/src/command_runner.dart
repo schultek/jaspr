@@ -12,9 +12,9 @@ import 'commands/convert_html_command.dart';
 import 'commands/create_command.dart';
 import 'commands/daemon_command.dart';
 import 'commands/doctor_command.dart';
-import 'commands/install_skills_command.dart';
 import 'commands/migrate_command.dart';
 import 'commands/new_command.dart';
+import 'commands/post_update_command.dart';
 import 'commands/serve_command.dart';
 import 'commands/update_command.dart';
 import 'helpers/analytics.dart';
@@ -44,8 +44,8 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     addCommand(UpdateCommand());
     addCommand(DoctorCommand());
     addCommand(MigrateCommand());
-    addCommand(InstallSkillsCommand());
     addCommand(ConvertHtmlCommand());
+    addCommand(PostUpdateCommand());
   }
 
   final Logger _logger = Logger();
@@ -100,7 +100,7 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
       _logger.info(jasprCliVersion);
       exitCode = ExitCode.success.code;
     }
-    if (topLevelResults.command?.name != 'update') {
+    if (topLevelResults.command?.name != 'update' && topLevelResults.command?.name != 'post-update') {
       await _checkForUpdates();
     }
     if (!isVersionCommand) {

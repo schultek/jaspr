@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:async/async.dart';
+import 'package:cli_util/cli_util.dart' as cli_util;
 import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:jaspr_cli/src/process_runner.dart';
@@ -29,8 +30,18 @@ class FakeIO {
   final MockProcessRunner process;
   final MockSockets sockets;
 
+  final Set<int> inUsePorts = {};
+
   final _serverSocketsController = StreamController<FakeServerSocket>();
-  late final StreamQueue<FakeServerSocket> serverSockets = StreamQueue(_serverSocketsController.stream);
+  // Filter port 0, which is used internally by DWDS/DDS so to not interfere
+  // with test server bindings.
+  late final StreamQueue<FakeServerSocket> serverSockets = StreamQueue(
+    _serverSocketsController.stream.where((s) => s.port != 0),
+  );
+
+  void notifyServerSocket(FakeServerSocket socket) {
+    _serverSocketsController.add(socket);
+  }
 
   final FakeStdin stdin;
   final FakeIOSink stdout;
@@ -41,7 +52,13 @@ class FakeIO {
 
   T runZoned<T>(T Function() body) {
     return io.IOOverrides.runZoned(
-      () => ProcessRunner.runZoned(body, process),
+      () => Zone.current
+          .fork(
+            zoneValues: {
+              cli_util.environmentOverridesKey: {'DART_SDK': '/fake'},
+            },
+          )
+          .run(() => ProcessRunner.runZoned(body, process)),
       getCurrentDirectory: () => fs.currentDirectory,
       setCurrentDirectory: (path) => fs.currentDirectory = path,
       createFile: fs.file,
@@ -58,8 +75,10 @@ class FakeIO {
       socketStartConnect: (host, port, {sourceAddress, sourcePort = 0, timeout}) async =>
           io.ConnectionTask.fromSocket(sockets.connect(host, port), () {}),
       serverSocketBind: (host, port, {backlog = 0, shared = false, v6Only = false}) async {
+        if (inUsePorts.contains(port)) {
+          throw io.SocketException('Address already in use');
+        }
         final socket = FakeServerSocket(await _lookupAddress(host), port, this);
-        _serverSocketsController.add(socket);
         return socket;
       },
       stdin: () => stdin,
@@ -122,8 +141,14 @@ class FakeProcess extends Mock implements io.Process {
   @override
   IOSink get stdin => IOSink(StreamController<List<int>>().sink);
 
+  bool killed = false;
+
+  @override
+  int get pid => 12345;
+
   @override
   bool kill([io.ProcessSignal signal = io.ProcessSignal.sigterm]) {
+    killed = true;
     if (!_exitCode.isCompleted) _exitCode.complete(1);
     return true;
   }
@@ -225,17 +250,47 @@ class FakeStdin extends Stream<List<int>> implements io.Stdin {
     _controller.add(utf8.encode('$line\n'));
   }
 
+  /// Emulates the Windows console, where [lineMode] can only be disabled while
+  /// [echoMode] is disabled, and [echoMode] can only be enabled while
+  /// [lineMode] is enabled.
+  bool windowsTerminalModes = false;
+
+  bool _echoMode = true;
+  bool _lineMode = true;
+
   @override
-  bool echoMode = true;
+  bool get echoMode => _echoMode;
+
+  @override
+  set echoMode(bool value) {
+    if (windowsTerminalModes && value && !_lineMode) {
+      throw const io.StdinException('Error setting terminal echo mode');
+    }
+    _echoMode = value;
+  }
 
   @override
   bool echoNewlineMode = false;
 
   @override
-  bool lineMode = true;
+  bool get lineMode => _lineMode;
 
   @override
-  bool get hasTerminal => false;
+  set lineMode(bool value) {
+    if (windowsTerminalModes && !value && _echoMode) {
+      throw const io.StdinException('Error setting terminal line mode');
+    }
+    _lineMode = value;
+  }
+
+  void addBytes(List<int> bytes) {
+    _controller.add(bytes);
+  }
+
+  bool hasTerminalOverride = false;
+
+  @override
+  bool get hasTerminal => hasTerminalOverride;
 
   @override
   StreamSubscription<List<int>> listen(

@@ -1,3 +1,6 @@
+/// @docImport 'client_app.dart';
+library;
+
 import 'package:universal_web/web.dart' as web;
 
 import '../dom/type_checks.dart';
@@ -5,26 +8,68 @@ import '../framework/framework.dart';
 import 'dom_render_object.dart';
 import 'utils.dart';
 
-/// A slot that attaches a child component to a specific DOM node within
-/// a [SlottedChildView].
+/// A slot of a [SlottedChildView] that renders [child] into part of the view's DOM nodes.
+///
+/// The [child] hydrates the nodes already in that part,
+/// and any nodes it doesn't reuse are removed.
 abstract class ChildSlot extends Component {
+  /// Initializes [key] for subclasses.
   const ChildSlot({super.key});
 
-  factory ChildSlot.fromQuery(String query, {required Component child, Key? key}) = QueryChildSlot;
+  /// Creates a slot that renders [child] as the content of
+  /// the first element matching the CSS selector [query].
+  ///
+  /// Only elements nested in the view's nodes are searched,
+  /// not the top-level nodes themselves.
+  factory ChildSlot.fromQuery(String query, {required Component child, Key? key}) = _QueryChildSlot;
 
+  /// Creates a slot that renders [child] between the [start] and [end] nodes,
+  /// such as two comment markers.
+  ///
+  /// The [start] and [end] nodes must share a parent and be part of the view's nodes.
+  factory ChildSlot.between({required web.Node start, required web.Node end, required Component child, Key? key}) =
+      _RangeChildSlot;
+
+  /// The component this slot renders.
   Component get child;
 
+  /// Creates the render object that renders [child] into part of [parent]'s nodes.
   ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent);
+
+  /// Whether this slot renders into the same DOM nodes as [oldComponent].
+  ///
+  /// A slot can't be updated with one that renders into different nodes,
+  /// so give such slots different [key]s.
   bool canUpdate(ChildSlot oldComponent);
 
   @override
-  Element createElement() => ChildSlotElement(this);
+  Element createElement() => _ChildSlotElement(this);
+}
+
+/// A [ChildSlot] that attaches its child between two given DOM [start] and [end] nodes.
+class _RangeChildSlot extends ChildSlot {
+  const _RangeChildSlot({required this.start, required this.end, required this.child, super.key});
+
+  final web.Node start;
+  final web.Node end;
+  @override
+  final Component child;
+
+  @override
+  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
+    return ChildSlotRenderObject.between(parent, start, end);
+  }
+
+  @override
+  bool canUpdate(ChildSlot oldComponent) {
+    return oldComponent is _RangeChildSlot && oldComponent.start == start && oldComponent.end == end;
+  }
 }
 
 /// A [ChildSlot] that attaches its child to the first DOM element matching
 /// the given CSS [query].
-class QueryChildSlot extends ChildSlot {
-  const QueryChildSlot(this.query, {required this.child, super.key});
+class _QueryChildSlot extends ChildSlot {
+  const _QueryChildSlot(this.query, {required this.child, super.key});
 
   final String query;
   @override
@@ -52,12 +97,12 @@ class QueryChildSlot extends ChildSlot {
 
   @override
   bool canUpdate(ChildSlot oldComponent) {
-    return oldComponent is QueryChildSlot && oldComponent.query == query;
+    return oldComponent is _QueryChildSlot && oldComponent.query == query;
   }
 }
 
-class ChildSlotElement extends MultiChildRenderObjectElement {
-  ChildSlotElement(ChildSlot super.component);
+class _ChildSlotElement extends MultiChildRenderObjectElement {
+  _ChildSlotElement(ChildSlot super.component);
 
   @override
   void update(ChildSlot newComponent) {
@@ -81,7 +126,7 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
     final parent = parentRenderObjectElement!.renderObject as DomRenderObject;
     assert(
       parent is SlottedDomRenderObject,
-      'ChildSlot must be used as a direct child of SlottedDomRenderObject.',
+      'ChildSlot must be used as a direct child of SlottedChildView.',
     );
     return slot.createRenderObject(parent as SlottedDomRenderObject);
   }
@@ -90,25 +135,37 @@ class ChildSlotElement extends MultiChildRenderObjectElement {
   void updateRenderObject(RenderObject renderObject) {}
 }
 
-/// Component that renders its children into specified DOM nodes (slots).
+/// A component that takes over existing DOM nodes and renders its [slots] into parts of them.
 ///
-/// Child components are mounted as direct children of this component, but may target
-/// specific nested DOM nodes within the component's DOM subtree. This allows for hydrating
-/// only specific parts of the DOM tree while having a single coherent component tree.
+/// The view hydrates only those parts while keeping a single component tree.
+/// For example, [ClientApp] uses a view to hydrate each @client component
+/// between its markers, leaving the rest of the server-rendered page untouched.
+///
+/// A [Component.apply] above the view also applies to the matching elements in its nodes.
 class SlottedChildView extends Component {
+  /// Creates a view that takes over the remaining unhydrated nodes of its parent element.
   SlottedChildView({required this.slots, super.key}) : nodes = null;
 
+  /// Creates a view that takes over [nodes], which must share a parent.
+  ///
+  /// If [nodes] aren't already in the view's parent element, they're moved to the view's position.
   SlottedChildView.withNodes({required List<web.Node> this.nodes, required this.slots, super.key});
 
+  /// The DOM nodes this view takes over,
+  /// or `null` to take over the remaining unhydrated nodes of its parent element.
+  ///
+  /// Can't change when the view updates.
   final List<web.Node>? nodes;
+
+  /// The slots that render components into parts of this view's nodes.
   final List<ChildSlot> slots;
 
   @override
-  Element createElement() => SlottedChildViewElement(this);
+  Element createElement() => _SlottedChildViewElement(this);
 }
 
-class SlottedChildViewElement extends DomRenderObjectElement {
-  SlottedChildViewElement(SlottedChildView super.component);
+class _SlottedChildViewElement extends DomRenderObjectElement {
+  _SlottedChildViewElement(SlottedChildView super.component);
 
   @override
   SlottedChildView get component => super.component as SlottedChildView;
@@ -123,42 +180,99 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   @override
+  List<Component> buildChildren() {
+    final parentResolver = inheritedDomResolver;
+    if (parentResolver == null) {
+      return buildOwnChildren();
+    }
+
+    final parentDomNode = SlottedDomRenderObject._realNodeOf(
+      (renderObject as SlottedDomRenderObject).parent!,
+    );
+
+    List<ApplyParams> getParams(RenderObject target) {
+      final parentParams = parentResolver(target);
+      if (parentParams.isEmpty) return const [];
+
+      if (!parentParams.any((p) => p.target.onlyChildren)) {
+        return parentParams;
+      }
+
+      // Find ChildSlotRenderObject in target's ancestor chain
+      ChildSlotRenderObject? slotRenderObject;
+      RenderObject? current = target;
+      while (current != null && current != renderObject) {
+        if (current is ChildSlotRenderObject) {
+          slotRenderObject = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (slotRenderObject != null && slotRenderObject.node == parentDomNode) {
+        // Direct child slot -> allow all params including onlyChildren: true
+        return parentParams;
+      } else {
+        // Nested slot -> allow only descendant params
+        return parentParams.where((p) => !p.target.onlyChildren).toList();
+      }
+    }
+
+    return [
+      for (final slot in buildOwnChildren())
+        wrapWithInheritedDomComponent(
+          getParams: getParams,
+          child: slot,
+        ),
+    ];
+  }
+
+  @override
   List<Component> buildOwnChildren() {
     return component.slots;
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    updateRenderObject(renderObject as SlottedDomRenderObject);
-  }
-
-  @override
   RenderObject createRenderObject() {
     final parent = parentRenderObjectElement!.renderObject;
-    final renderObject = SlottedDomRenderObject.fromNodes(component.nodes, parent as DomRenderObject);
+    final renderObject = SlottedDomRenderObject._fromNodes(component.nodes, parent as DomRenderObject);
     updateRenderObject(renderObject);
     return renderObject;
   }
 
-  final Map<web.HTMLElement, _AppliedParams> _appliedParams = {};
+  final Map<web.HTMLElement, _AppliedParams> _appliedParams = nodeMap();
 
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
     for (final element in _appliedParams.keys) {
-      resetElementParams(element);
+      _resetElementParams(element);
     }
     _appliedParams.clear();
 
-    if (inheritedDomParams case final inheritedDomParams?) {
+    if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
+      final slotRanges = {
+        for (final slot in component.slots)
+          if (slot is _RangeChildSlot) slot.start: slot.end,
+      };
+
       web.Node? current = renderObject.firstChildNode;
       while (current != null) {
+        if (slotRanges[current] case final endNode?) {
+          if (current == renderObject.lastChildNode) break;
+          current = endNode;
+          // The end of this slot can be the start of an adjacent slot.
+          if (slotRanges.containsKey(current)) continue;
+          if (current == renderObject.lastChildNode) break;
+          current = current.nextSibling;
+          continue;
+        }
+
         if (current.isElement) {
           for (final param in inheritedDomParams.reversed) {
-            final elements = findMatchingElements(current as web.Element, param.target);
+            final elements = _findMatchingElements(current as web.Element, param.target);
 
             for (final element in elements) {
-              updateElementParams(element as web.HTMLElement, param);
+              _updateElementParams(element as web.HTMLElement, param);
             }
           }
         }
@@ -171,10 +285,10 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     }
   }
 
-  List<web.Element> findMatchingElements(web.Element root, ApplyTarget target) {
+  List<web.Element> _findMatchingElements(web.Element root, ApplyTarget target) {
     final elements = <web.Element>[];
 
-    if (isMatchingElement(target, root)) {
+    if (_isMatchingElement(target, root)) {
       elements.add(root);
     }
 
@@ -188,7 +302,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     return elements;
   }
 
-  bool isMatchingElement(ApplyTarget target, web.Element element) {
+  bool _isMatchingElement(ApplyTarget target, web.Element element) {
     if (target.tag case final expectedTag? when element.localName != expectedTag) return false;
     if (target.id case final expectedId? when element.id != expectedId) return false;
     if (target.classes case final expectedClasses? when !expectedClasses.every((c) => element.classList.contains(c))) {
@@ -198,23 +312,34 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     return true;
   }
 
-  void resetElementParams(web.HTMLElement element) {
+  /// Removes the params this view applied to [element],
+  /// without leaving behind empty attributes that it didn't have before.
+  void _resetElementParams(web.HTMLElement element) {
     final params = _appliedParams[element];
     if (params == null) return;
 
     if (params.id != null && element.id == params.id) {
-      element.id = '';
+      element.removeAttribute('id');
     }
 
-    if (params.classes case final appliedClasses?) {
+    if (params.classes case final appliedClasses? when appliedClasses.isNotEmpty) {
       for (final c in appliedClasses) {
         element.classList.remove(c);
       }
+      if (element.classList.length == 0) {
+        element.removeAttribute('class');
+      }
     }
 
-    if (params.styles case final appliedStyles?) {
+    if (params.styles case final appliedStyles? when appliedStyles.isNotEmpty) {
       for (final e in appliedStyles.entries) {
         element.style.removeProperty(e.key);
+      }
+      if (element.style.length == 0) {
+        // Read the attribute first, so the browser syncs the pending style changes into it.
+        // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
+        element.getAttribute('style');
+        element.removeAttribute('style');
       }
     }
 
@@ -231,7 +356,7 @@ class SlottedChildViewElement extends DomRenderObjectElement {
     }
   }
 
-  void updateElementParams(web.HTMLElement element, ApplyParams newParams) {
+  void _updateElementParams(web.HTMLElement element, ApplyParams newParams) {
     final params = _appliedParams[element];
 
     String? appliedId = params?.id;
@@ -299,22 +424,10 @@ class SlottedChildViewElement extends DomRenderObjectElement {
   @override
   void unmount() {
     for (final element in _appliedParams.keys) {
-      resetElementParams(element);
+      _resetElementParams(element);
     }
     _appliedParams.clear();
     super.unmount();
-    _clearEventListeners(this);
-  }
-
-  static void _clearEventListeners(Element e) {
-    if (e case RenderObjectElement(renderObject: final DomRenderElement r)) {
-      r.events?.forEach((type, binding) {
-        binding.clear();
-      });
-      r.events = null;
-    }
-
-    e.visitChildren(_clearEventListeners);
   }
 }
 
@@ -331,10 +444,13 @@ class _AppliedParams extends ApplyParams {
   final Map<String, EventBinding>? eventBindings;
 }
 
+/// The render object of a [SlottedChildView], which holds the DOM nodes the view takes over.
+///
+/// Its only children are the [ChildSlotRenderObject]s of the view's slots.
 class SlottedDomRenderObject extends DomRenderFragment {
   SlottedDomRenderObject._(DomRenderObject parent, {this.firstChildNode, this.lastChildNode}) : super(parent, []);
 
-  factory SlottedDomRenderObject.fromNodes(List<web.Node>? nodes, DomRenderObject parent) {
+  factory SlottedDomRenderObject._fromNodes(List<web.Node>? nodes, DomRenderObject parent) {
     final nodesToAdd = nodes ?? [if (parent is HydratableDomRenderObject) ...parent.toHydrate];
 
     if (nodesToAdd.isEmpty) {
@@ -362,9 +478,11 @@ class SlottedDomRenderObject extends DomRenderFragment {
     return object;
   }
 
+  /// The first DOM node the view takes over, or `null` if it takes over none.
   @override
   final web.Node? firstChildNode;
 
+  /// The last DOM node the view takes over, or `null` if it takes over none.
   @override
   final web.Node? lastChildNode;
 
@@ -399,30 +517,53 @@ class SlottedDomRenderObject extends DomRenderFragment {
   }
 }
 
-class ChildSlotRenderObject extends DomRenderObject with MultiChildDomRenderObject, HydratableDomRenderObject {
-  ChildSlotRenderObject(this.node, DomRenderObject parent, [List<web.Node>? nodes]) {
+/// The render object of a [ChildSlot], which renders its children into
+/// part of the DOM nodes of a [SlottedChildView].
+///
+/// Create one in [ChildSlot.createRenderObject],
+/// with the view's render object as its parent.
+class ChildSlotRenderObject extends DomRenderObject
+    with MultiChildDomRenderObject, HydratableDomRenderObject
+    implements RenderFragment {
+  /// Creates a slot that renders its children as the content of [node],
+  /// hydrating the child nodes [node] already has.
+  ChildSlotRenderObject(this.node, DomRenderObject parent) {
     this.parent = parent;
-    toHydrate = [...nodes ?? node.childNodes.toIterable()];
-    beforeStart = toHydrate.firstOrNull?.previousSibling;
+    final childNodes = node.childNodes;
+    toHydrate = [
+      for (var childIndex = 0; childIndex < childNodes.length; childIndex += 1) childNodes.item(childIndex)!,
+    ];
+    _beforeStart = null;
   }
 
-  factory ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end) {
-    final nodes = <web.Node>[];
+  /// Creates a slot that renders its children between the sibling nodes [start] and [end],
+  /// hydrating the nodes already between them.
+  ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end) : node = start.parentElement! {
+    this.parent = parent;
+    toHydrate = [];
     web.Node? curr = start.nextSibling;
     while (curr != null && curr != end) {
-      nodes.add(curr);
+      toHydrate.add(curr);
       curr = curr.nextSibling;
     }
-    return ChildSlotRenderObject(start.parentElement!, parent, nodes);
+    // Place the children after the start node, even if the slot is empty.
+    _beforeStart = start;
   }
 
+  /// The element this slot renders its children into.
+  ///
+  /// For a slot created with [ChildSlotRenderObject.between],
+  /// this is the parent of its start and end nodes.
   @override
   final web.Element node;
-  late final web.Node? beforeStart;
+
+  /// The node after which the children of this slot are placed,
+  /// or `null` to place them at the start of [node].
+  late final web.Node? _beforeStart;
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
-    attachChild(child, after, startNode: beforeStart);
+    attachChild(child, after, startNode: _beforeStart);
   }
 
   @override

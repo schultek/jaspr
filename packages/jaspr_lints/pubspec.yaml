@@ -1,6 +1,6 @@
 name: jaspr_lints
 description: A collection of lints and assists for jaspr projects.
-version: 0.7.2
+version: 0.8.0-beta.0
 homepage: https://jaspr.site
 repository: https://github.com/schultek/jaspr
 issue_tracker: https://github.com/schultek/jaspr/issues
@@ -14,19 +14,19 @@ topics:
   - lints
 
 environment:
-  sdk: ^3.13.0-0
+  sdk: ^3.13.0
 
 resolution: workspace
 
 dependencies:
-  analysis_server_plugin: ^0.3.17
+  analysis_server_plugin: ^0.3.20
   analyzer: '>=13.3.0 <15.0.0'
-  analyzer_plugin: any
+  analyzer_plugin: ^0.14.14
   dart_data_home: ^0.1.0
   path: ^1.9.0
   yaml: ^3.1.2
 
 dev_dependencies:
-  analyzer_testing: ^0.3.2
-  test: ^1.29.0
+  analyzer_testing: ^0.4.0
+  test: ^1.31.0
   test_reflective_loader: ^0.4.0

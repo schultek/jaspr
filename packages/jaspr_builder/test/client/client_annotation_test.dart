@@ -4,11 +4,14 @@ import 'package:jaspr_builder/src/client/client_bundle_builder.dart';
 import 'package:jaspr_builder/src/client/client_module_builder.dart';
 import 'package:test/test.dart';
 
+import '../test_helper.dart';
 import 'sources/bundle.dart';
 import 'sources/client_basic.dart';
 import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
+import 'sources/client_model_enum.dart';
 import 'sources/client_model_extension.dart';
+import 'sources/client_nullable_models.dart';
 import 'sources/client_with_server_components.dart';
 
 void main() {
@@ -16,8 +19,7 @@ void main() {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'site');
-      await reader.testing.loadIsolateSources();
+      reader = await createTestReaderWriter();
     });
 
     group('on basic component', () {
@@ -42,12 +44,34 @@ void main() {
       });
     });
 
+    group('on component using model enum', () {
+      test('generates json module', () async {
+        await testBuilder(
+          ClientModuleBuilder(BuilderOptions({})),
+          clientModelEnumSources,
+          outputs: {...clientModelEnumModuleOutputs},
+          readerWriter: reader,
+        );
+      });
+    });
+
     group('on component using model extension', () {
       test('generates json module', () async {
         await testBuilder(
           ClientModuleBuilder(BuilderOptions({})),
           clientModelExtensionSources,
           outputs: {...clientModelExtensionModuleOutputs},
+          readerWriter: reader,
+        );
+      });
+    });
+
+    group('on component using nullable models', () {
+      test('generates null-safe decoders for class and extension codecs', () async {
+        await testBuilder(
+          ClientModuleBuilder(BuilderOptions({})),
+          clientNullableModelsSources,
+          outputs: {...clientNullableModelsModuleOutputs},
           readerWriter: reader,
         );
       });
@@ -124,7 +148,6 @@ void main() {
           ...clientWithServerComponentsModuleOutputs,
         },
         outputs: clientBundleOutputs,
-        readerWriter: reader,
       );
     });
   });

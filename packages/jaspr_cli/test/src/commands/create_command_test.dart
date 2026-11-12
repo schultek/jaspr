@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:jaspr_cli/src/command_runner.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -6,6 +8,10 @@ import '../fakes/fake_io.dart';
 import '../fakes/fake_project.dart';
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(ProcessStartMode.normal);
+  });
+
   group('create command', () {
     late JasprCommandRunner runner;
     late FakeIO io;
@@ -129,6 +135,56 @@ void main() {
         final pubspec = io.fs.file('myapp/pubspec.yaml').readAsStringSync();
         expect(pubspec, contains('name: myapp'));
         expect(pubspec, contains('jaspr:\n  mode: static'));
+      });
+    });
+
+    test('installs skills when --skills is passed', () async {
+      await io.runZoned(() async {
+        io.stubDartSDK();
+        when(
+          () => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
+        ).thenAnswer((_) async => FakeProcess.sync());
+        when(
+          () => io.process.start(
+            '/fake/bin/dart',
+            ['run', 'skills@', 'get', '-p', 'jaspr', '-a'],
+            workingDirectory: '/root/myapp',
+            mode: any(named: 'mode'),
+          ),
+        ).thenAnswer((_) async => FakeProcess.sync());
+
+        final result = await runner.run(['create', 'myapp', '--mode=client', '--skills']);
+
+        expect(result, equals(0));
+        verify(
+          () => io.process.start(
+            '/fake/bin/dart',
+            ['run', 'skills@', 'get', '-p', 'jaspr', '-a'],
+            workingDirectory: '/root/myapp',
+            mode: any(named: 'mode'),
+          ),
+        ).called(1);
+      });
+    });
+
+    test('does not install skills when --no-skills is passed', () async {
+      await io.runZoned(() async {
+        io.stubDartSDK();
+        when(
+          () => io.process.start('/fake/bin/dart', ['pub', 'get'], workingDirectory: '/root/myapp'),
+        ).thenAnswer((_) async => FakeProcess.sync());
+
+        final result = await runner.run(['create', 'myapp', '--mode=client', '--no-skills']);
+
+        expect(result, equals(0));
+        verifyNever(
+          () => io.process.start(
+            '/fake/bin/dart',
+            ['run', 'skills@', 'get', '-p', 'jaspr', '-a'],
+            workingDirectory: any(named: 'workingDirectory'),
+            mode: any(named: 'mode'),
+          ),
+        );
       });
     });
   });

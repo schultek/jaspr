@@ -29,21 +29,19 @@ extension FakeProject on FakeIO {
   }
 
   void stubDartSDK() {
-    when(() => process.runSync('which', ['dart'])).thenAnswer((_) => ProcessResult(0, 0, '/fake/bin/dart', null));
-    when(
-      () => process.runSync('where', ['dart.bat', 'dart.exe']),
-    ).thenAnswer((_) => ProcessResult(0, 0, '/fake/bin/dart', null));
     when(
       () => process.runSync('/fake/bin/dart', ['--version']),
     ).thenAnswer((_) => ProcessResult(0, 0, 'Dart SDK version: 3.14.0', null));
 
+    fs.file('/fake/bin/dart').createSync(recursive: true);
+    fs.file('/fake/lib/_internal/allowed_experiments.json').createSync(recursive: true);
     fs.file('/fake/version').createSync(recursive: true);
   }
 
   void stubFlutterSDK() {
     when(
       () => process.runSync('flutter', ['doctor', '--version', '--machine'], runInShell: true, stdoutEncoding: utf8),
-    ).thenAnswer((_) => ProcessResult(0, 0, '{"flutterRoot":"/fake/flutter","flutterVersion":"3.35.0"}', null));
+    ).thenAnswer((_) => ProcessResult(0, 0, '{"flutterRoot":"/fake/flutter"}', null));
     when(
       () => process.runSync('flutter', ['precache', '--web'], runInShell: true),
     ).thenAnswer((_) => ProcessResult(0, 0, null, null));
@@ -59,7 +57,7 @@ dependencies:
   jaspr: ^$jasprCoreVersion
 
 dev_dependencies:
-  build_web_compilers: ^4.4.6
+  build_web_compilers: ^4.8.12
   jaspr_builder: ^$jasprBuilderVersion
 
 jaspr:

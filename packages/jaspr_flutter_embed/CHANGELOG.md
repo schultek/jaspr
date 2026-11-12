@@ -1,3 +1,7 @@
+## 0.5.0-beta.0
+
+- Require Dart 3.13 or later.
+
 ## 0.4.11
 
 - `jaspr` upgraded to `0.23.0`

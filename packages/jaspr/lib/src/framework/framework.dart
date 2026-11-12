@@ -112,11 +112,19 @@ abstract class Component {
     Key? key,
   }) = DomComponent._;
 
-  /// Creates a component which applies its parameters (like [classes], [styles], etc.) to its
-  /// [target] element(s).
+  /// Creates a component which applies [id], [classes], [styles], [attributes], and [events]
+  /// to the elements of [child] that [target] matches.
   ///
-  /// This does not create a HTML element itself. All properties are merged with the respective target element's
-  /// properties. The target's properties take precedence where there are conflicts.
+  /// This does not render an element itself.
+  /// By default, [target] is [ApplyTarget.anyChild],
+  /// which matches the top-level elements of [child].
+  ///
+  /// The [classes] are added to each matched element's classes.
+  /// The [id] and each style, attribute, and event only apply where neither
+  /// the element nor a [Component.apply] nested in this one already sets them.
+  ///
+  /// On the client, this also applies to the server-rendered elements of a server component,
+  /// such as a component passed to a @client component.
   ///
   /// Example:
   /// ```dart
@@ -137,7 +145,7 @@ abstract class Component {
   ///
   /// Renders:
   /// ```html
-  /// <div class="applied-class some-class" style="padding: 8px; background-color: red;">
+  /// <div class="some-class applied-class" style="background-color: red; padding: 8px">
   ///   Hello World
   /// </div>
   /// ```
@@ -150,6 +158,7 @@ abstract class Component {
     Map<String, String>? attributes,
     Map<String, EventCallback>? events,
     required Component child,
+    Key? key,
   }) = _ApplyDomComponent;
 
   /// Creates a component which renders a list of child components without any wrapping element.
@@ -415,6 +424,7 @@ abstract class Element implements BuildContext {
         }
         if (owner._isReload) {
           child.onReload();
+          child.rebuild();
         }
         newChild = child;
       } else if (child._parentChanged || Component.canUpdate(child.component, newComponent)) {
@@ -493,14 +503,13 @@ abstract class Element implements BuildContext {
     //    from beginning to end.
     // At this point we narrowed the old and new lists to the point
     // where the nodes no longer match.
-    // 3. Walk the narrowed part of the old list to get the list of
-    //    keys and sync null with non-keyed items.
+    // 3. Walk the narrowed part of the new list to get the list of keys,
+    //    then sync null with the items in the narrowed part of the old list
+    //    that aren't reused, so they're deactivated before any new item mounts.
     // 4. Walk the narrowed part of the new list forwards:
     //     * Sync non-keyed items with null
     //     * Sync keyed items with the source if it exists, else with null.
     // 5. Walk the bottom of the list again, syncing the nodes.
-    // 6. Sync null with any items in the list of keys that are still
-    //    mounted.
 
     if (oldChildren.length <= 1 && newComponents.length <= 1) {
       final Element? oldChild = replaceWithNullIfForgotten(oldChildren.firstOrNull);
@@ -572,18 +581,20 @@ abstract class Element implements BuildContext {
       }
     }
 
-    while (newChildrenTop <= newChildrenBottom) {
-      if (oldChildrenTop <= oldChildrenBottom) {
-        final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
-        if (oldChild != null) {
-          final Key? key = oldChild.component.key;
-          if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
-            deactivateChild(oldChild);
-          }
+    // Deactivate the old children that aren't reused before updating the new ones,
+    // so a new child never mounts while an old child it replaces is still active.
+    while (oldChildrenTop <= oldChildrenBottom) {
+      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
+      if (oldChild != null) {
+        final Key? key = oldChild.component.key;
+        if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
+          deactivateChild(oldChild);
         }
-        oldChildrenTop += 1;
       }
+      oldChildrenTop += 1;
+    }
 
+    while (newChildrenTop <= newChildrenBottom) {
       Element? oldChild;
       final Component newComponent = newComponents[newChildrenTop];
       final Key? key = newComponent.key;
@@ -595,17 +606,6 @@ abstract class Element implements BuildContext {
       newChildren[newChildrenTop] = newChild;
       prevChild = newChild;
       newChildrenTop += 1;
-    }
-
-    while (oldChildrenTop <= oldChildrenBottom) {
-      final Element? oldChild = replaceWithNullIfForgotten(oldChildren[oldChildrenTop]);
-      if (oldChild != null) {
-        final Key? key = oldChild.component.key;
-        if (key == null || retakeOldKeyedChildren == null || !retakeOldKeyedChildren.containsKey(key)) {
-          deactivateChild(oldChild);
-        }
-      }
-      oldChildrenTop += 1;
     }
 
     // We've scanned the whole list.
@@ -752,6 +752,21 @@ abstract class Element implements BuildContext {
     if (this is RenderObjectElement) {
       newSlot.target = this as RenderObjectElement;
     }
+  }
+
+  /// Called whenever the application is reassembled during debugging, for
+  /// example during hot reload.
+  ///
+  /// This method should rerun any initialization logic that depends on global
+  /// state, for example, image loading from asset bundles (since the asset
+  /// bundle may have changed).
+  @mustCallSuper
+  @protected
+  void reassemble() {
+    markNeedsBuild();
+    visitChildren((Element child) {
+      child.reassemble();
+    });
   }
 
   void _updateDepth(int parentDepth) {
@@ -1211,7 +1226,6 @@ abstract class Element implements BuildContext {
   @mustCallSuper
   void onReload() {
     _dirty = true;
-    rebuild();
   }
 }
 

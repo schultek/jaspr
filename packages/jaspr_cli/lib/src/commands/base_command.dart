@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
@@ -9,6 +8,7 @@ import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_updater/pub_updater.dart';
 
+import '../dev/util.dart' as util;
 import '../helpers/analytics.dart';
 import '../logging.dart';
 import '../project.dart';
@@ -46,30 +46,71 @@ abstract class BaseCommand extends Command<int> {
           // SIGTERM is not supported on Windows.
           Platform.isWindows ? const Stream<void>.empty() : ProcessSignal.sigterm.watch(),
         ]).listen((signal) async {
+          isShuttingDown = true;
           cancelCount++;
           if (cancelCount > 1) exit(1);
           shutdown();
         });
 
+    final completer = Completer<int>();
+
+    runZonedGuarded(
+      () async {
+        try {
+          final result = await runCommand();
+          if (!completer.isCompleted) {
+            completer.complete(result);
+          }
+        } catch (error, stackTrace) {
+          if (!completer.isCompleted) {
+            completer.completeError(error, stackTrace);
+          }
+        }
+      },
+      (error, stackTrace) {
+        logger.write('Uncaught error: $error', tag: Tag.cli, level: Level.critical);
+        if (verbose) {
+          logger.write(stackTrace.toString(), tag: Tag.cli, level: Level.critical);
+        }
+        if (!completer.isCompleted) {
+          completer.completeError(error, stackTrace);
+        }
+      },
+    );
+
     try {
-      final result = await runCommand();
+      final result = await completer.future;
       return result;
     } finally {
       await cancelSub.cancel();
-      await stop();
+      if (_shutdownFuture != null) {
+        await _shutdownFuture;
+      } else {
+        await stop();
+      }
     }
   }
 
   Future<int> runCommand();
 
-  Future<void> stop() async {
-    logger.clearFooter();
-    final gs = [...guards];
-    guards.clear();
-    for (final g in gs) {
-      await g();
-    }
+  Future<void>? _stopFuture;
+
+  Future<void> stop() {
+    return _stopFuture ??= () async {
+      logger.clearFooter();
+      final gs = [...guards];
+      guards.clear();
+      for (final guard in gs) {
+        try {
+          await guard();
+        } catch (e) {
+          logger.write('Error stopping resource: $e', level: Level.debug);
+        }
+      }
+    }();
   }
+
+  static bool isShuttingDown = false;
 
   Future<Never>? _shutdownFuture;
 
@@ -77,12 +118,12 @@ abstract class BaseCommand extends Command<int> {
     if (_shutdownFuture != null) return _shutdownFuture!;
 
     _shutdownFuture = Future<Never>.sync(() async {
-      logger.complete(false);
+      isShuttingDown = true;
 
       if (guards.isNotEmpty) {
         logger.write('\nShutting down...');
-        await stop();
       }
+      await stop();
 
       exit(1);
     });
@@ -185,60 +226,24 @@ abstract class BaseCommand extends Command<int> {
     bool Function()? onFail,
     Level? Function(String)? levelFor,
     void Function(int)? onComplete,
-  }) async {
-    if (progress != null) {
-      logger.write(progress, tag: tag, progress: ProgressState.running);
-    }
-
-    final errSub = process.stderr.listen((event) {
-      logger.write(utf8.decode(event), tag: tag, level: Level.error, progress: ProgressState.completed);
-    });
-
-    final outSub = process.stdout.map(utf8.decode).splitLines().listen((log) {
-      if (hide != null && hide.call(log)) return;
-
-      final level = levelFor?.call(log) ?? Level.info;
-      if (progress != null) {
-        logger.write(log, tag: tag, level: level, progress: ProgressState.running);
-      } else {
-        logger.write(log, tag: tag, level: level);
-      }
-    });
-
-    int? exitCode;
-    bool wasKilled = false;
-    guardResource(() async {
-      if (exitCode == null) {
-        logger.write('Terminating $name...', level: Level.debug);
-        process.kill();
-        wasKilled = true;
-        await errSub.cancel();
-        await outSub.cancel();
-        await process.exitCode;
-      }
-    });
-
-    exitCode = await process.exitCode.then<int>((c) => Future.delayed(Duration(seconds: 1), () => c));
-
-    if (wasKilled) {
-      return exitCode;
-    }
-
-    await Future<void>.delayed(Duration(milliseconds: 300));
-
-    await errSub.cancel();
-    await outSub.cancel();
-
-    onComplete?.call(exitCode);
-
-    if (exitCode != 0 && (onFail == null || onFail())) {
-      logger.complete(false);
-      await shutdown();
-    }
-
-    logger.complete(true);
-
-    return exitCode;
+  }) {
+    return util.watchProcess(
+      name,
+      process,
+      logger: logger,
+      tag: tag,
+      progress: progress,
+      hide: hide,
+      levelFor: levelFor,
+      guard: guardResource,
+      onComplete: onComplete,
+      onFail: (code) async {
+        if (onFail == null || onFail()) {
+          logger.complete(false);
+          await shutdown();
+        }
+      },
+    );
   }
 
   Future<void> copyToBuildDir(String from, [List<String> targets = const ['']]) async {
@@ -275,26 +280,5 @@ abstract class BaseCommand extends Command<int> {
     }
 
     await moves.wait;
-  }
-}
-
-extension on Stream<String> {
-  Stream<String> splitLines() {
-    var data = '';
-    return transform(
-      StreamTransformer.fromHandlers(
-        handleData: (d, s) {
-          data += d;
-          int index;
-          while ((index = data.indexOf('\n')) != -1) {
-            s.add(data.substring(0, index + 1));
-            data = data.substring(index + 1);
-          }
-        },
-        handleDone: (s) {
-          s.add(data);
-        },
-      ),
-    );
   }
 }

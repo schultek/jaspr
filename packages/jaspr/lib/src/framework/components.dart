@@ -55,12 +55,6 @@ class DomElement extends DomRenderObjectElement {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    updateRenderObject(renderObject as RenderElement);
-  }
-
-  @override
   void update(DomComponent newComponent) {
     assert(component.tag == newComponent.tag, 'Cannot update a DomComponent with a different tag.');
     super.update(newComponent);
@@ -91,7 +85,7 @@ class DomElement extends DomRenderObjectElement {
     var attributes = component.attributes;
     var events = component.events;
 
-    if (inheritedDomParams case final inheritedDomParams?) {
+    if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
       final classesSet = {...?_splitClasses(classes)};
       styles = Map.of(styles ?? {});
       attributes = Map.of(attributes ?? {});
@@ -146,6 +140,7 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
     this.attributes,
     this.events,
     required this.child,
+    super.key,
   });
 
   final ApplyTarget target;
@@ -184,30 +179,49 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
   }
 }
 
-/// Defines the target for a [Component.apply] component.
+/// Which elements a [Component.apply] applies its properties to.
 ///
-/// The target can select either a direct child or descendant,
-/// and optionally filter by [tag], [id], and [classes].
+/// A target matches either the top-level elements of the apply's child
+/// (those not nested in another of its elements) or the child's elements at any depth.
+/// The [tag], [id], and [classes] filters narrow the matches further.
 final class ApplyTarget {
+  /// A target that matches all top-level elements of the apply's child.
+  ///
+  /// This is the default target of [Component.apply].
   static const ApplyTarget anyChild = ApplyTarget.childWith();
 
+  /// Creates a target that matches the top-level elements of the apply's child
+  /// with the given [tag], [id], and [classes].
   const ApplyTarget.childWith({
     this.tag,
     this.id,
     this.classes,
   }) : onlyChildren = true;
 
+  /// Creates a target that matches the elements of the apply's child at any depth
+  /// with the given [tag], [id], and [classes].
   const ApplyTarget.descendantWith({
     this.tag,
     this.id,
     this.classes,
   }) : onlyChildren = false;
 
+  /// Whether this target only matches the top-level elements of the apply's child.
   final bool onlyChildren;
+
+  /// The tag name an element must have to match, such as `div`, or `null` for any.
   final String? tag;
+
+  /// The ID an element must have to match, or `null` for any.
   final String? id;
+
+  /// The classes an element must all have to match, or `null` for any.
   final Set<String>? classes;
 
+  /// A CSS selector that matches the same elements as this target.
+  ///
+  /// If [onlyChildren] is `true`, this is a relative selector that
+  /// starts with the `>` child combinator.
   String get query => [
     if (onlyChildren) '> ',
     if (tag == null && id == null && classes == null)
@@ -227,57 +241,58 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
 
   InheritedElement? _inheritedDomElement;
 
-  List<ApplyParams>? get inheritedDomParams {
+  @override
+  void _updateInheritance() {
+    final oldInheritedDomElement = _inheritedDomElement;
+    super._updateInheritance();
+    _inheritedDomElement = _inheritedElements?[_InheritedDomComponent];
+    if (oldInheritedDomElement != _inheritedDomElement) {
+      markNeedsRender();
+    }
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    // Render again if reactivated where the inherited params differ,
+    // such as when moved with a global key.
+    if (_dirtyRender) markNeedsBuild();
+  }
+
+  @internal
+  @protected
+  DomParamsResolver? get inheritedDomResolver {
     if (_inheritedDomElement case final inheritedDomElement?) {
       final inheritedDomComponent = dependOnInheritedElement(inheritedDomElement) as _InheritedDomComponent;
-      return inheritedDomComponent.params;
+      return inheritedDomComponent.resolveParams;
     }
     return null;
+  }
+
+  @internal
+  @protected
+  List<ApplyParams>? inheritedDomParamsFor(RenderObject target) {
+    return inheritedDomResolver?.call(target);
+  }
+
+  @internal
+  @protected
+  Component wrapWithInheritedDomComponent({
+    required DomParamsResolver getParams,
+    required Component child,
+  }) {
+    return _InheritedDomComponent(
+      key: child.key == null ? null : ValueKey(child.key),
+      resolveParams: getParams,
+      child: child,
+    );
   }
 
   List<Component> buildOwnChildren();
 
   @override
   List<Component> buildChildren() {
-    if (inheritedDomParams case final inheritedDomParams?) {
-      final List<ApplyParams> newParams = inheritedDomParams.where((p) => !p.target.onlyChildren).toList();
-
-      // If we either removed all selectors (or none), we can return the children as is.
-      // The inherited element was already removed (or kept) by the [_updateInheritance] method.
-      if (newParams.isEmpty || newParams.length == inheritedDomParams.length) {
-        return buildOwnChildren();
-      }
-
-      return [
-        for (final child in buildOwnChildren()) _InheritedDomComponent(params: newParams, child: child),
-      ];
-    }
     return buildOwnChildren();
-  }
-
-  @override
-  void _updateInheritance() {
-    super._updateInheritance();
-    if (_inheritedElements case final originalInheritedElements?) {
-      if (originalInheritedElements[_InheritedDomComponent] case final inheritedElement?) {
-        final updatedInheritedElements = HashMap<Type, InheritedElement>.of(originalInheritedElements);
-        _inheritedDomElement = inheritedElement;
-
-        // Removing this here when *some* selectors use child combinators allows us to short-circuit the build logic to
-        // not add a new [_InheritedDomComponent] when either:
-        //   - *all* selectors use child combinators, as then the inherited element is already removed, or
-        //   - *all* selectors use descendant combinators, as then the inherited element stays unchanged.
-        // Only when *some* selectors use descendant combinators and *some* selectors use child combinators do we need
-        // to create a new [_InheritedDomComponent] in the [buildChildren] method.
-        if ((inheritedElement.component as _InheritedDomComponent).params.any((p) => p.target.onlyChildren)) {
-          updatedInheritedElements.remove(_InheritedDomComponent);
-        }
-
-        _inheritedElements = updatedInheritedElements;
-        return;
-      }
-    }
-    _inheritedDomElement = null;
   }
 }
 
@@ -300,27 +315,55 @@ class ApplyParams {
   final Map<String, EventCallback>? events;
 }
 
-class _InheritedDomComponent extends InheritedComponent {
-  const _InheritedDomComponent({required this.params, required super.child});
+typedef DomParamsResolver = List<ApplyParams> Function(RenderObject target);
 
-  final List<ApplyParams> params;
+bool _isDirectDomChild(RenderObject target, RenderObject? applyParent) {
+  RenderObject? current = target;
+  while (current != null) {
+    if (current.parent == applyParent) {
+      return true;
+    }
+    if (current.parent case final parent? when parent is RenderFragment) {
+      current = parent;
+    } else {
+      break;
+    }
+  }
+  return false;
+}
+
+class _InheritedDomComponent extends InheritedComponent {
+  const _InheritedDomComponent({super.key, required this.resolveParams, required super.child});
+
+  final DomParamsResolver resolveParams;
 
   factory _InheritedDomComponent.merge(
     BuildContext context, {
     required ApplyParams params,
     required Component child,
   }) {
-    final current = context.dependOnInheritedComponentOfExactType<_InheritedDomComponent>();
-    if (current == null) {
-      return _InheritedDomComponent(params: [params], child: child);
+    final parentResolver = context.dependOnInheritedComponentOfExactType<_InheritedDomComponent>()?.resolveParams;
+
+    List<ApplyParams> resolveParams(RenderObject target) {
+      final parentParams = parentResolver?.call(target) ?? const [];
+      final applyParent = (context as Element)._parentRenderObjectElement?.renderObject;
+
+      if (params.target.onlyChildren && !_isDirectDomChild(target, applyParent)) {
+        return parentParams;
+      }
+
+      if (parentParams.isEmpty) {
+        return [params];
+      }
+
+      return [...parentParams, params];
     }
-    return _InheritedDomComponent(params: [...current.params, params], child: child);
+
+    return _InheritedDomComponent(resolveParams: resolveParams, child: child);
   }
 
   @override
   bool updateShouldNotify(_InheritedDomComponent oldComponent) {
-    if (identical(this, oldComponent)) return false;
-    if (params.isEmpty && oldComponent.params.isEmpty) return false;
     return true;
   }
 }

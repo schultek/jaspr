@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import '../bundles/bundles.dart';
 import '../bundles/scaffold/scaffold_bundle.dart';
 import '../helpers/print_logo.dart';
+import '../helpers/skills_helper.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
@@ -42,6 +43,12 @@ class CreateCommand extends BaseCommand {
       negatable: true,
       defaultsTo: true,
       help: 'Run "dart pub get" after creating the project.',
+    );
+    argParser.addFlag(
+      'skills',
+      negatable: true,
+      defaultsTo: null,
+      help: 'Install Jaspr AI skills after creating the project.',
     );
     argParser.addSeparator('Project Presets:');
     argParser.addOption(
@@ -183,6 +190,11 @@ class CreateCommand extends BaseCommand {
       );
     }
 
+    final useSkills = await getSkills();
+    if (useSkills) {
+      await installJasprSkills(workingDirectory: dir.absolute.path);
+    }
+
     final relativePath = p.relative(dir.path, from: Directory.current.absolute.path);
     final commands = [
       if (relativePath != '.') 'cd $relativePath',
@@ -255,6 +267,11 @@ class CreateCommand extends BaseCommand {
         progress: 'Resolving dependencies...',
         hide: (s) => s == '...' || s.contains('+'),
       );
+    }
+
+    final useSkills = await getSkills();
+    if (useSkills) {
+      await installJasprSkills(workingDirectory: dir.absolute.path);
     }
 
     logger.write(
@@ -408,6 +425,18 @@ class CreateCommand extends BaseCommand {
         return b;
       }(),
     };
+  }
+
+  Future<bool> getSkills() async {
+    final opt = argResults?.wasParsed('skills') ?? false ? argResults?.flag('skills') : null;
+    if (opt != null) {
+      return opt;
+    }
+    if (!stdout.hasTerminal) {
+      return false;
+    }
+    logger.write('\n');
+    return await logger.confirm('Install Jaspr AI skills for your agent? (via pkg:skills)', defaultValue: true);
   }
 }
 

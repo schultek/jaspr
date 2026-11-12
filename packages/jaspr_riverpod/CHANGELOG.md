@@ -1,3 +1,8 @@
+## 0.5.0-beta-0
+
+- Require Dart 3.13 or later.
+- Fix an issue with sync overrides when hot-reloading a component using `ProviderScope`.
+
 ## 0.4.6
 
 - Support `riverpod` version `3.3.2`.

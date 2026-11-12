@@ -97,6 +97,64 @@ void main() {
       });
     });
 
+    test('passes --enable-experiment on to build_runner and the server compile', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [...buildRunnerBuildArgs, '--enable-experiment=primary-constructors'],
+        );
+
+        final serverProcess = FakeProcess();
+        when(
+          () => io.process.start(
+            '/fake/bin/dart',
+            any(that: containsAllInOrder(['compile', 'exe'])),
+            workingDirectory: '/root/myapp',
+          ),
+        ).thenAnswer((inv) async {
+          expect(
+            inv.positionalArguments[1],
+            equals([
+              'compile',
+              'exe',
+              '--enable-experiment=primary-constructors',
+              'lib/main.server.dart',
+              '-o',
+              './build/jaspr/app',
+              '-Djaspr.flags.release=true',
+            ]),
+          );
+
+          return serverProcess;
+        });
+
+        final buildResult = runner.run(['build', '--verbose', '--enable-experiment=primary-constructors']);
+
+        await expectLater(
+          io.stdout.queue,
+          emits('Building myapp in server rendering mode.'),
+        );
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[SERVER] Building server app...',
+            'Compiling server executable.',
+          ]),
+        );
+
+        serverProcess.exit(0);
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
+
+        expect(await buildResult, equals(0));
+      });
+    });
+
     test('builds project with static mode', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'static');
@@ -116,6 +174,7 @@ void main() {
           expect(
             inv.positionalArguments[1],
             equals([
+              'run',
               '--enable-asserts',
               '-Djaspr.flags.release=true',
               '-Djaspr.flags.generate=true',
@@ -177,8 +236,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrderWithTimeout([
+            emitsThrough('Stopping server...'),
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -256,12 +315,37 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrderWithTimeout([
+            emitsThrough('Stopping server...'),
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
 
         expect(await buildResult, equals(0));
+      });
+    });
+
+    test('fails when explicit --port is invalid or out of range', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'static');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerBuildArgs);
+        final buildResult = runner.run(['build', '--port', '0', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emits('Building myapp in static rendering mode.'),
+        );
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Invalid port "0". Must be a number between 1 and 65535.'),
+        );
+
+        expect(await buildResult, equals(1));
       });
     });
 
@@ -397,6 +481,7 @@ void main() {
             'Generating pages:',
             '(1/1) Generating "/abc" ...',
             '(2/2) Generating "/abc2" ...',
+            'Stopping server...',
             '[LOG] Generating sitemap.xml...',
           ]),
         );
@@ -436,7 +521,6 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -503,7 +587,6 @@ void main() {
 const buildRunnerBuildArgs = [
   '--release',
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:entrypoint=compiler=dart2js',
   '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O2"]',
 ];
@@ -511,7 +594,6 @@ const buildRunnerBuildArgs = [
 const buildRunnerFlutterBuildArgs = [
   '--release',
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:entrypoint=compiler=dart2js',
   '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O2","-Ddart.vm.product=true","-DFLUTTER_WEB_USE_SKWASM=false","-DFLUTTER_WEB_USE_SKIA=true"]',
   '--define=build_web_compilers:entrypoint=use-ui-libraries=true',

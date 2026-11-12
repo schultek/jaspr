@@ -32,7 +32,7 @@ class ThemeToggleState extends State<ThemeToggle> {
       else
         Document.head(
           children: [
-            // ignore: prefer_html_methods
+            // ignore: jaspr_lints/prefer_html_components
             .element(
               id: 'theme-script',
               tag: 'script',

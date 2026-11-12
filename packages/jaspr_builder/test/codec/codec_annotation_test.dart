@@ -4,8 +4,10 @@ import 'package:jaspr_builder/src/codec/codec_bundle_builder.dart';
 import 'package:jaspr_builder/src/codec/codec_module_builder.dart';
 import 'package:test/test.dart';
 
+import '../test_helper.dart';
 import 'sources/bundle.dart';
 import 'sources/model_class.dart';
+import 'sources/model_enum.dart';
 import 'sources/model_extension.dart';
 
 void main() {
@@ -13,8 +15,7 @@ void main() {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'site');
-      await reader.testing.loadIsolateSources();
+      reader = await createTestReaderWriter();
     });
 
     group('on model class', () {
@@ -23,6 +24,17 @@ void main() {
           CodecModuleBuilder(BuilderOptions({})),
           modelClassSources,
           outputs: modelClassOutputs,
+          readerWriter: reader,
+        );
+      });
+    });
+
+    group('on enum', () {
+      test('generates json module', () async {
+        await testBuilder(
+          CodecModuleBuilder(BuilderOptions({})),
+          modelEnumSources,
+          outputs: modelEnumOutputs,
           readerWriter: reader,
         );
       });
@@ -42,9 +54,8 @@ void main() {
     test('generates bundle', () async {
       await testBuilder(
         CodecBundleBuilder(BuilderOptions({})),
-        {...modelClassOutputs, ...modelExtensionOutputs},
+        {...modelClassOutputs, ...modelEnumOutputs, ...modelExtensionOutputs},
         outputs: codecBundleOutputs,
-        readerWriter: reader,
       );
     });
   });

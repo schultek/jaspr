@@ -11,7 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class Quote implements _i1.TableRow, _i1.ProtocolSerialization {
+abstract class Quote implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Quote._({this.id, required this.quote, required this.author, required this.likes});
 
   factory Quote({int? id, required String quote, required String author, required List<int> likes}) = _QuoteImpl;
@@ -39,7 +39,7 @@ abstract class Quote implements _i1.TableRow, _i1.ProtocolSerialization {
   List<int> likes;
 
   @override
-  _i1.Table get table => t;
+  _i1.Table<int?> get table => t;
 
   Quote copyWith({int? id, String? quote, String? author, List<int>? likes});
   @override
@@ -99,7 +99,7 @@ class _QuoteImpl extends Quote {
   }
 }
 
-class QuoteTable extends _i1.Table {
+class QuoteTable extends _i1.Table<int?> {
   QuoteTable({super.tableRelation}) : super(tableName: 'quotes') {
     quote = _i1.ColumnString('quote', this);
     author = _i1.ColumnString('author', this);

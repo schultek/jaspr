@@ -15,24 +15,12 @@ sealed class ComponentAnchor {
   late final web.Node endNode;
 }
 
-final Expando<ClientComponentAnchor> _clientAnchorExpando = Expando();
-
-extension ClientAnchorExtension on web.Node {
-  ClientComponentAnchor? get clientAnchor => _clientAnchorExpando[this];
-
-  set clientAnchor(ClientComponentAnchor? anchor) {
-    _clientAnchorExpando[this] = anchor;
-  }
-}
-
 class ClientComponentAnchor extends ComponentAnchor {
   ClientComponentAnchor._(super.name, super.key, super.startNode, this.data);
 
   String? data;
   late FutureOr<ClientBuilder> builder;
   final List<ServerComponentAnchor> serverAnchors = [];
-
-  void Function(void Function())? _setState;
 
   /// The decoded parameters for this client component.
   Map<String, Object?> get _decodedParameters {
@@ -44,37 +32,23 @@ class ClientComponentAnchor extends ComponentAnchor {
     return const {};
   }
 
+  bool get isResolved => builder is ClientBuilder && serverAnchors.every((a) => a.isResolved);
+
   Future<void> resolve() async {
-    final (clientBuilder, _) = await (
-      Future.value(builder),
-      serverAnchors.map((a) => a.resolve()).wait,
-    ).wait;
+    final (clientBuilder, _) = await (Future.value(builder), serverAnchors.map((a) => a.resolve()).wait).wait;
     builder = clientBuilder;
   }
 
   Component build() {
     assert(builder is ClientBuilder, 'ClientComponentAnchor was not resolved before calling build()');
-    return StatefulBuilder(
-      key: GlobalObjectKey(key),
-      builder: (_, setState) {
-        _setState = setState;
-        final clientParameters = ClientParams(_decodedParameters, serverAnchors);
-        return (builder as ClientBuilder)(clientParameters);
-      },
-    );
-  }
 
-  void rebuild(String? data, List<ServerComponentAnchor> serverAnchors) {
-    assert(_setState != null, 'ClientComponentAnchor was not built before calling rebuild()');
-    _setState!(() {
-      this.data = data;
-      this.serverAnchors.clear();
-      this.serverAnchors.addAll(serverAnchors);
-    });
+    final clientParameters = ClientParams(_decodedParameters, serverAnchors);
+    final component = (builder as ClientBuilder)(clientParameters);
+    return Builder(key: _ClientAnchorKey(key), builder: (_) => component);
   }
 
   ChildSlot createSlot() {
-    return _AnchorChildSlot(
+    return ChildSlot.between(
       key: UniqueKey(),
       start: startNode,
       end: endNode,
@@ -83,29 +57,34 @@ class ClientComponentAnchor extends ComponentAnchor {
   }
 }
 
-class _AnchorChildSlot extends ChildSlot {
-  _AnchorChildSlot({required this.start, required this.end, required this.child, super.key});
+/// A global key for a client component anchor, compared by its string value.
+///
+/// Anchor keys are rebuilt as new strings each time
+/// markers are extracted, such as on reloads,
+/// so [GlobalObjectKey] can't be used, as it compares with [identical],
+/// which only matches equal strings when compiled with dart2js.
+final class _ClientAnchorKey extends GlobalKey {
+  const _ClientAnchorKey(this.value) : super.constructor();
 
-  final web.Node start;
-  final web.Node end;
-  @override
-  final Component child;
+  /// The string whose value is used by this key's [operator==].
+  final String value;
 
   @override
-  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
-    return ChildSlotRenderObject.between(parent, start, end);
-  }
+  bool operator ==(Object other) => other is _ClientAnchorKey && other.value == value;
 
   @override
-  bool canUpdate(ChildSlot oldComponent) {
-    return oldComponent is _AnchorChildSlot && oldComponent.start == start && oldComponent.end == end;
-  }
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => '[_ClientAnchorKey $value]';
 }
 
 class ServerComponentAnchor extends ComponentAnchor {
   ServerComponentAnchor(super.name, super.key, super.startNode);
 
   final List<ClientComponentAnchor> clientAnchors = [];
+
+  bool get isResolved => clientAnchors.every((a) => a.isResolved);
 
   Future<void> resolve() async {
     await [for (final anchor in clientAnchors) anchor.resolve()].wait;
@@ -122,13 +101,7 @@ class ServerComponentAnchor extends ComponentAnchor {
     }
     nodes.add(endNode);
 
-    return SlottedChildView.withNodes(
-      key: GlobalKey(),
-      nodes: nodes,
-      slots: [
-        for (final client in clientAnchors) client.createSlot(),
-      ],
-    );
+    return SlottedChildView.withNodes(nodes: nodes, slots: [for (final client in clientAnchors) client.createSlot()]);
   }
 }
 
@@ -185,9 +158,7 @@ FutureOr<ClientBuilder> getClientByName(String name) {
   return clients[name]!.loadedBuilder;
 }
 
-List<ClientComponentAnchor> extractAnchors({
-  List<web.Node>? nodes,
-}) {
+List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
   nodes ??= [?web.document.body];
 
   final List<ComponentAnchor> anchors = [];
@@ -241,10 +212,11 @@ List<ClientComponentAnchor> extractAnchors({
         comp.endNode = currNode;
         comp.builder = getClientByName(name);
 
-        // Remove the data string.
-        start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
+        if (!kDebugMode) {
+          // Remove the data string.
+          start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
+        }
 
-        start.clientAnchor = comp;
         if (anchors.isEmpty) {
           clientAnchors.add(comp);
         } else {

@@ -204,12 +204,153 @@ void main() {
           '@import url(fonts.css);\n'
           '.main {\n'
           '  width: 100px;\n'
-          '}\n'
-          '.main p {\n'
-          '  font-size: 2em;\n'
+          '  p {\n'
+          '    font-size: 2em;\n'
+          '  }\n'
           '}',
         ),
       );
+    });
+  });
+
+  group('nested style rules', () {
+    test('a nested selector stays nested', () {
+      expect(
+        css('.main', [css('&:hover').styles(color: Colors.blue)]).toCss(),
+        equals(
+          '.main {\n'
+          '  &:hover {\n'
+          '    color: blue;\n'
+          '  }\n'
+          '}',
+        ),
+      );
+    });
+
+    test('a child whose selector is just & belongs to the parent block', () {
+      expect(
+        css('.main', [css('&').styles(width: 100.px)]).toCss(),
+        equals(
+          '.main {\n'
+          '  width: 100px;\n'
+          '}',
+        ),
+      );
+    });
+
+    test('nests as deep as it is declared', () {
+      expect(
+        css('.main', [
+          css('ul', [
+            css('li', [css('&:first-child').styles(fontWeight: FontWeight.bold)]),
+          ]),
+        ]).toCss(),
+        equals(
+          '.main {\n'
+          '  ul {\n'
+          '    li {\n'
+          '      &:first-child {\n'
+          '        font-weight: bold;\n'
+          '      }\n'
+          '    }\n'
+          '  }\n'
+          '}',
+        ),
+      );
+    });
+
+    test('an at-rule nested in a rule stays inside it', () {
+      expect(
+        css('.main', [
+          css('&').styles(width: 100.px),
+          css.media(MediaQuery.screen(minWidth: 1000.px), [css('&').styles(width: 200.px)]),
+        ]).toCss(),
+        equals(
+          '.main {\n'
+          '  width: 100px;\n'
+          '  @media screen and (min-width: 1000px) {\n'
+          '    width: 200px;\n'
+          '  }\n'
+          '}',
+        ),
+      );
+    });
+
+    test('a bare & writes into any grouping at-rule nested in a rule', () {
+      expect(
+        css('.main', [
+          css.supports('(display: grid)', [css('&').styles(display: Display.grid)]),
+          css.layer(name: 'base', [css('&').styles(width: 100.px)]),
+        ]).toCss(),
+        equals(
+          '.main {\n'
+          '  @supports (display: grid) {\n'
+          '    display: grid;\n'
+          '  }\n'
+          '  @layer base {\n'
+          '    width: 100px;\n'
+          '  }\n'
+          '}',
+        ),
+      );
+    });
+
+    test('a bare & writes into an at-rule nested in another one', () {
+      expect(
+        css('.main', [
+          css.media(MediaQuery.screen(minWidth: 1000.px), [
+            css.supports('(display: grid)', [css('&').styles(display: Display.grid)]),
+          ]),
+        ]).toCss(),
+        equals(
+          '.main {\n'
+          '  @media screen and (min-width: 1000px) {\n'
+          '    @supports (display: grid) {\n'
+          '      display: grid;\n'
+          '    }\n'
+          '  }\n'
+          '}',
+        ),
+      );
+    });
+
+    test('any other selector in a nested at-rule stays a nested rule', () {
+      expect(
+        css('.main', [
+          css.media(MediaQuery.screen(minWidth: 1000.px), [
+            css('&').styles(width: 200.px),
+            css('&:hover').styles(width: 300.px),
+          ]),
+        ]).toCss(),
+        equals(
+          '.main {\n'
+          '  @media screen and (min-width: 1000px) {\n'
+          '    width: 200px;\n'
+          '    &:hover {\n'
+          '      width: 300px;\n'
+          '    }\n'
+          '  }\n'
+          '}',
+        ),
+      );
+    });
+
+    test('a rule with only children still opens its block', () {
+      expect(
+        css('.main', [css('p').styles(fontSize: 2.em)]).toCss(),
+        equals(
+          '.main {\n'
+          '  p {\n'
+          '    font-size: 2em;\n'
+          '  }\n'
+          '}',
+        ),
+      );
+    });
+
+    test('a rule with nothing in it renders nothing', () {
+      expect(css('.main').toCss(), isEmpty);
+      expect(css('.main', [css('p')]).toCss(), isEmpty);
     });
   });
 }

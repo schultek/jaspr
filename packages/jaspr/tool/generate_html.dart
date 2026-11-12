@@ -480,7 +480,7 @@ void writeTagResource(Class clazz, Map<String, dynamic> data, Map<String, dynami
     }
     signature += ',';
 
-    if (field.type case TypeReference(symbol: final symbol) when enums.containsKey(symbol)) {
+    if (field.type case TypeReference(:final symbol) when enums.containsKey(symbol)) {
       final values = enums[symbol]['values'].keys as Iterable<String>;
       signature += ' // One of ${values.map((v) => '`.$v`').join(', ')}';
     }
@@ -524,7 +524,7 @@ void writeTagResource(Class clazz, Map<String, dynamic> data, Map<String, dynami
         TypeReference(symbol: 'bool') => 'true',
         TypeReference(symbol: 'int') => '1',
         TypeReference(symbol: 'double') => '1.0',
-        TypeReference(symbol: final symbol) when enums.containsKey(symbol) => '.${enums[symbol]['values'].keys.first}',
+        TypeReference(:final symbol) when enums.containsKey(symbol) => '.${enums[symbol]['values'].keys.first}',
         _ => throw ArgumentError('Unsupported type for example: ${field.type}'),
       };
       example += '${exampleParam.name}: $value';
