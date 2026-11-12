@@ -10,6 +10,7 @@ description: Create, serve and build projects using the Jaspr CLI.
 Jaspr comes with a cli tool to create, serve and build your website.
 
 - `jaspr create`: Create a new Jaspr project.
+- `jaspr new`: Create a new component or content page inside an existing project.
 - `jaspr serve`: Serve the project and automatically refresh when you make changes.
 - `jaspr build`: Build the project according to the selected rendering mode.
 
@@ -86,6 +87,21 @@ This will walk you through a series of options to configure your starter project
 Alternatively, you can select a pre-made template using the `--template` option, with the following templates being available:
 
 - `docs`: A template for documentation websites using [`jaspr_content`](/content).
+
+## Creating Components and Pages
+
+Inside an existing project you can scaffold single files with:
+
+```shell
+jaspr new component ContactInfo
+jaspr new page getting_started
+```
+
+By default `jaspr new component` creates a `StatelessComponent` in `lib/components/`. Use `--stateful`, `--async`, `--inherited` or `--flutter` to pick another component type, and `--client`, `--with-styles` or `--with-test` to extend the generated file.
+
+`jaspr new page` creates a [`jaspr_content`](/content) page in your `content/` directory and fills in the frontmatter from options like `--title`, `--layout` or `--index`.
+
+Both subcommands accept `--path` to choose where the file is created and `--dry-run` to preview the changes without writing anything.
 
 ## Development Server
 

@@ -12,6 +12,7 @@
 - Fixed key shortcuts in `jaspr serve` not working on Windows.
 - Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
 - Fixed `jaspr serve` blocking all following reloads when a connected browser stops responding (e.g. a phone with the screen turned off).
+- Added `jaspr new component` command to generate new components and `jaspr new page` to generate new `jaspr_content` pages inside existing projects (Also supported by VSCode extension).
 
 ## 0.24.0-beta.0
 

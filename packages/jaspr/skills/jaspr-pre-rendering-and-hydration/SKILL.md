@@ -16,7 +16,7 @@ Jaspr pre-renders components at request/build-time on the server. Interactive br
    - **Importing:** You MUST NOT import `dart:js_interop` or `package:web` in any code imported by the server entrypoint.
    - **Importing:** You MUST NOT import `dart:io` or `dart:ffi` in any code imported by the client entrypoint.
    - **Using:** You can import `package:universal_web` in shared code, but you MUST wrap any access to its browser APIs inside an `if (kIsWeb)` check to prevent crashing during server-side rendering.
-3. **Interactivity / Hydration:** Components are server-rendered by default. To add client interactivity (e.g., event listeners, state, using browser APIs), you **MUST** annotate a component with `@client`. 
+3. **Interactivity / Hydration:** Components are server-rendered by default. To add client interactivity (e.g., event listeners, state, using browser APIs), you **MUST** annotate a component with `@client`. When creating a new client component, prefer the CLI command `jaspr new component MyButton --client --stateful` instead of writing the class and the annotation by hand
 
 ### The `@client` Annotation and `ClientApp`
 
@@ -127,6 +127,7 @@ When pre-rendering in `server` or `static` mode, fetch data asynchronously (e.g.
 - **Rule 1:** You MUST use `AsyncStatelessComponent` or `AsyncBuilder` to perform async work during the build phase.
 - **Rule 2:** These components MUST ONLY be used on the server (import `package:jaspr/server.dart`).
 - **Rule 3:** Once data is fetched on the server, pass it to `@client` components as serialized parameters (primitives or `@encoder`/`@decoder` types), or wrap server-only content in a server component child.
+- **Rule 4:** To create a new async component, you may use `jaspr new component MyServerComponent --async`. It generates the `package:jaspr/server.dart` import and the `Future<Component> build(...) async` signature.
 
 **Example Usage:**
 

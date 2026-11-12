@@ -1,0 +1,7 @@
+name: new_async_component
+description: A jaspr_cli brick to create Async Stateless Commponents
+
+version: 0.1.0
+
+environment:
+  mason: ">=0.1.0-dev.52 <0.1.0"
