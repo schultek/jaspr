@@ -5,7 +5,8 @@
 /// A constant that is true if the application was compiled in release mode.
 ///
 /// More specifically, this is a constant that is true if the application was
-/// compiled in Dart with the '-Djaspr.flags.release=true' flag.
+/// compiled in Dart with the '-Djaspr.flags.release=true' flag, or as a product
+/// build of the Dart VM, such as with `dart compile exe`.
 ///
 /// Since this is a const value, it can be used to indicate to the compiler that
 /// a particular block of code will not be executed in release mode, and hence
@@ -18,7 +19,7 @@
 /// See also:
 ///
 ///  * [kDebugMode], which is true in debug builds.
-const bool kReleaseMode = bool.fromEnvironment('jaspr.flags.release');
+const bool kReleaseMode = bool.fromEnvironment('jaspr.flags.release') || bool.fromEnvironment('dart.vm.product');
 
 /// A constant that is true if the application was run in verbose mode.
 ///

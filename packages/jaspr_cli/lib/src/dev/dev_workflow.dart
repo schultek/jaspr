@@ -18,6 +18,7 @@ import 'client_manager.dart';
 import 'client_runner.dart';
 import 'css_runner.dart';
 import 'flutter_runner.dart';
+import 'reloaded_sources.dart';
 import 'server_runner.dart';
 import 'util.dart';
 
@@ -39,6 +40,8 @@ class DevWorkflow {
 
   final ExpressionCompilerService? ddcService;
   final Logger logger;
+
+  final ReloadedSources _reloadedSources;
 
   late final ClientManager clients;
   late final ChromeRunner chrome;
@@ -90,6 +93,7 @@ class DevWorkflow {
     required this._useDwdsWebSocketConnection,
     required this._toolConfiguration,
     required this._assetReader,
+    required this._reloadedSources,
     required this.logger,
     this.ddcService,
   }) {
@@ -140,31 +144,38 @@ class DevWorkflow {
         .listen(null);
   }
 
+  /// Hot reloads all connected clients, then reloads any changed stylesheets.
   Future<void> reloadClients() async {
+    final deliveredSources = _reloadedSources.snapshot();
     flutter?.reload();
     final cssFuture = css.reload();
     await server?.reload();
 
-    for (final clientConnection in clients.connections) {
-      await clientConnection.performHotReload();
+    var allReloaded = true;
+    await clients.forEachConnection('Hot reload', (clientConnection) async {
+      if (!await clientConnection.performHotReload()) {
+        allReloaded = false;
+        // Skip reassemble and html reload if client hot-reload fails.
+        return;
+      }
       await clientConnection.reassemble();
       if (project.requireMode != JasprMode.client) {
         await clientConnection.reloadHtml();
       }
+    });
+    if (allReloaded) {
+      _reloadedSources.removeDelivered(deliveredSources);
     }
 
-    final changedCssFiles = await cssFuture;
-    if (changedCssFiles.isNotEmpty) {
-      for (final clientConnection in clients.connections) {
-        await clientConnection.reloadStylesheets(changedCssFiles);
-      }
-      for (final file in changedCssFiles) {
-        logger.write('Reloaded $file', tag: Tag.css);
-      }
-    }
+    await _reloadStylesheets(cssFuture);
   }
 
+  /// Hot restarts all connected clients, then reloads any changed stylesheets.
+  ///
+  /// If [incremental] is `true`, the Flutter and CSS runners are only
+  /// reloaded instead of fully restarted.
   Future<void> restartClients({bool incremental = false}) async {
+    final deliveredSources = _reloadedSources.snapshot();
     final Future<List<String>> cssFuture;
     if (incremental) {
       flutter?.reload();
@@ -176,25 +187,27 @@ class DevWorkflow {
 
     await server?.reload();
 
-    for (final clientConnection in clients.connections) {
-      await clientConnection.restart();
+    var allRestarted = true;
+    await clients.forEachConnection('Hot restart', (clientConnection) async {
+      if (await clientConnection.restart() == null) {
+        allRestarted = false;
+        // Skip html reload if client restart fails.
+        return;
+      }
       if (project.requireMode != JasprMode.client) {
         await clientConnection.reloadHtml();
       }
+    });
+    if (allRestarted) {
+      _reloadedSources.removeDelivered(deliveredSources);
     }
 
-    final changedCssFiles = await cssFuture;
-    if (changedCssFiles.isNotEmpty) {
-      for (final clientConnection in clients.connections) {
-        await clientConnection.reloadStylesheets(changedCssFiles);
-      }
-      for (final file in changedCssFiles) {
-        logger.write('Reloaded $file', tag: Tag.css);
-      }
-    }
+    await _reloadStylesheets(cssFuture);
   }
 
+  /// Fully reloads the page in all connected clients.
   Future<void> refreshClients() async {
+    final deliveredSources = _reloadedSources.snapshot();
     flutter?.reload();
     final cssFuture = css.reload();
     await server?.reload();
@@ -205,8 +218,29 @@ class DevWorkflow {
       }
     }
 
-    for (final client in clients.connections) {
-      await client.refreshPage();
+    var allRefreshed = true;
+    await clients.forEachConnection('Refresh', (client) async {
+      if (await client.refreshPage() == null) {
+        allRefreshed = false;
+      }
+    });
+    if (allRefreshed) {
+      _reloadedSources.removeDelivered(deliveredSources);
+    }
+  }
+
+  /// Waits for [cssFuture] and, if any stylesheets changed,
+  /// reloads them in all connected clients.
+  Future<void> _reloadStylesheets(Future<List<String>> cssFuture) async {
+    final changedCssFiles = await cssFuture;
+    if (changedCssFiles.isEmpty) return;
+
+    await clients.forEachConnection(
+      'Stylesheet reload',
+      (clientConnection) => clientConnection.reloadStylesheets(changedCssFiles),
+    );
+    for (final file in changedCssFiles) {
+      logger.write('Reloaded $file', tag: Tag.css);
     }
   }
 
@@ -252,22 +286,20 @@ class DevWorkflow {
     }
 
     const target = 'web';
-    final reloadedSources = <Map<String, Object>>[];
+    final reloadedSources = ReloadedSources();
     var pipeline = const Pipeline();
 
     // Only provide relevant build results as a broadcast stream.
     final filteredBuildResults = clientRunner.buildResults.asyncMap<BuildResult>((results) {
       if (moduleFormat == 'ddc') {
-        reloadedSources.clear();
         results.changedAssets?.forEach((uri) {
           if (uri.path.endsWith('.ddc.js')) {
             final libraryId = ddcUriToLibraryId(uri);
-            final reloadedSource = {
+            reloadedSources.add(libraryId, {
               'src': ddcUriToSourceUrl('', target, uri),
               'module': libraryId,
               'libraries': [libraryId],
-            };
-            reloadedSources.add(reloadedSource);
+            });
           }
         });
       }
@@ -326,6 +358,9 @@ class DevWorkflow {
       timer.cancel();
       await initialBuildSub.cancel();
     }
+
+    // The initial page load already contains everything the initial build produced.
+    reloadedSources.clear();
 
     if (initialResult.status == BuildStatus.failed) {
       logger.write(
@@ -420,7 +455,10 @@ class DevWorkflow {
     if (moduleFormat == 'ddc') {
       cascade = cascade.add((Request req) {
         if (req.url.path == 'reloaded_sources.json') {
-          return Response.ok(jsonEncode(reloadedSources), headers: {'content-type': 'application/json'});
+          return Response.ok(
+            jsonEncode(reloadedSources.toJson()),
+            headers: {'content-type': 'application/json'},
+          );
         }
         return Response.notFound('');
       });
@@ -450,6 +488,7 @@ class DevWorkflow {
       useDwdsWebSocketConnection: useDwdsWebSocketConnection,
       toolConfiguration: toolConfiguration,
       assetReader: assetReader,
+      reloadedSources: reloadedSources,
       ddcService: ddcService,
       logger: logger,
     );
