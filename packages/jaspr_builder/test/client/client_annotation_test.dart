@@ -4,6 +4,7 @@ import 'package:jaspr_builder/src/client/client_bundle_builder.dart';
 import 'package:jaspr_builder/src/client/client_module_builder.dart';
 import 'package:test/test.dart';
 
+import '../test_helper.dart';
 import 'sources/bundle.dart';
 import 'sources/client_basic.dart';
 import 'sources/client_invalid.dart';
@@ -18,8 +19,7 @@ void main() {
     late TestReaderWriter reader;
 
     setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'site');
-      await reader.testing.loadIsolateSources();
+      reader = await createTestReaderWriter();
     });
 
     group('on basic component', () {
@@ -148,7 +148,6 @@ void main() {
           ...clientWithServerComponentsModuleOutputs,
         },
         outputs: clientBundleOutputs,
-        readerWriter: reader,
       );
     });
   });
