@@ -7,7 +7,7 @@
   no longer renders in debug mode. This matches what `kDebugMode` was already documented to do.
 - Fixed key shortcuts in `jaspr serve` not working on Windows.
 - Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
-- Fixed a rebuild removing the `open` attribute that the browser set on a `dialog` (through `showModal()` or `show()`) or a `details` element.
+- **Breaking**: Changed `open` on `dialog()` and `details()` to `bool?`. When it is not set, the browser controls the attribute, which fixes a rebuild closing a dialog opened with `showModal()` or `show()` and a `details` element the user opened. Pass `open: false` to keep the element closed.
 
 ## 0.24.0-beta.0
 

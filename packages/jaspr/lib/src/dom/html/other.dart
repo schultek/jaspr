@@ -13,7 +13,7 @@ final class details extends StatelessComponent {
   /// {@macro jaspr.html.details}
   const details(
     this.children, {
-    this.open = false,
+    this.open,
     this.id,
     this.classes,
     this.styles,
@@ -22,8 +22,8 @@ final class details extends StatelessComponent {
     super.key,
   });
 
-  /// Indicates whether or not the details — that is, the contents of the &lt;details&gt; element — are currently visible.
-  final bool open;
+  /// Indicates whether or not the details — that is, the contents of the &lt;details&gt; element — are currently visible. If not set, the browser keeps control of the state, so the details stay as the user toggled them.
+  final bool? open;
 
   /// The id of the HTML element. Must be unique within the document.
   final String? id;
@@ -50,7 +50,7 @@ final class details extends StatelessComponent {
       id: id,
       classes: classes,
       styles: styles,
-      attributes: {...?attributes, if (open) 'open': ''},
+      attributes: {...?attributes, 'open': ?_explicitBool(open)},
       events: events,
       children: children,
     );
@@ -64,7 +64,7 @@ final class dialog extends StatelessComponent {
   /// {@macro jaspr.html.dialog}
   const dialog(
     this.children, {
-    this.open = false,
+    this.open,
     this.id,
     this.classes,
     this.styles,
@@ -73,8 +73,8 @@ final class dialog extends StatelessComponent {
     super.key,
   });
 
-  /// Indicates that the dialog is active and can be interacted with. When the open attribute is not set, the dialog shouldn't be shown to the user.
-  final bool open;
+  /// Indicates that the dialog is active and can be interacted with. When the open attribute is not set, the dialog shouldn't be shown to the user. If not set, the browser keeps control of the state, which a dialog opened with `showModal()` or `show()` needs.
+  final bool? open;
 
   /// The id of the HTML element. Must be unique within the document.
   final String? id;
@@ -101,7 +101,7 @@ final class dialog extends StatelessComponent {
       id: id,
       classes: classes,
       styles: styles,
-      attributes: {...?attributes, if (open) 'open': ''},
+      attributes: {...?attributes, 'open': ?_explicitBool(open)},
       events: events,
       children: children,
     );
