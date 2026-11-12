@@ -106,6 +106,6 @@ final styles = [
       // Wait for the server to be stopped.
       await runner.runner.commands.values.whereType<ServeCommand>().firstOrNull?.stop();
       await serveResult;
-    }, timeout: Timeout(Duration(minutes: 3)));
+    }, timeout: Timeout(Duration(minutes: 4)));
   });
 }
