@@ -244,10 +244,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
-    for (final element in _appliedParams.keys) {
-      _resetElementParams(element);
-    }
-    _appliedParams.clear();
+    _resetAppliedParams();
 
     if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
       final slotRanges = {
@@ -312,12 +309,16 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     return true;
   }
 
+  /// Removes the DOM values and event listeners this view added,
+  /// then clears its record of them.
+  void _resetAppliedParams() {
+    _appliedParams.forEach(_resetElementParams);
+    _appliedParams.clear();
+  }
+
   /// Removes the params this view applied to [element],
   /// without leaving behind empty attributes that it didn't have before.
-  void _resetElementParams(web.HTMLElement element) {
-    final params = _appliedParams[element];
-    if (params == null) return;
-
+  static void _resetElementParams(web.HTMLElement element, _AppliedParams params) {
     if (params.id != null && element.id == params.id) {
       element.removeAttribute('id');
     }
@@ -423,10 +424,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
   @override
   void unmount() {
-    for (final element in _appliedParams.keys) {
-      _resetElementParams(element);
-    }
-    _appliedParams.clear();
+    _resetAppliedParams();
     super.unmount();
   }
 }
