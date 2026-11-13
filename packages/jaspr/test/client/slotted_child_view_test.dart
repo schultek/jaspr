@@ -486,6 +486,34 @@ void main() {
       expect(btn.className, '');
     });
 
+    testClient('preserves server-only applied params when client apply toggles off', (tester) async {
+      window.document.body!.innerHTML = '<section><button id="save" class="btn server-applied client-applied" data-j-apply="c:client-applied">Save</button></section>'
+          .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              classes: hasParams ? 'client-applied' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.className, 'btn server-applied client-applied');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.className, 'btn server-applied');
+    });
+
     testClient('applies direct child params to root range slot', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Click me</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;

@@ -511,5 +511,68 @@ void main() {
         contains('data-j-apply="i:test%3B1%2C2%253;c:c%3B1,c%2C2"'),
       );
     });
+    testServer('encodes direct child apply params across fragments', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          classes: 'fragment-applied',
+          child: Component.fragment([
+            App1(),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<!--@app1 apply<[{"c":"fragment-applied"}]>-->'),
+      );
+    });
+
+    testServer('does not add data-j-apply for server-only apply inside server component', (tester) async {
+      tester.pumpComponent(
+        AppWithServerComponent(
+          child: Component.apply(
+            classes: 'server-only',
+            child: span(classes: 'child-class', [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span class="child-class server-only">Hello</span>'),
+      );
+      expect(
+        response.body,
+        isNot(contains('data-j-apply')),
+      );
+    });
+
+    testServer('only includes client-managed params in data-j-apply when server component has its own apply', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          classes: 'client-managed',
+          child: AppWithServerComponent(
+            child: Component.apply(
+              classes: 'server-only',
+              child: span(classes: 'child-class', [text('Hello')]),
+            ),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span class="child-class server-only client-managed" data-j-apply="c:client-managed">Hello</span>'),
+      );
+    });
   });
 }

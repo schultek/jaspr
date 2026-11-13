@@ -55,7 +55,7 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
       if (registry.serverElements.containsKey(e)) {
         return false;
       }
-      if (e is RenderObjectElement) {
+      if (e is RenderObjectElement && e.renderObject is! RenderFragment) {
         hasRenderElement = true;
       }
       if (e.component case final ApplyDomComponent applyComp) {

@@ -49,9 +49,6 @@ class DomElement extends DomRenderObjectElement {
   @override
   DomComponent get component => super.component as DomComponent;
 
-  @internal
-  String? appliedDiff;
-
   @override
   List<Component> buildOwnChildren() {
     return component.children ?? const [];
@@ -94,11 +91,6 @@ class DomElement extends DomRenderObjectElement {
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
 
-      final appliedClasses = <String>[];
-      final appliedStyles = <String>[];
-      final appliedAttributes = <String>[];
-      String? appliedId;
-
       for (final param in inheritedDomParams.reversed) {
         if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
         // DOM Element.id is empty when neither the id field nor the attributes map supplies an ID.
@@ -110,33 +102,21 @@ class DomElement extends DomRenderObjectElement {
 
         if (param.id case final paramId? when id == null) {
           id = paramId;
-          appliedId = paramId;
         }
 
         if (param.classes case final paramClasses?) {
-          for (final c in paramClasses) {
-            if (!classesSet.contains(c)) {
-              appliedClasses.add(c);
-            }
-          }
           classesSet.addAll(paramClasses);
         }
 
         if (param.styles case final stylesProps?) {
           for (final MapEntry(:key, :value) in stylesProps.entries) {
-            if (!styles.containsKey(key)) {
-              styles[key] = value;
-              appliedStyles.add(key);
-            }
+            styles[key] ??= value;
           }
         }
 
         if (param.attributes case final attributesMap?) {
           for (final MapEntry(:key, :value) in attributesMap.entries) {
-            if (!attributes.containsKey(key)) {
-              attributes[key] = value;
-              appliedAttributes.add(key);
-            }
+            attributes[key] ??= value;
           }
         }
 
@@ -148,28 +128,6 @@ class DomElement extends DomRenderObjectElement {
       }
 
       classes = classesSet.join(' ');
-
-      if (!binding.isClient) {
-        if (appliedId != null ||
-            appliedClasses.isNotEmpty ||
-            appliedStyles.isNotEmpty ||
-            appliedAttributes.isNotEmpty) {
-          final parts = <String>[];
-          if (appliedId != null) {
-            parts.add('i:${_escapeApplyValue(appliedId)}');
-          }
-          if (appliedClasses.isNotEmpty) {
-            parts.add('c:${appliedClasses.map(_escapeApplyValue).join(',')}');
-          }
-          if (appliedStyles.isNotEmpty) {
-            parts.add('s:${appliedStyles.map(_escapeApplyValue).join(',')}');
-          }
-          if (appliedAttributes.isNotEmpty) {
-            parts.add('a:${appliedAttributes.map(_escapeApplyValue).join(',')}');
-          }
-          appliedDiff = parts.join(';');
-        }
-      }
     }
 
     renderObject.update(id, classes, styles, attributes, events);
@@ -227,6 +185,7 @@ class ApplyDomComponent extends StatelessComponent implements DomComponent {
         styles: styles?.properties,
         attributes: attributes,
         events: events,
+        source: context as Element,
       ),
       child: child,
     );
@@ -326,7 +285,6 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
   }
 
   @internal
-  @protected
   List<ApplyParams>? inheritedDomParamsFor(RenderObject target) {
     return inheritedDomResolver?.call(target);
   }
@@ -361,6 +319,7 @@ class ApplyParams {
     this.styles,
     this.attributes,
     this.events,
+    this.source,
   });
 
   final ApplyTarget target;
@@ -369,6 +328,7 @@ class ApplyParams {
   final Map<String, String>? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
+  final Element? source;
 }
 
 typedef DomParamsResolver = List<ApplyParams> Function(RenderObject target);
@@ -491,7 +451,3 @@ class _FragmentElement extends MultiChildRenderObjectElement {
   @override
   void updateRenderObject(RenderFragment fragment) {}
 }
-
-String _escapeApplyValue(String val) => (val.contains(';') || val.contains(',') || val.contains('%'))
-    ? val.replaceAll('%', '%25').replaceAll(';', '%3B').replaceAll(',', '%2C')
-    : val;
