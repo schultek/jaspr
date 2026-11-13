@@ -358,7 +358,7 @@ void main() {
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
           '    <!--@app1 apply<[{"i":"outer-id","c":"outer-class"}]>-->\n'
-          '    <div id="outer-id" class="outer-class" data-app="1" data-j-apply="i:outer-id;c:outer-class"></div>\n'
+          '    <div id="outer-id" class="outer-class" data-app="1"></div>\n'
           '    <!--/@app1-->\n'
           '  </body>\n'
           '</html>\n'
@@ -370,6 +370,7 @@ void main() {
     testServer('encodes applied params above client component wrapping server component', (tester) async {
       tester.pumpComponent(
         Component.apply(
+          target: const ApplyTarget.descendantWith(),
           classes: 'server-class',
           child: AppWithServerComponent(
             child: span(classes: 'child-class', [text('Hello')]),
@@ -386,8 +387,12 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_server_component data<{"child":"s@1"}> apply<[{"c":"server-class"}]>-->\n'
-          '    <div class="server-class" data-app="with-child" data-j-apply="c:server-class"><!--s@1--><span class="child-class">Hello</span><!--/s@1--></div>\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}> apply<[{"t":{"d":true},"c":"server-class"}]>-->\n'
+          '    <div class="server-class" data-app="with-child">\n'
+          '      <!--s@1-->\n'
+          '      <span class="child-class server-class" data-j-apply="c:server-class">Hello</span>\n'
+          '      <!--/s@1-->\n'
+          '    </div>\n'
           '    <!--/@app_with_server_component-->\n'
           '  </body>\n'
           '</html>\n'
@@ -443,7 +448,7 @@ void main() {
           '  <body>\n'
           '    <div class="descendant-class">\n'
           '      <!--@app1 apply<[{"t":{"d":true},"c":"descendant-class"}]>-->\n'
-          '      <div class="descendant-class" data-app="1" data-j-apply="c:descendant-class"></div>\n'
+          '      <div class="descendant-class" data-app="1"></div>\n'
           '      <!--/@app1-->\n'
           '    </div>\n'
           '  </body>\n'
@@ -487,12 +492,15 @@ void main() {
         ),
       );
     });
-    testServer('escapes special characters in data-j-apply', (tester) async {
+    testServer('escapes special characters in data-j-apply on server components', (tester) async {
       tester.pumpComponent(
         Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
           id: 'test;1,2%3',
           classes: 'c;1 c,2',
-          child: App1(),
+          child: AppWithServerComponent(
+            child: span([text('Hello')]),
+          ),
         ),
       );
 

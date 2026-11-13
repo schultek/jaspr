@@ -79,8 +79,6 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
       return;
     }
 
-    _applyParamsToDescendants(element);
-
     final startMarker = MarkupRenderText(
       '<!--${DomValidator.clientMarkerPrefix}${target.name}${data != null ? ' data<$data>' : ''}${applyData != null ? ' apply<$applyData>' : ''}-->',
       true,
@@ -89,22 +87,6 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
 
     group.children.insertAfter(startMarker);
     group.children.insertBefore(endMarker);
-  }
-
-  void _applyParamsToDescendants(Element parent) {
-    parent.visitChildren((child) {
-      if (registry.clientBoundaries.contains(child)) {
-        return;
-      }
-      if (child is DomElement) {
-        if (child.appliedDiff case final diff?) {
-          if (child.renderObject case final MarkupRenderElement renderObject) {
-            (renderObject.attributes ??= {})['data-j-apply'] = diff;
-          }
-        }
-      }
-      _applyParamsToDescendants(child);
-    });
   }
 
   String? getData() {
@@ -149,7 +131,7 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
 
     for (final element in elements) {
       registry.serverElements[element] = s;
-      binding.addRenderAdapter(ServerComponentAdapter(s, element));
+      binding.addRenderAdapter(ServerComponentAdapter(registry, s, element));
     }
 
     return 's${DomValidator.clientMarkerPrefix}$s';
