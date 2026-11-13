@@ -329,6 +329,9 @@ bool _isValidMountParameter(FormalParameterElement param) {
   if (type is! FunctionType) {
     return false;
   }
+  if (type.typeParameters.isNotEmpty) {
+    return false;
+  }
   final returnType = type.returnType;
   if (returnType.element == null ||
       !componentChecker.isExactly(returnType.element!) ||

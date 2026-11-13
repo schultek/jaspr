@@ -123,3 +123,26 @@ const modelWithIncompatibleParamMountSources = {
     }
   ''',
 };
+
+const modelWithGenericMountSources = {
+  'site|lib/model_generic_mount.dart': '''
+    import 'package:jaspr/jaspr.dart';
+
+    class ModelGenericMount {
+      ModelGenericMount(this.child);
+
+      final Component child;
+
+      @decoder
+      factory ModelGenericMount.fromRaw(
+        Map<String, dynamic> raw,
+        Component Function<T>(String) mount,
+      ) {
+        return ModelGenericMount(mount<void>(raw['child'] as String));
+      }
+
+      @encoder
+      Map<String, dynamic> toRaw() => {'child': child};
+    }
+  ''',
+};
