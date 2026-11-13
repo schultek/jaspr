@@ -247,23 +247,13 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     _resetAppliedParams();
 
     if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
-      final slotRanges = {
-        for (final slot in component.slots)
-          if (slot is _RangeChildSlot) slot.start: slot.end,
-      };
+      final slotRanges = nodeMap<web.Node, web.Node>();
+      for (final slot in component.slots) {
+        if (slot is _RangeChildSlot) slotRanges[slot.start] = slot.end;
+      }
 
       web.Node? current = renderObject.firstChildNode;
       while (current != null) {
-        if (slotRanges[current] case final endNode?) {
-          if (current == renderObject.lastChildNode) break;
-          current = endNode;
-          // The end of this slot can be the start of an adjacent slot.
-          if (slotRanges.containsKey(current)) continue;
-          if (current == renderObject.lastChildNode) break;
-          current = current.nextSibling;
-          continue;
-        }
-
         if (current.isElement) {
           for (final param in inheritedDomParams.reversed) {
             final elements = _findMatchingElements(current as web.Element, param.target);
@@ -277,7 +267,9 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
         if (current == renderObject.lastChildNode) {
           break;
         }
-        current = current.nextSibling;
+        // Skip the slot's contents and visit its end anchor,
+        // which can also start the next slot.
+        current = slotRanges[current] ?? current.nextSibling;
       }
     }
   }
