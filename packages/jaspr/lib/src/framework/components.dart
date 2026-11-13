@@ -98,9 +98,9 @@ class DomElement extends DomRenderObjectElement {
 
     if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
       final classesSet = {...?_splitClasses(classes)};
-      styles = {...?styles};
-      attributes = {...?attributes};
-      events = {...?events};
+      styles = Map.of(styles ?? {});
+      attributes = Map.of(attributes ?? {});
+      events = Map.of(events ?? {});
 
       for (final param in inheritedDomParams.reversed) {
         final String effectiveId = id ?? attributes['id'] ?? '';
