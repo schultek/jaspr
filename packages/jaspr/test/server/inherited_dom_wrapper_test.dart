@@ -207,6 +207,55 @@ void main() {
       );
     });
 
+    test('empty target id matches missing and empty ids', () async {
+      final result = await renderComponent(
+        Component.apply(
+          target: ApplyTarget.descendantWith(tag: 'button', id: ''),
+          classes: 'example',
+          child: div([
+            button([]),
+            button(id: '', []),
+            button(id: 'named', []),
+            button(attributes: {'id': ''}, []),
+            button(attributes: {'id': 'from-attributes'}, []),
+          ]),
+        ),
+        standalone: true,
+      );
+
+      expect(
+        result.body,
+        decodedMatches(
+          '<div>\n'
+          '  <button class="example"></button>\n'
+          '  <button id="" class="example"></button>\n'
+          '  <button id="named"></button>\n'
+          '  <button class="example" id></button>\n'
+          '  <button id="from-attributes"></button>\n'
+          '</div>\n',
+        ),
+      );
+    });
+
+    test('can target an id supplied by an inner apply attribute', () async {
+      final result = await renderComponent(
+        Component.apply(
+          target: ApplyTarget.childWith(id: 'named'),
+          classes: 'example',
+          child: Component.apply(
+            attributes: {'id': 'named'},
+            child: button([]),
+          ),
+        ),
+        standalone: true,
+      );
+
+      expect(
+        result.body,
+        decodedMatches('<button class="example" id="named"></button>\n'),
+      );
+    });
+
     test('can target descendants by class', () async {
       final result = await renderComponent(
         Component.apply(
