@@ -514,6 +514,73 @@ void main() {
       expect(btn.className, 'btn server-applied');
     });
 
+    testClient('hydrates and cleans up data-j-apply on SVG root element', (tester) async {
+      window.document.body!.innerHTML =
+          '<svg class="icon applied" data-j-apply="c:applied" width="100" height="100"></svg>'.toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .childWith(tag: 'svg'),
+              classes: hasParams ? 'applied' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final svg = window.document.querySelector('svg')!;
+      expect(svg.getAttribute('class'), 'icon applied');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(svg.getAttribute('class'), 'icon');
+    });
+
+    testClient('hydrates and cleans up data-j-apply on range slot element anchors', (tester) async {
+      window.document.body!.innerHTML =
+          '<span class="anchor applied" data-j-apply="c:applied">Start</span>'
+                  '<button>Slot Content</button>'
+                  '<span class="end-anchor applied" data-j-apply="c:applied">End</span>'
+              .toJS;
+      final spans = window.document.querySelectorAll('span');
+      final start = spans.item(0)! as HTMLElement;
+      final end = spans.item(1)! as HTMLElement;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'span'),
+              classes: hasParams ? 'applied' : null,
+              child: SlottedChildView(
+                slots: [
+                  ChildSlot.between(start: start, end: end, child: button([])),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(start.getAttribute('class'), 'anchor applied');
+      expect(end.getAttribute('class'), 'end-anchor applied');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(start.getAttribute('class'), 'anchor');
+      expect(end.getAttribute('class'), 'end-anchor');
+    });
+
     testClient('applies direct child params to root range slot', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Click me</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;

@@ -50,21 +50,23 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
     data = getData();
 
     final applied = <ApplyDomComponent>[];
-    var hasRenderElement = false;
-    element.visitAncestorElements((e) {
-      if (registry.serverElements.containsKey(e)) {
-        return false;
-      }
-      if (e is RenderObjectElement && e.renderObject is! RenderFragment) {
-        hasRenderElement = true;
-      }
-      if (e.component case final ApplyDomComponent applyComp) {
-        if (!applyComp.target.onlyChildren || !hasRenderElement) {
-          applied.add(applyComp);
+    if (!registry.serverElements.containsKey(element)) {
+      var hasRenderElement = false;
+      element.visitAncestorElements((e) {
+        if (registry.serverElements.containsKey(e)) {
+          return false;
         }
-      }
-      return true;
-    });
+        if (e is RenderObjectElement && e.renderObject is! RenderFragment) {
+          hasRenderElement = true;
+        }
+        if (e.component case final ApplyDomComponent applyComp) {
+          if (!applyComp.target.onlyChildren || !hasRenderElement) {
+            applied.add(applyComp);
+          }
+        }
+        return true;
+      });
+    }
 
     if (applied.isNotEmpty) {
       applyData = const DomValidator().escapeMarkerText(jsonEncode(applied.map((a) => a.toMap()).toList()));

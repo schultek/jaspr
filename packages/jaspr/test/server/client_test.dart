@@ -341,6 +341,24 @@ void main() {
       );
     });
 
+    testServer('does not serialize outer client applies onto client component directly nested as server component', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          classes: 'outer-apply',
+          child: AppWithServerComponent(child: App1()),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<!--s@1--><!--@app1--><div data-app="1"></div><!--/@app1--><!--/s@1-->'),
+      );
+    });
+
     testServer('renders server components inside custom model parameter', (tester) async {
       tester.pumpComponent(AppWithCustomModel(model: ModelWithComponent(span([text('Custom Model')]))));
 

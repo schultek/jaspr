@@ -241,7 +241,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   bool _didHydrate = false;
-  final Map<web.HTMLElement, _AppliedParams> _appliedParams = nodeMap();
+  final Map<web.Element, _AppliedParams> _appliedParams = nodeMap();
 
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
@@ -266,7 +266,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
             final elements = _findMatchingElements(current as web.Element, param.target);
 
             for (final element in elements) {
-              _updateElementParams(element as web.HTMLElement, param);
+              _updateElementParams(element, param);
             }
           }
         }
@@ -282,33 +282,26 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   void _hydrateInitialNodes(SlottedDomRenderObject renderObject) {
-    final slotRanges = {
-      for (final slot in component.slots)
-        if (slot is _RangeChildSlot) slot.start: slot.end,
-    };
+    final slotRanges = nodeMap<web.Node, web.Node>();
+    for (final slot in component.slots) {
+      if (slot is _RangeChildSlot) slotRanges[slot.start] = slot.end;
+    }
 
     web.Node? current = renderObject.firstChildNode;
     while (current != null) {
-      if (slotRanges[current] case final endNode?) {
-        if (current == renderObject.lastChildNode) break;
-        current = endNode;
-        if (slotRanges.containsKey(current)) continue;
-        if (current == renderObject.lastChildNode) break;
-        current = current.nextSibling;
-        continue;
-      }
-
       if (current.isElement) {
         _hydrateInitialAppliedParams(current as web.Element);
       }
 
-      if (current == renderObject.lastChildNode) break;
-      current = current.nextSibling;
+      if (current == renderObject.lastChildNode) {
+        break;
+      }
+      current = slotRanges[current] ?? current.nextSibling;
     }
   }
 
   void _hydrateInitialAppliedParams(web.Element root) {
-    void process(web.HTMLElement element) {
+    void process(web.Element element) {
       if (element.hasAttribute('data-j-apply')) {
         final raw = element.getAttribute('data-j-apply')!;
         element.removeAttribute('data-j-apply');
@@ -338,7 +331,10 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
           Map<String, String>? appliedStyles;
           if (appliedStylesList != null) {
-            appliedStyles = {for (final s in appliedStylesList) s: element.style.getPropertyValue(s)};
+            final style = element.inlineStyle;
+            if (style != null) {
+              appliedStyles = {for (final s in appliedStylesList) s: style.getPropertyValue(s)};
+            }
           }
 
           Map<String, String>? appliedAttributes;
@@ -357,12 +353,10 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
       }
     }
 
-    if (root.isHtmlElement) {
-      process(root as web.HTMLElement);
-    }
+    process(root);
     final descendants = root.querySelectorAll('[data-j-apply]');
     for (int i = 0; i < descendants.length; i++) {
-      process(descendants.item(i) as web.HTMLElement);
+      process(descendants.item(i) as web.Element);
     }
   }
 
@@ -410,7 +404,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
   /// Removes the params this view applied to [element],
   /// without leaving behind empty attributes that it didn't have before.
-  static void _resetElementParams(web.HTMLElement element, _AppliedParams params) {
+  static void _resetElementParams(web.Element element, _AppliedParams params) {
     if (params.id != null && element.id == params.id) {
       element.removeAttribute('id');
     }
@@ -425,14 +419,17 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     }
 
     if (params.styles case final appliedStyles? when appliedStyles.isNotEmpty) {
-      for (final e in appliedStyles.entries) {
-        element.style.removeProperty(e.key);
-      }
-      if (element.style.length == 0) {
-        // Read the attribute first, so the browser syncs the pending style changes into it.
-        // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
-        element.getAttribute('style');
-        element.removeAttribute('style');
+      final style = element.inlineStyle;
+      if (style != null) {
+        for (final e in appliedStyles.entries) {
+          style.removeProperty(e.key);
+        }
+        if (style.length == 0) {
+          // Read the attribute first, so the browser syncs the pending style changes into it.
+          // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
+          element.getAttribute('style');
+          element.removeAttribute('style');
+        }
       }
     }
 
@@ -449,7 +446,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     }
   }
 
-  void _updateElementParams(web.HTMLElement element, ApplyParams newParams) {
+  void _updateElementParams(web.Element element, ApplyParams newParams) {
     final params = _appliedParams[element];
 
     String? appliedId = params?.id;
@@ -477,10 +474,13 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
     if (newParams.styles case final newStyles?) {
       appliedStyles ??= {};
-      for (final e in newStyles.entries) {
-        if (element.style.getPropertyValue(e.key).isEmpty) {
-          element.style.setProperty(e.key, e.value);
-          appliedStyles[e.key] = e.value;
+      final style = element.inlineStyle;
+      if (style != null) {
+        for (final e in newStyles.entries) {
+          if (style.getPropertyValue(e.key).isEmpty) {
+            style.setProperty(e.key, e.value);
+            appliedStyles[e.key] = e.value;
+          }
         }
       }
     }
@@ -518,6 +518,14 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   void unmount() {
     _resetAppliedParams();
     super.unmount();
+  }
+}
+
+extension on web.Element {
+  web.CSSStyleDeclaration? get inlineStyle {
+    if (isHtmlElement) return (this as web.HTMLElement).style;
+    if (isSvgElement) return (this as web.SVGElement).style;
+    return null;
   }
 }
 
