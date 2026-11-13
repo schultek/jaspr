@@ -57,13 +57,18 @@ class ClientRunner {
   ) async {
     var cancelled = false;
     var ownsDaemon = false;
+    ClientRunner? runner;
     late final CancelableOperation<ClientRunner?> op;
     guard(() async {
       cancelled = true;
       if (!op.isCompleted) {
         op.cancel();
       }
-      if (ownsDaemon) {
+      if (runner != null) {
+        // Shut the runner down before its daemon goes away, so that the
+        // closing connection is not reported as an unexpected exit.
+        await runner!.shutDown();
+      } else if (ownsDaemon) {
         await util.stopDaemon(Directory.current.path);
       }
     });
@@ -98,9 +103,7 @@ class ClientRunner {
         final daemonPort = util.daemonPort(workingDirectory);
         final daemonPids = await util.findPidsForPort(daemonPort);
 
-        final runner = ClientRunner._(client, daemonPort, logger, daemonPids, ownsDaemon: ownsDaemon);
-        guard(() => runner.shutDown());
-        return runner;
+        return runner = ClientRunner._(client, daemonPort, logger, daemonPids, ownsDaemon: ownsDaemon);
       }),
     );
 
