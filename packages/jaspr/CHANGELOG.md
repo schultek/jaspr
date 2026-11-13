@@ -1,3 +1,9 @@
+## Unreleased patch
+
+### Fixes
+
+- Fixed a server built with `dart build cli` on Linux with Dart 3.14 or later not finding its `web` directory and failing with "Could not resolve project directory containing pubspec.yaml" when no `pubspec.yaml` is above it. Since Dart 3.14 such a bundle keeps the snapshot in `lib/libdartaot<name>.so`, which `Platform.script` points at.
+
 ## 0.24.0-beta.1
 
 ### New Features and Improvements
