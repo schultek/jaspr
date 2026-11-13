@@ -36,5 +36,29 @@ void main() {
         ),
       );
     });
+
+    test('renders open attribute of dialog and details correctly', () async {
+      var result = await renderComponent(div([dialog(open: true, []), details(open: true, [])]));
+
+      expect(
+        result.body,
+        decodedMatches(
+          '<!DOCTYPE html>\n'
+          '<html><head></head><body><div><dialog open></dialog><details open></details></div></body></html>\n'
+          '',
+        ),
+      );
+
+      result = await renderComponent(div([dialog(open: false, []), details(open: false, []), dialog([])]));
+
+      expect(
+        result.body,
+        decodedMatches(
+          '<!DOCTYPE html>\n'
+          '<html><head></head><body><div><dialog></dialog><details></details><dialog></dialog></div></body></html>\n'
+          '',
+        ),
+      );
+    });
   });
 }

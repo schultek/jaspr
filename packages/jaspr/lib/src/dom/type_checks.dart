@@ -15,6 +15,8 @@ extension DomTypeTests on JSAny? {
   bool get isHtmlSelectElement => this == null ? false : instanceof(_cachedHtmlSelectElementConstructor);
   bool get isTextAreaElement => this == null ? false : instanceof(_cachedHtmlTextAreaElementConstructor);
   bool get isHtmlOptionElement => this == null ? false : instanceof(_cachedHtmlOptionElementConstructor);
+  bool get isHtmlDialogElement => this == null ? false : instanceof(_cachedHtmlDialogElementConstructor);
+  bool get isHtmlDetailsElement => this == null ? false : instanceof(_cachedHtmlDetailsElementConstructor);
   bool get isText => this == null ? false : instanceof(_cachedTextConstructor);
   bool get isComment => this == null ? false : instanceof(_cachedCommentConstructor);
   bool get isDocumentFragment => this == null ? false : instanceof(_cachedDocumentFragmentConstructor);
@@ -26,6 +28,8 @@ final _cachedHtmlAnchorElementConstructor = _htmlAnchorElementConstructor;
 final _cachedHtmlSelectElementConstructor = _htmlSelectElementConstructor;
 final _cachedHtmlTextAreaElementConstructor = _htmlTextAreaElementConstructor;
 final _cachedHtmlOptionElementConstructor = _htmlOptionElementConstructor;
+final _cachedHtmlDialogElementConstructor = _htmlDialogElementConstructor;
+final _cachedHtmlDetailsElementConstructor = _htmlDetailsElementConstructor;
 final _cachedTextConstructor = _textConstructor;
 final _cachedCommentConstructor = _commentConstructor;
 final _cachedDocumentFragmentConstructor = _documentFragmentConstructor;
@@ -42,6 +46,10 @@ external JSFunction get _htmlSelectElementConstructor;
 external JSFunction get _htmlTextAreaElementConstructor;
 @JS('HTMLOptionElement')
 external JSFunction get _htmlOptionElementConstructor;
+@JS('HTMLDialogElement')
+external JSFunction get _htmlDialogElementConstructor;
+@JS('HTMLDetailsElement')
+external JSFunction get _htmlDetailsElementConstructor;
 @JS('Text')
 external JSFunction get _textConstructor;
 @JS('Comment')

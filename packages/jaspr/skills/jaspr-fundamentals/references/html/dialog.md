@@ -4,7 +4,7 @@ Signature of the dialog component:
 
 ```dart
 const dialog(List<Component> children, {
-  bool open = false,
+  bool? open,
   String? id,
   String? classes,
   Styles? styles,
