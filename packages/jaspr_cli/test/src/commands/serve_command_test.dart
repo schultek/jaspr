@@ -739,6 +739,77 @@ void main() {
       });
     });
 
+    // https://github.com/schultek/jaspr/issues/999
+    test('uses the precompiled DDC SDK from kernel/ddc/canary on Flutter 3.50 and later', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server', flutterEmbedding: true);
+        io.stubDartSDK();
+        io.stubFlutterSDK();
+        // Flutter 3.50 ships the precompiled SDKs in kernel/ddc/{stable,canary}
+        // instead of kernel/{ddcLibraryBundle,amd}-canvaskit.
+        io.fs.file('/fake/flutter/bin/cache/flutter_web_sdk/kernel/ddc/canary/dart_sdk.js').createSync(recursive: true);
+        io.fs.file('/fake/flutter/bin/cache/flutter_web_sdk/kernel/ddc/stable/dart_sdk.js').createSync(recursive: true);
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [
+            for (final arg in buildRunnerFlutterArgs)
+              arg.replaceFirst('kernel/ddcLibraryBundle-canvaskit', 'kernel/ddc/canary'),
+          ],
+        );
+        final server = io.stubFakeServer();
+
+        FakeProcess? flutterProcess;
+        when(
+          () => io.process.start(
+            'flutter',
+            [
+              'run',
+              '--device-id=web-server',
+              '-t',
+              '.dart_tool/jaspr/flutter_target.dart',
+              '--web-port=$flutterProxyPort',
+            ],
+            workingDirectory: '/root/myapp',
+            runInShell: true,
+          ),
+        ).thenAnswer((_) async => flutterProcess = FakeProcess());
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        expect(io.stdout.queue, emits('[BUILDER] Done building web assets.'));
+
+        await io.connectToProxy();
+
+        expect(flutterProcess, isNotNull);
+
+        await io.expectServerStarted(server);
+
+        server.exit(0);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+            'Stopping flutter run...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
     test('serves project with automatic port fallback when default port is in use', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'client');

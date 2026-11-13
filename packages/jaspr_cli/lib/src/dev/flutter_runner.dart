@@ -187,4 +187,23 @@ class FlutterRunner {
     }
     return webSdkPath;
   })();
+
+  /// The folder in [webSdkDir] with the precompiled DDC SDK (`dart_sdk.js`)
+  /// for the DDC library bundle or the AMD module format.
+  ///
+  /// Flutter 3.50 moved it from `kernel/ddcLibraryBundle-canvaskit` and
+  /// `kernel/amd-canvaskit` to `kernel/ddc/canary` and `kernel/ddc/stable`, and
+  /// no longer ships an AMD build. `build_web_compilers` compiles DDC library
+  /// bundles with `--canary`, which matches `kernel/ddc/canary`. Older Flutter
+  /// versions keep using their folders.
+  static String precompiledDdcSdkDir(String webSdkDir, {required bool ddcLibraryBundle}) {
+    if (ddcLibraryBundle) {
+      final canaryDir = p.join(webSdkDir, 'kernel', 'ddc', 'canary');
+      if (Directory(canaryDir).existsSync()) {
+        return canaryDir;
+      }
+      return p.join(webSdkDir, 'kernel', 'ddcLibraryBundle-canvaskit');
+    }
+    return p.join(webSdkDir, 'kernel', 'amd-canvaskit');
+  }
 }
