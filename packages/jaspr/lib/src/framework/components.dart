@@ -101,7 +101,8 @@ class DomElement extends DomRenderObjectElement {
 
       for (final param in inheritedDomParams.reversed) {
         if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
-        if (param.target.id case final expectedId? when expectedId != id) continue;
+        // DOM Element.id is empty when neither the id field nor the attributes map supplies an ID.
+        if (param.target.id case final expectedId? when expectedId != (id ?? attributes['id'] ?? '')) continue;
         if (param.target.classes case final expectedClasses?
             when !expectedClasses.every((c) => classesSet.contains(c))) {
           continue;
@@ -270,23 +271,6 @@ final class ApplyTarget {
 
   /// The classes an element must all have to match, or `null` for any.
   final Set<String>? classes;
-
-  /// A CSS selector that matches the same elements as this target.
-  ///
-  /// If [onlyChildren] is `true`, this is a relative selector that
-  /// starts with the `>` child combinator.
-  String get query => [
-    if (onlyChildren) '> ',
-    if (tag == null && id == null && classes == null)
-      '*'
-    else ...[
-      ?tag,
-      if (id != null) '#$id',
-      if (classes case final classes?)
-        for (final c in classes) '.$c',
-    ],
-  ].join();
-
   Map<String, dynamic> toMap() => {
     if (!onlyChildren) 'd': true,
     if (tag != null) 't': tag,
