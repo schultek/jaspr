@@ -92,11 +92,8 @@ class DomElement extends DomRenderObjectElement {
       events = Map.of(events ?? {});
 
       for (final param in inheritedDomParams.reversed) {
-        if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
-        // DOM Element.id is empty when neither the id field nor the attributes map supplies an ID.
-        if (param.target.id case final expectedId? when expectedId != (id ?? attributes['id'] ?? '')) continue;
-        if (param.target.classes case final expectedClasses?
-            when !expectedClasses.every((c) => classesSet.contains(c))) {
+        final String effectiveId = id ?? attributes['id'] ?? '';
+        if (!param.target.matches(tag: component.tag, id: effectiveId, classes: classesSet)) {
           continue;
         }
 
@@ -132,7 +129,94 @@ class DomElement extends DomRenderObjectElement {
 
     renderObject.update(id, classes, styles, attributes, events);
   }
+
+  @internal
+  String? computeAppliedDiff(bool Function(ApplyParams) isClientManaged) {
+    final inheritedDomParams = inheritedDomParamsFor(renderObject);
+    if (inheritedDomParams == null || inheritedDomParams.isEmpty) return null;
+
+    String? id = component.id;
+    final classesSet = {...?_splitClasses(component.classes)};
+    final styles = {...?component.styles?.properties};
+    final attributes = {...?component.attributes};
+
+    final appliedClasses = <String>[];
+    final appliedStyles = <String>[];
+    final appliedAttributes = <String>[];
+    String? appliedId;
+
+    for (final param in inheritedDomParams.reversed) {
+      final String effectiveId = id ?? attributes['id'] ?? '';
+      if (!param.target.matches(tag: component.tag, id: effectiveId, classes: classesSet)) {
+        continue;
+      }
+
+      final isClient = isClientManaged(param);
+
+      if (param.id case final paramId? when id == null) {
+        id = paramId;
+        if (isClient) {
+          appliedId = paramId;
+        }
+      }
+
+      if (param.classes case final paramClasses?) {
+        for (final c in paramClasses) {
+          if (!classesSet.contains(c)) {
+            if (isClient) {
+              appliedClasses.add(c);
+            }
+          }
+        }
+        classesSet.addAll(paramClasses);
+      }
+
+      if (param.styles case final stylesProps?) {
+        for (final MapEntry(:key, :value) in stylesProps.entries) {
+          if (!styles.containsKey(key)) {
+            styles[key] = value;
+            if (isClient) {
+              appliedStyles.add(key);
+            }
+          }
+        }
+      }
+
+      if (param.attributes case final attributesMap?) {
+        for (final MapEntry(:key, :value) in attributesMap.entries) {
+          if (!attributes.containsKey(key)) {
+            attributes[key] = value;
+            if (isClient) {
+              appliedAttributes.add(key);
+            }
+          }
+        }
+      }
+    }
+
+    if (appliedId != null || appliedClasses.isNotEmpty || appliedStyles.isNotEmpty || appliedAttributes.isNotEmpty) {
+      final parts = <String>[];
+      if (appliedId != null) {
+        parts.add('i:${_escapeApplyValue(appliedId)}');
+      }
+      if (appliedClasses.isNotEmpty) {
+        parts.add('c:${appliedClasses.map(_escapeApplyValue).join(',')}');
+      }
+      if (appliedStyles.isNotEmpty) {
+        parts.add('s:${appliedStyles.map(_escapeApplyValue).join(',')}');
+      }
+      if (appliedAttributes.isNotEmpty) {
+        parts.add('a:${appliedAttributes.map(_escapeApplyValue).join(',')}');
+      }
+      return parts.join(';');
+    }
+    return null;
+  }
 }
+
+String _escapeApplyValue(String val) => (val.contains(';') || val.contains(',') || val.contains('%'))
+    ? val.replaceAll('%', '%25').replaceAll(';', '%3B').replaceAll(',', '%2C')
+    : val;
 
 @internal
 class ApplyDomComponent extends StatelessComponent implements DomComponent {
@@ -230,6 +314,15 @@ final class ApplyTarget {
 
   /// The classes an element must all have to match, or `null` for any.
   final Set<String>? classes;
+
+  @internal
+  bool matches({required String tag, required String id, required Set<String> classes}) {
+    if (this.tag case final expectedTag? when expectedTag != tag) return false;
+    if (this.id case final expectedId? when expectedId != id) return false;
+    if (this.classes case final expectedClasses? when !expectedClasses.every(classes.contains)) return false;
+    return true;
+  }
+
   Map<String, dynamic> toMap() => {
     if (!onlyChildren) 'd': true,
     if (tag != null) 't': tag,
@@ -384,9 +477,9 @@ class _InheritedDomComponent extends InheritedComponent {
   }
 }
 
-@internal
-bool hasInheritedDomParams(Element element) {
-  return element._inheritedElements?.containsKey(_InheritedDomComponent) ?? false;
+extension DomParamsElement on Element {
+  @internal
+  bool get hasInheritedDomParams => _inheritedElements?.containsKey(_InheritedDomComponent) ?? false;
 }
 
 /// Represents a plain text node with no additional properties.
