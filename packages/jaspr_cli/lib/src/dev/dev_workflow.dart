@@ -345,6 +345,16 @@ class DevWorkflow {
       }
     });
 
+    // Also stop waiting when the build daemon goes away before the initial
+    // build completes. The listener that propagates `clientRunner.done` to the
+    // workflow is only installed after this wait.
+    clientRunner.done.then((_) {
+      if (!initialBuildCompleter.isCompleted) {
+        aborted = true;
+        initialBuildCompleter.completeError(Object());
+      }
+    });
+
     clientRunner.startBuild();
 
     final BuildResult initialResult;
