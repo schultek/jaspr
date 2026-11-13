@@ -45,6 +45,8 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
       return;
     }
 
+    registry.clientBoundaries.add(element);
+
     data = getData();
 
     final applied = <ApplyDomComponent>[];
@@ -91,6 +93,9 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   void _applyParamsToDescendants(Element parent) {
     parent.visitChildren((child) {
+      if (registry.clientBoundaries.contains(child)) {
+        return;
+      }
       if (child is DomElement) {
         if (child.appliedDiff case final diff?) {
           if (child.renderObject case final MarkupRenderElement renderObject) {
