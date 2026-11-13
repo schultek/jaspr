@@ -12,12 +12,21 @@ import '../process_runner.dart';
 import '../project.dart';
 
 /// Connects to the `build_runner` daemon.
-Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String> buildOptions, Logger logger) async {
+///
+/// [DaemonConnection.client] is `null` if connecting failed.
+/// [DaemonConnection.foreignDaemon] is `true` if it failed because another
+/// daemon with different options or another version is running in
+/// [workingDirectory]. That daemon belongs to another process and must not be
+/// stopped, even if it was still starting up when [isDaemonRunning] was checked.
+Future<DaemonConnection> startBuildDaemon(String workingDirectory, List<String> buildOptions, Logger logger) async {
   logger.write('Connecting to the build daemon...', tag: Tag.builder, progress: ProgressState.running);
   final args = [dartExecutable, 'run', 'build_runner', 'daemon', ...buildOptions];
   if (ProcessRunner.isDefault) {
     try {
-      return await BuildDaemonClient.connect(workingDirectory, args, logHandler: logger.writeServerLog);
+      return (
+        client: await BuildDaemonClient.connect(workingDirectory, args, logHandler: logger.writeServerLog),
+        foreignDaemon: false,
+      );
     } on OptionsSkew catch (e) {
       logger.write(
         'Incompatible options with current running build daemon: ${e.details}\n\n'
@@ -26,7 +35,7 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
         level: Level.critical,
         progress: ProgressState.completed,
       );
-      return null;
+      return (client: null, foreignDaemon: true);
     } on VersionSkew catch (e) {
       logger.write(
         'Incompatible version with current running build daemon: ${e.details}\n\n'
@@ -35,7 +44,7 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
         level: Level.critical,
         progress: ProgressState.completed,
       );
-      return null;
+      return (client: null, foreignDaemon: true);
     } on MissingPortFile catch (e) {
       logger.write(
         'Failed to start build daemon: ${e.details}.\n\n'
@@ -44,7 +53,7 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
         level: Level.critical,
         progress: ProgressState.completed,
       );
-      return null;
+      return (client: null, foreignDaemon: false);
     } catch (e) {
       logger.write(e.toString(), tag: Tag.builder, level: Level.error, progress: ProgressState.completed);
       logger.write(
@@ -53,21 +62,36 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
         level: Level.critical,
         progress: ProgressState.completed,
       );
-      return null;
+      return (client: null, foreignDaemon: false);
     }
   } else {
     await ProcessRunner.instance.start(args.first, args.sublist(1), workingDirectory: workingDirectory);
-    return await BuildDaemonClient.connectUnchecked(workingDirectory, logHandler: logger.writeServerLog);
+    return (
+      client: await BuildDaemonClient.connectUnchecked(workingDirectory, logHandler: logger.writeServerLog),
+      foreignDaemon: false,
+    );
   }
 }
+
+/// The result of [startBuildDaemon].
+typedef DaemonConnection = ({BuildDaemonClient? client, bool foreignDaemon});
 
 /// Whether a build daemon is already running in [workingDirectory], e.g. one
 /// started by another Jaspr process. A leftover port file of a daemon that is
 /// gone does not count.
+///
+/// Probes the port directly instead of looking up its process, so a missing or
+/// failing `lsof`/`netstat` doesn't make a running daemon look absent.
 Future<bool> isDaemonRunning(String workingDirectory) async {
   final port = getDaemonPort(workingDirectory);
   if (port == null) return false;
-  return (await findPidsForPort(port)).isNotEmpty;
+  try {
+    final socket = await Socket.connect(InternetAddress.loopbackIPv4, port, timeout: const Duration(seconds: 2));
+    socket.destroy();
+    return true;
+  } on SocketException {
+    return false;
+  }
 }
 
 /// Returns the port of the running daemon if the port file exists.

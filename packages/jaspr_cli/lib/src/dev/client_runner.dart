@@ -78,8 +78,12 @@ class ClientRunner {
         final workingDirectory = Directory.current.path;
 
         ownsDaemon = !await util.isDaemonRunning(workingDirectory);
-        final client = await util.startBuildDaemon(workingDirectory, buildOptions, logger);
-        if (client == null) return null;
+        final (:client, :foreignDaemon) = await util.startBuildDaemon(workingDirectory, buildOptions, logger);
+        if (client == null) {
+          // A daemon that was still starting up when we checked.
+          if (foreignDaemon) ownsDaemon = false;
+          return null;
+        }
         if (cancelled) {
           try {
             await client.close();
@@ -121,9 +125,11 @@ class ClientRunner {
     // E.g. the daemon of a running `jaspr serve`. If its options don't match,
     // connecting fails, and stopping it would break that other process.
     final ownsDaemon = !await util.isDaemonRunning(workingDirectory);
-    final client = await util.startBuildDaemon(workingDirectory, buildOptions, logger);
+    final (:client, :foreignDaemon) = await util.startBuildDaemon(workingDirectory, buildOptions, logger);
     if (client == null) {
-      if (ownsDaemon) {
+      // `foreignDaemon` also covers a daemon that was still starting up when
+      // we checked.
+      if (ownsDaemon && !foreignDaemon) {
         await util.stopDaemon(workingDirectory);
       }
       return 1;
