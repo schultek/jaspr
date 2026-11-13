@@ -9,6 +9,7 @@ library;
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;
@@ -159,7 +160,7 @@ abstract class Component {
     Map<String, EventCallback>? events,
     required Component child,
     Key? key,
-  }) = _ApplyDomComponent;
+  }) = ApplyDomComponent;
 
   /// Creates a component which renders a list of child components without any wrapping element.
   ///

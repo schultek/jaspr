@@ -85,14 +85,69 @@ void main() {
       expect(p2Element.textContent, equals('C'));
     });
 
+    testClient('should mount Component.apply from marker during hydration', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app_apply apply<[{"c":"applied-from-marker","i":"applied-id"}]>-->'
+                  '  <p>Content</p>'
+                  '  <!--/${marker}app_apply-->'
+                  '</div>'
+              .toJS;
+
+      final pElement = window.document.querySelector('body p')!;
+      expect(pElement.textContent, equals('Content'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app_apply': ClientLoader((_) => p([Component.text('Hydrated')])),
+          },
+        ),
+      );
+
+      runApp(const ClientApp());
+      await pumpEventQueue();
+
+      expect(pElement.textContent, equals('Hydrated'));
+      expect(pElement.id, equals('applied-id'));
+      expect(pElement.className, equals('applied-from-marker'));
+    });
+
+    testClient('should safely parse marker when data contains "apply=" string', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app_with_text data<{"msg":"please apply=here"}> apply<[{"c":"applied-cls"}]>-->'
+                  '  <p>Content</p>'
+                  '  <!--/${marker}app_with_text-->'
+                  '</div>'
+              .toJS;
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app_with_text': ClientLoader((params) => p([Component.text(params.get('msg'))])),
+          },
+        ),
+      );
+
+      runApp(const ClientApp());
+      await pumpEventQueue();
+
+      final pElement = window.document.querySelector('body p')!;
+      expect(pElement.textContent, equals('please apply=here'));
+      expect(pElement.className, equals('applied-cls'));
+    });
+
     testClient('should find and hydrate multiple markers with params', (tester) async {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
           '<div>'
-                  '  <!--${marker}app data={"name": "A"}-->'
+                  '  <!--${marker}app data<{"name": "A"}>-->'
                   '  <p>Hello</p>'
                   '  <!--/${marker}app-->'
-                  '  <!--${marker}app data={"name": "B"}-->'
+                  '  <!--${marker}app data<{"name": "B"}>-->'
                   '  <p>Hello</p>'
                   '  <!--/${marker}app-->'
                   '</div>'
@@ -130,7 +185,7 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
           '<div>'
-                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <!--${marker}app data<{"child":"s${marker}1"}>-->'
                   '  <p>'
                   '    <!--s${marker}1-->'
                   '    <span>Server Element</span>'
@@ -175,12 +230,12 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
           '<div>'
-                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <!--${marker}app data<{"child":"s${marker}1"}>-->'
                   '  <div>'
                   '    <!--s${marker}1-->'
                   '    <p>'
                   '      <span>Server Element</span>'
-                  '      <!--${marker}subapp data={"name":"Nested Client"}-->'
+                  '      <!--${marker}subapp data<{"name":"Nested Client"}>-->'
                   '      <strong>Fallback</strong>'
                   '      <!--/${marker}subapp-->'
                   '    </p>'
@@ -233,10 +288,10 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
           '<div>'
-                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <!--${marker}app data<{"child":"s${marker}1"}>-->'
                   '  <div>'
                   '    <!--s${marker}1-->'
-                  '    <!--${marker}subapp data={"name":"Nested Client"}-->'
+                  '    <!--${marker}subapp data<{"name":"Nested Client"}>-->'
                   '    <strong>Fallback</strong>'
                   '    <!--/${marker}subapp-->'
                   '    <!--/s${marker}1-->'
@@ -284,7 +339,7 @@ void main() {
         final marker = DomValidator.clientMarkerPrefix;
         window.document.body!.innerHTML =
             '<div>'
-                    '  <!--${marker}outer data={"child":"s${marker}1"}-->'
+                    '  <!--${marker}outer data<{"child":"s${marker}1"}>-->'
                     '  <!--s${marker}1-->'
                     '  <!--${marker}inner-->'
                     '  <button class="highlighted" data-outer="true">Click me</button>'
@@ -328,7 +383,7 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
           '<div>'
-                  '  <!--${marker}app data={"name": "A"}-->'
+                  '  <!--${marker}app data<{"name": "A"}>-->'
                   '  <!--\${"count": 1}-->'
                   '  <p>Fallback</p>'
                   '  <!--/${marker}app-->'
@@ -362,7 +417,7 @@ void main() {
       final newBody = window.document.createElement('body') as HTMLBodyElement;
       newBody.innerHTML =
           '<div>'
-                  '  <!--${marker}app data={"name": "B"}-->'
+                  '  <!--${marker}app data<{"name": "B"}>-->'
                   '  <!--\${"count": 2}-->'
                   '  <p>Fallback</p>'
                   '  <!--/${marker}app-->'
@@ -387,7 +442,7 @@ void main() {
         final marker = DomValidator.clientMarkerPrefix;
         window.document.body!.innerHTML =
             '<div>'
-                    '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                    '  <!--${marker}app data<{"child":"s${marker}1"}>-->'
                     '  <div>'
                     '    <!--s${marker}1-->'
                     '    <span>Server Element</span>'
@@ -427,7 +482,7 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
           '<div>'
-                  '  <!--${marker}app data={"child":"s${marker}1"}-->'
+                  '  <!--${marker}app data<{"child":"s${marker}1"}>-->'
                   '  <div>'
                   '    <!--s${marker}1-->'
                   '    <span>First Element</span>'

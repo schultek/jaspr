@@ -30,6 +30,9 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   bool get isClient => false;
 
   @override
+  bool get hasClients => _options?.clients?.isNotEmpty ?? false;
+
+  @override
   String get basePath => request.basePath;
 
   @override

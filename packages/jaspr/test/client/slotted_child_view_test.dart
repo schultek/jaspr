@@ -237,7 +237,7 @@ void main() {
     });
 
     testClient('removes applied params when toggled off even if initially present in html', (tester) async {
-      window.document.body!.innerHTML = '<section><button id="applied-id" class="original applied" style="color: red;" data-applied="true">Static</button></section>'
+      window.document.body!.innerHTML = '<section><button id="applied-id" class="original applied" style="color: red;" data-applied="true" data-j-apply=\'{"i":"applied-id","c":["applied"],"s":["color"],"a":["data-applied"]}\'>Static</button></section>'
           .toJS;
       var hasParams = true;
       late void Function(void Function() cb) setState;
@@ -271,6 +271,70 @@ void main() {
       expect(btn.className, 'original');
       expect(btn.hasAttribute('style'), isFalse);
       expect(btn.hasAttribute('data-applied'), isFalse);
+    });
+
+    testClient('preserves child-owned id and classes when client apply toggles off', (tester) async {
+      window.document.body!.innerHTML =
+          '<section><button id="save" class="btn active" data-j-apply=\'{"c":["active"]}\'>Save</button></section>'
+              .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              id: hasParams ? 'save' : null,
+              classes: hasParams ? 'active' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'save');
+      expect(btn.className, 'btn active');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.id, 'save');
+      expect(btn.className, 'btn');
+    });
+
+    testClient('preserves outer applied params when inner apply toggles off', (tester) async {
+      window.document.body!.innerHTML = '<section><button class="child-class server-class client-class" data-j-apply=\'{"c":["server-class","client-class"]}\'>Button</button></section>'
+          .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              classes: 'server-class',
+              child: .apply(
+                target: .descendantWith(tag: 'button'),
+                classes: hasParams ? 'client-class' : null,
+                child: SlottedChildView(slots: const []),
+              ),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.className, 'child-class client-class server-class');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.className, 'child-class server-class');
     });
 
     testClient('applies direct child params to root range slot', (tester) async {

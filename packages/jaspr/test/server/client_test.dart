@@ -158,7 +158,7 @@ void main() {
           '<!DOCTYPE html>\n'
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
-          '  <body><!--@app2 data={"count":1,"label":"Test"}--><div data-app="2"></div><!--/@app2--></body>\n'
+          '  <body><!--@app2 data<{"count":1,"label":"Test"}>--><div data-app="2"></div><!--/@app2--></body>\n'
           '</html>\n'
           '',
         ),
@@ -213,7 +213,7 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}>-->\n'
           '    <div data-app="with-child"><!--s@1--><span>Hello</span><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
           '  </body>\n'
@@ -236,7 +236,7 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_multiple_server_components data={"child1":"s@1","child2":"s@1"}-->\n'
+          '    <!--@app_with_multiple_server_components data<{"child1":"s@1","child2":"s@1"}>-->\n'
           '    <div data-app="with-multiple"><!--s@1--><span>Hello</span><!--/s@1--><!--s@1--><span>Hello</span><!--/s@1--></div>\n'
           '    <!--/@app_with_multiple_server_components-->\n'
           '  </body>\n'
@@ -260,7 +260,7 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}>-->\n'
           '    <div data-app="with-child"><!--s@1--><div><!--@app1--><div data-app="1"></div><!--/@app1--></div><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
           '  </body>\n'
@@ -284,9 +284,125 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}>-->\n'
           '    <div data-app="with-child"><!--s@1--><!--@app1--><div data-app="1"></div><!--/@app1--><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('encodes applied params above client component in marker', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          classes: 'outer-class',
+          id: 'outer-id',
+          child: App1(),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app1 apply<[{"i":"outer-id","c":"outer-class"}]>-->\n'
+          '    <div id="outer-id" class="outer-class" data-app="1" data-j-apply="{&quot;i&quot;:&quot;outer-id&quot;,&quot;c&quot;:[&quot;outer-class&quot;]}"></div>\n'
+          '    <!--/@app1-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('encodes applied params above client component wrapping server component', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          classes: 'server-class',
+          child: AppWithServerComponent(
+            child: span(classes: 'child-class', [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}> apply<[{"c":"server-class"}]>-->\n'
+          '    <div class="server-class" data-app="with-child" data-j-apply="{&quot;c&quot;:[&quot;server-class&quot;]}"><!--s@1--><span class="child-class">Hello</span><!--/s@1--></div>\n'
+          '    <!--/@app_with_server_component-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+    testServer('does not encode direct child apply params when separated by a render element', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: ApplyTarget.anyChild,
+          classes: 'parent-class',
+          child: div([
+            App1(),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <div class="parent-class" data-j-apply="{&quot;c&quot;:[&quot;parent-class&quot;]}"><!--@app1--><div data-app="1"></div><!--/@app1--></div>\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('encodes descendant apply params even when separated by a render element', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(),
+          classes: 'descendant-class',
+          child: div([
+            App1(),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <div class="descendant-class" data-j-apply="{&quot;c&quot;:[&quot;descendant-class&quot;]}">\n'
+          '      <!--@app1 apply<[{"t":{"d":true},"c":"descendant-class"}]>-->\n'
+          '      <div class="descendant-class" data-app="1" data-j-apply="{&quot;c&quot;:[&quot;descendant-class&quot;]}"></div>\n'
+          '      <!--/@app1-->\n'
+          '    </div>\n'
           '  </body>\n'
           '</html>\n'
           '',

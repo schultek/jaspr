@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../../dom/validator.dart';
 import '../../framework/framework.dart';
 import '../components/client_component_registry.dart';
@@ -15,6 +17,7 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   bool _isClientBoundary = true;
   late String? data;
+  String? applyData;
 
   @override
   void prepareBoundary(ChildGroup group) {
@@ -43,6 +46,29 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
     }
 
     data = getData();
+
+    final applied = <ApplyDomComponent>[];
+    var hasRenderElement = false;
+    element.visitAncestorElements((e) {
+      if (registry.serverElements.containsKey(e)) {
+        return false;
+      }
+      if (e is RenderObjectElement) {
+        hasRenderElement = true;
+      }
+      if (e.component case final ApplyDomComponent applyComp) {
+        if (!applyComp.target.onlyChildren || !hasRenderElement) {
+          applied.add(applyComp);
+        }
+      }
+      return true;
+    });
+
+    if (applied.isNotEmpty) {
+      applyData = const DomValidator().escapeMarkerText(jsonEncode(applied.map((a) => a.toMap()).toList()));
+    } else {
+      applyData = null;
+    }
   }
 
   @override
@@ -52,7 +78,7 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
     }
 
     final startMarker = MarkupRenderText(
-      '<!--${DomValidator.clientMarkerPrefix}${target.name}${data != null ? ' data=$data' : ''}-->',
+      '<!--${DomValidator.clientMarkerPrefix}${target.name}${data != null ? ' data<$data>' : ''}${applyData != null ? ' apply<$applyData>' : ''}-->',
       true,
     );
     final endMarker = MarkupRenderText('<!--/${DomValidator.clientMarkerPrefix}${target.name}-->', true);

@@ -1,6 +1,8 @@
 /// @docImport 'client_app.dart';
 library;
 
+import 'dart:convert';
+
 import 'package:universal_web/web.dart' as web;
 
 import '../dom/type_checks.dart';
@@ -240,10 +242,17 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     return renderObject;
   }
 
+  bool _didHydrate = false;
   final Map<web.HTMLElement, _AppliedParams> _appliedParams = nodeMap();
 
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
+    final inheritedDomParams = inheritedDomParamsFor(renderObject);
+    if ((component.nodes != null || (inheritedDomParams != null && inheritedDomParams.isNotEmpty)) && !_didHydrate) {
+      _didHydrate = true;
+      _hydrateInitialNodes(renderObject);
+    }
+
     for (final element in _appliedParams.keys) {
       _resetElementParams(element);
     }
@@ -282,6 +291,75 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
         }
         current = current.nextSibling;
       }
+    }
+  }
+
+  void _hydrateInitialNodes(SlottedDomRenderObject renderObject) {
+    final slotRanges = {
+      for (final slot in component.slots)
+        if (slot is _RangeChildSlot) slot.start: slot.end,
+    };
+
+    web.Node? current = renderObject.firstChildNode;
+    while (current != null) {
+      if (slotRanges[current] case final endNode?) {
+        if (current == renderObject.lastChildNode) break;
+        current = endNode;
+        if (slotRanges.containsKey(current)) continue;
+        if (current == renderObject.lastChildNode) break;
+        current = current.nextSibling;
+        continue;
+      }
+
+      if (current.isElement) {
+        _hydrateInitialAppliedParams(current as web.Element);
+      }
+
+      if (current == renderObject.lastChildNode) break;
+      current = current.nextSibling;
+    }
+  }
+
+  void _hydrateInitialAppliedParams(web.Element root) {
+    void process(web.HTMLElement element) {
+      if (element.hasAttribute('data-j-apply')) {
+        final raw = element.getAttribute('data-j-apply')!;
+        element.removeAttribute('data-j-apply');
+
+        try {
+          final data = jsonDecode(raw) as Map<String, dynamic>;
+          final appliedId = data['i'] as String?;
+          final appliedClasses = (data['c'] as List?)?.cast<String>();
+          final appliedStylesList = (data['s'] as List?)?.cast<String>();
+          final appliedAttributesList = (data['a'] as List?)?.cast<String>();
+
+          Map<String, String>? appliedStyles;
+          if (appliedStylesList != null) {
+            appliedStyles = {for (final s in appliedStylesList) s: element.style.getPropertyValue(s)};
+          }
+
+          Map<String, String>? appliedAttributes;
+          if (appliedAttributesList != null) {
+            appliedAttributes = {for (final a in appliedAttributesList) a: element.getAttribute(a) ?? ''};
+          }
+
+          _appliedParams[element] = _AppliedParams(
+            target: ApplyTarget.anyChild,
+            id: appliedId,
+            classes: appliedClasses,
+            styles: appliedStyles,
+            attributes: appliedAttributes,
+          );
+        } catch (_) {}
+      }
+    }
+
+    if (root.isHtmlElement) {
+      process(root as web.HTMLElement);
+    }
+    final descendants = root.querySelectorAll('[data-j-apply]');
+    for (int i = 0; i < descendants.length; i++) {
+      process(descendants.item(i) as web.HTMLElement);
     }
   }
 
@@ -369,16 +447,14 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
       if (element.id.isEmpty) {
         element.id = newId;
         appliedId = newId;
-      } else if (element.id == newId && (appliedId == null || appliedId == newId)) {
-        appliedId = newId;
       }
     }
 
     if (newParams.classes case final newClasses?) {
       appliedClasses ??= [];
       for (final c in newClasses) {
-        element.classList.add(c);
-        if (!appliedClasses.contains(c)) {
+        if (!element.classList.contains(c)) {
+          element.classList.add(c);
           appliedClasses.add(c);
         }
       }
@@ -390,8 +466,6 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
         if (element.style.getPropertyValue(e.key).isEmpty) {
           element.style.setProperty(e.key, e.value);
           appliedStyles[e.key] = e.value;
-        } else if (element.style.getPropertyValue(e.key) == e.value && !appliedStyles.containsKey(e.key)) {
-          appliedStyles[e.key] = e.value;
         }
       }
     }
@@ -401,8 +475,6 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
       for (final e in newAttributes.entries) {
         if (!element.hasAttribute(e.key)) {
           element.setAttribute(e.key, e.value);
-          appliedAttributes[e.key] = e.value;
-        } else if (element.getAttribute(e.key) == e.value && !appliedAttributes.containsKey(e.key)) {
           appliedAttributes[e.key] = e.value;
         }
       }

@@ -91,6 +91,11 @@ class DomElement extends DomRenderObjectElement {
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
 
+      final appliedClasses = <String>[];
+      final appliedStyles = <String>[];
+      final appliedAttributes = <String>[];
+      String? appliedId;
+
       for (final param in inheritedDomParams.reversed) {
         if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
         if (param.target.id case final expectedId? when expectedId != id) continue;
@@ -99,21 +104,35 @@ class DomElement extends DomRenderObjectElement {
           continue;
         }
 
-        id ??= param.id;
+        if (param.id case final paramId? when id == null) {
+          id = paramId;
+          appliedId = paramId;
+        }
 
         if (param.classes case final paramClasses?) {
+          for (final c in paramClasses) {
+            if (!classesSet.contains(c)) {
+              appliedClasses.add(c);
+            }
+          }
           classesSet.addAll(paramClasses);
         }
 
         if (param.styles case final stylesProps?) {
           for (final MapEntry(:key, :value) in stylesProps.entries) {
-            styles[key] ??= value;
+            if (!styles.containsKey(key)) {
+              styles[key] = value;
+              appliedStyles.add(key);
+            }
           }
         }
 
         if (param.attributes case final attributesMap?) {
           for (final MapEntry(:key, :value) in attributesMap.entries) {
-            attributes[key] ??= value;
+            if (!attributes.containsKey(key)) {
+              attributes[key] = value;
+              appliedAttributes.add(key);
+            }
           }
         }
 
@@ -125,14 +144,30 @@ class DomElement extends DomRenderObjectElement {
       }
 
       classes = classesSet.join(' ');
+
+      if (!binding.isClient && binding.hasClients) {
+        if (appliedId != null ||
+            appliedClasses.isNotEmpty ||
+            appliedStyles.isNotEmpty ||
+            appliedAttributes.isNotEmpty) {
+          final diff = <String, dynamic>{
+            'i': ?appliedId,
+            if (appliedClasses.isNotEmpty) 'c': appliedClasses,
+            if (appliedStyles.isNotEmpty) 's': appliedStyles,
+            if (appliedAttributes.isNotEmpty) 'a': appliedAttributes,
+          };
+          attributes['data-j-apply'] = jsonEncode(diff);
+        }
+      }
     }
 
     renderObject.update(id, classes, styles, attributes, events);
   }
 }
 
-class _ApplyDomComponent extends StatelessComponent implements DomComponent {
-  const _ApplyDomComponent({
+@internal
+class ApplyDomComponent extends StatelessComponent implements DomComponent {
+  const ApplyDomComponent({
     this.target = ApplyTarget.anyChild,
     this.id,
     this.classes,
@@ -161,6 +196,14 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
   final Component child;
   @override
   List<Component>? get children => null;
+
+  Map<String, dynamic> toMap() => {
+    if (target != ApplyTarget.anyChild) 't': target.toMap(),
+    if (id != null) 'i': id,
+    if (classes != null) 'c': classes,
+    if (styles?.properties case final s? when s.isNotEmpty) 's': s,
+    if (attributes != null && attributes!.isNotEmpty) 'a': attributes,
+  };
 
   @override
   Component build(BuildContext context) {
@@ -233,6 +276,25 @@ final class ApplyTarget {
         for (final c in classes) '.$c',
     ],
   ].join();
+
+  Map<String, dynamic> toMap() => {
+    if (!onlyChildren) 'd': true,
+    if (tag != null) 't': tag,
+    if (id != null) 'i': id,
+    if (classes != null && classes!.isNotEmpty) 'c': classes!.toList(),
+  };
+
+  factory ApplyTarget.fromMap(Map<String, dynamic> map) {
+    final onlyChildren = map['d'] != true;
+    final tag = map['t'] as String?;
+    final id = map['i'] as String?;
+    final classes = (map['c'] as List?)?.cast<String>().toSet();
+    if (onlyChildren) {
+      return ApplyTarget.childWith(tag: tag, id: id, classes: classes);
+    } else {
+      return ApplyTarget.descendantWith(tag: tag, id: id, classes: classes);
+    }
+  }
 }
 
 @protected

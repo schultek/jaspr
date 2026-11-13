@@ -10,6 +10,7 @@ import 'package:universal_web/js_interop.dart';
 // See also https://github.com/dart-lang/sdk/issues/60344
 extension DomTypeTests on JSAny? {
   bool get isElement => this == null ? false : instanceof(_cachedElementConstructor);
+  bool get isHtmlElement => this == null ? false : instanceof(_cachedHtmlElementConstructor);
   bool get isHtmlInputElement => this == null ? false : instanceof(_cachedHtmlInputElementConstructor);
   bool get isHtmlAnchorElement => this == null ? false : instanceof(_cachedHtmlAnchorElementConstructor);
   bool get isHtmlSelectElement => this == null ? false : instanceof(_cachedHtmlSelectElementConstructor);
@@ -21,6 +22,7 @@ extension DomTypeTests on JSAny? {
 }
 
 final _cachedElementConstructor = _elementConstructor;
+final _cachedHtmlElementConstructor = _htmlElementConstructor;
 final _cachedHtmlInputElementConstructor = _htmlInputElementConstructor;
 final _cachedHtmlAnchorElementConstructor = _htmlAnchorElementConstructor;
 final _cachedHtmlSelectElementConstructor = _htmlSelectElementConstructor;
@@ -32,6 +34,8 @@ final _cachedDocumentFragmentConstructor = _documentFragmentConstructor;
 
 @JS('Element')
 external JSFunction get _elementConstructor;
+@JS('HTMLElement')
+external JSFunction get _htmlElementConstructor;
 @JS('HTMLInputElement')
 external JSFunction get _htmlInputElementConstructor;
 @JS('HTMLAnchorElement')
