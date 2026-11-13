@@ -2,9 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:collection/collection.dart';
 
+import '../utils.dart';
 import 'codecs.dart';
 
 /// Builds modules for types annotated with @encoder / @decoder
@@ -102,17 +105,26 @@ class CodecModuleBuilder implements Builder {
         );
         return null;
       }
-      if (candidate.formalParameters.length != 1) {
+      if (candidate.formalParameters.isEmpty || candidate.formalParameters.length > 2) {
         log.severe(
-          'Members annotated with @decoder must have exactly one parameter. Failing element: ${element.name}.${candidate.name}() in library $libName.',
+          'Members annotated with @decoder must have either one parameter or two parameters (with the second being a ComponentMount mount function). Failing element: ${element.name}.${candidate.name}() in library $libName.',
         );
         return null;
       }
-      if (candidate.formalParameters.length != 1) {
+      if (!candidate.formalParameters.first.isPositional) {
         log.severe(
-          'Members annotated with @decoder must have exactly one parameter. Failing element: ${element.name}.${candidate.name}() in library $libName.',
+          'The first parameter of @decoder must be positional. Failing element: ${element.name}.${candidate.name}() in library $libName.',
         );
         return null;
+      }
+      if (candidate.formalParameters.length == 2) {
+        final mountParam = candidate.formalParameters[1];
+        if (!_isValidMountParameter(mountParam)) {
+          log.severe(
+            'The second parameter of @decoder must be a function matching "ComponentMount". Failing element: ${element.name}.${candidate.name}() in library $libName.',
+          );
+          return null;
+        }
       }
       if (candidate.returnType != element.thisType) {
         log.severe(
@@ -226,6 +238,8 @@ class CodecElement {
   final String rawType;
   final String import;
   final String? typeImport;
+  final bool hasMount;
+  final String? mountParam;
 
   CodecElement({
     required this.name,
@@ -235,9 +249,14 @@ class CodecElement {
     required this.rawType,
     required this.import,
     this.typeImport,
+    this.hasMount = false,
+    this.mountParam,
   });
 
   factory CodecElement.fromElement(InterfaceElement element, ExecutableElement decoder, MethodElement encoder) {
+    final hasMount = decoder.formalParameters.length == 2;
+    final mountParam = hasMount && decoder.formalParameters[1].isNamed ? decoder.formalParameters[1].name : null;
+
     if (element is ExtensionTypeElement) {
       final typeElement = element.representation.type.element!;
       if (element.library.exportNamespace.get2(typeElement.name!) == typeElement) {
@@ -248,6 +267,8 @@ class CodecElement {
           encoder: encoder.name ?? '',
           rawType: encoder.returnType.getDisplayString(),
           import: element.library.firstFragment.source.uri.toString(),
+          hasMount: hasMount,
+          mountParam: mountParam,
         );
       } else {
         final import = element.library.firstFragment.importedLibraries
@@ -262,6 +283,8 @@ class CodecElement {
           rawType: encoder.returnType.getDisplayString(),
           import: element.library.firstFragment.source.uri.toString(),
           typeImport: import?.firstFragment.source.uri.toString(),
+          hasMount: hasMount,
+          mountParam: mountParam,
         );
       }
     } else {
@@ -271,6 +294,8 @@ class CodecElement {
         encoder: encoder.name ?? '',
         rawType: encoder.returnType.getDisplayString(),
         import: element.library.firstFragment.source.uri.toString(),
+        hasMount: hasMount,
+        mountParam: mountParam,
       );
     }
   }
@@ -282,7 +307,9 @@ class CodecElement {
       encoder = map['encoder'] as String,
       rawType = map['rawType'] as String,
       import = map['import'] as String,
-      typeImport = map['typeImport'] as String?;
+      typeImport = map['typeImport'] as String?,
+      hasMount = map['hasMount'] as bool? ?? false,
+      mountParam = map['mountParam'] as String?;
 
   Map<String, Object?> serialize() => {
     'name': name,
@@ -292,5 +319,31 @@ class CodecElement {
     'rawType': rawType,
     'import': import,
     'typeImport': ?typeImport,
+    if (hasMount) 'hasMount': true,
+    'mountParam': ?mountParam,
   };
+}
+
+bool _isValidMountParameter(FormalParameterElement param) {
+  final type = param.type;
+  if (type is! FunctionType) {
+    return false;
+  }
+  if (type.typeParameters.isNotEmpty) {
+    return false;
+  }
+  final returnType = type.returnType;
+  if (returnType.element == null ||
+      !componentChecker.isExactly(returnType.element!) ||
+      returnType.nullabilitySuffix == NullabilitySuffix.question) {
+    return false;
+  }
+  if (type.normalParameterTypes.length != 1 ||
+      !type.normalParameterTypes.first.isDartCoreString ||
+      type.normalParameterTypes.first.nullabilitySuffix == NullabilitySuffix.question ||
+      type.optionalParameterTypes.isNotEmpty ||
+      type.namedParameterTypes.isNotEmpty) {
+    return false;
+  }
+  return true;
 }

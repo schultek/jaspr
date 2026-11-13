@@ -105,6 +105,25 @@ class AppWithMultipleServerComponents extends StatelessComponent {
   }
 }
 
+class ModelWithComponent {
+  const ModelWithComponent(this.child);
+
+  final Component child;
+
+  Map<String, dynamic> toRaw() => {'child': child};
+}
+
+class AppWithCustomModel extends StatelessComponent {
+  const AppWithCustomModel({required this.model});
+
+  final ModelWithComponent model;
+
+  @override
+  Component build(BuildContext context) {
+    return div(attributes: {'data-app': 'with-model'}, [model.child]);
+  }
+}
+
 void main() {
   group('@client', () {
     setUpAll(() {
@@ -123,6 +142,10 @@ void main() {
             AppWithMultipleServerComponents: ClientTarget<AppWithMultipleServerComponents>(
               'app_with_multiple_server_components',
               params: (app) => {'child1': app.child1, 'child2': app.child2},
+            ),
+            AppWithCustomModel: ClientTarget<AppWithCustomModel>(
+              'app_with_custom_model',
+              params: (app) => {'model': app.model.toRaw()},
             ),
           },
         ),
@@ -287,6 +310,28 @@ void main() {
           '    <!--@app_with_server_component data<{"child":"s@1"}>-->\n'
           '    <div data-app="with-child"><!--s@1--><!--@app1--><div data-app="1"></div><!--/@app1--><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('renders server components inside custom model parameter', (tester) async {
+      tester.pumpComponent(AppWithCustomModel(model: ModelWithComponent(span([text('Custom Model')]))));
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app_with_custom_model data<{"model":{"child":"s@1"}}>-->\n'
+          '    <div data-app="with-model"><!--s@1--><span>Custom Model</span><!--/s@1--></div>\n'
+          '    <!--/@app_with_custom_model-->\n'
           '  </body>\n'
           '</html>\n'
           '',

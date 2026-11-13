@@ -226,6 +226,117 @@ void main() {
       expect(spanElement.textContent, equals('Server Element'));
     });
 
+    testClient('should find and hydrate client component with custom model using mount callback', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data<{"model":{"title":"Custom Card","child":"s${marker}1"}}>-->'
+                  '  <div class="card">'
+                  '    <h1>Custom Card</h1>'
+                  '    <button>Count: 0</button>'
+                  '    <!--s${marker}1-->'
+                  '    <span>Server Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '  </div>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final cardElement = window.document.querySelector('body .card')!;
+      final h1Element = window.document.querySelector('body h1')!;
+      final buttonElement = window.document.querySelector('body button')! as HTMLElement;
+      final spanElement = window.document.querySelector('body span')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(cardElement.parentNode, equals(divElement));
+      expect(h1Element.parentNode, equals(cardElement));
+      expect(h1Element.textContent, equals('Custom Card'));
+      expect(buttonElement.parentNode, equals(cardElement));
+      expect(buttonElement.textContent, equals('Count: 0'));
+      expect(spanElement.parentNode, equals(cardElement));
+      expect(spanElement.textContent, equals('Server Element'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              final model = ModelWithComponentMount.fromRaw(
+                params.get<Map<String, dynamic>>('model'),
+                params.mount,
+              );
+              return CustomModelCardComponent(model: model);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(cardElement.parentNode, equals(divElement));
+      expect(cardElement.className, 'card hydrated');
+      expect(h1Element.parentNode, equals(cardElement));
+      expect(h1Element.textContent, equals('Custom Card'));
+      expect(spanElement.parentNode, equals(cardElement));
+      expect(spanElement.textContent, equals('Server Element'));
+
+      buttonElement.click();
+      await pumpEventQueue();
+
+      expect(buttonElement.textContent, equals('Count: 1'));
+      expect(spanElement.parentNode, equals(cardElement));
+      expect(spanElement.textContent, equals('Server Element'));
+    });
+
+    testClient('should find and hydrate client component with custom model using named mount callback', (tester) async {
+      final marker = DomValidator.clientMarkerPrefix;
+      window.document.body!.innerHTML =
+          '<div>'
+                  '  <!--${marker}app data<{"model":{"child":"s${marker}1"}}>-->'
+                  '  <p>'
+                  '    <!--s${marker}1-->'
+                  '    <span>Server Element</span>'
+                  '    <!--/s${marker}1-->'
+                  '  </p>'
+                  '  <!--/${marker}app-->'
+                  '</div>'
+              .toJS;
+
+      final divElement = window.document.querySelector('body div')!;
+      final pElement = window.document.querySelector('body p')!;
+      final spanElement = window.document.querySelector('body span')!;
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(pElement.parentNode, equals(divElement));
+      expect(spanElement.parentNode, equals(pElement));
+      expect(spanElement.textContent, equals('Server Element'));
+
+      Jaspr.initializeApp(
+        options: ClientOptions(
+          clients: {
+            'app': ClientLoader((params) {
+              final model = ModelWithNamedMount.fromRaw(
+                params.get<Map<String, dynamic>>('model'),
+                mount: params.mount,
+              );
+              return p(classes: 'hydrated', [model.child]);
+            }),
+          },
+        ),
+      );
+
+      tester.pumpComponent(const ClientApp());
+      await pumpEventQueue();
+
+      expect(divElement.parentNode, equals(window.document.body));
+      expect(pElement.parentNode, equals(divElement));
+      expect(pElement.className, 'hydrated');
+      expect(spanElement.parentNode, equals(pElement));
+      expect(spanElement.textContent, equals('Server Element'));
+    });
+
     testClient('should find and hydrate nested client component inside server component', (tester) async {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
@@ -547,5 +658,66 @@ class ReloadTestComponentState extends State<ReloadTestComponent>
   @override
   Component build(BuildContext context) {
     return p([Component.text('Hello ${component.name}, Count: $count')]);
+  }
+}
+
+class ModelWithComponentMount {
+  const ModelWithComponentMount({required this.title, required this.child});
+
+  final String title;
+  final Component child;
+
+  factory ModelWithComponentMount.fromRaw(
+    Map<String, dynamic> raw,
+    ComponentMount mount,
+  ) {
+    return ModelWithComponentMount(
+      title: raw['title'] as String,
+      child: mount(raw['child'] as String),
+    );
+  }
+}
+
+class ModelWithNamedMount {
+  const ModelWithNamedMount({required this.child});
+
+  final Component child;
+
+  factory ModelWithNamedMount.fromRaw(
+    Map<String, dynamic> raw, {
+    required ComponentMount mount,
+  }) {
+    return ModelWithNamedMount(
+      child: mount(raw['child'] as String),
+    );
+  }
+}
+
+class CustomModelCardComponent extends StatefulComponent {
+  const CustomModelCardComponent({required this.model, super.key});
+
+  final ModelWithComponentMount model;
+
+  @override
+  State<CustomModelCardComponent> createState() => _CustomModelCardComponentState();
+}
+
+class _CustomModelCardComponentState extends State<CustomModelCardComponent> {
+  int count = 0;
+
+  @override
+  Component build(BuildContext context) {
+    return div(classes: 'card hydrated', [
+      h1([Component.text(component.model.title)]),
+      button(
+        onClick: () {
+          setState(() {
+            count++;
+          });
+        },
+        [Component.text('Count: $count')],
+      ),
+      component.model.child,
+    ]);
   }
 }

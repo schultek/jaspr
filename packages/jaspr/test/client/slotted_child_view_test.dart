@@ -683,6 +683,40 @@ void main() {
       expect(clicks, 2);
     });
 
+    testClient('applies direct child params to the element anchors of adjacent range slots', (tester) async {
+      window.document.body!.innerHTML =
+          '<span></span><button></button><span></span><button></button><span></span>'.toJS;
+      final anchors = window.document.querySelectorAll('span');
+      final shared = anchors.item(1)!;
+      var clicks = 0;
+
+      tester.pumpComponent(
+        .apply(
+          target: ApplyTarget.anyChild,
+          classes: 'anchor',
+          events: {'click': (_) => clicks++},
+          child: SlottedChildView(
+            slots: [
+              .between(start: anchors.item(0)!, end: shared, child: button([])),
+              .between(start: shared, end: anchors.item(2)!, child: button([])),
+            ],
+          ),
+        ),
+      );
+
+      expect(window.document.querySelectorAll('span.anchor').length, 3);
+
+      // The view skips the slots' contents, so only
+      // the slots' own components bind the buttons' listeners.
+      final buttons = window.document.querySelectorAll('button');
+      (buttons.item(0)! as HTMLElement).click();
+      (buttons.item(1)! as HTMLElement).click();
+      expect(clicks, 2);
+
+      tester.binding.detachRootComponent();
+      expect(window.document.querySelectorAll('span.anchor').length, 0);
+    });
+
     testClient('does not own the elements of adjacent range slots that share an anchor', (tester) async {
       window.document.body!.innerHTML = '<!--a--><button>First</button><!--b--><button>Second</button><!--c-->'.toJS;
       final anchors = window.document.body!.childNodes;

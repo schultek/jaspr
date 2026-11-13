@@ -21,6 +21,8 @@ It is important to understand that **Server Components are not a separate API** 
 
 Instead, Server Components are a design paradigm enabled by Jaspr's compilation and hydration model. You achieve this simply by **passing components as parameters** (such as a `child` component, or lists/maps of components) to a component annotated with [`@client`](/api/utils/at_client).
 
+You can also pass components inside custom data classes by using `ComponentMount` with the [`@decoder`](/api/utils/at_encoder_decoder#decoding-models-with-component-fields-server-components) annotation.
+
 ## A Simple Example: Expandable Card
 
 Let's build a client-side component called `ExpandableCard`. It features a button that lets users toggle the visibility of the card's content. To do this, the card must be interactive and annotated with `@client`. However, the content inside the card is static content that doesn't need client-side interactivity.
