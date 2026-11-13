@@ -597,5 +597,37 @@ void main() {
         contains('<span class="child-class inner-client-applied" data-j-apply="c:inner-client-applied">Hello</span>'),
       );
     });
+
+    testServer(
+      'handles nested alternating server-client boundaries by isolating outer applies from inner server components',
+      (tester) async {
+        tester.pumpComponent(
+          Component.apply(
+            target: const ApplyTarget.descendantWith(tag: 'span'),
+            classes: 'outer-applied',
+            child: AppWithServerComponent(
+              child: div([
+                Component.apply(
+                  target: const ApplyTarget.descendantWith(tag: 'span'),
+                  classes: 'inner-client-applied',
+                  child: AppWithServerComponent(
+                    child: span(classes: 'child-class', [text('Hello')]),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        );
+
+        final response = await tester.request('/');
+
+        expect(
+          response.body,
+          contains(
+            '<span class="child-class inner-client-applied outer-applied" data-j-apply="c:inner-client-applied">Hello</span>',
+          ),
+        );
+      },
+    );
   });
 }

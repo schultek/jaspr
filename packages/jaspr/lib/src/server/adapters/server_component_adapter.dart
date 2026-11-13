@@ -126,10 +126,27 @@ final class ServerComponentAdapter extends ElementBoundaryAdapter {
     return null;
   }
 
+  int? _minDepth;
+
+  int _getMinDepth() {
+    if (_minDepth case final minDepth?) {
+      return minDepth;
+    }
+    Element? parentServer;
+    element.visitAncestorElements((ancestor) {
+      if (registry.serverElements.containsKey(ancestor)) {
+        parentServer = ancestor;
+        return false;
+      }
+      return true;
+    });
+    return _minDepth = parentServer?.depth ?? 0;
+  }
+
   bool _isClientManaged(ApplyParams param) {
     final source = param.source;
     if (source == null) return false;
-    return source.depth < element.depth;
+    return source.depth > _getMinDepth() && source.depth < element.depth;
   }
 }
 
