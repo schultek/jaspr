@@ -45,11 +45,22 @@ jobs:
         run: dart run melos run format
 
       - name: Check linting
-        run: dart run melos analyze --fatal-infos --concurrency=4
+        run: dart analyze --fatal-infos
 
   test:
-    name: Test Packages
+    name: Test (${{ matrix.package }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - jaspr
+          - jaspr_builder
+          - jaspr_cli
+          - jaspr_content
+          - jaspr_lints
+          - jaspr_riverpod
+          - jaspr_router
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -67,10 +78,24 @@ jobs:
           mkdir -p coverage
 
       - name: Run Unit tests
-        run: dart run melos run coverage --no-select
+        run: dart run melos run coverage --scope=${{ matrix.package }}
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
         with:
           files: coverage/*_lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  test-packages:
+    name: Test Packages
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all tests passed
+        run: |
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "One or more package test jobs failed."
+            exit 1
+          fi
+          echo "All package tests passed successfully."
