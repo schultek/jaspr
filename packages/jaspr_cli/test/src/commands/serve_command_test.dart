@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:build_daemon/data/build_request.dart';
 import 'package:build_daemon/data/build_status.dart';
+import 'package:build_daemon/data/build_target_request.dart';
 import 'package:jaspr_cli/src/command_runner.dart';
 import 'package:jaspr_cli/src/project.dart';
 import 'package:mocktail/mocktail.dart';
@@ -121,6 +123,62 @@ void main() {
         );
 
         expect(await serveResult, equals(1));
+      });
+    });
+
+    test('does not report the build daemon as exited unexpectedly when stopping after a failed build', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        // Stopping the daemon closes its connection, as a real daemon process
+        // that is killed would. The pid is never in use.
+        when(() => io.process.run('lsof', ['-tiTCP:1234', '-sTCP:LISTEN'])).thenAnswer((_) async {
+          await buildDaemon.close();
+          return ProcessResult(0, 0, '2147483647\n', '');
+        });
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await expectLater(
+          buildDaemon.messages,
+          emitsInOrderWithTimeout([
+            isA<BuildTargetRequest>(),
+            isA<BuildRequest>(),
+          ]),
+        );
+        buildDaemon.sendMessage(
+          BuildResults((b) {
+            b.results.add(
+              DefaultBuildResult((b) {
+                b.target = 'web';
+                b.status = BuildStatus.failed;
+              }),
+            );
+          }),
+        );
+
+        // Stops through the guards, like Ctrl+C.
+        expect(await serveResult, equals(1));
+
+        final errors = <String>[];
+        while (await io.stderr.queue.hasNext.timeout(const Duration(milliseconds: 300), onTimeout: () => false)) {
+          errors.add(await io.stderr.queue.next);
+        }
+        expect(errors, contains('[BUILDER] [ERROR] Could not start dev server due to build errors.'));
+        expect(errors, isNot(contains(contains('exited unexpectedly'))));
       });
     });
 
