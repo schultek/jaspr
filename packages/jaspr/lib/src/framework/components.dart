@@ -49,6 +49,9 @@ class DomElement extends DomRenderObjectElement {
   @override
   DomComponent get component => super.component as DomComponent;
 
+  @internal
+  Map<String, dynamic>? appliedDiff;
+
   @override
   List<Component> buildOwnChildren() {
     return component.children ?? const [];
@@ -150,13 +153,12 @@ class DomElement extends DomRenderObjectElement {
             appliedClasses.isNotEmpty ||
             appliedStyles.isNotEmpty ||
             appliedAttributes.isNotEmpty) {
-          final diff = <String, dynamic>{
+          appliedDiff = <String, dynamic>{
             'i': ?appliedId,
             if (appliedClasses.isNotEmpty) 'c': appliedClasses,
             if (appliedStyles.isNotEmpty) 's': appliedStyles,
             if (appliedAttributes.isNotEmpty) 'a': appliedAttributes,
           };
-          binding.trackAppliedParams(this, diff);
         }
       }
     }

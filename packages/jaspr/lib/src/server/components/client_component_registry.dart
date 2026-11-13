@@ -14,12 +14,6 @@ class ClientComponentRegistry extends ObserverComponent {
 class ClientComponentRegistryElement extends ObserverElement {
   ClientComponentRegistryElement(super.component);
 
-  @override
-  void mount(Element? parent, ElementSlot newSlot) {
-    super.mount(parent, newSlot);
-    (binding as ServerAppBinding).clientRegistry = this;
-  }
-
   bool _didHandleClientScript = false;
 
   final Map<Element, ClientTarget> clientElements = {};

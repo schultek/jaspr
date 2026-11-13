@@ -8,9 +8,6 @@ abstract class AppBinding with SchedulerBinding {
   /// Whether the current app is run on the client (in the browser)
   bool get isClient;
 
-  /// Whether this app has client components registered.
-  bool get hasClients => false;
-
   /// The currently active url.
   ///
   /// On the server, this is the request url.
@@ -27,7 +24,4 @@ abstract class AppBinding with SchedulerBinding {
 
   /// Report an error that occurred during the build process of [element].
   void reportBuildError(Element element, Object error, StackTrace stackTrace);
-
-  /// Called during server rendering when [element] has applied DOM parameters.
-  void trackAppliedParams(DomElement element, Map<String, dynamic> diff) {}
 }
