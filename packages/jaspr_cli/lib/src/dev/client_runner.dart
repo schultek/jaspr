@@ -23,7 +23,7 @@ class ClientRunner {
 
   void startBuild() => client.startBuild();
 
-  ClientRunner._(this.client, this.daemonPort, this.logger, [this.daemonPids = const []]) {
+  ClientRunner._(this.client, this.daemonPort, this.logger, this.daemonPids, {required this.ownsDaemon}) {
     client.shutdownNotifications.listen((data) {
       logger.write(data.message, tag: Tag.builder, level: Level.warning);
       if (data.failureType == 75) {
@@ -33,6 +33,10 @@ class ClientRunner {
     });
   }
 
+  /// Whether this process started the build daemon. A daemon that was already
+  /// running belongs to another Jaspr process and must not be stopped by us.
+  final bool ownsDaemon;
+
   /// Starts the build daemon for development watching.
   static Future<ClientRunner?> start(
     List<String> buildOptions,
@@ -40,26 +44,32 @@ class ClientRunner {
     void Function(FutureOr<void> Function()) guard,
   ) async {
     var cancelled = false;
+    var ownsDaemon = false;
     late final CancelableOperation<ClientRunner?> op;
     guard(() async {
       cancelled = true;
       if (!op.isCompleted) {
         op.cancel();
       }
-      await util.stopDaemon(Directory.current.path);
+      if (ownsDaemon) {
+        await util.stopDaemon(Directory.current.path);
+      }
     });
 
     op = CancelableOperation<ClientRunner?>.fromFuture(
       Future(() async {
         final workingDirectory = Directory.current.path;
 
+        ownsDaemon = !await util.isDaemonRunning(workingDirectory);
         final client = await util.startBuildDaemon(workingDirectory, buildOptions, logger);
         if (client == null) return null;
         if (cancelled) {
           try {
             await client.close();
           } catch (_) {}
-          await util.stopDaemon(workingDirectory);
+          if (ownsDaemon) {
+            await util.stopDaemon(workingDirectory);
+          }
           return null;
         }
 
@@ -76,7 +86,7 @@ class ClientRunner {
         final daemonPort = util.daemonPort(workingDirectory);
         final daemonPids = await util.findPidsForPort(daemonPort);
 
-        final runner = ClientRunner._(client, daemonPort, logger, daemonPids);
+        final runner = ClientRunner._(client, daemonPort, logger, daemonPids, ownsDaemon: ownsDaemon);
         guard(() => runner.shutDown());
         return runner;
       }),
@@ -93,9 +103,14 @@ class ClientRunner {
     void Function(FutureOr<void> Function())? guard,
   }) async {
     final workingDirectory = Directory.current.path;
+    // E.g. the daemon of a running `jaspr serve`. If its options don't match,
+    // connecting fails, and stopping it would break that other process.
+    final ownsDaemon = !await util.isDaemonRunning(workingDirectory);
     final client = await util.startBuildDaemon(workingDirectory, buildOptions, logger);
     if (client == null) {
-      await util.stopDaemon(workingDirectory);
+      if (ownsDaemon) {
+        await util.stopDaemon(workingDirectory);
+      }
       return 1;
     }
 
@@ -106,7 +121,9 @@ class ClientRunner {
       try {
         await client.close();
       } catch (_) {}
-      await util.stopDaemon(workingDirectory, knownPids: daemonPids);
+      if (ownsDaemon) {
+        await util.stopDaemon(workingDirectory, knownPids: daemonPids);
+      }
     }
 
     guard?.call(cleanUp);
@@ -164,7 +181,10 @@ class ClientRunner {
     try {
       await client.close();
     } catch (_) {}
-    await util.stopDaemon(Directory.current.path, knownPids: daemonPids);
+    // A shared daemon stops on its own once its last client disconnects.
+    if (ownsDaemon) {
+      await util.stopDaemon(Directory.current.path, knownPids: daemonPids);
+    }
     if (!_doneCompleter.isCompleted) _doneCompleter.complete(code);
   }
 }
