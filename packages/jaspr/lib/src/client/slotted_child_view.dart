@@ -1,8 +1,6 @@
 /// @docImport 'client_app.dart';
 library;
 
-import 'dart:convert';
-
 import 'package:universal_web/web.dart' as web;
 
 import '../dom/type_checks.dart';
@@ -316,11 +314,27 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
         element.removeAttribute('data-j-apply');
 
         try {
-          final data = jsonDecode(raw) as Map<String, dynamic>;
-          final appliedId = data['i'] as String?;
-          final appliedClasses = (data['c'] as List?)?.cast<String>();
-          final appliedStylesList = (data['s'] as List?)?.cast<String>();
-          final appliedAttributesList = (data['a'] as List?)?.cast<String>();
+          String? appliedId;
+          List<String>? appliedClasses;
+          List<String>? appliedStylesList;
+          List<String>? appliedAttributesList;
+
+          for (final section in raw.split(';')) {
+            final colonIndex = section.indexOf(':');
+            if (colonIndex == -1) continue;
+            final key = section.substring(0, colonIndex);
+            final val = section.substring(colonIndex + 1);
+            switch (key) {
+              case 'i':
+                appliedId = _unescapeApplyValue(val);
+              case 'c':
+                appliedClasses = val.split(',').map(_unescapeApplyValue).toList();
+              case 's':
+                appliedStylesList = val.split(',').map(_unescapeApplyValue).toList();
+              case 'a':
+                appliedAttributesList = val.split(',').map(_unescapeApplyValue).toList();
+            }
+          }
 
           Map<String, String>? appliedStyles;
           if (appliedStylesList != null) {
@@ -635,3 +649,6 @@ class ChildSlotRenderObject extends DomRenderObject
     removeChild(child);
   }
 }
+
+String _unescapeApplyValue(String val) =>
+    val.contains('%') ? val.replaceAll('%2C', ',').replaceAll('%3B', ';').replaceAll('%25', '%') : val;

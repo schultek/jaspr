@@ -99,7 +99,7 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
       if (child is DomElement) {
         if (child.appliedDiff case final diff?) {
           if (child.renderObject case final MarkupRenderElement renderObject) {
-            (renderObject.attributes ??= {})['data-j-apply'] = jsonEncode(diff);
+            (renderObject.attributes ??= {})['data-j-apply'] = diff;
           }
         }
       }

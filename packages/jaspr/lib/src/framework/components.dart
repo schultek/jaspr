@@ -50,7 +50,7 @@ class DomElement extends DomRenderObjectElement {
   DomComponent get component => super.component as DomComponent;
 
   @internal
-  Map<String, dynamic>? appliedDiff;
+  String? appliedDiff;
 
   @override
   List<Component> buildOwnChildren() {
@@ -153,12 +153,20 @@ class DomElement extends DomRenderObjectElement {
             appliedClasses.isNotEmpty ||
             appliedStyles.isNotEmpty ||
             appliedAttributes.isNotEmpty) {
-          appliedDiff = <String, dynamic>{
-            'i': ?appliedId,
-            if (appliedClasses.isNotEmpty) 'c': appliedClasses,
-            if (appliedStyles.isNotEmpty) 's': appliedStyles,
-            if (appliedAttributes.isNotEmpty) 'a': appliedAttributes,
-          };
+          final parts = <String>[];
+          if (appliedId != null) {
+            parts.add('i:${_escapeApplyValue(appliedId)}');
+          }
+          if (appliedClasses.isNotEmpty) {
+            parts.add('c:${appliedClasses.map(_escapeApplyValue).join(',')}');
+          }
+          if (appliedStyles.isNotEmpty) {
+            parts.add('s:${appliedStyles.map(_escapeApplyValue).join(',')}');
+          }
+          if (appliedAttributes.isNotEmpty) {
+            parts.add('a:${appliedAttributes.map(_escapeApplyValue).join(',')}');
+          }
+          appliedDiff = parts.join(';');
         }
       }
     }
@@ -499,3 +507,7 @@ class _FragmentElement extends MultiChildRenderObjectElement {
   @override
   void updateRenderObject(RenderFragment fragment) {}
 }
+
+String _escapeApplyValue(String val) => (val.contains(';') || val.contains(',') || val.contains('%'))
+    ? val.replaceAll('%', '%25').replaceAll(';', '%3B').replaceAll(',', '%2C')
+    : val;

@@ -237,7 +237,7 @@ void main() {
     });
 
     testClient('removes applied params when toggled off even if initially present in html', (tester) async {
-      window.document.body!.innerHTML = '<section><button id="applied-id" class="original applied" style="color: red;" data-applied="true" data-j-apply=\'{"i":"applied-id","c":["applied"],"s":["color"],"a":["data-applied"]}\'>Static</button></section>'
+      window.document.body!.innerHTML = '<section><button id="applied-id" class="original applied" style="color: red;" data-applied="true" data-j-apply="i:applied-id;c:applied;s:color;a:data-applied">Static</button></section>'
           .toJS;
       var hasParams = true;
       late void Function(void Function() cb) setState;
@@ -275,8 +275,7 @@ void main() {
 
     testClient('preserves child-owned id and classes when client apply toggles off', (tester) async {
       window.document.body!.innerHTML =
-          '<section><button id="save" class="btn active" data-j-apply=\'{"c":["active"]}\'>Save</button></section>'
-              .toJS;
+          '<section><button id="save" class="btn active" data-j-apply="c:active">Save</button></section>'.toJS;
       var hasParams = true;
       late void Function(void Function() cb) setState;
 
@@ -306,7 +305,7 @@ void main() {
     });
 
     testClient('preserves outer applied params when inner apply toggles off', (tester) async {
-      window.document.body!.innerHTML = '<section><button class="child-class server-class client-class" data-j-apply=\'{"c":["server-class","client-class"]}\'>Button</button></section>'
+      window.document.body!.innerHTML = '<section><button class="child-class server-class client-class" data-j-apply="c:server-class,client-class">Button</button></section>'
           .toJS;
       var hasParams = true;
       late void Function(void Function() cb) setState;
@@ -335,6 +334,37 @@ void main() {
       await pumpEventQueue();
 
       expect(btn.className, 'child-class server-class');
+    });
+
+    testClient('correctly unescapes special characters in data-j-apply', (tester) async {
+      window.document.body!.innerHTML = '<section><button id="btn;1,2%3" class="c;1 c,2" data-j-apply="i:btn%3B1%2C2%253;c:c%3B1,c%2C2">Escape</button></section>'
+          .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              id: hasParams ? 'btn;1,2%3' : null,
+              classes: hasParams ? 'c;1 c,2' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'btn;1,2%3');
+      expect(btn.className, 'c;1 c,2');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.hasAttribute('id'), isFalse);
+      expect(btn.className, '');
     });
 
     testClient('applies direct child params to root range slot', (tester) async {

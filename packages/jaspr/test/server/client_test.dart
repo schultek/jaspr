@@ -358,7 +358,7 @@ void main() {
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
           '    <!--@app1 apply<[{"i":"outer-id","c":"outer-class"}]>-->\n'
-          '    <div id="outer-id" class="outer-class" data-app="1" data-j-apply="{&quot;i&quot;:&quot;outer-id&quot;,&quot;c&quot;:[&quot;outer-class&quot;]}"></div>\n'
+          '    <div id="outer-id" class="outer-class" data-app="1" data-j-apply="i:outer-id;c:outer-class"></div>\n'
           '    <!--/@app1-->\n'
           '  </body>\n'
           '</html>\n'
@@ -387,7 +387,7 @@ void main() {
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
           '    <!--@app_with_server_component data<{"child":"s@1"}> apply<[{"c":"server-class"}]>-->\n'
-          '    <div class="server-class" data-app="with-child" data-j-apply="{&quot;c&quot;:[&quot;server-class&quot;]}"><!--s@1--><span class="child-class">Hello</span><!--/s@1--></div>\n'
+          '    <div class="server-class" data-app="with-child" data-j-apply="c:server-class"><!--s@1--><span class="child-class">Hello</span><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
           '  </body>\n'
           '</html>\n'
@@ -443,7 +443,7 @@ void main() {
           '  <body>\n'
           '    <div class="descendant-class">\n'
           '      <!--@app1 apply<[{"t":{"d":true},"c":"descendant-class"}]>-->\n'
-          '      <div class="descendant-class" data-app="1" data-j-apply="{&quot;c&quot;:[&quot;descendant-class&quot;]}"></div>\n'
+          '      <div class="descendant-class" data-app="1" data-j-apply="c:descendant-class"></div>\n'
           '      <!--/@app1-->\n'
           '    </div>\n'
           '  </body>\n'
@@ -485,6 +485,22 @@ void main() {
           '</html>\n'
           '',
         ),
+      );
+    });
+    testServer('escapes special characters in data-j-apply', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          id: 'test;1,2%3',
+          classes: 'c;1 c,2',
+          child: App1(),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('data-j-apply="i:test%3B1%2C2%253;c:c%3B1,c%2C2"'),
       );
     });
   });
