@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:jaspr/server.dart';
 import 'package:jaspr/src/server/server_handler.dart';
+import 'package:path/path.dart' as p;
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:test/test.dart';
@@ -144,6 +145,44 @@ void main() {
       // Jaspr internal endpoint prefixes return 404
       response = await handler(Request('GET', Uri.http('localhost', r'/$jasprMessageHandler')));
       expect(response.statusCode, equals(404));
+    });
+  });
+
+  group('compiledExecutableDir', () {
+    final bundle = p.join('app', 'bundle');
+
+    test('returns the directory of an executable with an appended snapshot', () {
+      final executable = p.join(bundle, 'bin', 'main');
+      expect(compiledExecutableDir(executable, executable), equals(p.join(bundle, 'bin')));
+    });
+
+    test('returns the executable directory for a Linux bundle snapshot', () {
+      expect(
+        compiledExecutableDir(p.join(bundle, 'lib', 'libdartaotmain.so'), p.join(bundle, 'bin', 'main')),
+        equals(p.join(bundle, 'bin')),
+      );
+    });
+
+    test('returns the executable directory for another entry point of a Linux bundle', () {
+      expect(
+        compiledExecutableDir(p.join(bundle, 'lib', 'libdartaotworker.so'), p.join(bundle, 'bin', 'main')),
+        equals(p.join(bundle, 'bin')),
+      );
+    });
+
+    test('returns null for a snapshot from another bundle', () {
+      expect(
+        compiledExecutableDir(p.join('other', 'lib', 'libdartaotmain.so'), p.join(bundle, 'bin', 'main')),
+        isNull,
+      );
+    });
+
+    test('returns null when running from source', () {
+      expect(compiledExecutableDir(p.join('app', 'bin', 'main.dart'), p.join('sdk', 'bin', 'dart')), isNull);
+    });
+
+    test('returns null for an AOT snapshot run by dartaotruntime', () {
+      expect(compiledExecutableDir(p.join('app', 'main.aot'), p.join('sdk', 'bin', 'dartaotruntime')), isNull);
     });
   });
 }

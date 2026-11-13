@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/retry.dart' as retry;
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_gzip/shelf_gzip.dart';
@@ -31,10 +32,10 @@ String _findRootProjectDir() {
   final scriptPath = script.scheme.isEmpty || script.isScheme('file') ? script.toFilePath() : null;
 
   // When running as a compiled executable,
-  // the script is the executable itself,
-  // so its directory is the project directory.
-  if (scriptPath != null && Platform.resolvedExecutable == scriptPath) {
-    return path.dirname(scriptPath);
+  // its directory is the project directory.
+  final executableDir = scriptPath != null ? compiledExecutableDir(scriptPath, Platform.resolvedExecutable) : null;
+  if (executableDir != null) {
+    return executableDir;
   }
 
   // Otherwise search upwards for a `pubspec.yaml`,
@@ -50,6 +51,30 @@ String _findRootProjectDir() {
   }
 
   return foundDir;
+}
+
+/// Returns the directory of [executablePath] if [scriptPath] shows that
+/// the program runs as a compiled executable, or `null` otherwise.
+@visibleForTesting
+String? compiledExecutableDir(String scriptPath, String executablePath) {
+  // The snapshot is appended to the executable, so the script is the executable itself.
+  if (scriptPath == executablePath) {
+    return path.dirname(executablePath);
+  }
+
+  // On Linux, `dart build cli` (since Dart 3.14) keeps the snapshot of `bin/<name>`
+  // separately as `lib/libdartaot<name>.so` in the same bundle.
+  // Bundle entry points other than the first are symlinks to it, so the names don't have to match.
+  final scriptDir = path.dirname(scriptPath);
+  final scriptName = path.basename(scriptPath);
+  if (path.basename(scriptDir) == 'lib' &&
+      scriptName.startsWith('libdartaot') &&
+      scriptName.endsWith('.so') &&
+      path.equals(path.dirname(scriptDir), path.dirname(path.dirname(executablePath)))) {
+    return path.dirname(executablePath);
+  }
+
+  return null;
 }
 
 String? _tryFindRootProjectDir(String startingDir) {
