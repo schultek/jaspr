@@ -527,27 +527,22 @@ class ChildSlotRenderObject extends DomRenderObject
     implements RenderFragment {
   /// Creates a slot that renders its children as the content of [node],
   /// hydrating the child nodes [node] already has.
-  ChildSlotRenderObject(this.node, DomRenderObject parent) {
-    this.parent = parent;
-    final childNodes = node.childNodes;
-    toHydrate = [
-      for (var childIndex = 0; childIndex < childNodes.length; childIndex += 1) childNodes.item(childIndex)!,
-    ];
-    _beforeStart = null;
-  }
+  ChildSlotRenderObject(web.Element node, DomRenderObject parent) : this._(node, parent);
 
   /// Creates a slot that renders its children between the sibling nodes [start] and [end],
   /// hydrating the nodes already between them.
-  ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end) : node = start.parentElement! {
+  ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end)
+    : this._(start.parentElement!, parent, start: start, end: end);
+
+  /// Creates a slot that hydrates all children of [node] or,
+  /// when anchors are supplied, only the nodes between [start] and [end].
+  ChildSlotRenderObject._(this.node, DomRenderObject parent, {web.Node? start, web.Node? end}) : _beforeStart = start {
     this.parent = parent;
-    toHydrate = [];
-    web.Node? curr = start.nextSibling;
-    while (curr != null && curr != end) {
-      toHydrate.add(curr);
-      curr = curr.nextSibling;
+    var current = start == null ? node.firstChild : start.nextSibling;
+    while (current != null && current != end) {
+      toHydrate.add(current);
+      current = current.nextSibling;
     }
-    // Place the children after the start node, even if the slot is empty.
-    _beforeStart = start;
   }
 
   /// The element this slot renders its children into.
@@ -557,9 +552,10 @@ class ChildSlotRenderObject extends DomRenderObject
   @override
   final web.Element node;
 
-  /// The node after which the children of this slot are placed,
+  /// The node after which children are placed,
+  /// even if the range is initially empty,
   /// or `null` to place them at the start of [node].
-  late final web.Node? _beforeStart;
+  final web.Node? _beforeStart;
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
