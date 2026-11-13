@@ -11,7 +11,13 @@ import 'util.dart';
 
 /// A collection of method and events relevant to the running application.
 class ClientDomain extends Domain {
-  ClientDomain(Daemon daemon, this.workflow) : super(daemon, 'client') {
+  ClientDomain(
+    Daemon daemon,
+    this.workflow, {
+    this.onReload,
+    this.onRestart,
+  }) : super(daemon, 'client') {
+    registerHandler('reload', _reload);
     registerHandler('restart', _restart);
     registerHandler('callServiceExtension', _callServiceExtension);
     registerHandler('stop', _stop);
@@ -20,6 +26,8 @@ class ClientDomain extends Domain {
   }
 
   final DevWorkflow workflow;
+  final Future<void> Function()? onReload;
+  final Future<void> Function()? onRestart;
 
   StreamSubscription<dynamic>? _clientEventSubscription;
 
@@ -41,13 +49,63 @@ class ClientDomain extends Domain {
     return response?.json;
   }
 
+  Future<Map<String, Object?>> _reload(Map<String, Object?> args) async {
+    return _restart({...args, 'fullRestart': false});
+  }
+
   Future<Map<String, Object?>> _restart(Map<String, Object?> args) async {
-    final appId = getStringArg(args, 'appId', required: true);
+    final fullRestart = getBoolArg(args, 'fullRestart') ?? false;
+    final appId = getStringArg(args, 'appId', required: false);
+
+    if (onReload != null && onRestart != null) {
+      final stopwatch = Stopwatch()..start();
+      final actionName = fullRestart ? 'hot restart' : 'hot reload';
+      final progressId = fullRestart ? 'hot.restart' : 'hot.reload';
+
+      sendEvent('app.progress', {
+        'appId': ?appId,
+        'id': '0',
+        'message': 'Performing $actionName...',
+        'progressId': progressId,
+      });
+
+      try {
+        if (fullRestart) {
+          await onRestart!();
+        } else {
+          await onReload!();
+        }
+
+        sendEvent('app.progress', {
+          'appId': ?appId,
+          'id': '0',
+          'finished': true,
+          'progressId': progressId,
+        });
+        sendEvent('app.log', {
+          'appId': ?appId,
+          'log': '${fullRestart ? 'Restarted' : 'Reloaded'} application in ${stopwatch.elapsedMilliseconds}ms',
+        });
+        return {'code': 0};
+      } catch (e) {
+        sendEvent('app.progress', {
+          'appId': ?appId,
+          'id': '0',
+          'finished': true,
+          'progressId': progressId,
+        });
+        return {'code': 1, 'message': e.toString()};
+      }
+    }
+
+    if (appId == null) {
+      throw ArgumentError.value(null, 'appId', 'Required when workflow callbacks are not provided');
+    }
     final appState = workflow.clients.getConnection(appId);
     if (appState == null) {
       throw ArgumentError.value(appId, 'appId', 'Not found');
     }
-    final fullRestart = getBoolArg(args, 'fullRestart') ?? false;
+
     if (!fullRestart) {
       final stopwatch = Stopwatch()..start();
       sendEvent('app.progress', {

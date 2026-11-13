@@ -110,3 +110,38 @@ export class DynamicDebugConfigProvider
     return results;
   }
 }
+
+export class JasprDebugAdapterTrackerFactory
+  implements vscode.DebugAdapterTrackerFactory
+{
+  createDebugAdapterTracker(
+    session: vscode.DebugSession
+  ): vscode.ProviderResult<vscode.DebugAdapterTracker> {
+    const processId = session.configuration._processId;
+    if (!processId) {
+      return undefined;
+    }
+    const daemon = JasprServeDaemon.getDaemonByProcessId(processId);
+    if (!daemon) {
+      return undefined;
+    }
+
+    return {
+      onWillReceiveMessage(message: any) {
+        if (message?.type === "request") {
+          if (message.command === "hotReload") {
+            daemon.reload();
+          } else if (
+            message.command === "restart" ||
+            message.command === "hotRestart" ||
+            ((message.command === "disconnect" ||
+              message.command === "terminate") &&
+              Boolean(message.arguments?.restart))
+          ) {
+            daemon.restart();
+          }
+        }
+      },
+    };
+  }
+}

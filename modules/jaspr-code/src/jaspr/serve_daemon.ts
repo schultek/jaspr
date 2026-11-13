@@ -32,6 +32,40 @@ export class JasprServeDaemon implements vscode.Disposable {
   private randomId: number = 0;
   private runName: string = "";
 
+  private static _activeDaemons: Map<number, JasprServeDaemon> = new Map();
+  public static activeDaemon: JasprServeDaemon | undefined;
+
+  public static getDaemonByProcessId(
+    processId: number
+  ): JasprServeDaemon | undefined {
+    return this._activeDaemons.get(processId);
+  }
+
+  public static getActiveDaemon(): JasprServeDaemon | undefined {
+    if (this.activeDaemon && this.activeDaemon.status === "running") {
+      return this.activeDaemon;
+    }
+    const activeSession = vscode.debug.activeDebugSession;
+    if (activeSession?.configuration?._processId) {
+      const daemon = this.getDaemonByProcessId(
+        activeSession.configuration._processId
+      );
+      if (daemon && daemon.status === "running") {
+        return daemon;
+      }
+    }
+    for (const daemon of this._activeDaemons.values()) {
+      if (daemon.status === "running") {
+        return daemon;
+      }
+    }
+    return undefined;
+  }
+
+  private nextRequestId: number = 1;
+  private lastReloadTime: number = 0;
+  private lastRestartTime: number = 0;
+
   async start(
     context: vscode.ExtensionContext,
     folder?: vscode.WorkspaceFolder,
@@ -45,6 +79,10 @@ export class JasprServeDaemon implements vscode.Disposable {
     this.folder = folder;
     this.randomId = Math.floor(Math.random() * 1000000);
     this.runName = debugConfiguration?.name ?? "Jaspr";
+
+    JasprServeDaemon.activeDaemon = this;
+    JasprServeDaemon._activeDaemons.set(this.randomId, this);
+    void vscode.commands.executeCommand("setContext", "jaspr:isRunning", true);
 
     this.statusBarItem = await vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Left,
@@ -114,6 +152,15 @@ export class JasprServeDaemon implements vscode.Disposable {
         }
       })
     );
+
+    this._disposables.push(
+      vscode.debug.onDidTerminateDebugSession((session) => {
+        const index = this.sessions.indexOf(session);
+        if (index !== -1) {
+          this.sessions.splice(index, 1);
+        }
+      })
+    );
   }
 
   async _startTerminal(context: vscode.ExtensionContext) {
@@ -136,6 +183,15 @@ export class JasprServeDaemon implements vscode.Disposable {
 
             if (data.length === 1 && data.charCodeAt(0) === 3) {
               // Ctrl+C
+              this.stop();
+              return;
+            }
+
+            if (data === "r") {
+              this.reload();
+            } else if (data === "R") {
+              this.restart();
+            } else if (data === "q") {
               this.stop();
             }
           },
@@ -198,7 +254,41 @@ export class JasprServeDaemon implements vscode.Disposable {
     });
   }
 
+  public reload(): void {
+    const now = Date.now();
+    if (now - this.lastReloadTime < 250) {
+      return;
+    }
+    this.lastReloadTime = now;
+    this.sendRequest("client.restart", { fullRestart: false });
+  }
+
+  public restart(): void {
+    const now = Date.now();
+    if (now - this.lastRestartTime < 250) {
+      return;
+    }
+    this.lastRestartTime = now;
+    this.sendRequest("client.restart", { fullRestart: true });
+  }
+
+  public sendRequest(method: string, params?: any): void {
+    if (this.status !== "running" || !this.process) {
+      return;
+    }
+    const id = `${++this.nextRequestId}`;
+    const request = [{ method, params, id }];
+    this.process.stdin.write(JSON.stringify(request) + "\n");
+  }
+
   async stop(): Promise<void> {
+    if (JasprServeDaemon.activeDaemon === this) {
+      JasprServeDaemon.activeDaemon = undefined;
+    }
+    JasprServeDaemon._activeDaemons.delete(this.randomId);
+    if (JasprServeDaemon._activeDaemons.size === 0) {
+      void vscode.commands.executeCommand("setContext", "jaspr:isRunning", false);
+    }
     this.process?.stdin.write('[{"method":"daemon.shutdown", "id": "0"}]\n');
     this.statusBarCloseItem?.hide();
     const sess = this.sessions;
@@ -210,6 +300,13 @@ export class JasprServeDaemon implements vscode.Disposable {
   }
 
   async dispose() {
+    if (JasprServeDaemon.activeDaemon === this) {
+      JasprServeDaemon.activeDaemon = undefined;
+    }
+    JasprServeDaemon._activeDaemons.delete(this.randomId);
+    if (JasprServeDaemon._activeDaemons.size === 0) {
+      void vscode.commands.executeCommand("setContext", "jaspr:isRunning", false);
+    }
     this.stop();
 
     this.statusBarItem?.dispose();

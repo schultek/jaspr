@@ -60,6 +60,16 @@
         "command": "jaspr.doctor",
         "title": "Doctor",
         "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.hotReload",
+        "title": "Hot Reload",
+        "category": "Jaspr"
+      },
+      {
+        "command": "jaspr.hotRestart",
+        "title": "Hot Restart",
+        "category": "Jaspr"
       }
     ],
     "menus": {
@@ -77,9 +87,29 @@
         },
         {
           "command": "jaspr.doctor"
+        },
+        {
+          "command": "jaspr.hotReload",
+          "when": "jaspr:isRunning"
+        },
+        {
+          "command": "jaspr.hotRestart",
+          "when": "jaspr:isRunning"
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "jaspr.hotReload",
+        "key": "r",
+        "when": "inDebugMode && jaspr:isRunning && !editorTextFocus"
+      },
+      {
+        "command": "jaspr.hotRestart",
+        "key": "shift+r",
+        "when": "inDebugMode && jaspr:isRunning && !editorTextFocus"
+      }
+    ],
     "debuggers": [
       {
         "type": "jaspr",
