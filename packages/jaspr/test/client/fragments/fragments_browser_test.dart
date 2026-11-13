@@ -1,6 +1,8 @@
 @TestOn('browser')
 library;
 
+import 'dart:js_interop';
+
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -203,6 +205,299 @@ void main() {
       expect(divElement.childNodes.item(2), equals(pElement));
 
       expect(bElement.parentNode, isNull);
+    });
+
+    group('with an empty fragment as first or last child', () {
+      final fragments = <String, Component Function()>{
+        'empty first': () => Component.fragment([
+          const Component.empty(),
+          h1([Component.text('A')]),
+        ]),
+        'empty last': () => Component.fragment([
+          h1([Component.text('A')]),
+          const Component.empty(),
+        ]),
+        'empty first and last': () => Component.fragment([
+          const Component.empty(),
+          h1([Component.text('A')]),
+          b([Component.text('B')]),
+          const Component.empty(),
+        ]),
+        'nested empty first and last': () => Component.fragment([
+          Component.fragment([
+            Component.fragment([const Component.empty()]),
+          ]),
+          h1([Component.text('A')]),
+          Component.fragment([
+            const Component.empty(),
+            Component.fragment([]),
+          ]),
+        ]),
+        'nested fragment with empty edges': () => Component.fragment([
+          Component.fragment([
+            const Component.empty(),
+            h1([Component.text('A')]),
+            const Component.empty(),
+          ]),
+        ]),
+      };
+
+      for (final MapEntry(key: name, value: fragment) in fragments.entries) {
+        testClient('should remove fragment children when replaced ($name)', (tester) async {
+          final component = FakeComponent(child: div([fragment()]));
+          tester.pumpComponent(component);
+
+          final divElement = window.document.querySelector('body div')!;
+          final h1Element = window.document.querySelector('body h1')!;
+          expect(h1Element.parentNode, equals(divElement));
+
+          component.updateChild(
+            div([
+              p([Component.text('Replacement')]),
+            ]),
+          );
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('<p>Replacement</p>'));
+          expect(divElement.contains(h1Element), isFalse);
+        });
+
+        testClient('should insert sibling after fragment ($name)', (tester) async {
+          final component = FakeComponent(
+            child: div([
+              Component.text('Start'),
+              Component.fragment(key: ValueKey('f'), [fragment()]),
+            ]),
+          );
+          tester.pumpComponent(component);
+
+          final divElement = window.document.querySelector('body div')!;
+          final before = divElement.innerHTML.toString();
+
+          component.updateChild(
+            div([
+              Component.text('Start'),
+              Component.fragment(key: ValueKey('f'), [fragment()]),
+              p([Component.text('End')]),
+            ]),
+          );
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('$before<p>End</p>'));
+        });
+
+        testClient('should move fragment children when fragment moves ($name)', (tester) async {
+          final component = FakeComponent(
+            child: div([
+              Component.fragment(key: ValueKey('f1'), [fragment()]),
+              Component.fragment(key: ValueKey('f2'), [
+                p([Component.text('P')]),
+              ]),
+            ]),
+          );
+          tester.pumpComponent(component);
+
+          final divElement = window.document.querySelector('body div')!;
+          final fragmentHtml = divElement.innerHTML.toString().replaceAll('<p>P</p>', '');
+
+          component.updateChild(
+            div([
+              Component.fragment(key: ValueKey('f2'), [
+                p([Component.text('P')]),
+              ]),
+              Component.fragment(key: ValueKey('f1'), [fragment()]),
+            ]),
+          );
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('<p>P</p>$fragmentHtml'));
+        });
+      }
+
+      final updates = <String, (List<Component>, List<Component>)>{
+        'added first': (
+          [
+            h1([Component.text('A')]),
+          ],
+          [
+            const Component.empty(),
+            h1([Component.text('A')]),
+          ],
+        ),
+        'added last': (
+          [
+            h1([Component.text('A')]),
+          ],
+          [
+            h1([Component.text('A')]),
+            const Component.empty(),
+          ],
+        ),
+        'moved first': (
+          [
+            h1(key: ValueKey('h'), [Component.text('A')]),
+            Component.fragment(key: ValueKey('e'), []),
+          ],
+          [
+            Component.fragment(key: ValueKey('e'), []),
+            h1(key: ValueKey('h'), [Component.text('A')]),
+          ],
+        ),
+        'moved last': (
+          [
+            Component.fragment(key: ValueKey('e'), []),
+            h1(key: ValueKey('h'), [Component.text('A')]),
+          ],
+          [
+            h1(key: ValueKey('h'), [Component.text('A')]),
+            Component.fragment(key: ValueKey('e'), []),
+          ],
+        ),
+      };
+
+      for (final MapEntry(key: name, value: (before, after)) in updates.entries) {
+        testClient('should place and remove fragment children after the empty fragment was $name', (tester) async {
+          final component = FakeComponent(child: div([Component.fragment(before)]));
+          tester.pumpComponent(component);
+
+          final divElement = window.document.querySelector('body div')!;
+
+          component.updateChild(div([Component.fragment(after)]));
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('<h1>A</h1>'));
+
+          component.updateChild(
+            div([
+              Component.fragment(after),
+              p([Component.text('End')]),
+            ]),
+          );
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('<h1>A</h1><p>End</p>'));
+
+          component.updateChild(
+            div([
+              p([Component.text('Replacement')]),
+            ]),
+          );
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals('<p>Replacement</p>'));
+        });
+      }
+
+      testClient('should remove hydrated fragment children when replaced', (tester) async {
+        window.document.body!.innerHTML = '<div><h1>A</h1><p>B</p></div>'.toJS;
+
+        final component = FakeComponent(
+          child: div([
+            Component.fragment([
+              const Component.empty(),
+              h1([Component.text('A')]),
+              p([Component.text('B')]),
+              const Component.empty(),
+            ]),
+          ]),
+        );
+        tester.pumpComponent(component);
+
+        final divElement = window.document.querySelector('body div')!;
+        expect(divElement.innerHTML.toString(), equals('<h1>A</h1><p>B</p>'));
+
+        component.updateChild(
+          div([
+            b([Component.text('Replacement')]),
+          ]),
+        );
+        await pumpEventQueue();
+
+        expect(divElement.innerHTML.toString(), equals('<b>Replacement</b>'));
+      });
+
+      testClient('should move fragment children with a global key to a new parent', (tester) async {
+        final key = GlobalKey();
+        Component fragment() => Component.fragment(key: key, [
+          const Component.empty(),
+          h1([Component.text('A')]),
+          const Component.empty(),
+        ]);
+
+        final component = FakeComponent(
+          child: div([
+            section([fragment()]),
+            article([]),
+          ]),
+        );
+        tester.pumpComponent(component);
+
+        final divElement = window.document.querySelector('body div')!;
+
+        component.updateChild(
+          div([
+            section([]),
+            article([Component.text('Start'), fragment()]),
+          ]),
+        );
+        await pumpEventQueue();
+
+        expect(divElement.innerHTML.toString(), equals('<section></section><article>Start<h1>A</h1></article>'));
+
+        component.updateChild(
+          div([
+            section([]),
+            article([Component.text('Start')]),
+          ]),
+        );
+        await pumpEventQueue();
+
+        expect(divElement.innerHTML.toString(), equals('<section></section><article>Start</article>'));
+      });
+    });
+
+    testClient('should place a moved child after empty fragments that keep their slot', (tester) async {
+      Component empty(int key) => Component.fragment(key: ValueKey(key), []);
+
+      final component = FakeComponent(
+        child: div([
+          b(key: ValueKey('start'), [Component.text('S')]),
+          span(key: ValueKey('moved'), [Component.text('X')]),
+          empty(1),
+          empty(2),
+          empty(3),
+          b(key: ValueKey('end'), [Component.text('E')]),
+        ]),
+      );
+      tester.pumpComponent(component);
+
+      final divElement = document.querySelector('body div')!;
+      expect(divElement.innerHTML.toString(), equals('<b>S</b><span>X</span><b>E</b>'));
+
+      // The fragment with key 2 keeps its slot (same index, same previous sibling),
+      // so it is not attached again while the span moves behind it.
+      component.updateChild(
+        div([
+          b(key: ValueKey('start'), [Component.text('S')]),
+          empty(3),
+          empty(1),
+          empty(2),
+          span(key: ValueKey('moved'), [Component.text('X')]),
+          b(key: ValueKey('end'), [Component.text('E')]),
+        ]),
+      );
+      await pumpEventQueue();
+
+      expect(divElement.innerHTML.toString(), equals('<b>S</b><span>X</span><b>E</b>'));
+
+      component.updateChild(
+        div([
+          p([Component.text('Replacement')]),
+        ]),
+      );
+      await pumpEventQueue();
+
+      expect(divElement.innerHTML.toString(), equals('<p>Replacement</p>'));
     });
   });
 }

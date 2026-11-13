@@ -13,6 +13,8 @@
 - Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
 - Fixed `jaspr serve` blocking all following reloads when a connected browser stops responding (e.g. a phone with the screen turned off).
 - **Breaking**: Changed `open` on `dialog()` and `details()` to `bool?`. When it is not set, the browser controls the attribute, which fixes a rebuild closing a dialog opened with `showModal()` or `show()` and a `details` element the user opened. Pass `open: false` to keep the element closed.
+- Fixed a fragment staying in the DOM after it is removed or replaced when its first or last child renders nothing, such as `Component.empty()`.
+- Fixed a `Component.apply` above a `SlottedChildView` not applying to the start and end elements of its `ChildSlot.between` slots.
 
 ## 0.24.0-beta.0
 

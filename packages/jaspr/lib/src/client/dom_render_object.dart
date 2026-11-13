@@ -347,28 +347,26 @@ class DomRenderFragment extends DomRenderObject
   final web.DocumentFragment node;
   bool isAttached = false;
 
-  DomRenderObject? _firstChild;
-  DomRenderObject? _lastChild;
+  // A child fragment without nodes of its own (such as `Component.empty()`) has no first or last node,
+  // so both getters skip over it to the next child that has one.
 
   web.Node? get firstChildNode {
-    if (_firstChild case final firstChild?) {
-      if (firstChild is DomRenderFragment) {
-        return firstChild.firstChildNode;
+    for (var child = _firstChild; child != null; child = child.nextSibling) {
+      final node = child is DomRenderFragment ? child.firstChildNode : child.node;
+      if (node != null || child == _lastChild) {
+        return node;
       }
-
-      return firstChild.node;
     }
 
     return null;
   }
 
   web.Node? get lastChildNode {
-    if (_lastChild case final lastChild?) {
-      if (lastChild is DomRenderFragment) {
-        return lastChild.lastChildNode;
+    for (var child = _lastChild; child != null; child = child.previousSibling) {
+      final node = child is DomRenderFragment ? child.lastChildNode : child.node;
+      if (node != null || child == _firstChild) {
+        return node;
       }
-
-      return lastChild.node;
     }
 
     return null;
@@ -377,13 +375,6 @@ class DomRenderFragment extends DomRenderObject
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
     attachChild(child, after, startNode: firstChildNode?.previousSibling);
-
-    if (after == null) {
-      _firstChild = child;
-    }
-    if (after == _lastChild) {
-      _lastChild = child;
-    }
   }
 
   void move(DomRenderObject parent, web.Node targetNode, web.Node? afterNode) {
@@ -411,7 +402,7 @@ class DomRenderFragment extends DomRenderObject
 
     // Move nodes in reverse order for efficient insertion.
     while (currentNode != null) {
-      final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
+      final prevNode = currentNode != originalFirstChildNode ? currentNode.previousSibling : null;
 
       // Attach to new parent.
       targetNode.insertBefore(currentNode, beforeNode);
@@ -434,7 +425,8 @@ class DomRenderFragment extends DomRenderObject
       print('Remove fragment $node from ${parent.node}');
     }
 
-    if (firstChildNode == null) {
+    final firstNode = firstChildNode;
+    if (firstNode == null) {
       // If fragment is empty, nothing to remove.
       return;
     }
@@ -445,7 +437,7 @@ class DomRenderFragment extends DomRenderObject
     web.Node? beforeNode;
 
     while (currentNode != null) {
-      final prevNode = currentNode != firstChildNode ? currentNode.previousSibling : null;
+      final prevNode = currentNode != firstNode ? currentNode.previousSibling : null;
 
       assert(currentNode.parentNode == parent.node, 'Fragment child must be a child of the parent.');
 
@@ -470,15 +462,11 @@ class DomRenderFragment extends DomRenderObject
 
   @override
   void remove(DomRenderObject child) {
-    if (child == _firstChild) {
-      _firstChild = child.nextSibling;
-    }
-    if (child == _lastChild) {
-      _lastChild = child.previousSibling;
-    }
     if (!isAttached) {
       removeChild(child);
     } else {
+      // The parent removes the child's nodes, but only this fragment can unlink it from its children.
+      _unlinkChild(child);
       parent!.remove(child);
     }
   }
@@ -502,6 +490,11 @@ class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject
   void setRootNode(web.Element newNode) {
     _node = newNode;
     toHydrate = [...newNode.childNodes.toIterable()];
+
+    // The children were rendered into the previous node. A reload replaces their render objects
+    // without removing them here, so forget them, or they stay linked behind the new children.
+    _firstChild = null;
+    _lastChild = null;
   }
 
   @override
@@ -516,6 +509,11 @@ class RootDomRenderObject extends DomRenderObject with MultiChildDomRenderObject
 }
 
 mixin MultiChildDomRenderObject on DomRenderObject {
+  /// The first and last child, which link to the others in order through
+  /// [DomRenderObject.previousSibling] and [DomRenderObject.nextSibling].
+  DomRenderObject? _firstChild;
+  DomRenderObject? _lastChild;
+
   web.Node get attachTargetNode {
     if (this case DomRenderFragment(isAttached: true)) {
       return (parent as MultiChildDomRenderObject).attachTargetNode;
@@ -544,6 +542,14 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     child.parent = this;
 
     final targetNode = attachTargetNode;
+
+    // Link the child on every path below, including when its nodes are already in place,
+    // so that the links follow the order of the children after a move. This happens before
+    // resolving the node to attach after: a sibling whose slot did not change is not
+    // attached again, so its links can still point at the child's old position until the
+    // child is linked.
+    _linkChild(child, after);
+
     final afterNode = getRealNodeOf(after) ?? startNode;
 
     if (child case DomRenderFragment(isAttached: true)) {
@@ -578,12 +584,6 @@ mixin MultiChildDomRenderObject on DomRenderObject {
           'Fragment first child should have been placed after the specified node.',
         );
       }
-
-      final next = after?.nextSibling;
-      child.previousSibling = after;
-      after?.nextSibling = child;
-      child.nextSibling = next;
-      next?.previousSibling = child;
     } finally {
       child.finalize();
     }
@@ -605,14 +605,47 @@ mixin MultiChildDomRenderObject on DomRenderObject {
       node.removeChild(child.node);
     }
 
-    // Unlink the removed child from its siblings.
-    final oldPreviousSibling = child.previousSibling;
-    final oldNextSibling = child.nextSibling;
-    oldPreviousSibling?.nextSibling = oldNextSibling;
-    oldNextSibling?.previousSibling = oldPreviousSibling;
+    _unlinkChild(child);
+    child.parent = null;
+  }
+
+  void _linkChild(DomRenderObject child, DomRenderObject? after) {
+    if (child.previousSibling == after && (after == null ? _firstChild : after.nextSibling) == child) {
+      return;
+    }
+
+    _unlinkChild(child);
+
+    final next = after == null ? _firstChild : after.nextSibling;
+    child.previousSibling = after;
+    child.nextSibling = next;
+    if (after == null) {
+      _firstChild = child;
+    } else {
+      after.nextSibling = child;
+    }
+    if (next == null) {
+      _lastChild = child;
+    } else {
+      next.previousSibling = child;
+    }
+  }
+
+  void _unlinkChild(DomRenderObject child) {
+    final previous = child.previousSibling;
+    final next = child.nextSibling;
+    if (previous != null) {
+      previous.nextSibling = next;
+    } else if (_firstChild == child) {
+      _firstChild = next;
+    }
+    if (next != null) {
+      next.previousSibling = previous;
+    } else if (_lastChild == child) {
+      _lastChild = previous;
+    }
     child.previousSibling = null;
     child.nextSibling = null;
-    child.parent = null;
   }
 }
 
