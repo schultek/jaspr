@@ -574,5 +574,28 @@ void main() {
         contains('<span class="child-class server-only client-managed" data-j-apply="c:client-managed">Hello</span>'),
       );
     });
+
+    testServer('emits data-j-apply for apply inside a client component nested in a server component', (tester) async {
+      tester.pumpComponent(
+        AppWithServerComponent(
+          child: div([
+            Component.apply(
+              target: const ApplyTarget.descendantWith(tag: 'span'),
+              classes: 'inner-client-applied',
+              child: AppWithServerComponent(
+                child: span(classes: 'child-class', [text('Hello')]),
+              ),
+            ),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span class="child-class inner-client-applied" data-j-apply="c:inner-client-applied">Hello</span>'),
+      );
+    });
   });
 }

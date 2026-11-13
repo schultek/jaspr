@@ -13,7 +13,9 @@ final class ServerComponentAdapter extends ElementBoundaryAdapter {
 
   @override
   void applyBoundary(ChildGroup group) {
-    _applyParamsToSubtree(element);
+    if (hasInheritedDomParams(element)) {
+      _applyParamsToSubtree(element);
+    }
 
     final startMarker = MarkupRenderText('<!--s${DomValidator.clientMarkerPrefix}$id-->', true);
     final endMarker = MarkupRenderText('<!--/s${DomValidator.clientMarkerPrefix}$id-->', true);
@@ -127,16 +129,7 @@ final class ServerComponentAdapter extends ElementBoundaryAdapter {
   bool _isClientManaged(ApplyParams param) {
     final source = param.source;
     if (source == null) return false;
-    if (registry.serverElements.containsKey(source)) return false;
-    var isServer = false;
-    source.visitAncestorElements((ancestor) {
-      if (registry.serverElements.containsKey(ancestor)) {
-        isServer = true;
-        return false;
-      }
-      return true;
-    });
-    return !isServer;
+    return source.depth < element.depth;
   }
 }
 

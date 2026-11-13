@@ -384,6 +384,11 @@ class _InheritedDomComponent extends InheritedComponent {
   }
 }
 
+@internal
+bool hasInheritedDomParams(Element element) {
+  return element._inheritedElements?.containsKey(_InheritedDomComponent) ?? false;
+}
+
 /// Represents a plain text node with no additional properties.
 ///
 /// Styling is done through the parent element(s) and their styles.
