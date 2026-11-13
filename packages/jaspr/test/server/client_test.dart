@@ -124,6 +124,26 @@ class AppWithCustomModel extends StatelessComponent {
   }
 }
 
+class AppWithApplyAndServerComponent extends StatelessComponent {
+  const AppWithApplyAndServerComponent({required this.child});
+
+  final Component child;
+
+  @override
+  Component build(BuildContext context) {
+    return div(
+      attributes: {'data-app': 'with-apply-and-child'},
+      [
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          classes: 'client-applied',
+          child: child,
+        ),
+      ],
+    );
+  }
+}
+
 void main() {
   group('@client', () {
     setUpAll(() {
@@ -137,6 +157,10 @@ void main() {
             App4: ClientTarget<App4>('app4'),
             AppWithServerComponent: ClientTarget<AppWithServerComponent>(
               'app_with_server_component',
+              params: (app) => {'child': app.child},
+            ),
+            AppWithApplyAndServerComponent: ClientTarget<AppWithApplyAndServerComponent>(
+              'app_with_apply_and_server_component',
               params: (app) => {'child': app.child},
             ),
             AppWithMultipleServerComponents: ClientTarget<AppWithMultipleServerComponents>(
@@ -624,10 +648,37 @@ void main() {
         expect(
           response.body,
           contains(
-            '<span class="child-class inner-client-applied outer-applied" data-j-apply="c:inner-client-applied">Hello</span>',
+            '<span class="child-class inner-client-applied outer-applied" data-j-apply="c:inner-client-applied,outer-applied">Hello</span>',
           ),
         );
       },
     );
+
+    testServer('includes both outer and client-defined applies in data-j-apply while excluding server-only applies', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          classes: 'outer-applied',
+          child: AppWithApplyAndServerComponent(
+            child: Component.apply(
+              target: const ApplyTarget.descendantWith(tag: 'span'),
+              classes: 'server-only',
+              child: span(classes: 'child-class', [text('Hello')]),
+            ),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains(
+          '<span class="child-class server-only client-applied outer-applied" data-j-apply="c:client-applied,outer-applied">Hello</span>',
+        ),
+      );
+    });
   });
 }
