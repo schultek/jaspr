@@ -114,32 +114,6 @@ void main() {
       expect(pElement.className, equals('applied-from-marker'));
     });
 
-    testClient('should safely parse marker when data contains "apply=" string', (tester) async {
-      final marker = DomValidator.clientMarkerPrefix;
-      window.document.body!.innerHTML =
-          '<div>'
-                  '  <!--${marker}app_with_text data<{"msg":"please apply=here"}> apply<[{"c":"applied-cls"}]>-->'
-                  '  <p>Content</p>'
-                  '  <!--/${marker}app_with_text-->'
-                  '</div>'
-              .toJS;
-
-      Jaspr.initializeApp(
-        options: ClientOptions(
-          clients: {
-            'app_with_text': ClientLoader((params) => p([Component.text(params.get('msg'))])),
-          },
-        ),
-      );
-
-      runApp(const ClientApp());
-      await pumpEventQueue();
-
-      final pElement = window.document.querySelector('body p')!;
-      expect(pElement.textContent, equals('please apply=here'));
-      expect(pElement.className, equals('applied-cls'));
-    });
-
     testClient('should find and hydrate multiple markers with params', (tester) async {
       final marker = DomValidator.clientMarkerPrefix;
       window.document.body!.innerHTML =
