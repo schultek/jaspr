@@ -9,7 +9,7 @@ A website built with Jaspr can be deployed to nearly any standard web hosting pr
 depends on your chosen [Rendering Mode](/dev/modes):
 
 - **static**: Deploy your pre-rendered site to any static hosting provider.
-- **server**: Deploy your server application to any Dart hosting provider or containerized hosting service using Docker.
+- **server**: Deploy your server application to any Dart hosting provider (such as [Appwrite Sites](https://appwrite.io/docs/products/sites)) or containerized hosting service using Docker.
 - **client**: Deploy your site to any static hosting provider.
 
 ---
@@ -120,6 +120,76 @@ pull in flutter, otherwise the build will result in an error.
 
 With **server** mode `jaspr build` will generate a server executable `app.exe` and an additional assets folder `web/`
 to `/build/jaspr`. When deploying this executable, make sure to deploy the asset folder with it.
+
+### Appwrite Sites
+
+[Appwrite Sites](https://appwrite.io/docs/products/sites) provides built-in support for Jaspr applications with server-side rendering (SSR). It connects directly to your Git repository, builds your project using the native Dart/Flutter runtime with pre-installed `jaspr_cli`, and runs your compiled Jaspr server for every incoming request.
+
+To deploy your Jaspr app to Appwrite Sites:
+
+1. Confirm that your project is set to **server** mode in `pubspec.yaml`:
+
+   ```yaml
+   jaspr:
+     mode: server
+   ```
+
+   <Info>
+     The Appwrite build runtime ships with the Jaspr CLI pre-installed and requires Jaspr version 0.23.0 or later.
+   </Info>
+
+2. Push your project to a GitHub repository.
+
+3. Head to the [Appwrite Console](https://cloud.appwrite.io) and navigate to your project.
+
+4. Open the **Sites** page, click **Create site**, and select **Connect a repository**.
+
+5. Configure your site deployment:
+   1. Select your repository, production branch, and root directory.
+   2. Under **Framework**, select **Jaspr** (if Flutter is selected by default, switch it to **Jaspr**).
+   3. The default build settings will automatically be configured:
+      - **Install command:** `dart pub get`
+      - **Build command:** `jaspr build`
+      - **Output directory:** `./build/jaspr`
+   4. Add any environment variables required by the site.
+
+6. Click **Deploy**.
+
+Once deployed, each incoming request will be dynamically rendered on the server. Appwrite Sites also provides Git-triggered deployments, PR previews, instant rollbacks, and custom domains.
+
+#### Accessing Appwrite in Server Components
+
+When running on Appwrite Sites, each incoming SSR request includes an ephemeral API key passed via the `x-appwrite-key` header, along with environment variables `APPWRITE_SITE_API_ENDPOINT` and `APPWRITE_SITE_PROJECT_ID`.
+
+You can use the `dart_appwrite` package inside an `AsyncStatelessComponent` to securely interact with Appwrite services directly during server rendering:
+
+```dart
+import 'dart:io';
+
+import 'package:dart_appwrite/dart_appwrite.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/server.dart';
+
+class UsersPage extends AsyncStatelessComponent {
+  const UsersPage({super.key});
+
+  @override
+  Future<Component> build(BuildContext context) async {
+    final key = context.headers['x-appwrite-key']!;
+    final client = Client()
+        .setEndpoint(Platform.environment['APPWRITE_SITE_API_ENDPOINT']!)
+        .setProject(Platform.environment['APPWRITE_SITE_PROJECT_ID']!)
+        .setKey(key);
+
+    final users = await Users(client).list();
+    return p([text('${users.total} users')]);
+  }
+}
+```
+
+<Info>
+  Learn more in the [Appwrite Jaspr Quick Start](https://appwrite.io/docs/products/sites/quick-start/jaspr) and the [announcement blog post](https://appwrite.io/blog/post/announcing-jaspr-support).
+</Info>
 
 ### Docker
 
