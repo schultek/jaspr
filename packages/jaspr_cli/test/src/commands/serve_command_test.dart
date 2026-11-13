@@ -126,6 +126,46 @@ void main() {
       });
     });
 
+    test('stops with an error when the build daemon exits during the initial build', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await expectLater(
+          buildDaemon.messages,
+          emitsInOrderWithTimeout([
+            isA<BuildTargetRequest>(),
+            isA<BuildRequest>(),
+          ]),
+        );
+
+        // Gone before the first build result, without a notification.
+        await buildDaemon.close();
+
+        await expectLater(
+          io.stderr.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] [CRITICAL] The build daemon exited unexpectedly. Please restart Jaspr.',
+          ]),
+        );
+        expect(await serveResult.timeout(const Duration(seconds: 10)), equals(1));
+      });
+    });
+
     test('does not report the build daemon as exited unexpectedly when stopping after a failed build', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'client');
