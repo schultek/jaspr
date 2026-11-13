@@ -74,6 +74,56 @@ void main() {
       });
     });
 
+    test('stops with an error when the build daemon exits without notice', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        // E.g. killed by another Jaspr process: no ShutdownNotification, the
+        // connection just closes.
+        await buildDaemon.close();
+
+        await expectLater(
+          io.stderr.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] [CRITICAL] The build daemon exited unexpectedly. Please restart Jaspr.',
+          ]),
+        );
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(1));
+      });
+    });
+
     test('handles keyboard shortcuts (r, R, d, l)', () async {
       await io.runZoned(() async {
         io.stdin.hasTerminalOverride = true;

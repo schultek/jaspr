@@ -31,6 +31,18 @@ class ClientRunner {
       }
       shutDown(data.failureType);
     });
+    // A daemon that is killed (e.g. by another process) sends no shutdown
+    // notification, the connection just closes. Without this, the proxy would
+    // keep answering every request with an empty 503.
+    client.finished.whenComplete(() {
+      if (_isShutDown) return;
+      logger.write(
+        'The build daemon exited unexpectedly. Please restart Jaspr.',
+        tag: Tag.builder,
+        level: Level.critical,
+      );
+      shutDown(1);
+    }).ignore();
   }
 
   /// Whether this process started the build daemon. A daemon that was already
