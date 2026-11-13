@@ -1,4 +1,4 @@
-## Unreleased 0.24.0-beta.1
+## 0.24.0-beta.1
 
 ### New Features and Improvements
 

@@ -1,4 +1,4 @@
-## Unreleased 0.10.0-beta.1
+## 0.10.0-beta.1
 
 - Fixed `Link` navigating client-side on clicks the browser should handle: Ctrl/Cmd-, Shift- and Alt-clicks, non-primary buttons, already prevented clicks, and links with a `target` other than `_self` or a `download` attribute.
 - Fixed escaping of path segments that look like a parameter (`/:27017`), which previously failed the response with a 500 error.
