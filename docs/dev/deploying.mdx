@@ -157,38 +157,10 @@ To deploy your Jaspr app to Appwrite Sites:
 
 Once deployed, each incoming request will be dynamically rendered on the server. Appwrite Sites also provides Git-triggered deployments, PR previews, instant rollbacks, and custom domains.
 
-#### Accessing Appwrite in Server Components
-
-When running on Appwrite Sites, each incoming SSR request includes an ephemeral API key passed via the `x-appwrite-key` header, along with environment variables `APPWRITE_SITE_API_ENDPOINT` and `APPWRITE_SITE_PROJECT_ID`.
-
-You can use the `dart_appwrite` package inside an `AsyncStatelessComponent` to securely interact with Appwrite services directly during server rendering:
-
-```dart
-import 'dart:io';
-
-import 'package:dart_appwrite/dart_appwrite.dart';
-import 'package:jaspr/dom.dart';
-import 'package:jaspr/server.dart';
-
-class UsersPage extends AsyncStatelessComponent {
-  const UsersPage({super.key});
-
-  @override
-  Future<Component> build(BuildContext context) async {
-    final key = context.headers['x-appwrite-key']!;
-    final client = Client()
-        .setEndpoint(Platform.environment['APPWRITE_SITE_API_ENDPOINT']!)
-        .setProject(Platform.environment['APPWRITE_SITE_PROJECT_ID']!)
-        .setKey(key);
-
-    final users = await Users(client).list();
-    return p([text('${users.total} users')]);
-  }
-}
-```
+To call Appwrite services from your server-rendered components using ephemeral API keys, see the [Appwrite Sites development guide](https://appwrite.io/docs/products/sites/develop).
 
 <Info>
-  Learn more in the [Appwrite Jaspr Quick Start](https://appwrite.io/docs/products/sites/quick-start/jaspr) and the [announcement blog post](https://appwrite.io/blog/post/announcing-jaspr-support).
+  For more details, check out the [Appwrite Jaspr Quick Start](https://appwrite.io/docs/products/sites/quick-start/jaspr) and the [announcement blog post](https://appwrite.io/blog/post/announcing-jaspr-support).
 </Info>
 
 ### Docker
