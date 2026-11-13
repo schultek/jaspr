@@ -59,5 +59,24 @@ void main() {
         tempDir.deleteSync(recursive: true);
       }
     });
+
+    test('isDaemonRunning only reports a daemon that is listening on its port', () async {
+      final tempDir = Directory.systemTemp.createTempSync('daemon_running_test_');
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final port = server.port;
+      try {
+        expect(await isDaemonRunning(tempDir.path), isFalse, reason: 'no port file');
+
+        Directory(daemonWorkspace(tempDir.path)).createSync(recursive: true);
+        File(portFilePath(tempDir.path)).writeAsStringSync('$port\ntoken');
+        expect(await isDaemonRunning(tempDir.path), isTrue);
+
+        await server.close(force: true);
+        expect(await isDaemonRunning(tempDir.path), isFalse, reason: 'leftover port file');
+      } finally {
+        await server.close(force: true);
+        tempDir.deleteSync(recursive: true);
+      }
+    });
   });
 }
