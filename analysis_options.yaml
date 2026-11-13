@@ -1,5 +1,9 @@
 include: package:jaspr_repo/package.yaml
 
+analyzer:
+  exclude:
+    - apps/jaspr_pad/**
+
 plugins:
   jaspr_lints:
     path: packages/jaspr_lints
