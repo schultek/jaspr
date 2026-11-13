@@ -119,6 +119,41 @@ void main() {
       expect(node.open, isFalse);
     });
 
+    for (final initialOpen in [null, false]) {
+      testClient('should fully close a modal dialog when open is false (was $initialOpen)', (tester) async {
+        final dialogKey = GlobalNodeKey<HTMLDialogElement>();
+        final outsideKey = GlobalNodeKey<HTMLButtonElement>();
+        bool? open = initialOpen;
+
+        tester.pumpComponent(
+          StatefulBuilder(
+            builder: (context, set) {
+              setState = set;
+              return div([
+                button(key: outsideKey, [Component.text('Outside')]),
+                dialog(key: dialogKey, open: open, [Component.text('Content')]),
+              ]);
+            },
+          ),
+        );
+
+        final node = dialogKey.currentNode!;
+        var closeEvents = 0;
+        node.addEventListener('close', ((Event _) => closeEvents++).toJS);
+        node.showModal();
+
+        setState(() => open = false);
+        await pumpEventQueue();
+
+        expect(node.open, isFalse);
+        expect(node.matches(':modal'), isFalse);
+        expect(closeEvents, 1);
+
+        outsideKey.currentNode!.focus();
+        expect(document.activeElement, outsideKey.currentNode);
+      });
+    }
+
     testClient('should close details when open changes to false', (tester) async {
       final detailsKey = GlobalNodeKey<HTMLDetailsElement>();
       var open = true;

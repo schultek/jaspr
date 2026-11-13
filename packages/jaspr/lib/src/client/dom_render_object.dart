@@ -183,7 +183,12 @@ class DomRenderElement extends DomRenderObject
               if (kVerboseMode) {
                 print('Set dialog open: $shouldBeOpen');
               }
-              nodeAsDialogElement.open = shouldBeOpen;
+              if (shouldBeOpen) {
+                nodeAsDialogElement.open = true;
+              } else {
+                // Removing `open` from a dialog opened with showModal() leaves it modal and the page inert.
+                nodeAsDialogElement.close();
+              }
             }
             continue;
           }
