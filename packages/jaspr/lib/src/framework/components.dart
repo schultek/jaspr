@@ -145,7 +145,7 @@ class DomElement extends DomRenderObjectElement {
 
       classes = classesSet.join(' ');
 
-      if (!binding.isClient && binding.hasClients) {
+      if (!binding.isClient) {
         if (appliedId != null ||
             appliedClasses.isNotEmpty ||
             appliedStyles.isNotEmpty ||
@@ -156,7 +156,7 @@ class DomElement extends DomRenderObjectElement {
             if (appliedStyles.isNotEmpty) 's': appliedStyles,
             if (appliedAttributes.isNotEmpty) 'a': appliedAttributes,
           };
-          attributes['data-j-apply'] = jsonEncode(diff);
+          binding.trackAppliedParams(this, diff);
         }
       }
     }

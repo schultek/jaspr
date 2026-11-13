@@ -369,9 +369,7 @@ void main() {
           '<!DOCTYPE html>\n'
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
-          '  <body>\n'
-          '    <div class="parent-class" data-j-apply="{&quot;c&quot;:[&quot;parent-class&quot;]}"><!--@app1--><div data-app="1"></div><!--/@app1--></div>\n'
-          '  </body>\n'
+          '  <body><div class="parent-class"><!--@app1--><div data-app="1"></div><!--/@app1--></div></body>\n'
           '</html>\n'
           '',
         ),
@@ -398,9 +396,44 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <div class="descendant-class" data-j-apply="{&quot;c&quot;:[&quot;descendant-class&quot;]}">\n'
+          '    <div class="descendant-class">\n'
           '      <!--@app1 apply<[{"t":{"d":true},"c":"descendant-class"}]>-->\n'
           '      <div class="descendant-class" data-app="1" data-j-apply="{&quot;c&quot;:[&quot;descendant-class&quot;]}"></div>\n'
+          '      <!--/@app1-->\n'
+          '    </div>\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('does not add data-j-apply to server elements without client boundary above', (tester) async {
+      tester.pumpComponent(
+        div([
+          Component.apply(
+            classes: 'pure-server-applied',
+            child: div([
+              p([text('pure server')]),
+            ]),
+          ),
+          App1(),
+        ]),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <div>\n'
+          '      <div class="pure-server-applied"><p>pure server</p></div>\n'
+          '      <!--@app1-->\n'
+          '      <div data-app="1"></div>\n'
           '      <!--/@app1-->\n'
           '    </div>\n'
           '  </body>\n'

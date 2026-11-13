@@ -27,4 +27,7 @@ abstract class AppBinding with SchedulerBinding {
 
   /// Report an error that occurred during the build process of [element].
   void reportBuildError(Element element, Object error, StackTrace stackTrace);
+
+  /// Called during server rendering when [element] has applied DOM parameters.
+  void trackAppliedParams(DomElement element, Map<String, dynamic> diff) {}
 }

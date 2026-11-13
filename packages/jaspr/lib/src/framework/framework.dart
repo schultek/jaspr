@@ -9,7 +9,6 @@ library;
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
 
 import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;

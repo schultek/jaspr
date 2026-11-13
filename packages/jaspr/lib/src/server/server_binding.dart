@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 import '../../jaspr.dart';
+import 'adapters/applied_params_adapter.dart';
 import 'adapters/document_structure_helper.dart';
 import 'adapters/global_styles_adapter.dart';
 import 'async_build_owner.dart';
@@ -31,6 +32,19 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
 
   @override
   bool get hasClients => _options?.clients?.isNotEmpty ?? false;
+
+  ClientComponentRegistryElement? clientRegistry;
+
+  AppliedParamsAdapter? _appliedParamsAdapter;
+
+  @override
+  void trackAppliedParams(DomElement element, Map<String, dynamic> diff) {
+    if (hasClients) {
+      final adapter = _appliedParamsAdapter ??= AppliedParamsAdapter();
+      addRenderAdapter(adapter);
+      adapter.add(element, diff);
+    }
+  }
 
   @override
   String get basePath => request.basePath;
