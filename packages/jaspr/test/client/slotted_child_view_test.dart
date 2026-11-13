@@ -355,6 +355,232 @@ void main() {
       expect(clicks, 1);
     });
 
+    testClient('removes applied params when toggled off even if initially present in html', (tester) async {
+      window.document.body!.innerHTML = '<section><button id="applied-id" class="original applied" style="color: red;" data-applied="true" data-j-apply="i:applied-id;c:applied;s:color;a:data-applied">Static</button></section>'
+          .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              id: hasParams ? 'applied-id' : null,
+              classes: hasParams ? 'applied' : null,
+              styles: hasParams ? const Styles(color: Colors.red) : null,
+              attributes: hasParams ? const {'data-applied': 'true'} : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'applied-id');
+      expect(btn.className, 'original applied');
+      expect(btn.style.color, 'red');
+      expect(btn.getAttribute('data-applied'), 'true');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.hasAttribute('id'), isFalse);
+      expect(btn.className, 'original');
+      expect(btn.hasAttribute('style'), isFalse);
+      expect(btn.hasAttribute('data-applied'), isFalse);
+    });
+
+    testClient('preserves child-owned id and classes when client apply toggles off', (tester) async {
+      window.document.body!.innerHTML =
+          '<section><button id="save" class="btn active" data-j-apply="c:active">Save</button></section>'.toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              id: hasParams ? 'save' : null,
+              classes: hasParams ? 'active' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'save');
+      expect(btn.className, 'btn active');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.id, 'save');
+      expect(btn.className, 'btn');
+    });
+
+    testClient('preserves outer applied params when inner apply toggles off', (tester) async {
+      window.document.body!.innerHTML = '<section><button class="child-class server-class client-class" data-j-apply="c:server-class,client-class">Button</button></section>'
+          .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              classes: 'server-class',
+              child: .apply(
+                target: .descendantWith(tag: 'button'),
+                classes: hasParams ? 'client-class' : null,
+                child: SlottedChildView(slots: const []),
+              ),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.className, 'child-class client-class server-class');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.className, 'child-class server-class');
+    });
+
+    testClient('correctly unescapes special characters in data-j-apply', (tester) async {
+      window.document.body!.innerHTML = '<section><button id="btn;1,2%3" class="c;1 c,2" data-j-apply="i:btn%3B1%2C2%253;c:c%3B1,c%2C2">Escape</button></section>'
+          .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              id: hasParams ? 'btn;1,2%3' : null,
+              classes: hasParams ? 'c;1 c,2' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'btn;1,2%3');
+      expect(btn.className, 'c;1 c,2');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.hasAttribute('id'), isFalse);
+      expect(btn.className, '');
+    });
+
+    testClient('preserves server-only applied params when client apply toggles off', (tester) async {
+      window.document.body!.innerHTML = '<section><button id="save" class="btn server-applied client-applied" data-j-apply="c:client-applied">Save</button></section>'
+          .toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              classes: hasParams ? 'client-applied' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.className, 'btn server-applied client-applied');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.className, 'btn server-applied');
+    });
+
+    testClient('hydrates and cleans up data-j-apply on SVG root element', (tester) async {
+      window.document.body!.innerHTML =
+          '<svg class="icon applied" data-j-apply="c:applied" width="100" height="100"></svg>'.toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .childWith(tag: 'svg'),
+              classes: hasParams ? 'applied' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      final svg = window.document.querySelector('svg')!;
+      expect(svg.getAttribute('class'), 'icon applied');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(svg.getAttribute('class'), 'icon');
+    });
+
+    testClient('hydrates and cleans up data-j-apply on range slot element anchors', (tester) async {
+      window.document.body!.innerHTML =
+          '<span class="anchor applied" data-j-apply="c:applied">Start</span>'
+                  '<button>Slot Content</button>'
+                  '<span class="end-anchor applied" data-j-apply="c:applied">End</span>'
+              .toJS;
+      final spans = window.document.querySelectorAll('span');
+      final start = spans.item(0)! as HTMLElement;
+      final end = spans.item(1)! as HTMLElement;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'span'),
+              classes: hasParams ? 'applied' : null,
+              child: SlottedChildView(
+                slots: [
+                  ChildSlot.between(start: start, end: end, child: button([])),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(start.getAttribute('class'), 'anchor applied');
+      expect(end.getAttribute('class'), 'end-anchor applied');
+
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(start.getAttribute('class'), 'anchor');
+      expect(end.getAttribute('class'), 'end-anchor');
+    });
+
     testClient('applies direct child params to root range slot', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Click me</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;

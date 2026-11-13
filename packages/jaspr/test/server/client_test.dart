@@ -124,6 +124,26 @@ class AppWithCustomModel extends StatelessComponent {
   }
 }
 
+class AppWithApplyAndServerComponent extends StatelessComponent {
+  const AppWithApplyAndServerComponent({required this.child});
+
+  final Component child;
+
+  @override
+  Component build(BuildContext context) {
+    return div(
+      attributes: {'data-app': 'with-apply-and-child'},
+      [
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          classes: 'client-applied',
+          child: child,
+        ),
+      ],
+    );
+  }
+}
+
 void main() {
   group('@client', () {
     setUpAll(() {
@@ -137,6 +157,10 @@ void main() {
             App4: ClientTarget<App4>('app4'),
             AppWithServerComponent: ClientTarget<AppWithServerComponent>(
               'app_with_server_component',
+              params: (app) => {'child': app.child},
+            ),
+            AppWithApplyAndServerComponent: ClientTarget<AppWithApplyAndServerComponent>(
+              'app_with_apply_and_server_component',
               params: (app) => {'child': app.child},
             ),
             AppWithMultipleServerComponents: ClientTarget<AppWithMultipleServerComponents>(
@@ -181,7 +205,7 @@ void main() {
           '<!DOCTYPE html>\n'
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
-          '  <body><!--@app2 data={"count":1,"label":"Test"}--><div data-app="2"></div><!--/@app2--></body>\n'
+          '  <body><!--@app2 data<{"count":1,"label":"Test"}>--><div data-app="2"></div><!--/@app2--></body>\n'
           '</html>\n'
           '',
         ),
@@ -236,7 +260,7 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}>-->\n'
           '    <div data-app="with-child"><!--s@1--><span>Hello</span><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
           '  </body>\n'
@@ -259,7 +283,7 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_multiple_server_components data={"child1":"s@1","child2":"s@1"}-->\n'
+          '    <!--@app_with_multiple_server_components data<{"child1":"s@1","child2":"s@1"}>-->\n'
           '    <div data-app="with-multiple"><!--s@1--><span>Hello</span><!--/s@1--><!--s@1--><span>Hello</span><!--/s@1--></div>\n'
           '    <!--/@app_with_multiple_server_components-->\n'
           '  </body>\n'
@@ -283,7 +307,7 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}>-->\n'
           '    <div data-app="with-child"><!--s@1--><div><!--@app1--><div data-app="1"></div><!--/@app1--></div><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
           '  </body>\n'
@@ -307,13 +331,31 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_server_component data={"child":"s@1"}-->\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}>-->\n'
           '    <div data-app="with-child"><!--s@1--><!--@app1--><div data-app="1"></div><!--/@app1--><!--/s@1--></div>\n'
           '    <!--/@app_with_server_component-->\n'
           '  </body>\n'
           '</html>\n'
           '',
         ),
+      );
+    });
+
+    testServer('does not serialize outer client applies onto client component directly nested as server component', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          classes: 'outer-apply',
+          child: AppWithServerComponent(child: App1()),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<!--s@1--><!--@app1--><div data-app="1"></div><!--/@app1--><!--/s@1-->'),
       );
     });
 
@@ -329,12 +371,330 @@ void main() {
           '<html>\n'
           '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
           '  <body>\n'
-          '    <!--@app_with_custom_model data={"model":{"child":"s@1"}}-->\n'
+          '    <!--@app_with_custom_model data<{"model":{"child":"s@1"}}>-->\n'
           '    <div data-app="with-model"><!--s@1--><span>Custom Model</span><!--/s@1--></div>\n'
           '    <!--/@app_with_custom_model-->\n'
           '  </body>\n'
           '</html>\n'
           '',
+        ),
+      );
+    });
+
+    testServer('encodes applied params above client component in marker', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          classes: 'outer-class',
+          id: 'outer-id',
+          child: App1(),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app1 apply<[{"i":"outer-id","c":"outer-class"}]>-->\n'
+          '    <div id="outer-id" class="outer-class" data-app="1"></div>\n'
+          '    <!--/@app1-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('encodes applied params above client component wrapping server component', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(),
+          classes: 'server-class',
+          child: AppWithServerComponent(
+            child: span(classes: 'child-class', [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <!--@app_with_server_component data<{"child":"s@1"}> apply<[{"t":{"d":true},"c":"server-class"}]>-->\n'
+          '    <div class="server-class" data-app="with-child">\n'
+          '      <!--s@1-->\n'
+          '      <span class="child-class server-class" data-j-apply="c:server-class">Hello</span>\n'
+          '      <!--/s@1-->\n'
+          '    </div>\n'
+          '    <!--/@app_with_server_component-->\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+    testServer('does not encode direct child apply params when separated by a render element', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: ApplyTarget.anyChild,
+          classes: 'parent-class',
+          child: div([
+            App1(),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body><div class="parent-class"><!--@app1--><div data-app="1"></div><!--/@app1--></div></body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('encodes descendant apply params even when separated by a render element', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(),
+          classes: 'descendant-class',
+          child: div([
+            App1(),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <div class="descendant-class">\n'
+          '      <!--@app1 apply<[{"t":{"d":true},"c":"descendant-class"}]>-->\n'
+          '      <div class="descendant-class" data-app="1"></div>\n'
+          '      <!--/@app1-->\n'
+          '    </div>\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+
+    testServer('does not add data-j-apply to server elements without client boundary above', (tester) async {
+      tester.pumpComponent(
+        div([
+          Component.apply(
+            classes: 'pure-server-applied',
+            child: div([
+              p([text('pure server')]),
+            ]),
+          ),
+          App1(),
+        ]),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        equals(
+          '<!DOCTYPE html>\n'
+          '<html>\n'
+          '  <head><script src="/main.clients.dart.js" defer></script></head>\n'
+          '  <body>\n'
+          '    <div>\n'
+          '      <div class="pure-server-applied"><p>pure server</p></div>\n'
+          '      <!--@app1-->\n'
+          '      <div data-app="1"></div>\n'
+          '      <!--/@app1-->\n'
+          '    </div>\n'
+          '  </body>\n'
+          '</html>\n'
+          '',
+        ),
+      );
+    });
+    testServer('escapes special characters in data-j-apply on server components', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          id: 'test;1,2%3',
+          classes: 'c;1 c,2',
+          child: AppWithServerComponent(
+            child: span([text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('data-j-apply="i:test%3B1%2C2%253;c:c%3B1,c%2C2"'),
+      );
+    });
+    testServer('encodes direct child apply params across fragments', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          classes: 'fragment-applied',
+          child: Component.fragment([
+            App1(),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<!--@app1 apply<[{"c":"fragment-applied"}]>-->'),
+      );
+    });
+
+    testServer('does not add data-j-apply for server-only apply inside server component', (tester) async {
+      tester.pumpComponent(
+        AppWithServerComponent(
+          child: Component.apply(
+            classes: 'server-only',
+            child: span(classes: 'child-class', [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span class="child-class server-only">Hello</span>'),
+      );
+      expect(
+        response.body,
+        isNot(contains('data-j-apply')),
+      );
+    });
+
+    testServer('only includes client-managed params in data-j-apply when server component has its own apply', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          classes: 'client-managed',
+          child: AppWithServerComponent(
+            child: Component.apply(
+              classes: 'server-only',
+              child: span(classes: 'child-class', [text('Hello')]),
+            ),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span class="child-class server-only client-managed" data-j-apply="c:client-managed">Hello</span>'),
+      );
+    });
+
+    testServer('emits data-j-apply for apply inside a client component nested in a server component', (tester) async {
+      tester.pumpComponent(
+        AppWithServerComponent(
+          child: div([
+            Component.apply(
+              target: const ApplyTarget.descendantWith(tag: 'span'),
+              classes: 'inner-client-applied',
+              child: AppWithServerComponent(
+                child: span(classes: 'child-class', [text('Hello')]),
+              ),
+            ),
+          ]),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span class="child-class inner-client-applied" data-j-apply="c:inner-client-applied">Hello</span>'),
+      );
+    });
+
+    testServer(
+      'handles nested alternating server-client boundaries by isolating outer applies from inner server components',
+      (tester) async {
+        tester.pumpComponent(
+          Component.apply(
+            target: const ApplyTarget.descendantWith(tag: 'span'),
+            classes: 'outer-applied',
+            child: AppWithServerComponent(
+              child: div([
+                Component.apply(
+                  target: const ApplyTarget.descendantWith(tag: 'span'),
+                  classes: 'inner-client-applied',
+                  child: AppWithServerComponent(
+                    child: span(classes: 'child-class', [text('Hello')]),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        );
+
+        final response = await tester.request('/');
+
+        expect(
+          response.body,
+          contains(
+            '<span class="child-class inner-client-applied outer-applied" data-j-apply="c:inner-client-applied,outer-applied">Hello</span>',
+          ),
+        );
+      },
+    );
+
+    testServer('includes both outer and client-defined applies in data-j-apply while excluding server-only applies', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          classes: 'outer-applied',
+          child: AppWithApplyAndServerComponent(
+            child: Component.apply(
+              target: const ApplyTarget.descendantWith(tag: 'span'),
+              classes: 'server-only',
+              child: span(classes: 'child-class', [text('Hello')]),
+            ),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains(
+          '<span class="child-class server-only client-applied outer-applied" data-j-apply="c:client-applied,outer-applied">Hello</span>',
         ),
       );
     });

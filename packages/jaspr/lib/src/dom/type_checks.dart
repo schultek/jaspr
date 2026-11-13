@@ -10,6 +10,7 @@ import 'package:universal_web/js_interop.dart';
 // See also https://github.com/dart-lang/sdk/issues/60344
 extension DomTypeTests on JSAny? {
   bool get isElement => this == null ? false : instanceof(_cachedElementConstructor);
+  bool get isHtmlElement => this == null ? false : instanceof(_cachedHtmlElementConstructor);
   bool get isHtmlInputElement => this == null ? false : instanceof(_cachedHtmlInputElementConstructor);
   bool get isHtmlAnchorElement => this == null ? false : instanceof(_cachedHtmlAnchorElementConstructor);
   bool get isHtmlSelectElement => this == null ? false : instanceof(_cachedHtmlSelectElementConstructor);
@@ -18,9 +19,11 @@ extension DomTypeTests on JSAny? {
   bool get isText => this == null ? false : instanceof(_cachedTextConstructor);
   bool get isComment => this == null ? false : instanceof(_cachedCommentConstructor);
   bool get isDocumentFragment => this == null ? false : instanceof(_cachedDocumentFragmentConstructor);
+  bool get isSvgElement => this == null ? false : instanceof(_cachedSvgElementConstructor);
 }
 
 final _cachedElementConstructor = _elementConstructor;
+final _cachedHtmlElementConstructor = _htmlElementConstructor;
 final _cachedHtmlInputElementConstructor = _htmlInputElementConstructor;
 final _cachedHtmlAnchorElementConstructor = _htmlAnchorElementConstructor;
 final _cachedHtmlSelectElementConstructor = _htmlSelectElementConstructor;
@@ -29,9 +32,12 @@ final _cachedHtmlOptionElementConstructor = _htmlOptionElementConstructor;
 final _cachedTextConstructor = _textConstructor;
 final _cachedCommentConstructor = _commentConstructor;
 final _cachedDocumentFragmentConstructor = _documentFragmentConstructor;
+final _cachedSvgElementConstructor = _svgElementConstructor;
 
 @JS('Element')
 external JSFunction get _elementConstructor;
+@JS('HTMLElement')
+external JSFunction get _htmlElementConstructor;
 @JS('HTMLInputElement')
 external JSFunction get _htmlInputElementConstructor;
 @JS('HTMLAnchorElement')
@@ -48,3 +54,5 @@ external JSFunction get _textConstructor;
 external JSFunction get _commentConstructor;
 @JS('DocumentFragment')
 external JSFunction get _documentFragmentConstructor;
+@JS('SVGElement')
+external JSFunction get _svgElementConstructor;

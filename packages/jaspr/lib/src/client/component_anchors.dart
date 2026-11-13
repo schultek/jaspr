@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:universal_web/web.dart' as web;
 
 import '../../client.dart';
+import '../dom/styles/styles.dart';
 import '../dom/validator.dart';
 
 sealed class ComponentAnchor {
@@ -16,11 +17,23 @@ sealed class ComponentAnchor {
 }
 
 class ClientComponentAnchor extends ComponentAnchor {
-  ClientComponentAnchor._(super.name, super.key, super.startNode, this.data);
+  ClientComponentAnchor._(super.name, super.key, super.startNode, this.data, this.apply);
 
   String? data;
+  String? apply;
   late FutureOr<ClientBuilder> builder;
   final List<ServerComponentAnchor> serverAnchors = [];
+
+  List<_ApplyData> get _decodedApplyParams {
+    if (apply case final rawApply?) {
+      final unescaped = const DomValidator().unescapeMarkerText(rawApply);
+      final list = jsonDecode(unescaped) as List;
+      return [
+        for (final item in list) _ApplyData.fromMap(item as Map<String, dynamic>),
+      ];
+    }
+    return const [];
+  }
 
   /// The decoded parameters for this client component.
   Map<String, Object?> get _decodedParameters {
@@ -43,7 +56,19 @@ class ClientComponentAnchor extends ComponentAnchor {
     assert(builder is ClientBuilder, 'ClientComponentAnchor was not resolved before calling build()');
 
     final clientParameters = ClientParams(_decodedParameters, serverAnchors);
-    final component = (builder as ClientBuilder)(clientParameters);
+    var component = (builder as ClientBuilder)(clientParameters);
+
+    for (final apply in _decodedApplyParams) {
+      component = Component.apply(
+        target: apply.target,
+        id: apply.id,
+        classes: apply.classes,
+        styles: apply.styles != null ? Styles(raw: apply.styles) : null,
+        attributes: apply.attributes,
+        child: component,
+      );
+    }
+
     return Builder(key: _ClientAnchorKey(key), builder: (_) => component);
   }
 
@@ -146,7 +171,9 @@ class ServerComponentElement extends BuildableElement {
   }
 }
 
-final _clientStartRegex = RegExp('^${DomValidator.clientMarkerPrefixRegex}(\\S+)(?:\\s+#(\\S*))?(?:\\s+data=(.*))?\$');
+final _clientStartRegex = RegExp(
+  '^${DomValidator.clientMarkerPrefixRegex}(\\S+)(?:\\s+#(\\S*))?(?:\\s+data<([^>]*)>)?(?:\\s+apply<([^>]*)>)?\$',
+);
 final _clientEndRegex = RegExp('^/${DomValidator.clientMarkerPrefixRegex}(\\S+)\$');
 
 final _serverStartRegex = RegExp('^s${DomValidator.clientMarkerPrefixRegex}(\\d+)(?:\\s+#(\\S*))?\$');
@@ -183,6 +210,7 @@ List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
         final name = match.group(1)!;
         final key = match.group(2);
         final data = match.group(3);
+        final apply = match.group(4);
 
         final resolvedKey = key != null
             ? '@$name#$key'
@@ -192,7 +220,7 @@ List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
                 return '@$name-${anchors.length}-$count';
               })();
 
-        anchors.add(ClientComponentAnchor._(name, resolvedKey, currNode, data));
+        anchors.add(ClientComponentAnchor._(name, resolvedKey, currNode, data, apply));
         continue;
       }
 
@@ -268,4 +296,24 @@ List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
   }
 
   return clientAnchors;
+}
+
+class _ApplyData {
+  _ApplyData({required this.target, this.id, this.classes, this.styles, this.attributes});
+
+  final ApplyTarget target;
+  final String? id;
+  final String? classes;
+  final Map<String, String>? styles;
+  final Map<String, String>? attributes;
+
+  factory _ApplyData.fromMap(Map<String, dynamic> map) {
+    return _ApplyData(
+      target: map['t'] != null ? ApplyTarget.fromMap(map['t'] as Map<String, dynamic>) : ApplyTarget.anyChild,
+      id: map['i'] as String?,
+      classes: map['c'] as String?,
+      styles: (map['s'] as Map?)?.cast<String, String>(),
+      attributes: (map['a'] as Map?)?.cast<String, String>(),
+    );
+  }
 }
