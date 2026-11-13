@@ -56,7 +56,6 @@ melos:
     test:
       exec:
         command: dart test --exclude-tags=cli
-        concurrency: 4
       packageFilters:
         scope:
           [
@@ -73,7 +72,6 @@ melos:
         command: |
           dart test --coverage=coverage --exclude-tags=cli-integration-test &&
           dart pub global run coverage:format_coverage --check-ignore --report-on=lib --lcov -o "$MELOS_ROOT_PATH/coverage/\$MELOS_PACKAGE_NAME_lcov.info" -i ./coverage
-        concurrency: 4
       packageFilters:
         scope:
           [
