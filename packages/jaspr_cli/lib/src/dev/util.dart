@@ -61,6 +61,15 @@ Future<BuildDaemonClient?> startBuildDaemon(String workingDirectory, List<String
   }
 }
 
+/// Whether a build daemon is already running in [workingDirectory], e.g. one
+/// started by another Jaspr process. A leftover port file of a daemon that is
+/// gone does not count.
+Future<bool> isDaemonRunning(String workingDirectory) async {
+  final port = getDaemonPort(workingDirectory);
+  if (port == null) return false;
+  return (await findPidsForPort(port)).isNotEmpty;
+}
+
 /// Returns the port of the running daemon if the port file exists.
 int? getDaemonPort(String workingDirectory) {
   try {
