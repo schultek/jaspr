@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:intl/intl.dart';
 import 'package:jaspr/server.dart';
 
@@ -74,7 +76,23 @@ class RSSOutput extends SecondaryOutput {
   }
 
   /// The standard date format for dates within an RSS feed.
-  static final rssDateFormat = DateFormat('dd MMM yyyy');
+  ///
+  /// This is the RFC 822 format that RSS 2.0 requires, such as `Fri, 13 Nov 2026 00:00:00 GMT`.
+  /// It always writes `GMT`, so format dates in UTC.
+  static final rssDateFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", 'en_US');
+
+  /// Formats a date from the page or site data, such as `2026-11-13`, as an RSS date.
+  ///
+  /// A date without a time zone is read as UTC. A value that is not a date is kept as it is,
+  /// so that dates already written in the RSS format keep working.
+  static String _formatDate(Object value) {
+    final date = DateTime.tryParse(value.toString());
+    if (date == null) return value.toString();
+    final utc = date.isUtc ? date : DateTime.utc(date.year, date.month, date.day, date.hour, date.minute, date.second);
+    return rssDateFormat.format(utc);
+  }
+
+  static String _escape(Object value) => const HtmlEscape(HtmlEscapeMode.element).convert(value.toString());
 
   static RSSItem _defaultItemBuilder(Page page) {
     final pageData = page.data.page;
@@ -93,8 +111,11 @@ class RSSOutput extends SecondaryOutput {
     final description = this.description ?? siteData['description'] ?? '/';
     final language = this.language ?? siteData['language'] ?? 'en-US';
 
-    final pubDate = siteData['publishDate'] ?? rssDateFormat.format(DateTime.now());
-    final lastBuildDate = rssDateFormat.format(DateTime.now());
+    final lastBuildDate = rssDateFormat.format(DateTime.now().toUtc());
+    final pubDate = switch (siteData['publishDate']) {
+      final Object date => _formatDate(date),
+      null => lastBuildDate,
+    };
 
     final items = <String>[];
 
@@ -108,23 +129,23 @@ class RSSOutput extends SecondaryOutput {
       var itemSource =
           '''
     <item>
-      <title>${item.title}</title>
-      <link>$siteUrl${page.url}</link>''';
+      <title>${_escape(item.title)}</title>
+      <link>${_escape('$siteUrl${page.url}')}</link>''';
 
       if (item.description case final desc?) {
         itemSource += '''
-      <description>$desc</description>''';
+      <description>${_escape(desc)}</description>''';
       }
       if (item.pubDate case final pubDate?) {
         itemSource += '''
-      <pubDate>$pubDate</pubDate>''';
+      <pubDate>${_escape(_formatDate(pubDate))}</pubDate>''';
       }
       itemSource += '''
-      <guid>${page.url}</guid>''';
+      <guid isPermaLink="false">${_escape(page.url)}</guid>''';
 
       if (item.author case final author?) {
         itemSource += '''
-      <author>$author</author>''';
+      <author>${_escape(author)}</author>''';
       }
       itemSource += '''
     </item>''';
@@ -133,13 +154,14 @@ class RSSOutput extends SecondaryOutput {
 
     final feed =
         '''
+<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>$title</title>
-    <link>$siteUrl</link>
-    <description>$description</description>
-    <language>$language</language>
-    <pubDate>$pubDate</pubDate>
+    <title>${_escape(title)}</title>
+    <link>${_escape(siteUrl)}</link>
+    <description>${_escape(description)}</description>
+    <language>${_escape(language)}</language>
+    <pubDate>${_escape(pubDate)}</pubDate>
     <lastBuildDate>$lastBuildDate</lastBuildDate>
 ${items.reversed.join('\n')}
   </channel>
