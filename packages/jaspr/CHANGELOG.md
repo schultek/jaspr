@@ -1,4 +1,4 @@
-## Unreleased patch
+## Unreleased 0.24.0-beta.2
 
 ### Fixes
 
