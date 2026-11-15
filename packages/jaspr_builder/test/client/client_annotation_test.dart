@@ -11,6 +11,7 @@ import 'sources/client_invalid.dart';
 import 'sources/client_model_class.dart';
 import 'sources/client_model_enum.dart';
 import 'sources/client_model_extension.dart';
+import 'sources/client_model_with_mount.dart';
 import 'sources/client_nullable_models.dart';
 import 'sources/client_with_server_components.dart';
 
@@ -72,6 +73,17 @@ void main() {
           ClientModuleBuilder(BuilderOptions({})),
           clientNullableModelsSources,
           outputs: {...clientNullableModelsModuleOutputs},
+          readerWriter: reader,
+        );
+      });
+    });
+
+    group('on component using models with mount', () {
+      test('generates json module with mount passed to decoders', () async {
+        await testBuilder(
+          ClientModuleBuilder(BuilderOptions({})),
+          clientModelWithMountSources,
+          outputs: {...clientModelWithMountModuleOutputs},
           readerWriter: reader,
         );
       });

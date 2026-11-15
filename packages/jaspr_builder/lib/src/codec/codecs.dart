@@ -127,13 +127,19 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, Stri
       }
       return (decoder: decoder, cast: 'Map<String, Object?>$nullCheck');
     } else if (codecs[type.element.name] case final codec?) {
+      if (codec.hasMount && !allowComponent) {
+        throw const InvalidMountParameterException();
+      }
+      final mountArg = codec.hasMount ? (codec.mountParam != null ? '${codec.mountParam}: p.mount' : 'p.mount') : null;
+      final args = mountArg != null ? '$argument, $mountArg' : argument;
       final decoderCall = '[[${codec.import}]].${codec.extension ?? codec.name}.${codec.decoder}';
       if (type.nullabilitySuffix == NullabilitySuffix.question) {
         final rawType = codec.rawType;
         final cast = rawType == 'dynamic' || rawType.endsWith('?') ? rawType : '$rawType?';
-        return (decoder: 'switch ($argument) { final v? => $decoderCall(v), _ => null }', cast: cast);
+        final vArgs = mountArg != null ? 'v, $mountArg' : 'v';
+        return (decoder: 'switch ($argument) { final v? => $decoderCall($vArgs), _ => null }', cast: cast);
       }
-      return (decoder: '$decoderCall($argument)', cast: codec.rawType);
+      return (decoder: '$decoderCall($args)', cast: codec.rawType);
     } else if (allowComponent &&
         type.element.name == 'Component' &&
         type.element.library.identifier == 'package:jaspr/src/framework/framework.dart') {
@@ -185,4 +191,8 @@ extension on DartType {
 
 class InvalidParameterException implements Exception {
   const InvalidParameterException();
+}
+
+class InvalidMountParameterException implements Exception {
+  const InvalidMountParameterException();
 }
