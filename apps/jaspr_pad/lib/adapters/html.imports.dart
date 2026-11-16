@@ -17,6 +17,8 @@ export '../generated/imports/_web.dart'
         CustomEventOrStubbed,
         MouseEvent,
         MouseEventOrStubbed,
+        KeyboardEvent,
+        KeyboardEventOrStubbed,
         Event,
         EventOrStubbed,
         InputElement,
