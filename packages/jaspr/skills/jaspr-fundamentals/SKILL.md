@@ -42,6 +42,36 @@ class MyComponent extends StatelessComponent {
 }
 ```
 
+### Creating a Component
+
+The `jaspr new` CLI command can be used to create new components.
+
+- **Rule 1:** You SHOULD use the `jaspr new component` command to create a new component file, then edit the generated `build` method.
+- **Rule 2:** You MAY also hand-write a new component file from scratch, depending on situations.
+
+```bash
+jaspr new component ContactInfo            # StatelessComponent, creates lib/components/contact_info.dart
+jaspr new component TodoList --stateful    # StatefulComponent, with its State class
+jaspr new component AppTheme --inherited   # InheritedComponent, creates lib/app_theme.dart
+
+# Creates a FlutterEmbedView, and sets the project up for flutter embedding
+jaspr new component CounterView --flutter --flutter-app-name CounterWidget --with-flutter-widget
+```
+
+Useful options:
+
+- `--path <dir>`: where the file is created (defaults to `lib/components`)
+- `--with-styles`: adds the `@css` styles getter, see [jaspr-styling](../jaspr-styling/SKILL.md)
+- `--client`: adds the `@client` annotation, see [jaspr-pre-rendering-and-hydration](../jaspr-pre-rendering-and-hydration/SKILL.md)
+- `--async`: creates an `AsyncStatelessComponent` for server-side data fetching
+- `--with-test`: also generates a matching test under `test/`
+- `--dry-run`: prints what would be created without writing anything
+- `--flutter-app-name` (or `--app-name`): name of the Flutter widget to embed, only used with `--flutter`. 
+- `--with-sample-flutter-widget` (or `--with-flutter-widget`): generates a sample Flutter widget with the name of the flutter app, only used with `--flutter`. The flag is negatable, and if it is not passed at all then the command prompts for it.
+
+
+The name can be PascalCase, camelCase or snake_case. Run the command once per component instead of creating several files in one edit.
+
 ## HTML Components
 
 Jaspr provides typed components for standard HTML elements (e.g., `div()`, `p()`, `a()`, `button()`). To use these add the `package:jaspr/dom.dart` import. 

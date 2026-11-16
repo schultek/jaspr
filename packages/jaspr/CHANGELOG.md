@@ -14,6 +14,7 @@
 - Fixed HTML duplication after hot-reload in client mode.
 - Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
 - Fixed `jaspr serve` blocking all following reloads when a connected browser stops responding (e.g. a phone with the screen turned off).
+- Added `jaspr new component` command to generate new components and `jaspr new page` to generate new `jaspr_content` pages inside existing projects (Also supported by VSCode extension).
 
 - Fixed styles hot-reload recompiling all dependencies on every change on Windows.
 - Fixed key shortcuts in `jaspr serve` not working on Windows.
