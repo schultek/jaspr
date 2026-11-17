@@ -255,11 +255,16 @@ class ClientConnection {
       return false;
     }
 
-    final succeeded = await _apply(update, _callGuard.run);
+    // Include an update that the catch-up couldn't apply.
+    _markMissed(update);
+    final pending = _missedUpdate!;
+    _missedUpdate = null;
+
+    final succeeded = await _apply(pending, _callGuard.run);
     // A refresh that timed out still reloads the page once it gets through,
     // so there is nothing left to catch up on.
-    if (_callGuard.isUnresponsive && update != .refresh) {
-      _markMissed(update);
+    if (_callGuard.isUnresponsive && pending != .refresh) {
+      _markMissed(pending);
     }
     return succeeded;
   }
@@ -290,16 +295,20 @@ class ClientConnection {
     if (_isCatchingUp) return;
 
     _isCatchingUp = true;
+    ClientUpdate? update;
     try {
-      while (!_isDisposed && (_missedUpdate != null || _pendingStylesheets.isNotEmpty)) {
-        if (_missedUpdate case final update?) {
+      while (!_isDisposed) {
+        update = _missedUpdate;
+        if (update != null) {
           _missedUpdate = null;
-          await _apply(update, _unguarded);
+          if (!await _apply(update, _unguarded)) break;
+          update = null;
           continue;
         }
 
         // Changed stylesheets aren't part of an update, so deliver them afterwards.
         final stylesheets = _pendingStylesheets.toList();
+        if (stylesheets.isEmpty) break;
         _pendingStylesheets.clear();
         if (await _reloadStylesheets(stylesheets) == null) {
           // Keep them for the next stylesheet reload instead of retrying forever.
@@ -311,6 +320,11 @@ class ClientConnection {
       logger.write('Catching up failed for client $appId: $error', tag: .client, level: .warning);
       logger.write(stackTrace.toString(), tag: .client, level: .verbose);
     } finally {
+      // An update that couldn't be applied stays missed and is included in the
+      // next update, instead of being retried forever.
+      if (update != null) {
+        _markMissed(update);
+      }
       _isCatchingUp = false;
     }
   }

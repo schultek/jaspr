@@ -293,6 +293,43 @@ void main() {
     });
   });
 
+  test('includes an update the catch-up could not apply in the next update', () async {
+    await _withWorkflow(null, (fixture) async {
+      fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+      final hanging = await fixture.connectBrowser('hanging');
+      final respond = Completer<void>();
+      hanging.beforeRpc = (method) async {
+        if (method == 'reloadSources') await respond.future;
+      };
+
+      await fixture.workflow.reloadClients().timeout(const Duration(seconds: 5));
+      await fixture.workflow.restartClients(incremental: true).timeout(const Duration(seconds: 5));
+
+      // The browser responds again, but the restart it missed fails.
+      hanging.failingRpc = 'hotRestart';
+      hanging.calls.clear();
+      respond.complete();
+      await pumpEventQueue();
+      expect(hanging.calls, _restartCalls);
+      await expectLater(
+        fixture.io.stdout.queue,
+        emitsWithTimeout(emitsThrough(contains('Catching up failed for client hanging'))),
+      );
+
+      // The next update is a reload, which must not replace the restart.
+      hanging.failingRpc = null;
+      hanging.beforeRpc = null;
+      hanging.calls.clear();
+      await fixture.workflow.reloadClients();
+      expect(hanging.calls, _restartCalls);
+
+      // Afterwards updates are applied as usual.
+      hanging.calls.clear();
+      await fixture.workflow.reloadClients();
+      expect(hanging.calls, _reloadCalls);
+    });
+  });
+
   // A background tab throttled by the browser still answers, but may take
   // longer than the timeout for every call.
   test('catches up a browser that responds slower than the timeout', () async {
