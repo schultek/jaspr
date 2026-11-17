@@ -1,3 +1,7 @@
+## Unreleased 0.24.0-beta.2
+
+- Fixed a browser that `jaspr serve` skipped because it didn't respond in time (e.g. a tab in the background) showing outdated content until the next change. It now catches up on the reload it missed as soon as it responds again.
+
 ## 0.24.0-beta.1
 
 ### New Features and Improvements

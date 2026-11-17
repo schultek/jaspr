@@ -153,14 +153,8 @@ class DevWorkflow {
 
     var allReloaded = true;
     await clients.forEachConnection('Hot reload', (clientConnection) async {
-      if (!await clientConnection.performHotReload()) {
+      if (!await clientConnection.update(.reload)) {
         allReloaded = false;
-        // Skip reassemble and html reload if client hot-reload fails.
-        return;
-      }
-      await clientConnection.reassemble();
-      if (project.requireMode != JasprMode.client) {
-        await clientConnection.reloadHtml();
       }
     });
     if (allReloaded) {
@@ -189,13 +183,8 @@ class DevWorkflow {
 
     var allRestarted = true;
     await clients.forEachConnection('Hot restart', (clientConnection) async {
-      if (await clientConnection.restart() == null) {
+      if (!await clientConnection.update(.restart)) {
         allRestarted = false;
-        // Skip html reload if client restart fails.
-        return;
-      }
-      if (project.requireMode != JasprMode.client) {
-        await clientConnection.reloadHtml();
       }
     });
     if (allRestarted) {
@@ -220,7 +209,7 @@ class DevWorkflow {
 
     var allRefreshed = true;
     await clients.forEachConnection('Refresh', (client) async {
-      if (await client.refreshPage() == null) {
+      if (!await client.update(.refresh)) {
         allRefreshed = false;
       }
     });
