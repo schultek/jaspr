@@ -1,3 +1,7 @@
+## Unreleased 0.24.0-beta.2
+
+- Fixed `jaspr serve` with Flutter embedding or plugins failing on Flutter 3.50, which moved the precompiled DDC SDK to `kernel/ddc/canary` and `kernel/ddc/stable`.
+
 ## 0.24.0-beta.1
 
 ### New Features and Improvements
@@ -14,7 +18,6 @@
 - Fixed HTML duplication after hot-reload in client mode.
 - Fixed hot-reload losing changes when a new build starts before the previous reload has finished.
 - Fixed `jaspr serve` blocking all following reloads when a connected browser stops responding (e.g. a phone with the screen turned off).
-- Fixed `jaspr serve` with Flutter embedding or plugins failing on Flutter 3.50, which moved the precompiled DDC SDK to `kernel/ddc/canary`.
 
 - Fixed styles hot-reload recompiling all dependencies on every change on Windows.
 - Fixed key shortcuts in `jaspr serve` not working on Windows.

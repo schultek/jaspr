@@ -194,16 +194,17 @@ class FlutterRunner {
   /// Flutter 3.50 moved it from `kernel/ddcLibraryBundle-canvaskit` and
   /// `kernel/amd-canvaskit` to `kernel/ddc/canary` and `kernel/ddc/stable`, and
   /// no longer ships an AMD build. `build_web_compilers` compiles DDC library
-  /// bundles with `--canary`, which matches `kernel/ddc/canary`. Older Flutter
-  /// versions keep using their folders.
+  /// bundles with `--canary`, which matches `kernel/ddc/canary`. Otherwise it
+  /// compiles without `--canary`, which matches `kernel/ddc/stable`. Older
+  /// Flutter versions keep using their folders.
   static String precompiledDdcSdkDir(String webSdkDir, {required bool ddcLibraryBundle}) {
-    if (ddcLibraryBundle) {
-      final canaryDir = p.join(webSdkDir, 'kernel', 'ddc', 'canary');
-      if (Directory(canaryDir).existsSync()) {
-        return canaryDir;
-      }
-      return p.join(webSdkDir, 'kernel', 'ddcLibraryBundle-canvaskit');
+    final (ddcDir, legacyDir) = ddcLibraryBundle
+        ? ('canary', 'ddcLibraryBundle-canvaskit')
+        : ('stable', 'amd-canvaskit');
+    final dir = p.join(webSdkDir, 'kernel', 'ddc', ddcDir);
+    if (Directory(dir).existsSync()) {
+      return dir;
     }
-    return p.join(webSdkDir, 'kernel', 'amd-canvaskit');
+    return p.join(webSdkDir, 'kernel', legacyDir);
   }
 }
