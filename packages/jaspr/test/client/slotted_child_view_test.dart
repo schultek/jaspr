@@ -444,6 +444,26 @@ void main() {
       skip: true,
     );
 
+    // To be revisited: slotted child hydration with raw class attribute.
+    testClient(
+      'does not apply wrapper classes during hydration when element has raw class in attributes',
+      (tester) async {
+        window.document.body!.innerHTML = '<section><button class="label">Static</button></section>'.toJS;
+
+        tester.pumpComponent(
+          Component.apply(
+            target: const ApplyTarget.descendantWith(tag: 'button'),
+            classes: 'highlight',
+            child: SlottedChildView(slots: const []),
+          ),
+        );
+
+        final btn = window.document.querySelector('button')! as HTMLElement;
+        expect(btn.className, 'label');
+      },
+      skip: true,
+    );
+
     // To be revisited: CSS shorthand and longhand property overlap.
     testClient(
       'preserves child shorthand styles when wrapper applies overlapping longhand style',
