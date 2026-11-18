@@ -1,5 +1,9 @@
 ## Unreleased 0.24.0-beta.2
 
+### Fixes
+
+- Fixed a server built with `dart build cli` on Linux with Dart 3.14 or later not finding its `web` directory and failing with "Could not resolve project directory containing pubspec.yaml" when no `pubspec.yaml` is above it. Since Dart 3.14 such a bundle keeps the snapshot in `lib/libdartaot<name>.so`, which `Platform.script` points at.
+- Fixed `jaspr serve` with Flutter embedding or plugins failing on Flutter 3.50, which moved the precompiled DDC SDK to `kernel/ddc/canary` and `kernel/ddc/stable`.
 - Fixed a browser that `jaspr serve` skipped because it didn't respond in time (e.g. a tab in the background) showing outdated content until the next change. It now catches up on the reload it missed as soon as it responds again.
 
 ## 0.24.0-beta.1
