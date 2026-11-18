@@ -1,5 +1,7 @@
 ## Unreleased 0.24.0-beta.2
 
+- **Breaking**: Changed `open` on `dialog()` and `details()` to `bool?`. When it is not set, the browser controls the attribute, which fixes a rebuild closing a dialog opened with `showModal()` or `show()` and a `details` element the user opened. Pass `open: false` to keep the element closed.
+
 ### Fixes
 
 - Fixed a server built with `dart build cli` on Linux with Dart 3.14 or later not finding its `web` directory and failing with "Could not resolve project directory containing pubspec.yaml" when no `pubspec.yaml` is above it. Since Dart 3.14 such a bundle keeps the snapshot in `lib/libdartaot<name>.so`, which `Platform.script` points at.
