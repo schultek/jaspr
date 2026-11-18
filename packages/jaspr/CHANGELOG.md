@@ -1,3 +1,7 @@
+## Unreleased 0.24.0-beta.2
+
+- Fixed `jaspr serve` with Flutter embedding or plugins failing on Flutter 3.50, which moved the precompiled DDC SDK to `kernel/ddc/canary` and `kernel/ddc/stable`.
+
 ## 0.24.0-beta.1
 
 ### New Features and Improvements
