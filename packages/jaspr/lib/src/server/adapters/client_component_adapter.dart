@@ -53,9 +53,7 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
     if (!registry.serverElements.containsKey(element)) {
       var hasRenderElement = false;
       element.visitAncestorElements((e) {
-        if (registry.serverElements.containsKey(e)) {
-          return false;
-        }
+        final isServerElement = registry.serverElements.containsKey(e);
         if (e is RenderObjectElement && e.renderObject is! RenderFragment) {
           hasRenderElement = true;
         }
@@ -63,6 +61,9 @@ final class ClientComponentAdapter extends ElementBoundaryAdapter {
           if (!applyComp.target.onlyChildren || !hasRenderElement) {
             applied.add(applyComp);
           }
+        }
+        if (isServerElement) {
+          return false;
         }
         return true;
       });

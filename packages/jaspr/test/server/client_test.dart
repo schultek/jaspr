@@ -359,6 +359,40 @@ void main() {
       );
     });
 
+    testServer(
+      'serializes server-child root apply wrapper onto nested client component while excluding outer applies',
+      (
+        tester,
+      ) async {
+        tester.pumpComponent(
+          Component.apply(
+            classes: 'outer-apply',
+            child: AppWithServerComponent(
+              child: Component.apply(
+                classes: 'server-only',
+                child: App1(),
+              ),
+            ),
+          ),
+        );
+
+        final response = await tester.request('/');
+
+        expect(
+          response.body,
+          contains('<!--@app1 apply<[{"c":"server-only"}]>-->'),
+        );
+        expect(
+          response.body,
+          isNot(contains('<!--@app1 apply<[{"c":"server-only"},{"c":"outer-apply"}]>-->')),
+        );
+        expect(
+          response.body,
+          isNot(contains('<!--@app1 apply<[{"c":"outer-apply"}]>-->')),
+        );
+      },
+    );
+
     testServer('renders server components inside custom model parameter', (tester) async {
       tester.pumpComponent(AppWithCustomModel(model: ModelWithComponent(span([text('Custom Model')]))));
 
@@ -586,6 +620,52 @@ void main() {
       expect(
         response.body,
         contains('<span class="child-class server-only">Hello</span>'),
+      );
+      expect(
+        response.body,
+        isNot(contains('data-j-apply')),
+      );
+    });
+
+    testServer('does not record applied id when child element owns an id in attributes map', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          id: 'save',
+          child: AppWithServerComponent(
+            child: span(attributes: {'id': 'save'}, [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span id="save">Hello</span>'),
+      );
+      expect(
+        response.body,
+        isNot(contains('data-j-apply')),
+      );
+    });
+
+    testServer('does not record applied class attribute when child element has dedicated classes', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          attributes: const {'class': 'highlight'},
+          child: AppWithServerComponent(
+            child: span(classes: 'label', [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span class="label">Hello</span>'),
       );
       expect(
         response.body,

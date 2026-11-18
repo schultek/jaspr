@@ -248,6 +248,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     final inheritedDomParams = inheritedDomParamsFor(renderObject);
     if ((component.nodes != null || (inheritedDomParams != null && inheritedDomParams.isNotEmpty)) && !_didHydrate) {
       _didHydrate = true;
+      _appliedParams.clear();
       _hydrateInitialNodes(renderObject);
     }
 
@@ -512,6 +513,12 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
       attributes: appliedAttributes,
       events: appliedEvents,
     );
+  }
+
+  @override
+  void onReload() {
+    _didHydrate = false;
+    super.onReload();
   }
 
   @override

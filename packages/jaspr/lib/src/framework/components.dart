@@ -97,7 +97,10 @@ class DomElement extends DomRenderObjectElement {
     var events = component.events;
 
     if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
-      final classesSet = {...?_splitClasses(classes)};
+      final classesSet = {
+        ...?_splitClasses(classes),
+        ...?_splitClasses(attributes?['class']),
+      };
       styles = Map.of(styles ?? {});
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
@@ -113,7 +116,7 @@ class DomElement extends DomRenderObjectElement {
         List<String>? appliedStyles;
         List<String>? appliedAttributes;
 
-        if (param.id case final paramId? when id == null) {
+        if (param.id case final paramId? when id == null && !attributes.containsKey('id')) {
           id = paramId;
           appliedId = paramId;
         }
@@ -138,6 +141,9 @@ class DomElement extends DomRenderObjectElement {
         if (param.attributes case final attributesMap?) {
           for (final MapEntry(:key, :value) in attributesMap.entries) {
             if (!attributes.containsKey(key)) {
+              if (key == 'id' && (id != null || appliedId != null)) continue;
+              if (key == 'class' && classesSet.isNotEmpty) continue;
+              if (key == 'style' && styles.isNotEmpty) continue;
               attributes[key] = value;
               (appliedAttributes ??= []).add(key);
             }

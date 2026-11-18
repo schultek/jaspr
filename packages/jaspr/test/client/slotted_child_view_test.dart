@@ -423,6 +423,46 @@ void main() {
       expect(btn.className, 'btn');
     });
 
+    testClient('re-hydrates data-j-apply on reload and cleans up when apply is disabled', (tester) async {
+      const html =
+          '<section><button id="applied-id" class="original applied" data-j-apply="i:applied-id;c:applied">Static</button></section>';
+      window.document.body!.innerHTML = html.toJS;
+      var hasParams = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: .descendantWith(tag: 'button'),
+              id: hasParams ? 'applied-id' : null,
+              classes: hasParams ? 'applied' : null,
+              child: SlottedChildView(slots: const []),
+            );
+          },
+        ),
+      );
+
+      var btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'applied-id');
+      expect(btn.className, 'original applied');
+
+      // Reload with fresh server DOM containing data-j-apply
+      await _reload(tester, html);
+
+      btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'applied-id');
+      expect(btn.className, 'original applied');
+
+      // Now toggle off the apply params
+      setState(() => hasParams = false);
+      await pumpEventQueue();
+
+      expect(btn.hasAttribute('id'), isFalse);
+      expect(btn.className, 'original');
+    });
+
     testClient('preserves outer applied params when inner apply toggles off', (tester) async {
       window.document.body!.innerHTML = '<section><button class="child-class server-class client-class" data-j-apply="c:server-class,client-class">Button</button></section>'
           .toJS;
