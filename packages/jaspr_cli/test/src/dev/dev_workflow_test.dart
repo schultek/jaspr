@@ -166,13 +166,19 @@ void main() {
         expect(hanging.calls, isEmpty);
         expect(healthy.calls, expectedCalls);
 
-        // Once the pending call completes, the browser takes part in updates again.
+        // Once the pending call completes, the browser catches up on the update it was skipped for.
         respond.complete();
         await pumpEventQueue();
         await expectLater(
           fixture.io.stdout.queue,
-          emitsWithTimeout(emitsThrough(contains('Client hanging is responding again'))),
+          emitsWithTimeout(
+            emitsThrough(contains('Client hanging is responding again, catching up on the missed $action.')),
+          ),
         );
+        expect(hanging.calls, expectedCalls);
+        expect(healthy.calls, expectedCalls, reason: 'Other browsers are not updated again.');
+
+        // Afterwards it takes part in updates again.
         hanging.beforeRpc = null;
         hanging.calls.clear();
         healthy.calls.clear();
@@ -209,6 +215,188 @@ void main() {
           },
         ),
       ).called(1);
+    });
+  });
+
+  for (final (action, Future<void> Function(DevWorkflow) runUpdate, hangingRpc, expectedCalls) in [
+    ('reload', (DevWorkflow w) => w.reloadClients(), 'reloadSources', [..._reloadCalls, _reloadHtmlCall]),
+    ('restart', (DevWorkflow w) => w.restartClients(incremental: true), 'hotRestart', ['hotRestart', _reloadHtmlCall]),
+  ]) {
+    test('$action is repeated for a browser that responds again after it timed out', () async {
+      await _withWorkflow(null, mode: JasprMode.server, (fixture) async {
+        fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+        final hanging = await fixture.connectBrowser('hanging');
+        final respond = Completer<void>();
+        hanging.beforeRpc = (method) async {
+          if (method == hangingRpc) await respond.future;
+        };
+
+        // The calls after the one that timed out are skipped.
+        await runUpdate(fixture.workflow).timeout(const Duration(seconds: 5));
+        expect(hanging.calls, expectedCalls.take(expectedCalls.indexOf(hangingRpc) + 1).toList());
+
+        // No further update is needed for the browser to get them.
+        hanging.calls.clear();
+        respond.complete();
+        await pumpEventQueue();
+        expect(hanging.calls, expectedCalls);
+        await expectLater(
+          fixture.io.stdout.queue,
+          emitsWithTimeout(
+            emitsThrough(contains('Client hanging is responding again, catching up on the missed $action.')),
+          ),
+        );
+      });
+    });
+  }
+
+  test('refresh is not repeated for a browser that responds again after it timed out', () async {
+    await _withWorkflow(null, (fixture) async {
+      fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+      final hanging = await fixture.connectBrowser('hanging');
+      final respond = Completer<void>();
+      hanging.beforeRpc = (method) async {
+        if (method == 'fullReload') await respond.future;
+      };
+
+      await fixture.workflow.refreshClients().timeout(const Duration(seconds: 5));
+      expect(hanging.calls, ['fullReload']);
+
+      // The page reloads once the pending call gets through.
+      respond.complete();
+      await pumpEventQueue();
+      expect(hanging.calls, ['fullReload']);
+      await expectLater(
+        fixture.io.stdout.queue,
+        emitsWithTimeout(emitsThrough(endsWith('Client hanging is responding again.'))),
+      );
+    });
+  });
+
+  test('catches up with the most extensive update a browser missed', () async {
+    await _withWorkflow(null, (fixture) async {
+      fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+      final hanging = await fixture.connectBrowser('hanging');
+      final respond = Completer<void>();
+      hanging.beforeRpc = (method) async {
+        if (method == 'reloadSources') await respond.future;
+      };
+
+      await fixture.workflow.reloadClients().timeout(const Duration(seconds: 5));
+      await fixture.workflow.restartClients(incremental: true).timeout(const Duration(seconds: 5));
+      await fixture.workflow.reloadClients().timeout(const Duration(seconds: 5));
+
+      hanging.calls.clear();
+      respond.complete();
+      await pumpEventQueue();
+      expect(hanging.calls, _restartCalls);
+    });
+  });
+
+  test('includes an update the catch-up could not apply in the next update', () async {
+    await _withWorkflow(null, (fixture) async {
+      fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+      final hanging = await fixture.connectBrowser('hanging');
+      final respond = Completer<void>();
+      hanging.beforeRpc = (method) async {
+        if (method == 'reloadSources') await respond.future;
+      };
+
+      await fixture.workflow.reloadClients().timeout(const Duration(seconds: 5));
+      await fixture.workflow.restartClients(incremental: true).timeout(const Duration(seconds: 5));
+
+      // The browser responds again, but the restart it missed fails.
+      hanging.failingRpc = 'hotRestart';
+      hanging.calls.clear();
+      respond.complete();
+      await pumpEventQueue();
+      expect(hanging.calls, _restartCalls);
+      await expectLater(
+        fixture.io.stdout.queue,
+        emitsWithTimeout(emitsThrough(contains('Catching up failed for client hanging'))),
+      );
+
+      // The next update is a reload, which must not replace the restart.
+      hanging.failingRpc = null;
+      hanging.beforeRpc = null;
+      hanging.calls.clear();
+      await fixture.workflow.reloadClients();
+      expect(hanging.calls, _restartCalls);
+
+      // Afterwards updates are applied as usual.
+      hanging.calls.clear();
+      await fixture.workflow.reloadClients();
+      expect(hanging.calls, _reloadCalls);
+    });
+  });
+
+  // A background tab throttled by the browser still answers, but may take
+  // longer than the timeout for every call.
+  test('catches up a browser that responds slower than the timeout', () async {
+    await _withWorkflow(null, mode: JasprMode.server, (fixture) async {
+      const timeout = Duration(milliseconds: 100);
+      fixture.workflow.clients.callTimeout = timeout;
+      final slow = await fixture.connectBrowser('slow');
+      slow.beforeRpc = (_) => Future<void>.delayed(timeout * 1.5);
+
+      await fixture.workflow.reloadClients().timeout(const Duration(seconds: 5));
+      expect(slow.calls, ['getVM']);
+      await expectLater(
+        fixture.io.stdout.queue,
+        emitsWithTimeout(emitsThrough(contains('Client slow did not respond'))),
+      );
+
+      // The hot reload that timed out finishes first, then the whole reload is repeated.
+      const caughtUpCalls = ['getVM', 'reloadSources', ..._reloadCalls, _reloadHtmlCall];
+      await slow.completedRpcs.stream.firstWhere((method) => method == _reloadHtmlCall);
+      expect(slow.calls, caughtUpCalls);
+
+      // It is up to date now, so it isn't updated or reported as unresponsive again.
+      await Future<void>.delayed(timeout * 3);
+      expect(slow.calls, caughtUpCalls);
+      slow.beforeRpc = null;
+      slow.calls.clear();
+      await fixture.workflow.reloadClients();
+      expect(slow.calls, [..._reloadCalls, _reloadHtmlCall]);
+    });
+  });
+
+  test('updates skip a browser that is catching up and are applied afterwards', () async {
+    await _withWorkflow(null, (fixture) async {
+      fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+      final hanging = await fixture.connectBrowser('hanging');
+      final healthy = await fixture.connectBrowser('healthy');
+      final respond = Completer<void>();
+      hanging.beforeRpc = (method) async {
+        if (method == 'reloadSources') await respond.future;
+      };
+
+      // Fails instead of hanging when the update waits for the catch-up.
+      Future<void> update() => fixture.workflow.reloadClients().timeout(const Duration(seconds: 5));
+      await update();
+
+      // The browser responds again, but its catch-up takes a while.
+      final resume = Completer<void>();
+      hanging.beforeRpc = (method) async {
+        if (method == 'ext.jaspr.reassemble') await resume.future;
+      };
+      hanging.calls.clear();
+      healthy.calls.clear();
+      respond.complete();
+      await pumpEventQueue();
+      expect(hanging.calls, _reloadCalls);
+
+      await update();
+      expect(healthy.calls, _reloadCalls);
+      expect(hanging.calls, _reloadCalls, reason: 'The update should not overlap with the catch-up.');
+      final connection = fixture.workflow.clients.getConnection('hanging')!;
+      expect(await connection.reloadStylesheets(['main.css']), isNull, reason: 'The browser is skipped.');
+
+      hanging.beforeRpc = null;
+      hanging.calls.clear();
+      resume.complete();
+      await pumpEventQueue();
+      expect(hanging.calls, [..._reloadCalls, 'ext.jaspr.reload_stylesheets']);
     });
   });
 
