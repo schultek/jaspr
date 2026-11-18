@@ -349,6 +349,53 @@ void main() {
       });
     });
 
+    // https://github.com/schultek/jaspr/issues/999
+    test('uses the precompiled DDC SDK from kernel/ddc/stable on Flutter 3.50 and later', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client', flutterEmbedding: true);
+        io.stubDartSDK();
+        io.stubFlutterSDK();
+        // Flutter 3.50 ships the precompiled SDKs in kernel/ddc/{stable,canary}
+        // instead of kernel/{amd,ddcLibraryBundle}-canvaskit.
+        io.fs.file('/fake/flutter/bin/cache/flutter_web_sdk/kernel/ddc/canary/dart_sdk.js').createSync(recursive: true);
+        io.fs.file('/fake/flutter/bin/cache/flutter_web_sdk/kernel/ddc/stable/dart_sdk.js').createSync(recursive: true);
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [
+            for (final arg in buildRunnerFlutterBuildArgs)
+              arg.replaceFirst('kernel/amd-canvaskit', 'kernel/ddc/stable'),
+          ],
+        );
+
+        final buildResult = runner.run(['build', '--verbose']);
+
+        await expectLater(io.stdout.queue, emits('Building myapp in client rendering mode.'));
+
+        when(
+          () => io.process.start(
+            'flutter',
+            [
+              'build',
+              'web',
+              '-t',
+              '.dart_tool/jaspr/flutter_target.dart',
+              '--no-wasm-dry-run',
+              '--no-tree-shake-icons',
+              '--output=build/flutter',
+            ],
+            workingDirectory: '/root/myapp',
+            runInShell: true,
+          ),
+        ).thenAnswer((_) async => FakeProcess.sync());
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
+
+        expect(await buildResult, equals(0));
+      });
+    });
+
     test('builds project with flutter embedding', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'client', flutterEmbedding: true);

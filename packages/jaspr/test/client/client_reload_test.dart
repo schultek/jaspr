@@ -5,7 +5,7 @@ import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
-import 'package:jaspr/src/client/dom_render_object.dart' show RootDomRenderObject;
+import 'package:jaspr/src/client/dom_render_object.dart' show DomRenderObject, RootDomRenderObject;
 import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart' as web;
@@ -64,6 +64,35 @@ void main() {
       await pumpEventQueue();
 
       expect(web.document.querySelectorAll('.main > div').length, equals(1));
+    });
+
+    testClient('should not keep render objects of an earlier reload linked to the root', (tester) async {
+      tester.pumpComponent(const ConstApp());
+      await pumpEventQueue();
+
+      final root = tester.binding.rootElement!;
+      final rootRenderObject = root.renderObject as RootDomRenderObject;
+
+      for (var reload = 1; reload <= 3; reload++) {
+        final newBody = web.document.createElement('body') as web.HTMLBodyElement;
+        rootRenderObject.setRootNode(newBody);
+        root.owner.performReload(root);
+        web.document.body!.replaceWith(newBody);
+        tester.binding.completeInitialFrame();
+        await pumpEventQueue();
+
+        // ConstApp renders one element below the root. A reload gives it a new render object,
+        // and the one it replaces must not stay in the root's list of children.
+        final child = find
+            .tag('div')
+            .evaluate()
+            .map((element) => (element as RenderObjectElement).renderObject as DomRenderObject)
+            .singleWhere((renderObject) => renderObject.parent == rootRenderObject);
+
+        expect(child.node.parentNode, equals(newBody), reason: 'reload $reload');
+        expect(child.previousSibling, isNull, reason: 'reload $reload');
+        expect(child.nextSibling, isNull, reason: 'reload $reload');
+      }
     });
 
     testClient('should update client component parameters and sync state on reload and use new nodes', (tester) async {

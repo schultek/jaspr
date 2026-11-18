@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:build_daemon/data/build_request.dart';
 import 'package:build_daemon/data/build_status.dart';
+import 'package:build_daemon/data/build_target_request.dart';
 import 'package:jaspr_cli/src/command_runner.dart';
 import 'package:jaspr_cli/src/project.dart';
 import 'package:mocktail/mocktail.dart';
@@ -71,6 +73,152 @@ void main() {
         );
 
         expect(await serveResult, equals(0));
+      });
+    });
+
+    test('stops with an error when the build daemon exits without notice', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] Done building web assets.',
+            '[LOG] Serving at http://localhost:8080',
+          ]),
+        );
+
+        // E.g. killed by another Jaspr process: no ShutdownNotification, the
+        // connection just closes.
+        await buildDaemon.close();
+
+        await expectLater(
+          io.stderr.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] [CRITICAL] The build daemon exited unexpectedly. Please restart Jaspr.',
+          ]),
+        );
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+          ]),
+        );
+
+        expect(await serveResult, equals(1));
+      });
+    });
+
+    test('stops with an error when the build daemon exits during the initial build', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await expectLater(
+          buildDaemon.messages,
+          emitsInOrderWithTimeout([
+            isA<BuildTargetRequest>(),
+            isA<BuildRequest>(),
+          ]),
+        );
+
+        // Gone before the first build result, without a notification.
+        await buildDaemon.close();
+
+        await expectLater(
+          io.stderr.queue,
+          emitsInOrderWithTimeout([
+            '[BUILDER] [CRITICAL] The build daemon exited unexpectedly. Please restart Jaspr.',
+          ]),
+        );
+        expect(await serveResult.timeout(const Duration(seconds: 10)), equals(1));
+      });
+    });
+
+    test('does not report the build daemon as exited unexpectedly when stopping after a failed build', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerDartArgs);
+
+        // Stopping the daemon closes its connection, as a real daemon process
+        // that is killed would. The pid is never in use.
+        when(() => io.process.run('lsof', ['-tiTCP:1234', '-sTCP:LISTEN'])).thenAnswer((_) async {
+          await buildDaemon.close();
+          return ProcessResult(0, 0, '2147483647\n', '');
+        });
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in client rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await expectLater(
+          buildDaemon.messages,
+          emitsInOrderWithTimeout([
+            isA<BuildTargetRequest>(),
+            isA<BuildRequest>(),
+          ]),
+        );
+        buildDaemon.sendMessage(
+          BuildResults((b) {
+            b.results.add(
+              DefaultBuildResult((b) {
+                b.target = 'web';
+                b.status = BuildStatus.failed;
+              }),
+            );
+          }),
+        );
+
+        // Stops through the guards, like Ctrl+C.
+        expect(await serveResult, equals(1));
+
+        final errors = <String>[];
+        while (await io.stderr.queue.hasNext.timeout(const Duration(milliseconds: 300), onTimeout: () => false)) {
+          errors.add(await io.stderr.queue.next);
+        }
+        expect(errors, contains('[BUILDER] [ERROR] Could not start dev server due to build errors.'));
+        expect(errors, isNot(contains(contains('exited unexpectedly'))));
       });
     });
 
@@ -685,6 +833,77 @@ void main() {
         io.stubFlutterSDK();
 
         final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerFlutterArgs);
+        final server = io.stubFakeServer();
+
+        FakeProcess? flutterProcess;
+        when(
+          () => io.process.start(
+            'flutter',
+            [
+              'run',
+              '--device-id=web-server',
+              '-t',
+              '.dart_tool/jaspr/flutter_target.dart',
+              '--web-port=$flutterProxyPort',
+            ],
+            workingDirectory: '/root/myapp',
+            runInShell: true,
+          ),
+        ).thenAnswer((_) async => flutterProcess = FakeProcess());
+
+        final serveResult = runner.run(['serve', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Starting myapp in server rendering mode.',
+            '[BUILDER] Starting web compilers...',
+            '[BUILDER] Connecting to the build daemon...',
+            '[BUILDER] Starting initial build...',
+          ]),
+        );
+
+        await io.runInitialBuild(buildDaemon);
+
+        expect(io.stdout.queue, emits('[BUILDER] Done building web assets.'));
+
+        await io.connectToProxy();
+
+        expect(flutterProcess, isNotNull);
+
+        await io.expectServerStarted(server);
+
+        server.exit(0);
+
+        expect(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            'Stopping web compilers...',
+            'Stopping flutter run...',
+          ]),
+        );
+
+        expect(await serveResult, equals(0));
+      });
+    });
+
+    // https://github.com/schultek/jaspr/issues/999
+    test('uses the precompiled DDC SDK from kernel/ddc/canary on Flutter 3.50 and later', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server', flutterEmbedding: true);
+        io.stubDartSDK();
+        io.stubFlutterSDK();
+        // Flutter 3.50 ships the precompiled SDKs in kernel/ddc/{stable,canary}
+        // instead of kernel/{ddcLibraryBundle,amd}-canvaskit.
+        io.fs.file('/fake/flutter/bin/cache/flutter_web_sdk/kernel/ddc/canary/dart_sdk.js').createSync(recursive: true);
+        io.fs.file('/fake/flutter/bin/cache/flutter_web_sdk/kernel/ddc/stable/dart_sdk.js').createSync(recursive: true);
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [
+            for (final arg in buildRunnerFlutterArgs)
+              arg.replaceFirst('kernel/ddcLibraryBundle-canvaskit', 'kernel/ddc/canary'),
+          ],
+        );
         final server = io.stubFakeServer();
 
         FakeProcess? flutterProcess;

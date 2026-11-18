@@ -130,6 +130,11 @@ class SyncMixinsBuilder implements Builder {
           try {
             final decoder = codecs.getDecoderFor(f.type, "value['${f.name}'] as __CAST__", false);
             return '${f.name} = $decoder;';
+          } on InvalidMountParameterException catch (_) {
+            throw UnsupportedError(
+              'ComponentMount is not supported for sync fields.\n'
+              'Failing field: [$f] in ${clazz.name}',
+            );
           } on InvalidParameterException catch (_) {
             throw UnsupportedError(
               'Fields annotated with @sync must have a primitive serializable type or a type that defines @decoder and @encoder methods.\n'
