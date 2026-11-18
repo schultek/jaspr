@@ -492,7 +492,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
 
     List<String> additionalFlutterBuildArgs() {
       final librariesPath = p.join(FlutterRunner.webSdkDir, 'libraries.json');
-      final sdkJsPath = p.join(FlutterRunner.webSdkDir, 'kernel', 'amd-canvaskit');
+      final sdkJsPath = FlutterRunner.precompiledDdcSdkDir(FlutterRunner.webSdkDir, ddcLibraryBundle: false);
       return [
         '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
         '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
