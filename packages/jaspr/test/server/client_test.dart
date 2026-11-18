@@ -698,7 +698,7 @@ void main() {
       );
     });
 
-    testServer('records only new applied style property when child element owns inline styles in attributes map', (
+    testServer('does not apply wrapper styles when child element owns inline styles in attributes map', (
       tester,
     ) async {
       tester.pumpComponent(
@@ -715,11 +715,84 @@ void main() {
 
       expect(
         response.body,
-        contains('data-j-apply="s:margin"'),
+        isNot(contains('data-j-apply')),
       );
       expect(
         response.body,
-        isNot(contains('s:color')),
+        contains('style="color: red"'),
+      );
+    });
+
+    testServer('preserves child inline styles with semicolons inside quotes and data URLs when applying classes', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          classes: 'applied-class',
+          child: AppWithServerComponent(
+            child: span(
+              attributes: {
+                'style':
+                    'font-family: "A;B"; background-image: url("data:image/svg+xml;utf8,<svg>;<circle/>"); color: red',
+              },
+              [text('Hello')],
+            ),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('class="applied-class"'),
+      );
+      expect(
+        response.body,
+        contains('data-j-apply="c:applied-class"'),
+      );
+      expect(
+        response.body,
+        contains('font-family: &quot;A;B&quot;'),
+      );
+      expect(
+        response.body,
+        contains('background-image: url(&quot;data:image/svg+xml;utf8,&lt;svg&gt;;&lt;circle/&gt;&quot;)'),
+      );
+      expect(
+        response.body,
+        contains('color: red'),
+      );
+    });
+
+    testServer('preserves casing of CSS custom properties in child inline styles and ignores wrapper styles', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          styles: Styles(raw: {'--brandColor': 'blue', '--otherColor': 'green'}),
+          child: AppWithServerComponent(
+            child: span(
+              attributes: {
+                'style': '--brandColor: red; color: var(--brandColor)',
+              },
+              [text('Hello')],
+            ),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span style="--brandColor: red; color: var(--brandColor)">Hello</span>'),
+      );
+      expect(
+        response.body,
+        isNot(contains('data-j-apply')),
       );
     });
 
