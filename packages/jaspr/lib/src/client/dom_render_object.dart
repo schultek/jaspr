@@ -174,6 +174,34 @@ class DomRenderElement extends DomRenderObject
               continue;
             }
           }
+        } else if (attrName == 'open' && (attrValue == 'true' || attrValue == 'false')) {
+          // `dialog()` and `details()` pass 'true' or 'false' when their `open` parameter is set.
+          final shouldBeOpen = attrValue == 'true';
+          if (node.isHtmlDialogElement) {
+            final nodeAsDialogElement = node as web.HTMLDialogElement;
+            if (nodeAsDialogElement.open != shouldBeOpen) {
+              if (kVerboseMode) {
+                print('Set dialog open: $shouldBeOpen');
+              }
+              if (shouldBeOpen) {
+                nodeAsDialogElement.open = true;
+              } else {
+                // Removing `open` from a dialog opened with showModal() leaves it modal and the page inert.
+                nodeAsDialogElement.close();
+              }
+            }
+            continue;
+          }
+          if (node.isHtmlDetailsElement) {
+            final nodeAsDetailsElement = node as web.HTMLDetailsElement;
+            if (nodeAsDetailsElement.open != shouldBeOpen) {
+              if (kVerboseMode) {
+                print('Set details open: $shouldBeOpen');
+              }
+              nodeAsDetailsElement.open = shouldBeOpen;
+            }
+            continue;
+          }
         }
 
         node.clearOrSetAttribute(attrName, attrValue);
@@ -181,6 +209,12 @@ class DomRenderElement extends DomRenderObject
     }
 
     final attributesToRemove = originalAttributes.difference({'id', 'class', 'style', ...?attributes?.keys});
+    if (attributesToRemove.contains('open') && (node.isHtmlDialogElement || node.isHtmlDetailsElement)) {
+      // The browser sets `open` on these elements itself (`showModal()`, `show()`, the user toggling
+      // the details). Removing it hides a modal dialog without closing it, so the page stays inert.
+      // Only an explicit `open: false` removes it.
+      attributesToRemove.remove('open');
+    }
     for (final name in attributesToRemove) {
       node.removeAttribute(name);
       if (kVerboseMode) {
