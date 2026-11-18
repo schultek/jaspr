@@ -621,6 +621,88 @@ void main() {
       expect(end.getAttribute('class'), 'end-anchor');
     });
 
+    testClient('leaves data-j-apply in nested range slot for inner view to hydrate', (tester) async {
+      window.document.body!.innerHTML = '<section><main><!--start--><button id="inner" class="btn" data-j-apply="i:inner">Inner</button><!--end--></main></section>'
+          .toJS;
+      final mainElement = window.document.querySelector('main')!;
+      var hasInnerApply = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return Component.apply(
+              target: const ApplyTarget.descendantWith(tag: 'button'),
+              classes: 'outer-class',
+              child: SlottedChildView(
+                slots: [
+                  ChildSlot.between(
+                    start: mainElement.firstChild!,
+                    end: mainElement.lastChild!,
+                    child: Component.apply(
+                      target: const ApplyTarget.childWith(tag: 'button'),
+                      id: hasInnerApply ? 'inner' : null,
+                      child: SlottedChildView(slots: const []),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'inner');
+      expect(btn.classList.contains('outer-class'), isTrue);
+
+      setState(() => hasInnerApply = false);
+      await pumpEventQueue();
+
+      expect(btn.hasAttribute('id'), isFalse);
+    });
+
+    testClient('leaves data-j-apply in nested query slot for inner view to hydrate', (tester) async {
+      window.document.body!.innerHTML = '<section><main class="slot-target"><button id="inner" class="btn" data-j-apply="i:inner">Inner</button></main></section>'
+          .toJS;
+      var hasInnerApply = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return Component.apply(
+              target: const ApplyTarget.descendantWith(tag: 'button'),
+              classes: 'outer-class',
+              child: SlottedChildView(
+                slots: [
+                  ChildSlot.fromQuery(
+                    '.slot-target',
+                    child: Component.apply(
+                      target: const ApplyTarget.childWith(tag: 'button'),
+                      id: hasInnerApply ? 'inner' : null,
+                      child: SlottedChildView(slots: const []),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      final btn = window.document.querySelector('button')! as HTMLElement;
+      expect(btn.id, 'inner');
+      expect(btn.classList.contains('outer-class'), isTrue);
+
+      setState(() => hasInnerApply = false);
+      await pumpEventQueue();
+
+      expect(btn.hasAttribute('id'), isFalse);
+    });
+
     testClient('applies direct child params to root range slot', (tester) async {
       window.document.body!.innerHTML = '<!--start--><button>Click me</button><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;

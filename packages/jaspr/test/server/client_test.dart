@@ -673,6 +673,56 @@ void main() {
       );
     });
 
+    testServer('does not record applied style property when child element owns style in attributes map', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          styles: Styles(color: Colors.red),
+          child: AppWithServerComponent(
+            child: span(attributes: {'style': 'color: red'}, [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span style="color: red">Hello</span>'),
+      );
+      expect(
+        response.body,
+        isNot(contains('data-j-apply')),
+      );
+    });
+
+    testServer('records only new applied style property when child element owns inline styles in attributes map', (
+      tester,
+    ) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          styles: Styles(color: Colors.red, margin: Margin.all(8.px)),
+          child: AppWithServerComponent(
+            child: span(attributes: {'style': 'color: red'}, [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('data-j-apply="s:margin"'),
+      );
+      expect(
+        response.body,
+        isNot(contains('s:color')),
+      );
+    });
+
     testServer('only includes client-managed params in data-j-apply when server component has its own apply', (
       tester,
     ) async {

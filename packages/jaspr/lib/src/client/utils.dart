@@ -11,6 +11,9 @@ import 'package:universal_web/web.dart' as web;
 /// since separate Dart references to the same node aren't `identical` on Wasm.
 Map<K, V> nodeMap<K extends web.Node, V>() => LinkedHashMap(hashCode: _nodeHashCode);
 
+/// Creates a set of DOM nodes with efficient lookups.
+Set<E> nodeSet<E extends web.Node>() => LinkedHashSet(hashCode: _nodeHashCode);
+
 /// A JS `WeakMap` from JS objects to numbers.
 ///
 /// Unlike an [Expando], it compares keys as JS objects.

@@ -43,6 +43,25 @@ List<String>? _splitClasses(String? classes) {
   return classNames.isEmpty ? null : classNames;
 }
 
+/// Parses raw CSS inline style declarations into a map of property-value pairs.
+///
+/// Returns `null` when [style] is `null` or contains no declarations.
+Map<String, String>? _parseInlineStyles(String? style) {
+  if (style == null || style.isEmpty) return null;
+
+  final styles = <String, String>{};
+  for (final declaration in style.split(';')) {
+    final colon = declaration.indexOf(':');
+    if (colon == -1) continue;
+    final property = declaration.substring(0, colon).trim().toLowerCase();
+    final value = declaration.substring(colon + 1).trim();
+    if (property.isNotEmpty && value.isNotEmpty) {
+      styles[property] = value;
+    }
+  }
+  return styles.isEmpty ? null : styles;
+}
+
 typedef _AppliedParam = ({
   ApplyParams param,
   String? id,
@@ -101,7 +120,11 @@ class DomElement extends DomRenderObjectElement {
         ...?_splitClasses(classes),
         ...?_splitClasses(attributes?['class']),
       };
-      styles = Map.of(styles ?? {});
+      final rawStyles = _parseInlineStyles(attributes?['style']);
+      styles = {
+        ...?rawStyles,
+        ...?styles,
+      };
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
 
@@ -168,6 +191,12 @@ class DomElement extends DomRenderObjectElement {
       }
 
       classes = classesSet.join(' ');
+      if (rawStyles != null) {
+        attributes.remove('style');
+      }
+      if (styles.isEmpty) {
+        styles = null;
+      }
     }
 
     renderObject.update(id, classes, styles, attributes, events);

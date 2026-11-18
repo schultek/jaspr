@@ -36,6 +36,9 @@ abstract class ChildSlot extends Component {
   /// Creates the render object that renders [child] into part of [parent]'s nodes.
   ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent);
 
+  /// Creates a filter function that checks whether a node is inside this slot's content.
+  bool Function(web.Node) createFilter(SlottedDomRenderObject parent);
+
   /// Whether this slot renders into the same DOM nodes as [oldComponent].
   ///
   /// A slot can't be updated with one that renders into different nodes,
@@ -61,6 +64,23 @@ class _RangeChildSlot extends ChildSlot {
   }
 
   @override
+  bool Function(web.Node) createFilter(SlottedDomRenderObject parent) {
+    final parentElement = start.parentElement;
+    if (parentElement == null) return (_) => false;
+
+    return (web.Node element) {
+      if (!parentElement.contains(element)) return false;
+      if (start.contains(element) || end.contains(element)) return false;
+
+      const following = web.Node.DOCUMENT_POSITION_FOLLOWING;
+      const containedBy = web.Node.DOCUMENT_POSITION_CONTAINED_BY;
+      final isAfterStart = (start.compareDocumentPosition(element) & (following | containedBy)) == following;
+      final isBeforeEnd = (end.compareDocumentPosition(element) & web.Node.DOCUMENT_POSITION_PRECEDING) != 0;
+      return isAfterStart && isBeforeEnd;
+    };
+  }
+
+  @override
   bool canUpdate(ChildSlot oldComponent) {
     return oldComponent is _RangeChildSlot && oldComponent.start == start && oldComponent.end == end;
   }
@@ -75,15 +95,13 @@ class _QueryChildSlot extends ChildSlot {
   @override
   final Component child;
 
-  @override
-  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
-    web.Element? target;
+  web.Element? findTargetElement(SlottedDomRenderObject parent) {
     web.Node? current = parent.firstChildNode;
     while (current != null) {
       if (current.isElement) {
-        target = (current as web.Element).querySelector(query);
+        final target = (current as web.Element).querySelector(query);
         if (target != null) {
-          break;
+          return target;
         }
       }
       if (current == parent.lastChildNode) {
@@ -91,8 +109,21 @@ class _QueryChildSlot extends ChildSlot {
       }
       current = current.nextSibling;
     }
+    return null;
+  }
+
+  @override
+  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
+    final target = findTargetElement(parent);
     assert(target != null, 'No node found for query "$query" in ChildSlot.');
     return ChildSlotRenderObject(target!, parent);
+  }
+
+  @override
+  bool Function(web.Node) createFilter(SlottedDomRenderObject parent) {
+    final target = findTargetElement(parent);
+    if (target == null) return (_) => false;
+    return (web.Node element) => element != target && target.contains(element);
   }
 
   @override
@@ -287,11 +318,12 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     for (final slot in component.slots) {
       if (slot is _RangeChildSlot) slotRanges[slot.start] = slot.end;
     }
+    final isInsideSlot = _createSlotFilter(renderObject);
 
     web.Node? current = renderObject.firstChildNode;
     while (current != null) {
       if (current.isElement) {
-        _hydrateInitialAppliedParams(current as web.Element);
+        _hydrateInitialAppliedParams(current as web.Element, isInsideSlot);
       }
 
       if (current == renderObject.lastChildNode) {
@@ -301,7 +333,24 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     }
   }
 
-  void _hydrateInitialAppliedParams(web.Element root) {
+  bool Function(web.Node) _createSlotFilter(SlottedDomRenderObject renderObject) {
+    if (component.slots.isEmpty) {
+      return (_) => false;
+    }
+
+    final filters = [
+      for (final slot in component.slots) slot.createFilter(renderObject),
+    ];
+
+    return (web.Node element) {
+      for (final filter in filters) {
+        if (filter(element)) return true;
+      }
+      return false;
+    };
+  }
+
+  void _hydrateInitialAppliedParams(web.Element root, bool Function(web.Node) isInsideSlot) {
     void process(web.Element element) {
       if (element.hasAttribute('data-j-apply')) {
         final raw = element.getAttribute('data-j-apply')!;
@@ -354,10 +403,15 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
       }
     }
 
-    process(root);
+    if (!isInsideSlot(root)) {
+      process(root);
+    }
     final descendants = root.querySelectorAll('[data-j-apply]');
     for (int i = 0; i < descendants.length; i++) {
-      process(descendants.item(i) as web.Element);
+      final element = descendants.item(i) as web.Element;
+      if (!isInsideSlot(element)) {
+        process(element);
+      }
     }
   }
 
