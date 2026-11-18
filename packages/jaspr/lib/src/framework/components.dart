@@ -43,11 +43,21 @@ List<String>? _splitClasses(String? classes) {
   return classNames.isEmpty ? null : classNames;
 }
 
+typedef _AppliedParam = ({
+  ApplyParams param,
+  String? id,
+  List<String>? classes,
+  List<String>? styles,
+  List<String>? attributes,
+});
+
 class DomElement extends DomRenderObjectElement {
   DomElement(DomComponent super.component);
 
   @override
   DomComponent get component => super.component as DomComponent;
+
+  List<_AppliedParam>? _appliedParams;
 
   @override
   List<Component> buildOwnChildren() {
@@ -79,6 +89,7 @@ class DomElement extends DomRenderObjectElement {
 
   @override
   void updateRenderObject(RenderElement renderObject) {
+    _appliedParams = null;
     var id = component.id;
     var classes = component.classes;
     var styles = component.styles?.properties;
@@ -86,35 +97,59 @@ class DomElement extends DomRenderObjectElement {
     var events = component.events;
 
     if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
-      final classesSet = {...?_splitClasses(classes)};
+      final classesSet = {
+        ...?_splitClasses(classes),
+        ...?_splitClasses(attributes?['class']),
+      };
       styles = Map.of(styles ?? {});
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
 
       for (final param in inheritedDomParams.reversed) {
-        if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
-        // DOM Element.id is empty when neither the id field nor the attributes map supplies an ID.
-        if (param.target.id case final expectedId? when expectedId != (id ?? attributes['id'] ?? '')) continue;
-        if (param.target.classes case final expectedClasses?
-            when !expectedClasses.every((c) => classesSet.contains(c))) {
+        final String effectiveId = id ?? attributes['id'] ?? '';
+        if (!param.target.matches(tag: component.tag, id: effectiveId, classes: classesSet)) {
           continue;
         }
 
-        id ??= param.id;
+        String? appliedId;
+        List<String>? appliedClasses;
+        List<String>? appliedStyles;
+        List<String>? appliedAttributes;
 
-        if (param.classes case final paramClasses?) {
-          classesSet.addAll(paramClasses);
+        if (param.id case final paramId? when id == null && !attributes.containsKey('id')) {
+          id = paramId;
+          appliedId = paramId;
         }
 
-        if (param.styles case final stylesProps?) {
+        if (param.classes case final paramClasses? when !attributes.containsKey('class')) {
+          for (final c in paramClasses) {
+            if (classesSet.add(c)) {
+              (appliedClasses ??= []).add(c);
+            }
+          }
+        }
+
+        // Elements with raw inline styles in `attributes['style']` are not augmented
+        // with styles from apply wrappers. Mixing structured styles with raw inline
+        // declarations is not supported.
+        if (param.styles case final stylesProps? when !attributes.containsKey('style')) {
           for (final MapEntry(:key, :value) in stylesProps.entries) {
-            styles[key] ??= value;
+            if (!styles.containsKey(key)) {
+              styles[key] = value;
+              (appliedStyles ??= []).add(key);
+            }
           }
         }
 
         if (param.attributes case final attributesMap?) {
           for (final MapEntry(:key, :value) in attributesMap.entries) {
-            attributes[key] ??= value;
+            if (!attributes.containsKey(key)) {
+              if (key == 'id' && (id != null || appliedId != null)) continue;
+              if (key == 'class' && (classesSet.isNotEmpty || classes != null)) continue;
+              if (key == 'style' && styles.isNotEmpty) continue;
+              attributes[key] = value;
+              (appliedAttributes ??= []).add(key);
+            }
           }
         }
 
@@ -123,17 +158,83 @@ class DomElement extends DomRenderObjectElement {
             events[key] ??= value;
           }
         }
+
+        if (appliedId != null || appliedClasses != null || appliedStyles != null || appliedAttributes != null) {
+          (_appliedParams ??= []).add((
+            param: param,
+            id: appliedId,
+            classes: appliedClasses,
+            styles: appliedStyles,
+            attributes: appliedAttributes,
+          ));
+        }
       }
 
-      classes = classesSet.join(' ');
+      classes = attributes.containsKey('class')
+          ? component.classes
+          : (classesSet.isEmpty ? null : classesSet.join(' '));
+      if (styles.isEmpty) {
+        styles = null;
+      }
     }
 
     renderObject.update(id, classes, styles, attributes, events);
   }
+
+  @internal
+  String? computeAppliedDiff(bool Function(ApplyParams) isClientManaged) {
+    final applied = _appliedParams;
+    if (applied == null || applied.isEmpty) return null;
+
+    final appliedClasses = <String>[];
+    final appliedStyles = <String>[];
+    final appliedAttributes = <String>[];
+    String? appliedId;
+
+    for (final entry in applied) {
+      if (!isClientManaged(entry.param)) continue;
+
+      if (entry.id case final id?) {
+        appliedId = id;
+      }
+      if (entry.classes case final classes?) {
+        appliedClasses.addAll(classes);
+      }
+      if (entry.styles case final styles?) {
+        appliedStyles.addAll(styles);
+      }
+      if (entry.attributes case final attributes?) {
+        appliedAttributes.addAll(attributes);
+      }
+    }
+
+    if (appliedId != null || appliedClasses.isNotEmpty || appliedStyles.isNotEmpty || appliedAttributes.isNotEmpty) {
+      final parts = <String>[];
+      if (appliedId != null) {
+        parts.add('i:${_escapeApplyValue(appliedId)}');
+      }
+      if (appliedClasses.isNotEmpty) {
+        parts.add('c:${appliedClasses.map(_escapeApplyValue).join(',')}');
+      }
+      if (appliedStyles.isNotEmpty) {
+        parts.add('s:${appliedStyles.map(_escapeApplyValue).join(',')}');
+      }
+      if (appliedAttributes.isNotEmpty) {
+        parts.add('a:${appliedAttributes.map(_escapeApplyValue).join(',')}');
+      }
+      return parts.join(';');
+    }
+    return null;
+  }
 }
 
-class _ApplyDomComponent extends StatelessComponent implements DomComponent {
-  const _ApplyDomComponent({
+String _escapeApplyValue(String val) => (val.contains(';') || val.contains(',') || val.contains('%'))
+    ? val.replaceAll('%', '%25').replaceAll(';', '%3B').replaceAll(',', '%2C')
+    : val;
+
+@internal
+class ApplyDomComponent extends StatelessComponent implements DomComponent {
+  const ApplyDomComponent({
     this.target = ApplyTarget.anyChild,
     this.id,
     this.classes,
@@ -163,6 +264,14 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
   @override
   List<Component>? get children => null;
 
+  Map<String, dynamic> toMap() => {
+    if (target != ApplyTarget.anyChild) 't': target.toMap(),
+    if (id != null) 'i': id,
+    if (classes != null) 'c': classes,
+    if (styles?.properties case final s? when s.isNotEmpty) 's': s,
+    if (attributes != null && attributes!.isNotEmpty) 'a': attributes,
+  };
+
   @override
   Component build(BuildContext context) {
     return _InheritedDomComponent.merge(
@@ -174,6 +283,7 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
         styles: styles?.properties,
         attributes: attributes,
         events: events,
+        source: context as Element,
       ),
       child: child,
     );
@@ -218,6 +328,33 @@ final class ApplyTarget {
 
   /// The classes an element must all have to match, or `null` for any.
   final Set<String>? classes;
+
+  @internal
+  bool matches({required String tag, required String id, required Set<String> classes}) {
+    if (this.tag case final expectedTag? when expectedTag != tag) return false;
+    if (this.id case final expectedId? when expectedId != id) return false;
+    if (this.classes case final expectedClasses? when !expectedClasses.every(classes.contains)) return false;
+    return true;
+  }
+
+  Map<String, dynamic> toMap() => {
+    if (!onlyChildren) 'd': true,
+    if (tag != null) 't': tag,
+    if (id != null) 'i': id,
+    if (classes != null && classes!.isNotEmpty) 'c': classes!.toList(),
+  };
+
+  factory ApplyTarget.fromMap(Map<String, dynamic> map) {
+    final onlyChildren = map['d'] != true;
+    final tag = map['t'] as String?;
+    final id = map['i'] as String?;
+    final classes = (map['c'] as List?)?.cast<String>().toSet();
+    if (onlyChildren) {
+      return ApplyTarget.childWith(tag: tag, id: id, classes: classes);
+    } else {
+      return ApplyTarget.descendantWith(tag: tag, id: id, classes: classes);
+    }
+  }
 }
 
 @protected
@@ -255,7 +392,6 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
   }
 
   @internal
-  @protected
   List<ApplyParams>? inheritedDomParamsFor(RenderObject target) {
     return inheritedDomResolver?.call(target);
   }
@@ -290,6 +426,7 @@ class ApplyParams {
     this.styles,
     this.attributes,
     this.events,
+    this.source,
   });
 
   final ApplyTarget target;
@@ -298,6 +435,7 @@ class ApplyParams {
   final Map<String, String>? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
+  final Element? source;
 }
 
 typedef DomParamsResolver = List<ApplyParams> Function(RenderObject target);
@@ -351,6 +489,11 @@ class _InheritedDomComponent extends InheritedComponent {
   bool updateShouldNotify(_InheritedDomComponent oldComponent) {
     return true;
   }
+}
+
+extension DomParamsElement on Element {
+  @internal
+  bool get hasInheritedDomParams => _inheritedElements?.containsKey(_InheritedDomComponent) ?? false;
 }
 
 /// Represents a plain text node with no additional properties.
