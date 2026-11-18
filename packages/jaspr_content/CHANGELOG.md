@@ -1,3 +1,7 @@
+## Unreleased 0.6.0-beta.1
+
+- Fixed `RSSOutput` writing feeds that are not valid RSS 2.0. Dates now use the RFC 822 format, text is escaped, and the `guid` is marked as not a permalink.
+
 ## 0.6.0-beta.0
 
 - Require Dart 3.13 or later.
