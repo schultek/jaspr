@@ -21,6 +21,7 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
     this.directory, {
     this.filterExtensions = const {},
     this.keepSuffixPattern,
+    this.ignorePattern,
     super.debugPrint,
     @visibleForTesting this.fileSystem = const LocalFileSystem(),
     @visibleForTesting DirectoryWatcherFactory? watcherFactory,
@@ -37,12 +38,23 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// A pattern to keep the file suffix for all matching pages.
   final Pattern? keepSuffixPattern;
 
+  /// A pattern for files that should not be loaded as pages.
+  ///
+  /// A file is skipped when the pattern matches at the start of its path. The path is relative to [directory]
+  /// and written with forward slashes on every platform. For example, `RegExp(r'(.*/)?README\.md$')` skips
+  /// every README.md, and `RegExp(r'drafts/.*')` skips everything below the top-level drafts folder.
+  ///
+  /// Like files excluded by [filterExtensions], ignored files can still be read as partials.
+  final Pattern? ignorePattern;
+
   @visibleForTesting
   final FileSystem fileSystem;
   @visibleForTesting
   final DirectoryWatcherFactory watcherFactory;
 
   static DirectoryWatcher _defaultWatcherFactory(String path) => DirectoryWatcher(path);
+
+  bool _isIgnored(String posixPath) => ignorePattern?.matchAsPrefix(posixPath) != null;
 
   final Map<String, Set<FilePageSource>> dependentSources = {};
 
@@ -113,6 +125,9 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
           final posixPath = p.posix.fromUri(
             fileSystem.path.toUri(fileSystem.path.relative(entry.path, from: directory)),
           );
+          if (_isIgnored(posixPath)) {
+            continue;
+          }
           entities.add(
             FilePageSource(
               posixPath,
@@ -142,6 +157,12 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
     final posixPath = p.posix.fromUri(
       fileSystem.path.toUri(fileSystem.path.relative(path, from: directory)),
     );
+    if (_isIgnored(posixPath)) {
+      // Like partials excluded by filterExtensions, ignored files are not page sources,
+      // but pages that read them as partials need a rebuild if they failed while the file was missing.
+      _invalidateDependentSources(path);
+      return;
+    }
     addSource(
       FilePageSource(
         posixPath,
@@ -161,7 +182,7 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
     if (source != null) {
       removeSource(source);
     } else {
-      // Partials excluded by filterExtensions are not page sources,
+      // Partials excluded by filterExtensions or ignorePattern are not page sources,
       // but might still have dependents registered through readPartial.
       _invalidateDependentSources(path);
     }
@@ -171,6 +192,10 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
     final source = sources.where((source) => source.file.path == path).firstOrNull;
     if (source != null) {
       invalidateSource(source, rebuild: rebuild);
+    } else {
+      // Partials excluded by filterExtensions or ignorePattern are not page sources,
+      // but might still have dependents registered through readPartial.
+      _invalidateDependentSources(path, rebuild: rebuild);
     }
   }
 
