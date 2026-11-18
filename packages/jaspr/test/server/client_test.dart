@@ -723,6 +723,87 @@ void main() {
       );
     });
 
+    testServer('does not emit duplicate class attributes when child has class in attributes map', (tester) async {
+      tester.pumpComponent(
+        Component.apply(
+          target: const ApplyTarget.descendantWith(tag: 'span'),
+          classes: 'highlight',
+          child: AppWithServerComponent(
+            child: span(attributes: {'class': 'label'}, [text('Hello')]),
+          ),
+        ),
+      );
+
+      final response = await tester.request('/');
+
+      expect(
+        response.body,
+        contains('<span class="label">Hello</span>'),
+      );
+      expect(
+        response.body,
+        isNot(contains('data-j-apply')),
+      );
+      final spanMatch = RegExp(r'<span[^>]*>').firstMatch(response.body)!.group(0)!;
+      expect('class='.allMatches(spanMatch).length, equals(1));
+    });
+
+    // To be revisited: CSS shorthand and longhand property overlap.
+    testServer(
+      'does not apply wrapper longhand style when child defines shorthand style',
+      (tester) async {
+        tester.pumpComponent(
+          Component.apply(
+            target: const ApplyTarget.descendantWith(tag: 'span'),
+            styles: Styles(margin: Margin.only(left: 8.px)),
+            child: AppWithServerComponent(
+              child: span(styles: Styles(margin: Margin.all(4.px)), [text('Hello')]),
+            ),
+          ),
+        );
+
+        final response = await tester.request('/');
+
+        expect(
+          response.body,
+          contains('<span style="margin: 4px">Hello</span>'),
+        );
+        expect(
+          response.body,
+          isNot(contains('data-j-apply')),
+        );
+      },
+      skip: true,
+    );
+
+    // To be revisited: CSS shorthand and longhand property overlap.
+    testServer(
+      'does not apply wrapper shorthand style when child defines longhand style',
+      (tester) async {
+        tester.pumpComponent(
+          Component.apply(
+            target: const ApplyTarget.descendantWith(tag: 'span'),
+            styles: Styles(margin: Margin.all(8.px)),
+            child: AppWithServerComponent(
+              child: span(styles: Styles(margin: Margin.only(left: 4.px)), [text('Hello')]),
+            ),
+          ),
+        );
+
+        final response = await tester.request('/');
+
+        expect(
+          response.body,
+          contains('<span style="margin-left: 4px">Hello</span>'),
+        );
+        expect(
+          response.body,
+          isNot(contains('data-j-apply')),
+        );
+      },
+      skip: true,
+    );
+
     testServer('preserves child inline styles with semicolons inside quotes and data URLs when applying classes', (
       tester,
     ) async {

@@ -423,6 +423,59 @@ void main() {
       expect(btn.className, 'btn');
     });
 
+    // To be revisited: slotted child hydration with raw inline styles.
+    testClient(
+      'does not apply wrapper styles during hydration when element has raw inline styles in html',
+      (tester) async {
+        window.document.body!.innerHTML = '<section><button style="color: blue;">Static</button></section>'.toJS;
+
+        tester.pumpComponent(
+          Component.apply(
+            target: const ApplyTarget.descendantWith(tag: 'button'),
+            styles: const Styles(backgroundColor: Colors.yellow, color: Colors.red),
+            child: SlottedChildView(slots: const []),
+          ),
+        );
+
+        final btn = window.document.querySelector('button')! as HTMLElement;
+        expect(btn.style.color, 'blue');
+        expect(btn.style.backgroundColor, '');
+      },
+      skip: true,
+    );
+
+    // To be revisited: CSS shorthand and longhand property overlap.
+    testClient(
+      'preserves child shorthand styles when wrapper applies overlapping longhand style',
+      (tester) async {
+        window.document.body!.innerHTML = '<section><button style="margin: 4px;">Static</button></section>'.toJS;
+        var hasParams = true;
+        late void Function(void Function() cb) setState;
+
+        tester.pumpComponent(
+          StatefulBuilder(
+            builder: (context, set) {
+              setState = set;
+              return Component.apply(
+                target: const ApplyTarget.descendantWith(tag: 'button'),
+                styles: hasParams ? Styles(margin: Margin.only(left: 8.px)) : null,
+                child: SlottedChildView(slots: const []),
+              );
+            },
+          ),
+        );
+
+        final btn = window.document.querySelector('button')! as HTMLElement;
+        expect(btn.style.marginLeft, '4px');
+
+        setState(() => hasParams = false);
+        await pumpEventQueue();
+
+        expect(btn.style.marginLeft, '4px');
+      },
+      skip: true,
+    );
+
     testClient('re-hydrates data-j-apply on reload and cleans up when apply is disabled', (tester) async {
       const html =
           '<section><button id="applied-id" class="original applied" data-j-apply="i:applied-id;c:applied">Static</button></section>';

@@ -121,7 +121,7 @@ class DomElement extends DomRenderObjectElement {
           appliedId = paramId;
         }
 
-        if (param.classes case final paramClasses?) {
+        if (param.classes case final paramClasses? when !attributes.containsKey('class')) {
           for (final c in paramClasses) {
             if (classesSet.add(c)) {
               (appliedClasses ??= []).add(c);
@@ -131,8 +131,7 @@ class DomElement extends DomRenderObjectElement {
 
         // Elements with raw inline styles in `attributes['style']` are not augmented
         // with styles from apply wrappers. Mixing structured styles with raw inline
-        // declarations is not supported and would require complex CSS declaration parsing
-        // and risk corrupting raw declarations.
+        // declarations is not supported.
         if (param.styles case final stylesProps? when !attributes.containsKey('style')) {
           for (final MapEntry(:key, :value) in stylesProps.entries) {
             if (!styles.containsKey(key)) {
@@ -146,7 +145,7 @@ class DomElement extends DomRenderObjectElement {
           for (final MapEntry(:key, :value) in attributesMap.entries) {
             if (!attributes.containsKey(key)) {
               if (key == 'id' && (id != null || appliedId != null)) continue;
-              if (key == 'class' && classesSet.isNotEmpty) continue;
+              if (key == 'class' && (classesSet.isNotEmpty || classes != null)) continue;
               if (key == 'style' && styles.isNotEmpty) continue;
               attributes[key] = value;
               (appliedAttributes ??= []).add(key);
@@ -171,7 +170,9 @@ class DomElement extends DomRenderObjectElement {
         }
       }
 
-      classes = classesSet.join(' ');
+      classes = attributes.containsKey('class')
+          ? component.classes
+          : (classesSet.isEmpty ? null : classesSet.join(' '));
       if (styles.isEmpty) {
         styles = null;
       }

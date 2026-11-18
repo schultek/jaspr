@@ -36,9 +36,6 @@ abstract class ChildSlot extends Component {
   /// Creates the render object that renders [child] into part of [parent]'s nodes.
   ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent);
 
-  /// Creates a filter function that checks whether a node is inside this slot's content.
-  bool Function(web.Node) createFilter(SlottedDomRenderObject parent);
-
   /// Whether this slot renders into the same DOM nodes as [oldComponent].
   ///
   /// A slot can't be updated with one that renders into different nodes,
@@ -63,8 +60,7 @@ class _RangeChildSlot extends ChildSlot {
     return ChildSlotRenderObject.between(parent, start, end);
   }
 
-  @override
-  bool Function(web.Node) createFilter(SlottedDomRenderObject parent) {
+  bool Function(web.Node) _createFilter() {
     final parentElement = start.parentElement;
     if (parentElement == null) return (_) => false;
 
@@ -119,8 +115,7 @@ class _QueryChildSlot extends ChildSlot {
     return ChildSlotRenderObject(target!, parent);
   }
 
-  @override
-  bool Function(web.Node) createFilter(SlottedDomRenderObject parent) {
+  bool Function(web.Node) _createFilter(SlottedDomRenderObject parent) {
     final target = findTargetElement(parent);
     if (target == null) return (_) => false;
     return (web.Node element) => element != target && target.contains(element);
@@ -279,7 +274,6 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     final inheritedDomParams = inheritedDomParamsFor(renderObject);
     if ((component.nodes != null || (inheritedDomParams != null && inheritedDomParams.isNotEmpty)) && !_didHydrate) {
       _didHydrate = true;
-      _appliedParams.clear();
       _hydrateInitialNodes(renderObject);
     }
 
@@ -339,7 +333,12 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     }
 
     final filters = [
-      for (final slot in component.slots) slot.createFilter(renderObject),
+      for (final slot in component.slots)
+        switch (slot) {
+          _RangeChildSlot s => s._createFilter(),
+          _QueryChildSlot s => s._createFilter(renderObject),
+          _ => (_) => false,
+        },
     ];
 
     return (web.Node element) {
@@ -571,6 +570,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
   @override
   void onReload() {
+    _resetAppliedParams();
     _didHydrate = false;
     super.onReload();
   }
