@@ -1,5 +1,44 @@
 ## Unreleased 0.6.0-beta.1
 
+- **Breaking**: Tightened the route loader classes,
+  so that each customization has one supported way:
+
+  - The following classes are now `final` and
+    can no longer be extended or implemented:
+
+    - `FilesystemLoader` and `FilePageSource`
+    - `GitHubLoader` and `GitHubPageSource`
+    - `MemoryLoader`, `MemoryPageSource`, and `MemoryPage`
+
+    To load pages from another kind of source,
+    extend `RouteLoaderBase` and `PageSource` instead.
+
+  - `RouteLoader` is now an `interface` class and
+    can no longer be extended, only implemented.
+
+    To create a custom route loader, extend `RouteLoaderBase` instead,
+    or implement `RouteLoader` directly.
+
+  - `PageSource.loadPage` is now private. Call `PageSource.load()` instead.
+
+  - `PageSource` now asserts that its path is relative, such as `blog/post.md`.
+    Pages with an absolute path never got a route that could be reached.
+
+  - These members are now marked as `@protected` and
+    should no longer be used outside their subclasses.
+
+    - `RouteLoaderBase`: `loadPageSources`, `addSource`, `removeSource`, `invalidateSource`,
+      `invalidateRoutes`, `invalidateAll`, `getSourceForPage`, `onReassemble`, and `resolver`
+    - `PageSource`: `buildPage` and `invalidate`
+
+    To rebuild a page from outside its loader, call `Page.markNeedsRebuild()` instead.
+
+  - These methods are now annotated with `@mustCallSuper`, so their overrides must call `super`:
+
+    - `RouteLoaderBase`: `loadRoutes`, `addSource`, `removeSource`, `invalidateSource`,
+      `invalidateRoutes`, and `invalidateAll`
+    - `PageSource`: `invalidate`
+
 ### New Features and Improvements
 
 - Added `ignorePattern` parameter to `FilesystemLoader`,
