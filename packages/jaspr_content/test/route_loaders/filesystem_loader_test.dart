@@ -427,6 +427,25 @@ void main() {
         // Assert
         expect(loader.sources, isEmpty);
       });
+
+      test('keeps the error of a failed eager rebuild until the page is requested', () async {
+        // Arrange
+        final fileSystem = MemoryFileSystem();
+        fileSystem.file('pages/index.md')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('---\ntitle: Valid\n---\nPage content');
+        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
+        await loader.loadRoutes((_) => PageConfig(), true);
+
+        // Act: Save invalid front matter, so the eager rebuild fails.
+        fileSystem.file('pages/index.md').writeAsStringSync('---\ntitle: [unclosed\n---\nPage content');
+        eventController.add(WatchEvent(ChangeType.MODIFY, 'pages/index.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The error isn't uncaught, which would fail this test,
+        // but surfaces when the page is loaded.
+        await expectLater(loader.sources.single.load(), throwsException);
+      });
     });
 
     group('Partials and Dependencies', () {
