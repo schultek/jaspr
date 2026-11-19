@@ -8,6 +8,11 @@
   The paths of the pages don't include the prefix, so config patterns and relative asset paths stay the same.
 - Added `PageConfig.matchUrlPrefix`, which resolves the config for the `urlPrefix` of the loader of each page, such as to configure each version of your docs differently.
 
+### Fixes
+
+- Fixed a page that failed to build, such as after a network error with `GitHubLoader`, failing with the same error on every request until its file changed or the server restarted.
+  The next request now builds the page again.
+
 ## 0.6.0-beta.1
 
 ### New Features and Improvements
