@@ -98,6 +98,66 @@ void main() {
         );
       });
 
+      test('resolves the config for the exact prefix of each loader with PageConfig.matchUrlPrefix', () async {
+        // Arrange: Nested prefixes, a prefix without a config, and a loader without a prefix.
+        final docsConfig = PageConfig();
+        final v1Config = PageConfig();
+        final fallback = PageConfig();
+        final loaders = [
+          for (final prefix in ['/docs', '/docs/v1', '/blog', null])
+            MemoryLoader(
+              urlPrefix: prefix,
+              pages: [const MemoryPage(path: 'guide.md')],
+            ),
+        ];
+
+        // Act: Load the routes of every loader with the same resolver.
+        final resolver = PageConfig.matchUrlPrefix({'/docs': docsConfig, '/docs/v1': v1Config}, fallback: fallback);
+        for (final loader in loaders) {
+          await loader.loadRoutes(resolver, false);
+        }
+
+        // Assert: The page under /docs/v1 gets its own config, even though its URL also starts with /docs.
+        final [docs, v1, blog, unprefixed] = [for (final loader in loaders) loader.sources.single];
+        expect(docs.config, same(docsConfig));
+        expect(v1.url, equals('/docs/v1/guide'));
+        expect(v1.config, same(v1Config));
+
+        // Assert: The other pages get the fallback config.
+        expect(blog.config, same(fallback));
+        expect(unprefixed.config, same(fallback));
+      });
+
+      test('resolves the default config without a fallback with PageConfig.matchUrlPrefix', () async {
+        // Arrange: A loader whose prefix has no config, and a config that differs from the default.
+        final docsConfig = PageConfig(enableFrontmatter: false, parsers: [MarkdownParser()]);
+        final loader = MemoryLoader(
+          urlPrefix: '/blog',
+          pages: [const MemoryPage(path: 'post.md')],
+        );
+
+        // Act: Load the routes with a resolver that has no fallback.
+        await loader.loadRoutes(PageConfig.matchUrlPrefix({'/docs': docsConfig}), false);
+
+        // Assert: The page gets a default config instead of the one for another prefix.
+        final config = loader.sources.single.config;
+        expect(config, isNot(same(docsConfig)));
+        expect(config.enableFrontmatter, isTrue);
+        expect(config.parsers, isEmpty);
+        expect(config.layouts, isEmpty);
+        expect(config.theme, isNull);
+      });
+
+      // A key that isn't a valid prefix can't be the prefix of any loader.
+      for (final key in ['', '/', 'docs', '/docs/', '/docs/1.2']) {
+        test('rejects the key "$key" for PageConfig.matchUrlPrefix', () {
+          expect(
+            () => PageConfig.matchUrlPrefix({'/docs': PageConfig(), key: PageConfig()}),
+            throwsA(isA<ArgumentError>().having((error) => error.name, 'name', 'configs')),
+          );
+        });
+      }
+
       // A dot is only rejected in the last segment.
       for (final prefix in ['/docs', '/docs/v2', '/0.10.0/docs', '/docs/v(2)', '/.well-known/docs', '/a-b_c~d']) {
         test('accepts the prefix $prefix', () {
