@@ -9,6 +9,7 @@ import 'match.dart';
 import 'matching.dart';
 import 'misc/error_screen.dart';
 import 'misc/inherited_router.dart';
+import 'misc/lazy_route_loader.dart';
 import 'route.dart';
 import 'router.dart';
 import 'typedefs.dart';
@@ -25,17 +26,19 @@ class RouteBuilder {
   final RouteConfiguration configuration;
 
   /// Builds the top-level Navigator for the given [RouteMatchList].
-  Component build(RouterState router) {
+  ///
+  /// The [loaders] track the lazy routes that are loading, by their location.
+  Component build(RouterState router, Map<Object, LazyRouteLoader> loaders) {
     if (router.matchList.isEmpty) {
       // The build method can be called before async redirect finishes. Build an
       // empty text until then.
       return Component.text('');
     }
 
-    return InheritedRouter(router: router, child: _buildRoute(router.matchList, router.routeLoaders));
+    return InheritedRouter(router: router, child: _buildRoute(router.matchList, loaders));
   }
 
-  Component _buildRoute(RouteMatchList matchList, Map<Object, RouteLoader> loaders) {
+  Component _buildRoute(RouteMatchList matchList, Map<Object, LazyRouteLoader> loaders) {
     try {
       return _buildRecursive(matchList, 0, loaders);
     } on _RouteBuilderError catch (e) {
@@ -43,7 +46,7 @@ class RouteBuilder {
     }
   }
 
-  Component _buildRecursive(RouteMatchList matchList, int startIndex, Map<Object, RouteLoader> loaders) {
+  Component _buildRecursive(RouteMatchList matchList, int startIndex, Map<Object, LazyRouteLoader> loaders) {
     final RouteMatch match = matchList.matches[startIndex];
 
     if (match.error != null) {
@@ -93,7 +96,7 @@ class RouteBuilder {
   }
 
   /// Calls the user-provided route builder from the [RouteMatch]'s [RouteBase].
-  Component _callRouteBuilder(RouteState state, Route route, Map<Object, RouteLoader> loaders) {
+  Component _callRouteBuilder(RouteState state, Route route, Map<Object, LazyRouteLoader> loaders) {
     final RouterComponentBuilder? builder = route.builder;
 
     if (builder == null) {
@@ -103,7 +106,7 @@ class RouteBuilder {
     Component child = Builder(builder: (c) => builder(c, state));
 
     if (route is LazyRoute) {
-      final l = loaders[state.subloc] ??= RouteLoader.from(route.load());
+      final l = loaders[state.subloc] ??= LazyRouteLoader.from(route.load());
 
       if (l.isPending) {
         final c = child;
@@ -129,7 +132,7 @@ class RouteBuilder {
   Component _callShellRouteBuilder(
     RouteState state,
     ShellRoute route,
-    Map<Object, RouteLoader> loaders, {
+    Map<Object, LazyRouteLoader> loaders, {
     required Component child,
   }) {
     final ShellRouteBuilder builder = route.builder;
@@ -137,7 +140,7 @@ class RouteBuilder {
     Component routeChild = Builder(builder: (c) => builder(c, state, child));
 
     if (route is LazyShellRoute) {
-      final l = loaders[state.subloc] ??= RouteLoader.from(route.load());
+      final l = loaders[state.subloc] ??= LazyRouteLoader.from(route.load());
       if (l.isPending) {
         final c = routeChild;
         routeChild = FutureBuilder(
