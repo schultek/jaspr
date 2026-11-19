@@ -29,7 +29,7 @@ import '../secondary_output/secondary_output.dart';
 ///
 /// To load pages from another kind of source, extend [RouteLoaderBase],
 /// which implements this interface.
-abstract class RouteLoader {
+abstract interface class RouteLoader {
   /// Loads the routes of the pages of this loader,
   /// and resolves the config of each page with [resolver].
   ///
@@ -61,7 +61,9 @@ abstract class RouteLoader {
 /// A base class for [RouteLoader] implementations.
 ///
 /// Subclasses implement [loadPageSources] to create a [PageSource] for each page,
-/// and can update their sources later with methods such as [addSource] and [invalidateSource].
+/// and can update their sources later with the protected methods,
+/// such as [addSource] and [invalidateSource].
+/// Code outside of the loader rebuilds a page with [Page.markNeedsRebuild] instead.
 abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   /// Creates a loader that prints its routes each time it builds them if [debugPrint] is `true`.
   RouteLoaderBase({this.debugPrint = false});
@@ -85,6 +87,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   /// The resolver of each page's config, from the latest call to [loadRoutes].
   ///
   /// Only available once [loadRoutes] was called.
+  @protected
   ConfigResolver get resolver {
     assert(_resolver != null, 'Resolver not available, call loadRoutes first.');
     return _resolver!;
@@ -115,8 +118,9 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
 
   /// Returns the source of this loader that built [page],
   /// or `null` if none of its sources did.
+  @protected
   T? getSourceForPage(Page page) {
-    return _sources?.where((source) => source.page == page).firstOrNull;
+    return _sources?.firstWhereOrNull((source) => source.page == page);
   }
 
   /// Loads the routes for the sources from [loadPageSources],
@@ -126,6 +130,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   /// If [eager] is `true`, every page is also loaded right away.
   /// The routes are reused until [invalidateRoutes] or [invalidateAll] is called.
   @override
+  @mustCallSuper
   Future<List<RouteBase>> loadRoutes(ConfigResolver resolver, bool eager) async {
     _reassembleSub ??= ServerApp.onReassemble.listen((_) {
       invalidateAll();
@@ -144,6 +149,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   ///
   /// Override this to release resources, such as file watchers,
   /// that the next call to [loadRoutes] can set up again.
+  @protected
   void onReassemble() {}
 
   /// Creates a route for each source that isn't private,
@@ -201,6 +207,7 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   /// Creates the sources of all pages of this loader.
   ///
   /// Called when the routes are first loaded, and again after [invalidateAll].
+  @protected
   Future<List<T>> loadPageSources();
 
   /// Invalidates the source of this loader that built [page], if any.
@@ -214,6 +221,8 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
 
   /// Adds [source] to the sources of this loader,
   /// so that the next call to [loadRoutes] creates a route for it.
+  @protected
+  @mustCallSuper
   void addSource(T source) {
     _sources ??= [];
     _sources!.add(source);
@@ -222,6 +231,8 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
 
   /// Removes [source] from the sources of this loader,
   /// so that the next call to [loadRoutes] no longer creates a route for it.
+  @protected
+  @mustCallSuper
   void removeSource(T source) {
     _sources?.remove(source);
     invalidateRoutes();
@@ -232,6 +243,8 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   ///
   /// When loading eagerly, the page is rebuilt right away,
   /// unless [rebuild] is `false`.
+  @protected
+  @mustCallSuper
   void invalidateSource(T source, {bool rebuild = true}) {
     source.invalidate(rebuild: rebuild);
     ServerApp.reloadClients(source.url);
@@ -239,12 +252,16 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
 
   /// Makes the next call to [loadRoutes] create the routes again,
   /// such as after the sources changed.
+  @protected
+  @mustCallSuper
   void invalidateRoutes() {
     _routes = null;
   }
 
   /// Discards all sources and routes,
   /// so that the next call to [loadRoutes] loads them again.
+  @protected
+  @mustCallSuper
   void invalidateAll() {
     _sources = null;
     _routes = null;
@@ -263,27 +280,23 @@ abstract class PageSource {
   /// The [path] determines the URL of the page and must use forward slashes.
   /// Unless [keepSuffix] is `true`, the URL of the page drops the file extension,
   /// and an index file gets the URL of its folder.
-  PageSource(this.path, this.loader, {bool keepSuffix = false}) {
-    assert(!path.contains(p.windows.separator), 'PageSource path must be in posix format (using forward slashes).');
+  PageSource(this.path, this.loader, {bool keepSuffix = false})
+    : assert(!path.contains(p.windows.separator), 'PageSource path must be in posix format (using forward slashes).'),
+      assert(!p.posix.isAbsolute(path), 'PageSource path must be relative, such as `blog/post.md`.'),
+      private = p.posix.split(path).any((segment) => segment.startsWith('_') || segment.startsWith('.')),
+      url = _createUrl(path, keepSuffix: keepSuffix);
 
-    final segments = p.posix.split(path).where((segment) => segment.isNotEmpty).toList();
-    if (segments.isEmpty) {
-      url = '/';
-      return;
+  /// Returns the URL of the page at [path].
+  static String _createUrl(String path, {required bool keepSuffix}) {
+    var segments = p.posix.split(path);
+    if (segments case [...final folders, final file] when !keepSuffix) {
+      // An index file gets the URL of its folder, such as `/blog` for `blog/index.md`.
+      // Other files drop their extension, such as `/blog/post` for `blog/post.md`.
+      final name = p.posix.basenameWithoutExtension(file);
+      segments = name == 'index' ? folders : [...folders, name];
     }
 
-    private = segments.any((s) => s.startsWith('_') || s.startsWith('.'));
-
-    if (!keepSuffix) {
-      final lastSegmentName = p.basenameWithoutExtension(segments.last);
-      if (lastSegmentName == 'index') {
-        segments.removeLast();
-      } else {
-        segments.last = lastSegmentName;
-      }
-    }
-
-    url = '/${segments.join('/')}';
+    return '/${segments.join('/')}';
   }
 
   /// The path of the page, such as `blog/post.md`, written with forward slashes.
@@ -292,11 +305,11 @@ abstract class PageSource {
   final String path;
 
   /// The URL of the page, such as `/blog/post`, derived from [path].
-  late final String url;
+  final String url;
 
   /// Whether a segment of [path] starts with `_` or `.`,
   /// in which case the page doesn't get a route.
-  late final bool private;
+  final bool private;
 
   /// The loader that this source belongs to.
   final RouteLoaderBase loader;
@@ -320,12 +333,12 @@ abstract class PageSource {
   /// If building the page fails, later calls fail with the same error
   /// until the source is invalidated.
   Future<Component> load() async {
-    return _future ??= loadPage();
+    return _future ??= _loadPage();
   }
 
   /// Builds the page with [buildPage], makes it the current [page],
   /// and renders it with its path and URL added to its data.
-  Future<Component> loadPage() async {
+  Future<Component> _loadPage() async {
     final newPage = await buildPage();
 
     if (_page != null) {
@@ -360,12 +373,15 @@ abstract class PageSource {
   ///
   /// Called by [load] when the page isn't built yet or was invalidated.
   /// Subclasses implement this to read their content, such as from a file.
+  @protected
   Future<Page> buildPage();
 
   /// Discards the page of this source, so that the next call to [load] builds it again.
   ///
   /// When the loader loads pages eagerly, the page is rebuilt right away,
   /// unless [rebuild] is `false`.
+  @protected
+  @mustCallSuper
   void invalidate({bool rebuild = true}) {
     if (_page != null) {
       RouteLoader._pages.remove(_page);
@@ -382,7 +398,7 @@ abstract class PageSource {
 }
 
 /// Debugging helpers for route loaders.
-extension RouteLoaderExtension on RouteLoader {
+extension _RouteLoaderExtension on RouteLoader {
   /// Prints the path of each of the [routes] and of their nested routes,
   /// indented by [padding].
   void _printRoutes(List<RouteBase> routes, [String padding = '']) {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http show get;
+import 'package:jaspr/server.dart' show protected;
 
 import '../page.dart';
 import 'route_loader.dart';
@@ -14,7 +15,7 @@ typedef GithubLoader = GitHubLoader;
 /// Routes are constructed based on the recursive folder structure starting at the root [path].
 /// Index files (index.*) are treated as the page for the containing folder.
 /// Files and folders starting with an underscore (_) or a dot (.) don't get routes.
-class GitHubLoader extends RouteLoaderBase<GitHubPageSource> {
+final class GitHubLoader extends RouteLoaderBase<GitHubPageSource> {
   /// Creates a loader for the pages under [path] in the GitHub [repo] at [ref].
   ///
   /// If [debugPrint] is `true`, the routes are printed each time they're built.
@@ -114,7 +115,7 @@ extension type _GitHubTree._(Map<String, Object?> tree) {
 /// A page source that fetches the content of its page from a file in a GitHub repository.
 ///
 /// A [GitHubLoader] creates one for each file it loads as a page.
-class GitHubPageSource extends PageSource {
+final class GitHubPageSource extends PageSource {
   /// Creates a page source for the file at [blobUrl] that belongs to [loader].
   ///
   /// Unless [keepSuffix] is true, the URL of the page drops the file extension,
@@ -129,6 +130,7 @@ class GitHubPageSource extends PageSource {
 
   /// Creates the page from the current content of the file on GitHub.
   @override
+  @protected
   Future<Page> buildPage() async {
     final response = await http.get(
       Uri.parse(blobUrl),

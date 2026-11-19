@@ -459,6 +459,37 @@ void main() {
         when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
       });
 
+      for (final eager in [false, true]) {
+        test(
+          'invalidates the pages that read a page as a partial when it is marked for rebuild '
+          '(${eager ? 'eager' : 'lazy'})',
+          () async {
+            // Arrange: Load the pages, and let the index page read the header page as a partial.
+            final fileSystem = MemoryFileSystem();
+            final pagesDir = fileSystem.directory('pages')..createSync();
+            pagesDir.childFile('header.md').writeAsStringSync('Header');
+            pagesDir.childFile('index.md').createSync();
+            pagesDir.childFile('other.md').createSync();
+            final loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
+            await loader.loadRoutes((_) => PageConfig(), eager);
+            final header = loader.sources.singleWhere((source) => source.path == 'header.md');
+            final index = loader.sources.singleWhere((source) => source.path == 'index.md');
+            final other = loader.sources.singleWhere((source) => source.path == 'other.md');
+            await header.load();
+            final cachedIndex = await index.load();
+            final cachedOther = await other.load();
+            loader.readPartialSync(fileSystem.path.join('pages', 'header.md'), index.page!);
+
+            // Act: Mark the header page for rebuild, such as after its data changed.
+            header.page!.markNeedsRebuild();
+
+            // Assert: The index page is rebuilt, but the other page isn't.
+            expect(await index.load(), isNot(same(cachedIndex)));
+            expect(await other.load(), same(cachedOther));
+          },
+        );
+      }
+
       test('invalidates dependent page when partial changes', () async {
         // Arrange
         final fileSystem = MemoryFileSystem();
