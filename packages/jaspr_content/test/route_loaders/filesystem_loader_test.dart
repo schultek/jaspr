@@ -302,42 +302,6 @@ void main() {
         when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
       });
 
-      test('adds new source on file add event', () async {
-        // Arrange
-        final fileSystem = MemoryFileSystem();
-        fileSystem.directory('pages').createSync();
-        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
-        await loader.loadRoutes((_) => PageConfig(), false);
-        expect(loader.sources, isEmpty);
-
-        // Act
-        fileSystem.file('pages/about.md').createSync();
-        eventController.add(WatchEvent(ChangeType.ADD, 'pages/about.md'));
-        await Future<void>.delayed(Duration.zero);
-
-        // Assert
-        expect(loader.sources, hasLength(1));
-        expect(loader.sources.first.url, equals('/about'));
-      });
-
-      test('adds new source on file add event on windows', () async {
-        // Arrange
-        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
-        fileSystem.directory('pages').createSync();
-        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
-        await loader.loadRoutes((_) => PageConfig(), false);
-        expect(loader.sources, isEmpty);
-
-        // Act
-        fileSystem.file(r'pages\about.md').createSync();
-        eventController.add(WatchEvent(ChangeType.ADD, r'pages\about.md'));
-        await Future<void>.delayed(Duration.zero);
-
-        // Assert
-        expect(loader.sources, hasLength(1));
-        expect(loader.sources.first.url, equals('/about'));
-      });
-
       test('does not add a source for an ignored file on file add event', () async {
         // Arrange
         final fileSystem = MemoryFileSystem();
@@ -392,41 +356,66 @@ void main() {
         expect(loader.sources.map((source) => source.url), equals(['/about']));
       });
 
-      test('removes source on file remove event', () async {
-        // Arrange
-        final fileSystem = MemoryFileSystem();
-        fileSystem.directory('pages').createSync();
-        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
-        fileSystem.file('pages/about.md').createSync();
+      for (final windows in [false, true]) {
+        for (final directory in windows ? ['pages', r'.\pages', r'C:\pages'] : ['pages', './pages', '/pages']) {
+          final suffix = 'when the directory is given as $directory${windows ? ' on windows' : ''}';
 
-        await loader.loadRoutes((_) => PageConfig(), false);
-        expect(loader.sources, hasLength(1));
+          // The watcher reports absolute paths on some platforms.
+          test('finds the source of a changed file $suffix', () async {
+            // Arrange
+            final fileSystem = MemoryFileSystem(style: windows ? FileSystemStyle.windows : FileSystemStyle.posix);
+            final filePath = fileSystem.path.join('pages', 'about.md');
+            fileSystem.file(filePath)
+              ..createSync(recursive: true)
+              ..writeAsStringSync('Page content');
+            loader = FilesystemLoader(directory, fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
 
-        // Act
-        eventController.add(WatchEvent(ChangeType.REMOVE, 'pages/about.md'));
-        await Future<void>.delayed(Duration.zero);
+            await loader.loadRoutes((_) => PageConfig(), false);
+            final source = loader.sources.single;
+            await source.load();
 
-        // Assert
-        expect(loader.sources, isEmpty);
-      });
+            // Act and assert: A modify event invalidates the page.
+            eventController.add(WatchEvent(ChangeType.MODIFY, filePath));
+            await Future<void>.delayed(Duration.zero);
+            expect(source.page, isNull);
 
-      test('removes source on file remove event on windows', () async {
-        // Arrange
-        final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
-        fileSystem.directory('pages').createSync();
-        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
-        fileSystem.file(r'pages\about.md').createSync();
+            // Act and assert: A remove event reported by absolute path removes the source.
+            eventController.add(WatchEvent(ChangeType.REMOVE, fileSystem.path.absolute(filePath)));
+            await Future<void>.delayed(Duration.zero);
+            expect(loader.sources, isEmpty);
+          });
 
-        await loader.loadRoutes((_) => PageConfig(), false);
-        expect(loader.sources, hasLength(1));
+          test('finds the source of an added file $suffix', () async {
+            // Arrange
+            final fileSystem = MemoryFileSystem(style: windows ? FileSystemStyle.windows : FileSystemStyle.posix);
+            fileSystem.directory('pages').createSync();
+            loader = FilesystemLoader(directory, fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
+            await loader.loadRoutes((_) => PageConfig(), false);
+            expect(loader.sources, isEmpty);
 
-        // Act
-        eventController.add(WatchEvent(ChangeType.REMOVE, r'pages\about.md'));
-        await Future<void>.delayed(Duration.zero);
+            // Act and assert: An add event adds the source.
+            final filePath = fileSystem.path.join('pages', 'about.md');
+            fileSystem.file(filePath)
+              ..createSync()
+              ..writeAsStringSync('Page content');
+            eventController.add(WatchEvent(ChangeType.ADD, filePath));
+            await Future<void>.delayed(Duration.zero);
+            final source = loader.sources.single;
+            expect(source.url, equals('/about'));
+            await source.load();
 
-        // Assert
-        expect(loader.sources, isEmpty);
-      });
+            // Act and assert: A modify event reported by absolute path invalidates the page.
+            eventController.add(WatchEvent(ChangeType.MODIFY, fileSystem.path.absolute(filePath)));
+            await Future<void>.delayed(Duration.zero);
+            expect(source.page, isNull);
+
+            // Act and assert: A remove event removes the source.
+            eventController.add(WatchEvent(ChangeType.REMOVE, filePath));
+            await Future<void>.delayed(Duration.zero);
+            expect(loader.sources, isEmpty);
+          });
+        }
+      }
 
       test('discards the page of a removed source without rebuilding it', () async {
         // Arrange: Load the page eagerly, so that a rebuild would happen right away.
@@ -756,81 +745,52 @@ void main() {
         });
       }
 
-      for (final filtered in [false, true]) {
-        test('invalidates dependent page when ${filtered ? 'an excluded' : 'an ignored'} partial changes', () async {
-          // Arrange the file system layout and content.
-          final fileSystem = MemoryFileSystem();
-          final pagesDir = fileSystem.directory('pages')..createSync();
-          final loader = FilesystemLoader(
-            'pages',
-            filterExtensions: filtered ? {'.md'} : const {},
-            ignorePattern: filtered ? null : RegExp(r'(.*/)?README\.md$'),
-            fileSystem: fileSystem,
-            watcherFactory: (_) => mockWatcher,
-          );
+      for (final windows in [false, true]) {
+        for (final filtered in [false, true]) {
+          // A partial can be read by an absolute path, such as with an absolute Liquid includesPath.
+          for (final absolute in [false, true]) {
+            test(
+              'invalidates dependent page when ${filtered ? 'an excluded' : 'an ignored'} partial '
+              '${absolute ? 'read by absolute path ' : ''}changes${windows ? ' on windows' : ''}',
+              () async {
+                // Arrange the file system layout and content.
+                final fileSystem = MemoryFileSystem(style: windows ? FileSystemStyle.windows : FileSystemStyle.posix);
+                final pagesDir = fileSystem.directory('pages')..createSync();
+                final loader = FilesystemLoader(
+                  'pages',
+                  filterExtensions: filtered ? {'.md'} : const {},
+                  ignorePattern: filtered ? null : RegExp(r'(.*/)?README\.md$'),
+                  fileSystem: fileSystem,
+                  watcherFactory: (_) => mockWatcher,
+                );
 
-          final partialPath = filtered ? 'pages/header.html' : 'pages/README.md';
-          fileSystem.file(partialPath)
-            ..createSync()
-            ..writeAsStringSync('Old');
-          pagesDir.childFile('index.md')
-            ..createSync()
-            ..writeAsStringSync('Page content');
+                final partialPath = fileSystem.path.join('pages', filtered ? 'header.html' : 'README.md');
+                fileSystem.file(partialPath)
+                  ..createSync()
+                  ..writeAsStringSync('Old');
+                pagesDir.childFile('index.md')
+                  ..createSync()
+                  ..writeAsStringSync('Page content');
 
-          // Initial load to activate the watcher.
-          await loader.loadRoutes((_) => PageConfig(), false);
-          final pageSource = loader.sources.single;
-          await pageSource.load();
+                // Initial load to activate the watcher.
+                await loader.loadRoutes((_) => PageConfig(), false);
+                final pageSource = loader.sources.single;
+                await pageSource.load();
 
-          // Establish dependency by reading the partial.
-          expect(loader.readPartialSync(partialPath, pageSource.page!), equals('Old'));
+                // Establish dependency by reading the partial.
+                final readPath = absolute ? fileSystem.path.absolute(partialPath) : partialPath;
+                expect(loader.readPartialSync(readPath, pageSource.page!), equals('Old'));
 
-          // Act: Simulate a modify event on the partial.
-          eventController.add(WatchEvent(ChangeType.MODIFY, partialPath));
-          await Future<void>.delayed(Duration.zero);
+                // Act: Simulate a modify event on the partial, reported by relative path.
+                eventController.add(WatchEvent(ChangeType.MODIFY, partialPath));
+                await Future<void>.delayed(Duration.zero);
 
-          // Assert: The page was invalidated.
-          expect(pageSource.page, isNull);
-        });
-
-        test(
-          'invalidates dependent page when ${filtered ? 'an excluded' : 'an ignored'} partial changes on windows',
-          () async {
-            // Arrange the file system layout and content.
-            final fileSystem = MemoryFileSystem(style: FileSystemStyle.windows);
-            final pagesDir = fileSystem.directory('pages')..createSync();
-            final loader = FilesystemLoader(
-              'pages',
-              filterExtensions: filtered ? {'.md'} : const {},
-              ignorePattern: filtered ? null : RegExp(r'(.*/)?README\.md$'),
-              fileSystem: fileSystem,
-              watcherFactory: (_) => mockWatcher,
+                // Assert: The page was invalidated.
+                expect(pageSource.page, isNull);
+              },
             );
-
-            final partialPath = filtered ? r'pages\header.html' : r'pages\README.md';
-            fileSystem.file(partialPath)
-              ..createSync()
-              ..writeAsStringSync('Old');
-            pagesDir.childFile('index.md')
-              ..createSync()
-              ..writeAsStringSync('Page content');
-
-            // Initial load to activate the watcher.
-            await loader.loadRoutes((_) => PageConfig(), false);
-            final pageSource = loader.sources.single;
-            await pageSource.load();
-
-            // Establish dependency by reading the partial.
-            expect(loader.readPartialSync(partialPath, pageSource.page!), equals('Old'));
-
-            // Act: Simulate a modify event on the partial.
-            eventController.add(WatchEvent(ChangeType.MODIFY, partialPath));
-            await Future<void>.delayed(Duration.zero);
-
-            // Assert: The page was invalidated.
-            expect(pageSource.page, isNull);
-          },
-        );
+          }
+        }
       }
 
       test('keeps a page that did not read a changed partial that is not a page source', () async {

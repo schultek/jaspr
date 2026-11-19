@@ -81,8 +81,17 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// as the default [watcherFactory].
   static DirectoryWatcher _defaultWatcherFactory(String path) => DirectoryWatcher(path);
 
+  /// The path context used to compare and convert file paths.
+  ///
+  /// Read once, since [LocalFileSystem.path] creates
+  /// a new context on every access.
+  late final p.Context _pathContext = fileSystem.path;
+
   /// The page sources that read each partial, keyed by the path of the partial.
-  final Map<String, Set<FilePageSource>> _dependentSources = {};
+  ///
+  /// Keys are compared as paths, since a partial can be read by a
+  /// different spelling of its path than the one the file watcher reports.
+  late final p.PathMap<Set<FilePageSource>> _dependentSources = .new(context: _pathContext);
 
   /// The subscription to the file changes in [directory],
   /// or `null` when the directory is not being watched.
@@ -106,9 +115,10 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// Adds, removes, or invalidates the page source of the file that [event] reports,
   /// and invalidates the pages that read the file as a partial.
   void _onFileEvent(WatchEvent event) {
-    // It looks like event.path is relative on most platforms, but an
-    // absolute path on Linux. Turn this into the expected relative path.
-    final path = p.normalize(p.relative(event.path));
+    // `event.path` is relative on most platforms, but absolute on Linux.
+    // Spell it like the file paths of the loaded sources, which start with
+    // [directory] as it was given, so that comparing them stays cheap.
+    final path = _pathContext.join(directory, _pathContext.relative(event.path, from: directory));
 
     if (event.type == ChangeType.ADD) {
       if (_createSource(fileSystem.file(path)) case final source?) {
@@ -144,8 +154,6 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// The [page] is invalidated when the file of the partial is
   /// later added, changed, or removed while serving.
   /// Since only [directory] is watched, this only happens for partials inside of it.
-  /// Invalidation also requires [path] to be normalized and relative to
-  /// the current working directory, such as `content/_includes/header.html`.
   @override
   Future<String> readPartial(String path, Page page) {
     return _getPartial(path, page).readAsString();
@@ -205,7 +213,7 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   FilePageSource? _createSource(File file) {
     // The path relative to the directory, with forward slashes on every platform.
     final path = p.posix.fromUri(
-      fileSystem.path.toUri(fileSystem.path.relative(file.path, from: directory)),
+      _pathContext.toUri(_pathContext.relative(file.path, from: directory)),
     );
     if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.posix.extension(path))) {
       return null;
@@ -219,8 +227,11 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   }
 
   /// Finds the page source of the file at [path].
+  ///
+  /// Compares as paths rather than strings, so that the lookup doesn't depend on
+  /// the directory listing and the watcher spelling a path the same way.
   FilePageSource? _sourceForFile(String path) {
-    return sources.firstWhereOrNull((source) => source.file.path == path);
+    return sources.firstWhereOrNull((source) => _pathContext.equals(source.file.path, path));
   }
 
   /// Removes [source] from the loader,

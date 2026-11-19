@@ -54,6 +54,9 @@
 ### Fixes
 
 - Fixed pages not being rebuilt when a partial that is not a page source, such as a file excluded by `filterExtensions`, is edited while serving.
+- Fixed pages not being rebuilt or removed while serving when
+  the `FilesystemLoader` directory or the path of a partial is absolute or not normalized,
+  such as with an absolute Liquid `includesPath` inside the loader directory.
 - Fixed an uncaught error when a page that is loaded eagerly fails to rebuild while serving,
   such as after saving invalid front matter.
   The error now surfaces when the page is requested.
