@@ -20,6 +20,7 @@ The `ContentApp` component orchestrates this process by taking a list of `RouteL
 ## Built-In Route Loaders
 
 `jaspr_content` comes with several built-in `RouteLoader` implementations to cover common use cases.
+Each of them can also mount its pages under a URL prefix, as described in [URL Prefixes](#url-prefixes).
 
 ### FilesystemLoader
 
@@ -128,6 +129,62 @@ ContentApp.custom(
 );
 ```
 
+## URL Prefixes
+
+Each built-in loader takes a `urlPrefix` argument that mounts its pages under that prefix. This lets one site serve several sets of pages, such as each version of your docs:
+
+```dart
+final latestLoader = FilesystemLoader('docs/latest', urlPrefix: '/docs');
+final v1Loader = FilesystemLoader('docs/v1', urlPrefix: '/docs/v1');
+
+ContentApp.custom(
+  loaders: [latestLoader, v1Loader],
+  // ...
+);
+```
+
+The prefix goes in front of the URL that each page gets from its path. With the prefix `/docs/v1`, the file `docs/v1/guide/intro.md` gets the URL `/docs/v1/guide/intro`, and `docs/v1/index.md` gets `/docs/v1`.
+
+Relative links in the content of a page still resolve from the root of the site, since the built-in layouts set the base URL of each page to `/`. In the pages of a loader with a prefix, include the prefix in links to its other pages, such as `[Intro](/docs/v1/guide/intro)`, since `[Intro](guide/intro)` links to `/guide/intro`. Relative asset paths aren't affected, since an `AssetManager` resolves them, as described below.
+
+The prefix must start with a `/` and not end with one, and its segments can't be empty, `.`, or `..`. It can't contain `:`, `%`, or a character that URLs percent-encode, such as a space, `?`, `#`, or a non-ASCII letter. The last segment can't contain a `.`, so use a prefix like `/docs/v1-2` instead of `/docs/1.2`. Make sure that the URLs of different loaders don't overlap, such as through a `v1` folder in `docs/latest`, since only the first matching route is served.
+
+The paths of the pages don't include the prefix, so config patterns, such as those of `PageConfig.match` and secondary outputs, work the same as without a prefix. This also means that pages of different loaders can share a path, such as `guide/intro.md` in each version, so tell them apart by their loader or URL instead.
+
+To give the pages of each loader their own config, use `PageConfig.matchUrlPrefix` as your `configResolver`. It resolves the config whose key is the `urlPrefix` of the page's loader. A key only matches that exact prefix, so `/docs` doesn't match the pages under `/docs/v1`. Pages whose loader has no prefix, or one that isn't a key, get the `fallback` config, or the default config without one:
+
+```dart
+ContentApp.custom(
+  loaders: [latestLoader, v1Loader],
+  configResolver: PageConfig.matchUrlPrefix({
+    '/docs': latestConfig,
+    '/docs/v1': v1Config,
+  }),
+  // ...
+);
+```
+
+A key that isn't a valid prefix, such as `/` or `/docs/`, throws an `ArgumentError`, since no loader can have that prefix.
+
+For other rules, such as combining the prefix with path patterns, write a `configResolver` that checks `source.loader`.
+
+Other features see the pages of all loaders together:
+
+- To filter the pages that eager loading provides, such as to list the other pages of the same version, check their `url` or `loader`.
+- `RSSOutput` writes one feed for the whole site to `/rss.xml`, which lists the pages of all loaders. With a config for each loader, add it to only one of them, since each config that has it adds its own `/rss.xml` route, and only the first is served. To only list the pages of some loaders, pass it a `filter`, such as `RSSFilter.custom((page) => page.loader == latestLoader)`.
+
+An `AssetManager` resolves relative asset paths from the path of the page within its `directory`, so use one for each loader. Give each an `outputPrefix` that isn't inside that of another, such as `assets/latest` and `assets/v1`, and use `filterPages` so that it only processes the pages of its loader:
+
+```dart
+final v1Assets = AssetManager(
+  directory: 'docs/v1',
+  outputPrefix: 'assets/v1',
+  filterPages: (page) => page.loader == v1Loader,
+);
+```
+
+Then set up each asset manager as described in [Assets](/content/concepts/assets#setup), all in the same config.
+
 ## Creating Custom Route Loaders
 
 If the built-in loaders don't fit your needs, you can create your own loader. The built-in loaders are final classes, so extend `RouteLoaderBase` and `PageSource` instead. At minimum, you'll need to:
@@ -141,6 +198,8 @@ If the built-in loaders don't fit your needs, you can create your own loader. Th
     - This method should discover all your page sources and return a list of `PageSource` objects.
 
 You might also need to implement `readPartial()` and `readPartialSync()` in your custom loader if your content strategy involves including partial files (via a template engine) and these partials also need to be sourced from your custom location.
+
+To support [URL prefixes](#url-prefixes), forward `super.urlPrefix` from the constructor of your loader. `PageSource` then adds the prefix to the `url` of each page.
 
 **Example: Loading Pages from a CMS**
 
@@ -171,7 +230,7 @@ class CmsPageSource extends PageSource {
 
 /// Custom RouteLoader for the CMS
 class CmsLoader extends RouteLoaderBase {
-  CmsLoader({super.debugPrint});
+  CmsLoader({super.urlPrefix, super.debugPrint});
 
   @override
   Future<List<PageSource>> loadPageSources() async {
