@@ -66,10 +66,75 @@ abstract interface class RouteLoader {
 /// Code outside of the loader rebuilds a page with [Page.markNeedsRebuild] instead.
 abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   /// Creates a loader that prints its routes each time it builds them if [debugPrint] is `true`.
-  RouteLoaderBase({this.debugPrint = false});
+  ///
+  /// If [urlPrefix] is set, the URL of each page starts with it.
+  /// Throws an [ArgumentError] if [urlPrefix] isn't a valid prefix.
+  RouteLoaderBase({this.debugPrint = false, this.urlPrefix}) {
+    if (urlPrefix case final prefix?) {
+      _checkUrlPrefix(prefix);
+    }
+  }
 
   /// Whether to print the routes each time they're built.
   final bool debugPrint;
+
+  /// The prefix of the URLs of all pages of this loader, such as `/docs/v2`,
+  /// or `null` to not prefix them.
+  ///
+  /// The prefix is added in front of the URL that each page gets from its path.
+  /// For example, with the prefix `/docs/v2`, the page at `guide/intro.md`
+  /// gets the URL `/docs/v2/guide/intro`, and the page at `index.md` gets `/docs/v2`.
+  ///
+  /// The paths of the pages don't include the prefix,
+  /// so patterns that match them, such as for [PageConfig.match],
+  /// parsers, and secondary outputs, stay the same.
+  /// To vary the config of the pages by their prefix,
+  /// check [PageSource.url] or [PageSource.loader] in a [ConfigResolver] instead.
+  ///
+  /// The prefix must start with a `/` and not end with one,
+  /// and its segments can't be empty, `.`, or `..`.
+  /// It can't contain `:`, `%`, or a character that URLs percent-encode,
+  /// such as a space, `?`, `#`, or a non-ASCII letter,
+  /// since routes can't match those characters as they are written.
+  /// A `.` in the last segment, such as in `/docs/1.2`, isn't supported.
+  final String? urlPrefix;
+
+  /// Throws an [ArgumentError] if [prefix] isn't a valid [urlPrefix].
+  static void _checkUrlPrefix(String prefix) {
+    if (!prefix.startsWith('/') || prefix.endsWith('/')) {
+      throw ArgumentError.value(prefix, 'urlPrefix', 'Must start with a `/` and not end with one, such as `/docs`');
+    }
+    final segments = prefix.substring(1).split('/');
+    for (final segment in segments) {
+      if (segment.isEmpty || segment == '.' || segment == '..') {
+        throw ArgumentError.value(prefix, 'urlPrefix', 'Each segment must be non-empty and not `.` or `..`');
+      }
+    }
+
+    // Routes treat `:` as the start of a parameter, and are matched against the percent-encoded
+    // path of the requested URL, so a character that needs encoding never matches.
+    // A prefix that is already encoded isn't decoded for the paths that static generation writes to.
+    if (prefix.contains(':') || prefix.contains('%') || Uri(path: prefix).path != prefix) {
+      throw ArgumentError.value(
+        prefix,
+        'urlPrefix',
+        'Must not contain `:`, `%`, or a character that URLs percent-encode, '
+            'such as a space, `?`, `#`, or a non-ASCII letter',
+      );
+    }
+
+    // TODO: Support a `.` in the last segment, such as in `/docs/0.10.0`.
+    // Static generation and MarkdownOutput take a URL whose last segment contains a `.`
+    // for the URL of a file. The root index page, whose URL is the prefix,
+    // is then written to a file at the path where the other pages need a folder.
+    if (segments.last.contains('.')) {
+      throw ArgumentError.value(
+        prefix,
+        'urlPrefix',
+        'A `.` in the last segment is not supported yet, so use a prefix such as `/docs/v2` instead',
+      );
+    }
+  }
 
   /// The routes from the latest call to [loadRoutes],
   /// or `null` if they need to be created again.
@@ -284,14 +349,15 @@ abstract class PageSource {
   /// The [path] determines the URL of the page and must use forward slashes.
   /// Unless [keepSuffix] is `true`, the URL of the page drops the file extension,
   /// and an index file gets the URL of its folder.
+  /// The URL starts with the [RouteLoaderBase.urlPrefix] of [loader], if set.
   PageSource(this.path, this.loader, {bool keepSuffix = false})
     : assert(!path.contains(p.windows.separator), 'PageSource path must be in posix format (using forward slashes).'),
       assert(!p.posix.isAbsolute(path), 'PageSource path must be relative, such as `blog/post.md`.'),
       private = p.posix.split(path).any((segment) => segment.startsWith('_') || segment.startsWith('.')),
-      url = _createUrl(path, keepSuffix: keepSuffix);
+      url = _createUrl(path, loader.urlPrefix, keepSuffix: keepSuffix);
 
-  /// Returns the URL of the page at [path].
-  static String _createUrl(String path, {required bool keepSuffix}) {
+  /// Returns the URL of the page at [path], starting with [prefix] if it isn't `null`.
+  static String _createUrl(String path, String? prefix, {required bool keepSuffix}) {
     var segments = p.posix.split(path);
     if (segments case [...final folders, final file] when !keepSuffix) {
       // An index file gets the URL of its folder, such as `/blog` for `blog/index.md`.
@@ -300,15 +366,19 @@ abstract class PageSource {
       segments = name == 'index' ? folders : [...folders, name];
     }
 
-    return '/${segments.join('/')}';
+    // Without any segments, the URL is the prefix itself, such as `/docs` for `index.md`.
+    if (segments.isEmpty) return prefix ?? '/';
+    return '${prefix ?? ''}/${segments.join('/')}';
   }
 
   /// The path of the page, such as `blog/post.md`, written with forward slashes.
   ///
   /// Config patterns, such as for secondary outputs, match against it.
+  /// It never includes the [RouteLoaderBase.urlPrefix] of the [loader].
   final String path;
 
-  /// The URL of the page, such as `/blog/post`, derived from [path].
+  /// The URL of the page, such as `/blog/post`,
+  /// derived from [path] and the [RouteLoaderBase.urlPrefix] of the [loader].
   final String url;
 
   /// Whether a segment of [path] starts with `_` or `.`,

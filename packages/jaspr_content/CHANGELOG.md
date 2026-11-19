@@ -21,6 +21,7 @@
 
   - `FilesystemLoader.addFile`, `removeFile`, `invalidateFile`, and `dependentSources` are now private.
     To choose which files become pages, use `filterExtensions` or `ignorePattern`.
+    To mount the pages under a URL prefix, use the new `urlPrefix` parameter.
 
   - `PageSource.loadPage` is now private. Call `PageSource.load()` instead.
 
@@ -50,6 +51,10 @@
 - Added `ignorePattern` parameter to `FilesystemLoader`,
   which skips the files whose path it matches from the start.
   This can be used to leave files such as `README.md` out of the pages.
+- Added `urlPrefix` parameter to `RouteLoaderBase` and the built-in route loaders,
+  which mounts the pages of a loader under a URL prefix, such as `/docs/v2`.
+  The paths of the pages don't include the prefix,
+  so config patterns and relative asset paths stay the same.
 
 ### Fixes
 

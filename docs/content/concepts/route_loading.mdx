@@ -20,6 +20,7 @@ The `ContentApp` component orchestrates this process by taking a list of `RouteL
 ## Built-In Route Loaders
 
 `jaspr_content` comes with several built-in `RouteLoader` implementations to cover common use cases.
+Each of them can also mount its pages under a URL prefix, as described in [URL Prefixes](#url-prefixes).
 
 ### FilesystemLoader
 
@@ -128,6 +129,42 @@ ContentApp.custom(
 );
 ```
 
+## URL Prefixes
+
+Each built-in loader takes a `urlPrefix` argument that mounts its pages under that prefix. This lets one site serve several sets of pages, such as each version of your docs:
+
+```dart
+final latestLoader = FilesystemLoader('docs/latest', urlPrefix: '/docs');
+final v1Loader = FilesystemLoader('docs/v1', urlPrefix: '/docs/v1');
+
+ContentApp.custom(
+  loaders: [latestLoader, v1Loader],
+  // ...
+);
+```
+
+The prefix goes in front of the URL that each page gets from its path. With the prefix `/docs/v1`, the file `docs/v1/guide/intro.md` gets the URL `/docs/v1/guide/intro`, and `docs/v1/index.md` gets `/docs/v1`.
+
+The prefix must start with a `/` and not end with one, and its segments can't be empty, `.`, or `..`. It can't contain `:`, `%`, or a character that URLs percent-encode, such as a space, `?`, `#`, or a non-ASCII letter. A `.` in the last segment isn't supported yet, so use a prefix like `/docs/v1-2` instead of `/docs/1.2`. Make sure that the URLs of different loaders don't overlap, such as through a `v1` folder in `docs/latest`, since only the first matching route is served.
+
+The paths of the pages don't include the prefix, so config patterns, such as those of `PageConfig.match` and secondary outputs, work the same as without a prefix. This also means that pages of different loaders can share a path, such as `guide/intro.md` in each version. To tell them apart, use their URL or loader instead of their path:
+
+- To vary the config of the pages by loader, check `source.loader` or `source.url` in your `configResolver`, such as with `(source) => source.loader == v1Loader ? v1Config : config`.
+- To filter the pages that eager loading provides, such as to list the other pages of the same version, check their `url` or `loader`.
+- `RSSOutput` writes one feed for the whole site to `/rss.xml`, which lists the pages of all loaders. To only list the pages of some loaders, pass it a `filter`, such as `RSSFilter.custom((page) => page.loader == latestLoader)`.
+
+An `AssetManager` resolves relative asset paths from the path of the page within its `directory`, so use one for each loader. Give each an `outputPrefix` that isn't inside that of another, such as `assets/latest` and `assets/v1`, and use `filterPages` so that it only processes the pages of its loader:
+
+```dart
+final v1Assets = AssetManager(
+  directory: 'docs/v1',
+  outputPrefix: 'assets/v1',
+  filterPages: (page) => page.loader == v1Loader,
+);
+```
+
+Then set up each asset manager as described in [Assets](/content/concepts/assets#setup), all in the same config.
+
 ## Creating Custom Route Loaders
 
 If the built-in loaders don't fit your needs, you can create your own loader. The built-in loaders are final classes, so extend `RouteLoaderBase` and `PageSource` instead. At minimum, you'll need to:
@@ -141,6 +178,8 @@ If the built-in loaders don't fit your needs, you can create your own loader. Th
     - This method should discover all your page sources and return a list of `PageSource` objects.
 
 You might also need to implement `readPartial()` and `readPartialSync()` in your custom loader if your content strategy involves including partial files (via a template engine) and these partials also need to be sourced from your custom location.
+
+To support [URL prefixes](#url-prefixes), forward `super.urlPrefix` from the constructor of your loader. `PageSource` then adds the prefix to the `url` of each page.
 
 **Example: Loading Pages from a CMS**
 
@@ -171,7 +210,7 @@ class CmsPageSource extends PageSource {
 
 /// Custom RouteLoader for the CMS
 class CmsLoader extends RouteLoaderBase {
-  CmsLoader({super.debugPrint});
+  CmsLoader({super.urlPrefix, super.debugPrint});
 
   @override
   Future<List<PageSource>> loadPageSources() async {
