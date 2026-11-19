@@ -86,6 +86,11 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   /// For example, with the prefix `/docs/v2`, the page at `guide/intro.md`
   /// gets the URL `/docs/v2/guide/intro`, and the page at `index.md` gets `/docs/v2`.
   ///
+  /// Relative links in the content of the pages, such as `guide/intro`,
+  /// still resolve from the root of the site with the built-in layouts,
+  /// so links between the pages of this loader need to include the prefix,
+  /// such as `/docs/v2/guide/intro`.
+  ///
   /// The paths of the pages don't include the prefix,
   /// so patterns that match them, such as for [PageConfig.match],
   /// parsers, and secondary outputs, stay the same.

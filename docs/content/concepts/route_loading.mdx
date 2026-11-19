@@ -145,6 +145,8 @@ ContentApp.custom(
 
 The prefix goes in front of the URL that each page gets from its path. With the prefix `/docs/v1`, the file `docs/v1/guide/intro.md` gets the URL `/docs/v1/guide/intro`, and `docs/v1/index.md` gets `/docs/v1`.
 
+Relative links in the content of a page still resolve from the root of the site, since the built-in layouts set the base URL of each page to `/`. In the pages of a loader with a prefix, include the prefix in links to its other pages, such as `[Intro](/docs/v1/guide/intro)`, since `[Intro](guide/intro)` links to `/guide/intro`. Relative asset paths aren't affected, since an `AssetManager` resolves them, as described below.
+
 The prefix must start with a `/` and not end with one, and its segments can't be empty, `.`, or `..`. It can't contain `:`, `%`, or a character that URLs percent-encode, such as a space, `?`, `#`, or a non-ASCII letter. The last segment can't contain a `.`, so use a prefix like `/docs/v1-2` instead of `/docs/1.2`. Make sure that the URLs of different loaders don't overlap, such as through a `v1` folder in `docs/latest`, since only the first matching route is served.
 
 The paths of the pages don't include the prefix, so config patterns, such as those of `PageConfig.match` and secondary outputs, work the same as without a prefix. This also means that pages of different loaders can share a path, such as `guide/intro.md` in each version, so tell them apart by their loader or URL instead.
