@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:jaspr/server.dart';
@@ -80,9 +81,8 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// as the default [watcherFactory].
   static DirectoryWatcher _defaultWatcherFactory(String path) => DirectoryWatcher(path);
 
-  bool _isIgnored(String posixPath) => ignorePattern?.matchAsPrefix(posixPath) != null;
-
-  final Map<String, Set<FilePageSource>> dependentSources = {};
+  /// The page sources that read each partial, keyed by the path of the partial.
+  final Map<String, Set<FilePageSource>> _dependentSources = {};
 
   /// The subscription to the file changes in [directory],
   /// or `null` when the directory is not being watched.
@@ -98,20 +98,34 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
     bool eager,
   ) async {
     if (kDebugMode) {
-      _watcherSub ??= watcherFactory(directory).events.listen((event) {
-        // It looks like event.path is relative on most platforms, but an
-        // absolute path on Linux. Turn this into the expected relative path.
-        final path = p.normalize(p.relative(event.path));
-        if (event.type == ChangeType.MODIFY) {
-          invalidateFile(path);
-        } else if (event.type == ChangeType.REMOVE) {
-          removeFile(path);
-        } else if (event.type == ChangeType.ADD) {
-          addFile(path);
-        }
-      });
+      _watcherSub ??= watcherFactory(directory).events.listen(_onFileEvent);
     }
     return super.loadRoutes(resolver, eager);
+  }
+
+  /// Adds, removes, or invalidates the page source of the file that [event] reports,
+  /// and invalidates the pages that read the file as a partial.
+  void _onFileEvent(WatchEvent event) {
+    // It looks like event.path is relative on most platforms, but an
+    // absolute path on Linux. Turn this into the expected relative path.
+    final path = p.normalize(p.relative(event.path));
+
+    if (event.type == ChangeType.ADD) {
+      if (_createSource(fileSystem.file(path)) case final source?) {
+        addSource(source);
+      }
+    } else if (_sourceForFile(path) case final source?) {
+      if (event.type == ChangeType.REMOVE) {
+        removeSource(source);
+      } else {
+        invalidateSource(source);
+      }
+    }
+
+    // Pages can read any file as a partial, even one that isn't a page,
+    // and might have failed to build while an added file was missing.
+    // For a changed page, `invalidateSource` already did, so this finds nothing.
+    _invalidateDependentSources(path);
   }
 
   /// Stops watching [directory] when the server is reassembled.
@@ -150,7 +164,7 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   File _getPartial(String path, Page page) {
     final pageSource = getSourceForPage(page);
     if (pageSource != null) {
-      (dependentSources[path] ??= {}).add(pageSource);
+      (_dependentSources[path] ??= {}).add(pageSource);
     }
     return fileSystem.file(path);
   }
@@ -173,25 +187,9 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
       final List<FilePageSource> entities = [];
       for (final entry in dir.listSync()) {
         if (entry is File) {
-          if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.extension(entry.path))) {
-            continue;
+          if (_createSource(entry) case final source?) {
+            entities.add(source);
           }
-
-          // Convert the file path to a posix path.
-          final posixPath = p.posix.fromUri(
-            fileSystem.path.toUri(fileSystem.path.relative(entry.path, from: directory)),
-          );
-          if (_isIgnored(posixPath)) {
-            continue;
-          }
-          entities.add(
-            FilePageSource(
-              posixPath,
-              entry,
-              this,
-              keepSuffix: keepSuffixPattern?.matchAsPrefix(posixPath) != null,
-            ),
-          );
         } else if (entry is Directory) {
           entities.addAll(loadFiles(entry));
         }
@@ -202,99 +200,58 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
     return loadFiles(root);
   }
 
-  void addFile(String path) {
-    if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.extension(path))) {
-      // Partials excluded by filterExtensions are not page sources,
-      // but might have dependents that failed while the partial was missing.
-      _invalidateDependentSources(path);
-      return;
-    }
-    // Convert the file path to a posix path.
-    final posixPath = p.posix.fromUri(
-      fileSystem.path.toUri(fileSystem.path.relative(path, from: directory)),
+  /// Creates the page source for [file], or returns `null` if
+  /// [filterExtensions] or [ignorePattern] skip it.
+  FilePageSource? _createSource(File file) {
+    // The path relative to the directory, with forward slashes on every platform.
+    final path = p.posix.fromUri(
+      fileSystem.path.toUri(fileSystem.path.relative(file.path, from: directory)),
     );
-    if (_isIgnored(posixPath)) {
-      // Like partials excluded by filterExtensions, ignored files are not page sources,
-      // but pages that read them as partials need a rebuild if they failed while the file was missing.
-      _invalidateDependentSources(path);
-      return;
+    if (filterExtensions.isNotEmpty && !filterExtensions.contains(p.posix.extension(path))) {
+      return null;
     }
-    addSource(
-      FilePageSource(
-        posixPath,
-        fileSystem.file(path),
-        this,
-        keepSuffix: keepSuffixPattern?.matchAsPrefix(posixPath) != null,
-      ),
-    );
+    if (ignorePattern?.matchAsPrefix(path) != null) {
+      return null;
+    }
 
-    // Another file might depend on this file, so failed before it was added.
-    // Now that it's added, ensure that the dependent source is rebuilt.
-    _invalidateDependentSources(path);
+    final keepSuffix = keepSuffixPattern?.matchAsPrefix(path) != null;
+    return FilePageSource(path, file, this, keepSuffix: keepSuffix);
   }
 
-  void removeFile(String path) {
-    final source = sources.where((source) => source.file.path == path).firstOrNull;
-    if (source != null) {
-      removeSource(source);
-    } else {
-      // Partials excluded by filterExtensions or ignorePattern are not page sources,
-      // but might still have dependents registered through readPartial.
-      _invalidateDependentSources(path);
-    }
+  /// Finds the page source of the file at [path].
+  FilePageSource? _sourceForFile(String path) {
+    return sources.firstWhereOrNull((source) => source.file.path == path);
   }
 
-  void invalidateFile(String path, {bool rebuild = true}) {
-    final source = sources.where((source) => source.file.path == path).firstOrNull;
-    if (source != null) {
-      invalidateSource(source, rebuild: rebuild);
-    } else {
-      // Partials excluded by filterExtensions or ignorePattern are not page sources,
-      // but might still have dependents registered through readPartial.
-      _invalidateDependentSources(path, rebuild: rebuild);
-    }
-  }
-
-  /// Removes [source] from the loader and discards its page without rebuilding it,
-  /// stops tracking it as a dependent of the partials it read,
-  /// and invalidates the pages that read its file as a partial.
+  /// Removes [source] from the loader,
+  /// and stops tracking it as a dependent of the partials it read.
   @override
   @protected
   void removeSource(FilePageSource source) {
-    // Invalidate the removed source without rebuilding it,
-    // since its own file no longer exists.
-    super.invalidateSource(source, rebuild: false);
     super.removeSource(source);
-
-    // Remove the source from the dependents of partials it read,
-    // dropping entries that no longer have any dependents.
-    dependentSources.removeWhere((_, dependencies) {
+    _dependentSources.removeWhere((_, dependencies) {
       dependencies.remove(source);
       return dependencies.isEmpty;
     });
-
-    // If other sources depend on it,
-    // invalidate them too so they don't keep serving stale content.
-    _invalidateDependentSources(source.file.path);
   }
 
   /// Invalidates [source] and the pages that read its file as a partial.
   @override
   @protected
-  void invalidateSource(FilePageSource source, {bool rebuild = true}) {
-    super.invalidateSource(source, rebuild: rebuild);
-    _invalidateDependentSources(source.file.path, rebuild: rebuild);
+  void invalidateSource(FilePageSource source) {
+    super.invalidateSource(source);
+    _invalidateDependentSources(source.file.path);
   }
 
   /// Invalidates the page sources that read the file at [path] as a partial.
   ///
   /// They stop being dependents of the partial until they read it again.
-  void _invalidateDependentSources(String path, {bool rebuild = true}) {
-    final dependencies = dependentSources.remove(path);
+  void _invalidateDependentSources(String path) {
+    final dependencies = _dependentSources.remove(path);
     if (dependencies == null) return;
 
     for (final dependent in dependencies) {
-      invalidateSource(dependent, rebuild: rebuild);
+      invalidateSource(dependent);
     }
   }
 
@@ -304,7 +261,7 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   @protected
   void invalidateAll() {
     super.invalidateAll();
-    dependentSources.clear();
+    _dependentSources.clear();
   }
 }
 

@@ -231,9 +231,14 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
 
   /// Removes [source] from the sources of this loader,
   /// so that the next call to [loadRoutes] no longer creates a route for it.
+  ///
+  /// Also discards the page that [source] built without rebuilding it,
+  /// and reloads the browsers that show it while serving.
   @protected
   @mustCallSuper
   void removeSource(T source) {
+    source.invalidate(rebuild: false);
+    ServerApp.reloadClients(source.url);
     _sources?.remove(source);
     invalidateRoutes();
   }
@@ -241,12 +246,11 @@ abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   /// Discards the page that [source] built,
   /// and reloads the browsers that show it while serving.
   ///
-  /// When loading eagerly, the page is rebuilt right away,
-  /// unless [rebuild] is `false`.
+  /// When loading eagerly, the page is rebuilt right away.
   @protected
   @mustCallSuper
-  void invalidateSource(T source, {bool rebuild = true}) {
-    source.invalidate(rebuild: rebuild);
+  void invalidateSource(T source) {
+    source.invalidate();
     ServerApp.reloadClients(source.url);
   }
 
