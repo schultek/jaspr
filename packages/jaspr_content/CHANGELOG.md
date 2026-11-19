@@ -1,8 +1,19 @@
 ## Unreleased 0.6.0-beta.1
 
-- Added `ignorePattern` parameter to `FilesystemLoader`, which skips the files whose path it matches from the start. This can be used to leave files such as `README.md` out of the pages.
+### New Features and Improvements
+
+- Added `ignorePattern` parameter to `FilesystemLoader`,
+  which skips the files whose path it matches from the start.
+  This can be used to leave files such as `README.md` out of the pages.
+
+### Fixes
+
 - Fixed pages not being rebuilt when a partial that is not a page source, such as a file excluded by `filterExtensions`, is edited while serving.
-- Fixed `RSSOutput` writing feeds that are not valid RSS 2.0. Dates now use the RFC 822 format, text is escaped, and the `guid` is marked as not a permalink.
+- Fixed an uncaught error when a page that is loaded eagerly fails to rebuild while serving,
+  such as after saving invalid front matter.
+  The error now surfaces when the page is requested.
+- Fixed `RSSOutput` writing feeds that are not valid RSS 2.0.
+  Dates now use the RFC 822 format, text is escaped, and the `guid` is marked as not a permalink.
 
 ## 0.6.0-beta.0
 
