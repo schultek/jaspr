@@ -1,8 +1,7 @@
 ## Unreleased 0.10.0-beta.2
 
 - **Breaking**: Removed `RouteLoader` and `RouterState.routeLoaders`.
-  They were internal helpers for lazy routes,
-  and the name clashed with `RouteLoader` from `jaspr_content`.
+  They were internal helpers for lazy routes, and the name clashed with `RouteLoader` from `jaspr_content`.
 
 ## 0.10.0-beta.1
 

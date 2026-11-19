@@ -2,13 +2,14 @@
 
 - **Breaking**: Changed `open` on `dialog()` and `details()` to `bool?`. When it is not set, the browser controls the attribute, which fixes a rebuild closing a dialog opened with `showModal()` or `show()` and a `details` element the user opened. Pass `open: false` to keep the element closed.
 
+- **Breaking**: Usages of `Component.apply` are now tracked across server-client boundaries and encoded on affected client component markers and elements. 
+  - Using `Component.apply` on the server to wrap a client component now properly affects child components on the client after hydration.
+  - Using `Component.apply` on the client to wrap a server component now properly applies properties to affected dom elements.
+
 ### Fixes
 
 - Fixed `Component.apply` not applying to server-rendered components inside `@client` components on the client, and fixed applied properties not being removed from slotted child elements when toggled off.
   - Applied properties and classes are now tracked and cleanly removed on toggle-off without clearing the child element's own properties.
-  - Target-defined properties always take precedence over applied properties, with structured styles merging on a per-property basis.
-  - Raw `class` and `style` attributes defined in an element's `attributes` map are preserved verbatim without wrapper styles or classes applied, preventing duplicate HTML attributes.
-  - Child elements with an `id` or attributes in their `attributes` map are never overwritten by applied values.
   - Slotted child views reset applied parameters and event listeners on reload before re-hydration.
 - Fixed a server built with `dart build cli` on Linux with Dart 3.14 or later not finding its `web` directory and failing with "Could not resolve project directory containing pubspec.yaml" when no `pubspec.yaml` is above it. Since Dart 3.14 such a bundle keeps the snapshot in `lib/libdartaot<name>.so`, which `Platform.script` points at.
 - Fixed `jaspr serve` with Flutter embedding or plugins failing on Flutter 3.50, which moved the precompiled DDC SDK to `kernel/ddc/canary` and `kernel/ddc/stable`.
