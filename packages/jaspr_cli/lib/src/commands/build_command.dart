@@ -402,6 +402,16 @@ class BuildCommand extends BaseCommand with ProxyHelper {
         final excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
         final now = DateTime.now().toW3CDateTimeString();
 
+        // The sitemap protocol requires `&`, `'`, `"`, `>`, and `<` to be escaped,
+        // such as in a route like `/terms&conditions`.
+        const sitemapEscape = HtmlEscape(
+          HtmlEscapeMode(
+            escapeLtGt: true,
+            escapeQuot: true,
+            escapeApos: true,
+          ),
+        );
+
         for (final route in generatedRoutes.entries) {
           if (excludePattern != null && excludePattern.hasMatch(route.key)) {
             continue;
@@ -413,7 +423,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
           }
 
           content.writeln('  <url>');
-          content.writeln('    <loc>$domain${route.key}</loc>');
+          content.writeln('    <loc>${sitemapEscape.convert('$domain${route.key}')}</loc>');
           content.writeln('    <lastmod>${sitemapData.lastmod?.toW3CDateTimeFormat() ?? now}</lastmod>');
           if (sitemapData.changefreq != null) {
             content.writeln('    <changefreq>${sitemapData.changefreq}</changefreq>');
