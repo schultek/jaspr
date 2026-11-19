@@ -24,7 +24,8 @@ import 'route_loader.dart';
 ///
 /// To choose which files become pages and what their URLs are,
 /// use [filterExtensions], [ignorePattern], and [keepSuffixPattern].
-class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
+/// To load pages from another kind of source, extend [RouteLoaderBase] instead.
+final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// Creates a loader for the pages under [directory].
   ///
   /// If [debugPrint] is `true`, the routes are printed each time they're built.
@@ -117,6 +118,7 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   ///
   /// The next call to [loadRoutes] starts watching it again.
   @override
+  @protected
   void onReassemble() {
     _watcherSub?.cancel();
     _watcherSub = null;
@@ -159,6 +161,8 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   ///
   /// Returns no sources if the directory doesn't exist.
   @override
+  @protected
+  @visibleForTesting
   Future<List<FilePageSource>> loadPageSources() async {
     final root = fileSystem.directory(directory);
     if (!await root.exists()) {
@@ -255,6 +259,7 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// stops tracking it as a dependent of the partials it read,
   /// and invalidates the pages that read its file as a partial.
   @override
+  @protected
   void removeSource(FilePageSource source) {
     // Invalidate the removed source without rebuilding it,
     // since its own file no longer exists.
@@ -275,6 +280,7 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
 
   /// Invalidates [source] and the pages that read its file as a partial.
   @override
+  @protected
   void invalidateSource(FilePageSource source, {bool rebuild = true}) {
     super.invalidateSource(source, rebuild: rebuild);
     _invalidateDependentSources(source.file.path, rebuild: rebuild);
@@ -295,6 +301,7 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// Invalidates all page sources and routes,
   /// and forgets which pages read which partials.
   @override
+  @protected
   void invalidateAll() {
     super.invalidateAll();
     dependentSources.clear();
@@ -305,7 +312,7 @@ class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
 ///
 /// A [FilesystemLoader] creates one for each file it loads as a page.
 /// A custom [RouteLoaderBase] can also use it for pages that it reads from files.
-class FilePageSource extends PageSource {
+final class FilePageSource extends PageSource {
   /// Creates a page source for [file] that belongs to [loader].
   ///
   /// The [path] determines the URL of the page and must use forward slashes.
@@ -326,6 +333,7 @@ class FilePageSource extends PageSource {
   ///
   /// Throws a [FileSystemException] if the file can't be read.
   @override
+  @protected
   Future<Page> buildPage() async {
     final content = await file.readAsString();
 

@@ -130,7 +130,7 @@ ContentApp.custom(
 
 ## Creating Custom Route Loaders
 
-If the built-in loaders don't fit your needs, you can create a custom `RouteLoader` implementation. At minimum, you'll need to:
+If the built-in loaders don't fit your needs, you can create your own loader. The built-in loaders are final classes, so extend `RouteLoaderBase` and `PageSource` instead. At minimum, you'll need to:
 
 1.  Create a custom `PageSource` subclass (e.g. `MyPageSource extends PageSource`) and implement its `buildPage()` method.
 

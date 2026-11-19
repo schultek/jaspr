@@ -8,7 +8,7 @@ import 'route_loader.dart';
 /// A loader that loads routes from memory.
 ///
 /// Takes a list of [MemoryPage]s and creates routes from them.
-class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
+final class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
   /// Creates a loader for the given `pages`.
   ///
   /// If [debugPrint] is `true`, the routes are printed each time they're built.
@@ -32,7 +32,7 @@ class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
 ///
 /// - Use `MemoryPage()` to create a normal page from a content String.
 /// - Use `MemoryPage.builder()` to create a page from a component builder function.
-class MemoryPage {
+final class MemoryPage {
   /// Creates a new [MemoryPage] with the given [path] and [content].
   ///
   /// Optionally takes [initialData] to pass to the page.
@@ -79,7 +79,7 @@ class MemoryPage {
 /// A page source that creates its page from a [MemoryPage].
 ///
 /// A [MemoryLoader] creates one for each of its pages.
-class MemoryPageSource extends PageSource {
+final class MemoryPageSource extends PageSource {
   /// Creates a page source for the given memory page that belongs to [loader].
   ///
   /// Unless [keepSuffix] is true, the URL of the page drops the file extension,
@@ -90,6 +90,7 @@ class MemoryPageSource extends PageSource {
 
   /// Creates the page from the content or builder of the [MemoryPage].
   @override
+  @protected
   Future<Page> buildPage() async {
     if (_page.builder case final pageBuilder?) {
       return _BuilderPage(
