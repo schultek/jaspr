@@ -439,7 +439,7 @@ void main() {
         expect(source.page, isNull);
       });
 
-      test('keeps the error of a failed eager rebuild until the page is requested', () async {
+      test('surfaces the error of a failed eager rebuild when the page is requested', () async {
         // Arrange
         final fileSystem = MemoryFileSystem();
         fileSystem.file('pages/index.md')
