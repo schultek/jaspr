@@ -126,6 +126,23 @@ abstract class Component {
   /// On the client, this also applies to the server-rendered elements of a server component,
   /// such as a component passed to a @client component.
   ///
+  /// ### Precedence and Merging Rules
+  ///
+  /// - **Precedence**: Target-owned properties always take precedence over applied properties.
+  ///   Inner [Component.apply] wrappers also take precedence over outer ones.
+  /// - **Classes**: Applied [classes] are merged as a set of whitespace-separated tokens with
+  ///   the target's classes. If the target element specifies raw class names via `attributes: {'class': ...}`,
+  ///   classes from [Component.apply] are **never applied** to that element to preserve raw attributes
+  ///   and prevent duplicate HTML attributes.
+  /// - **Styles**: Applied [styles] are merged on a per-property basis. Any style property already
+  ///   defined on the target element is preserved. If a target element specifies raw inline styles via
+  ///   `attributes: {'style': ...}`, styles from [Component.apply] are **never applied** to that element
+  ///   to avoid corrupting raw style declarations or unsafe mixing of structured and raw styles.
+  /// - **ID & Attributes**: An `id` or other attributes defined on the target element (or in its attributes map)
+  ///   are never overwritten by applied values.
+  /// - **Events**: Event listeners on the target element take precedence; applied listeners are added as
+  ///   supplementary listeners if not already bound.
+  ///
   /// Example:
   /// ```dart
   /// return Component.apply(
@@ -159,7 +176,7 @@ abstract class Component {
     Map<String, EventCallback>? events,
     required Component child,
     Key? key,
-  }) = _ApplyDomComponent;
+  }) = ApplyDomComponent;
 
   /// Creates a component which renders a list of child components without any wrapping element.
   ///

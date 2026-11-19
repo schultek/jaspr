@@ -131,6 +131,87 @@ void main() {
     });
   }
 
+  for (final (action, Future<void> Function(DevWorkflow) runUpdate, hangingRpc, expectedCalls) in [
+    ('reload', (DevWorkflow w) => w.reloadClients(), 'reloadSources', _reloadCalls),
+    ('restart', (DevWorkflow w) => w.restartClients(incremental: true), 'hotRestart', _restartCalls),
+    ('refresh', (DevWorkflow w) => w.refreshClients(), 'fullReload', ['fullReload']),
+  ]) {
+    test('$action skips a browser that stops responding', () async {
+      await _withWorkflow(null, (fixture) async {
+        fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+        final hanging = await fixture.connectBrowser('hanging');
+        final healthy = await fixture.connectBrowser('healthy');
+
+        // Fails instead of hanging when an unresponsive browser blocks the update.
+        Future<void> update() => runUpdate(fixture.workflow).timeout(const Duration(seconds: 5));
+
+        // The browser never answers, e.g. a phone with the screen turned off.
+        final respond = Completer<void>();
+        hanging.beforeRpc = (method) async {
+          if (method == hangingRpc) await respond.future;
+        };
+
+        await update();
+        expect(hanging.calls, expectedCalls.take(expectedCalls.indexOf(hangingRpc) + 1).toList());
+        expect(healthy.calls, expectedCalls);
+        await expectLater(
+          fixture.io.stdout.queue,
+          emitsWithTimeout(emitsThrough(contains('Client hanging did not respond'))),
+        );
+
+        // Following updates skip the browser without waiting for it again.
+        hanging.calls.clear();
+        healthy.calls.clear();
+        await update();
+        expect(hanging.calls, isEmpty);
+        expect(healthy.calls, expectedCalls);
+
+        // Once the pending call completes, the browser takes part in updates again.
+        respond.complete();
+        await pumpEventQueue();
+        await expectLater(
+          fixture.io.stdout.queue,
+          emitsWithTimeout(emitsThrough(contains('Client hanging is responding again'))),
+        );
+        hanging.beforeRpc = null;
+        hanging.calls.clear();
+        healthy.calls.clear();
+        await update();
+        expect(hanging.calls, expectedCalls);
+        expect(healthy.calls, expectedCalls);
+      });
+    });
+  }
+
+  test('delivers missed stylesheets once a browser responds again', () async {
+    await _withWorkflow(null, (fixture) async {
+      fixture.workflow.clients.callTimeout = const Duration(milliseconds: 100);
+      final hanging = await fixture.connectBrowser('hanging');
+      final respond = Completer<void>();
+      hanging.beforeRpc = (method) async {
+        if (method == 'reloadSources') await respond.future;
+      };
+
+      await fixture.workflow.reloadClients().timeout(const Duration(seconds: 5));
+      final connection = fixture.workflow.clients.getConnection('hanging')!;
+      expect(await connection.reloadStylesheets(['main.css']), isNull, reason: 'The browser is skipped.');
+      expect(hanging.calls, isNot(contains('ext.jaspr.reload_stylesheets')));
+
+      hanging.beforeRpc = null;
+      respond.complete();
+      await pumpEventQueue();
+      expect(hanging.calls, contains('ext.jaspr.reload_stylesheets'));
+      verify(
+        () => hanging.service.callServiceExtension(
+          'ext.jaspr.reload_stylesheets',
+          args: {
+            'urls': jsonEncode(['main.css']),
+          },
+        ),
+      ).called(1);
+    });
+  });
+
   for (final (action, Future<void> Function(DevWorkflow) runUpdate, expectedCalls) in [
     ('reload', (DevWorkflow w) => w.reloadClients(), [..._reloadCalls, _reloadHtmlCall]),
     ('restart', (DevWorkflow w) => w.restartClients(), [..._restartCalls, _reloadHtmlCall]),

@@ -1,5 +1,7 @@
 import 'package:meta/meta_meta.dart';
 
+import '../framework/framework.dart';
+
 /// Used to annotate a client component.
 const client = ClientAnnotation._();
 
@@ -18,14 +20,20 @@ final class EncoderAnnotation {
   const EncoderAnnotation._();
 }
 
-/// Used to annotate an decoder function for a custom model.
+/// Used to annotate a decoder function for a custom model.
 const decoder = DecoderAnnotation._();
 
-/// Use with [decoder] to annotate an decoder function for a custom model.
+/// Use with [decoder] to annotate a decoder function for a custom model.
 @Target({TargetKind.constructor, TargetKind.method})
 final class DecoderAnnotation {
   const DecoderAnnotation._();
 }
+
+/// A function that mounts a server component with the given [id].
+///
+/// Can be passed as an additional parameter to a `@decoder` function to decode
+/// [Component] fields of a custom model.
+typedef ComponentMount = Component Function(String id);
 
 /// Define a platform specific import with auto-generated stubbing.
 ///

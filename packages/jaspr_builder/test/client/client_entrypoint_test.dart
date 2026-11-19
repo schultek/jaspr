@@ -5,13 +5,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('client entrypoint', () {
-    late TestReaderWriter reader;
-
-    setUp(() async {
-      reader = TestReaderWriter(rootPackage: 'site');
-      await reader.testing.loadIsolateSources();
-    });
-
     test('generates main entrypoint in web directory', () async {
       await testBuilder(
         ClientEntrypointBuilder(BuilderOptions({})),
@@ -41,7 +34,6 @@ void main() {
               '}\n'
               '',
         },
-        readerWriter: reader,
       );
     });
 
@@ -74,7 +66,6 @@ void main() {
               '}\n'
               '',
         },
-        readerWriter: reader,
       );
     });
   });

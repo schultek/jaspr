@@ -5,6 +5,7 @@ import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
 import 'package:jaspr/dom.dart';
+import 'package:jaspr/src/client/dom_render_object.dart' show DomRenderObject, RootDomRenderObject;
 import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/client_test.dart';
 import 'package:universal_web/web.dart' as web;
@@ -57,11 +58,37 @@ void main() {
       expect(web.document.querySelectorAll('.main > div').length, equals(1));
     });
 
+    testClient('should not keep render objects of an earlier reload linked to the root', (tester) async {
+      tester.pumpComponent(const ConstApp());
+      await pumpEventQueue();
+
+      final root = tester.binding.rootElement!;
+      final rootRenderObject = root.renderObject as RootDomRenderObject;
+
+      for (var reload = 1; reload <= 3; reload++) {
+        final newBody = web.document.createElement('body') as web.HTMLBodyElement;
+        await tester.binding.reloadBody(newBody);
+        await pumpEventQueue();
+
+        // ConstApp renders one element below the root. A reload gives it a new render object,
+        // and the one it replaces must not stay in the root's list of children.
+        final child = find
+            .tag('div')
+            .evaluate()
+            .map((element) => (element as RenderObjectElement).renderObject as DomRenderObject)
+            .singleWhere((renderObject) => renderObject.parent == rootRenderObject);
+
+        expect(child.node.parentNode, equals(newBody), reason: 'reload $reload');
+        expect(child.previousSibling, isNull, reason: 'reload $reload');
+        expect(child.nextSibling, isNull, reason: 'reload $reload');
+      }
+    });
+
     testClient('should update client component parameters and sync state on reload and use new nodes', (tester) async {
       final marker = DomValidator.clientMarkerPrefix;
       web.document.body!.innerHTML =
           '<div>'
-                  '  <!--${marker}reload_app data={"name": "Alpha"}-->'
+                  '  <!--${marker}reload_app data<{"name": "Alpha"}>-->'
                   '  <!--\${"count": 10}-->'
                   '  <p>Fallback</p>'
                   '  <!--/${marker}reload_app-->'
@@ -88,7 +115,7 @@ void main() {
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
       newBody.innerHTML =
           '<div>'
-                  '  <!--${marker}reload_app data={"name": "Beta"}-->'
+                  '  <!--${marker}reload_app data<{"name": "Beta"}>-->'
                   '  <!--\${"count": 20}-->'
                   '  <p>Fallback</p>'
                   '  <!--/${marker}reload_app-->'
@@ -117,7 +144,7 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       web.document.body!.innerHTML =
           '<div id="container">'
-                  '  <!--${marker}dynamic_app data={"title": "V1"}-->'
+                  '  <!--${marker}dynamic_app data<{"title": "V1"}>-->'
                   '  <!--/${marker}dynamic_app-->'
                   '</div>'
               .toJS;
@@ -142,7 +169,7 @@ void main() {
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
       newBody.innerHTML =
           '<div id="container">'
-                  '  <!--${marker}dynamic_app data={"title": "V2"}-->'
+                  '  <!--${marker}dynamic_app data<{"title": "V2"}>-->'
                   '  <!--/${marker}dynamic_app-->'
                   '</div>'
               .toJS;

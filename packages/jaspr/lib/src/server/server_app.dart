@@ -32,6 +32,12 @@ final class ServerApp {
   static final StreamController<Object> _reassembleController = StreamController.broadcast();
   static Stream<Object> get onReassemble => _reassembleController.stream;
 
+  /// Notifies [onReassemble] listeners that the application code was reloaded.
+  ///
+  /// [runApp] does this after each server-side reload. A server that reloads code itself, such as
+  /// one that renders Jaspr through [serveApp] or [renderComponent], calls this after its own hot reload.
+  static void reassemble() => _reassembleController.add(Object());
+
   static final List<Middleware> _middleware = [];
 
   /// Adds a shelf middleware to the server application.
@@ -62,7 +68,7 @@ final class ServerApp {
   void _reload(SetupFunction setup) {
     _setup = setup;
     _handler = _createHandler();
-    _reassembleController.add(Object());
+    reassemble();
   }
 
   Handler _createHandler() {

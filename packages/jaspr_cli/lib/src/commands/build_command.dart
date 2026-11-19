@@ -11,6 +11,7 @@ import '../dev/css_runner.dart';
 import '../dev/flutter_runner.dart';
 import '../dev/server_runner.dart';
 import '../helpers/dart_define_helpers.dart';
+import '../helpers/experiment_helpers.dart';
 import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
@@ -108,6 +109,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
       defaultsTo: true,
     );
     addDartDefineArgs();
+    addExperimentArgs();
   }
 
   @override
@@ -184,7 +186,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
     }
 
     if (!hasBuildError) {
-      final exitCode = await CssRunner.build(project: project, logger: logger);
+      final exitCode = await CssRunner.build(project: project, logger: logger, experiments: experiments);
       if (exitCode != 0) {
         hasBuildError = true;
       } else {
@@ -222,6 +224,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
       final process = await ProcessRunner.instance.start(dartExecutable, [
         'compile',
         compileTarget,
+        ...experimentArgs,
         if (targetOS != null) ...[
           '--target-os',
           targetOS,
@@ -298,6 +301,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
         port: serverPort,
         proxyPort: proxyPort,
         serverDefines: serverDefines,
+        experiments: experiments,
         logger: logger,
         serverStartedCompleter: serverStartedCompleter,
         guard: guardResource,
@@ -398,6 +402,16 @@ class BuildCommand extends BaseCommand with ProxyHelper {
         final excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
         final now = DateTime.now().toW3CDateTimeString();
 
+        // The sitemap protocol requires `&`, `'`, `"`, `>`, and `<` to be escaped,
+        // such as in a route like `/terms&conditions`.
+        const sitemapEscape = HtmlEscape(
+          HtmlEscapeMode(
+            escapeLtGt: true,
+            escapeQuot: true,
+            escapeApos: true,
+          ),
+        );
+
         for (final route in generatedRoutes.entries) {
           if (excludePattern != null && excludePattern.hasMatch(route.key)) {
             continue;
@@ -409,7 +423,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
           }
 
           content.writeln('  <url>');
-          content.writeln('    <loc>$domain${route.key}</loc>');
+          content.writeln('    <loc>${sitemapEscape.convert('$domain${route.key}')}</loc>');
           content.writeln('    <lastmod>${sitemapData.lastmod?.toW3CDateTimeFormat() ?? now}</lastmod>');
           if (sitemapData.changefreq != null) {
             content.writeln('    <changefreq>${sitemapData.changefreq}</changefreq>');
@@ -488,7 +502,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
 
     List<String> additionalFlutterBuildArgs() {
       final librariesPath = p.join(FlutterRunner.webSdkDir, 'libraries.json');
-      final sdkJsPath = p.join(FlutterRunner.webSdkDir, 'kernel', 'amd-canvaskit');
+      final sdkJsPath = FlutterRunner.precompiledDdcSdkDir(FlutterRunner.webSdkDir, ddcLibraryBundle: false);
       return [
         '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
         '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
@@ -516,6 +530,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
             '--define=build_web_compilers:dart_source_cleanup=enabled=false',
           ],
         ],
+        ...experimentArgs,
       ],
       outputDir: outputDir,
       logger: logger,

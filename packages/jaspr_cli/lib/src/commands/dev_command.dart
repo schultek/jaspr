@@ -14,6 +14,7 @@ import '../dev/dev_workflow.dart';
 import '../dev/flutter_runner.dart';
 import '../dev/server_runner.dart';
 import '../helpers/dart_define_helpers.dart';
+import '../helpers/experiment_helpers.dart';
 import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
@@ -62,11 +63,12 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
     );
     argParser.addFlag(
       'skip-server',
-      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable.',
+      help: 'Skip running the server and only run the client workflow. When using this, the server must be started manually, including setting the JASPR_PROXY_PORT environment variable. Pass --port to choose the proxy port.',
       negatable: false,
       defaultsTo: false,
     );
     addDartDefineArgs();
+    addExperimentArgs();
   }
 
   @override
@@ -135,7 +137,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         );
         return 1;
       }
-      if (shouldCheckPort && !await isPortAvailable(parsed)) {
+      if (!await isPortAvailable(parsed)) {
         logger.write(
           'Port $explicitPort is already in use.\nPlease quit the running process or choose a different port.',
           tag: Tag.cli,
@@ -149,7 +151,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
       port = shouldCheckPort ? await findAvailablePort(defaultPort) : defaultPort;
     }
 
-    final proxyPort = project.requireMode == JasprMode.client
+    final proxyPort = project.requireMode == JasprMode.client || (skipServer && explicitPort != null)
         ? port
         : await findAvailablePort(int.parse(serverProxyPort), exclude: [port]);
 
@@ -233,6 +235,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         project: project,
         logger: logger,
         userDefines: getServerDartDefines(),
+        experiments: experiments,
         restArgs: argResults!.rest,
         release: release,
         debug: debug,
@@ -616,8 +619,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
     List<String> additionalFlutterBuildArgs() {
       final sdkKernelPath = p.url.join('kernel', 'ddc_outline.dill');
       final librariesPath = p.join(FlutterRunner.webSdkDir, 'libraries.json');
-      final ddcSdkPrefix = usesDdcLibraryBundles ? 'ddcLibraryBundle-canvaskit' : 'amd-canvaskit';
-      final sdkJsPath = p.join(FlutterRunner.webSdkDir, 'kernel', ddcSdkPrefix);
+      final sdkJsPath = FlutterRunner.precompiledDdcSdkDir(
+        FlutterRunner.webSdkDir,
+        ddcLibraryBundle: usesDdcLibraryBundles,
+      );
       return [
         '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
         '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
@@ -669,11 +674,13 @@ abstract class DevCommand extends BaseCommand with ProxyHelper {
         },
         if (project.flutterMode != FlutterMode.none) ...additionalFlutterBuildArgs(),
       ],
+      ...experimentArgs,
     ];
 
     final workflow = await DevWorkflow.start(
       proxyPort: proxyPort,
       buildArgs: buildArgs,
+      experiments: experiments,
       project: project,
       logger: logger,
       guard: guardResource,

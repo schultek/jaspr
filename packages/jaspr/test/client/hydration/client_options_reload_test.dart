@@ -55,7 +55,7 @@ void main() {
   testClient('keeps parent state when a reload adds a deferred client in its server child', (tester) async {
     final marker = DomValidator.clientMarkerPrefix;
     web.HTMLElement shellBody({required bool withChild}) => _parseBody(
-      '<!--${marker}shell data={"child":"s${marker}1"}-->'
+      '<!--${marker}shell data<{"child":"s${marker}1"}>-->'
       '<div><button id="shell">Server</button>'
       '<!--s${marker}1--><div>${withChild ? _client('added') : ''}</div><!--/s${marker}1--></div>'
       '<!--/${marker}shell-->',

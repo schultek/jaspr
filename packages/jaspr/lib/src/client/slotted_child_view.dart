@@ -60,6 +60,22 @@ class _RangeChildSlot extends ChildSlot {
     return ChildSlotRenderObject.between(parent, start, end);
   }
 
+  bool Function(web.Node) _createFilter() {
+    final parentElement = start.parentElement;
+    if (parentElement == null) return (_) => false;
+
+    return (web.Node element) {
+      if (!parentElement.contains(element)) return false;
+      if (start.contains(element) || end.contains(element)) return false;
+
+      const following = web.Node.DOCUMENT_POSITION_FOLLOWING;
+      const containedBy = web.Node.DOCUMENT_POSITION_CONTAINED_BY;
+      final isAfterStart = (start.compareDocumentPosition(element) & (following | containedBy)) == following;
+      final isBeforeEnd = (end.compareDocumentPosition(element) & web.Node.DOCUMENT_POSITION_PRECEDING) != 0;
+      return isAfterStart && isBeforeEnd;
+    };
+  }
+
   @override
   bool canUpdate(ChildSlot oldComponent) {
     return oldComponent is _RangeChildSlot && oldComponent.start == start && oldComponent.end == end;
@@ -75,15 +91,13 @@ class _QueryChildSlot extends ChildSlot {
   @override
   final Component child;
 
-  @override
-  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
-    web.Element? target;
+  web.Element? findTargetElement(SlottedDomRenderObject parent) {
     web.Node? current = parent.firstChildNode;
     while (current != null) {
       if (current.isElement) {
-        target = (current as web.Element).querySelector(query);
+        final target = (current as web.Element).querySelector(query);
         if (target != null) {
-          break;
+          return target;
         }
       }
       if (current == parent.lastChildNode) {
@@ -91,8 +105,20 @@ class _QueryChildSlot extends ChildSlot {
       }
       current = current.nextSibling;
     }
+    return null;
+  }
+
+  @override
+  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
+    final target = findTargetElement(parent);
     assert(target != null, 'No node found for query "$query" in ChildSlot.');
     return ChildSlotRenderObject(target!, parent);
+  }
+
+  bool Function(web.Node) _createFilter(SlottedDomRenderObject parent) {
+    final target = findTargetElement(parent);
+    if (target == null) return (_) => false;
+    return (web.Node element) => element != target && target.contains(element);
   }
 
   @override
@@ -240,39 +266,33 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     return renderObject;
   }
 
-  final Map<web.HTMLElement, _AppliedParams> _appliedParams = nodeMap();
+  bool _didHydrate = false;
+  final Map<web.Element, _AppliedParams> _appliedParams = nodeMap();
 
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
-    for (final element in _appliedParams.keys) {
-      _resetElementParams(element);
+    final inheritedDomParams = inheritedDomParamsFor(renderObject);
+    if ((component.nodes != null || (inheritedDomParams != null && inheritedDomParams.isNotEmpty)) && !_didHydrate) {
+      _didHydrate = true;
+      _hydrateInitialNodes(renderObject);
     }
-    _appliedParams.clear();
+
+    _resetAppliedParams();
 
     if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
-      final slotRanges = {
-        for (final slot in component.slots)
-          if (slot is _RangeChildSlot) slot.start: slot.end,
-      };
+      final slotRanges = nodeMap<web.Node, web.Node>();
+      for (final slot in component.slots) {
+        if (slot is _RangeChildSlot) slotRanges[slot.start] = slot.end;
+      }
 
       web.Node? current = renderObject.firstChildNode;
       while (current != null) {
-        if (slotRanges[current] case final endNode?) {
-          if (current == renderObject.lastChildNode) break;
-          current = endNode;
-          // The end of this slot can be the start of an adjacent slot.
-          if (slotRanges.containsKey(current)) continue;
-          if (current == renderObject.lastChildNode) break;
-          current = current.nextSibling;
-          continue;
-        }
-
         if (current.isElement) {
           for (final param in inheritedDomParams.reversed) {
             final elements = _findMatchingElements(current as web.Element, param.target);
 
             for (final element in elements) {
-              _updateElementParams(element as web.HTMLElement, param);
+              _updateElementParams(element, param);
             }
           }
         }
@@ -280,20 +300,131 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
         if (current == renderObject.lastChildNode) {
           break;
         }
-        current = current.nextSibling;
+        // Skip the slot's contents and visit its end anchor,
+        // which can also start the next slot.
+        current = slotRanges[current] ?? current.nextSibling;
+      }
+    }
+  }
+
+  void _hydrateInitialNodes(SlottedDomRenderObject renderObject) {
+    final slotRanges = nodeMap<web.Node, web.Node>();
+    for (final slot in component.slots) {
+      if (slot is _RangeChildSlot) slotRanges[slot.start] = slot.end;
+    }
+    final isInsideSlot = _createSlotFilter(renderObject);
+
+    web.Node? current = renderObject.firstChildNode;
+    while (current != null) {
+      if (current.isElement) {
+        _hydrateInitialAppliedParams(current as web.Element, isInsideSlot);
+      }
+
+      if (current == renderObject.lastChildNode) {
+        break;
+      }
+      current = slotRanges[current] ?? current.nextSibling;
+    }
+  }
+
+  bool Function(web.Node) _createSlotFilter(SlottedDomRenderObject renderObject) {
+    if (component.slots.isEmpty) {
+      return (_) => false;
+    }
+
+    final filters = [
+      for (final slot in component.slots)
+        switch (slot) {
+          _RangeChildSlot s => s._createFilter(),
+          _QueryChildSlot s => s._createFilter(renderObject),
+          _ => (_) => false,
+        },
+    ];
+
+    return (web.Node element) {
+      for (final filter in filters) {
+        if (filter(element)) return true;
+      }
+      return false;
+    };
+  }
+
+  void _hydrateInitialAppliedParams(web.Element root, bool Function(web.Node) isInsideSlot) {
+    void process(web.Element element) {
+      if (element.hasAttribute('data-j-apply')) {
+        final raw = element.getAttribute('data-j-apply')!;
+        element.removeAttribute('data-j-apply');
+
+        try {
+          String? appliedId;
+          List<String>? appliedClasses;
+          List<String>? appliedStylesList;
+          List<String>? appliedAttributesList;
+
+          for (final section in raw.split(';')) {
+            final colonIndex = section.indexOf(':');
+            if (colonIndex == -1) continue;
+            final key = section.substring(0, colonIndex);
+            final val = section.substring(colonIndex + 1);
+            switch (key) {
+              case 'i':
+                appliedId = _unescapeApplyValue(val);
+              case 'c':
+                appliedClasses = val.split(',').map(_unescapeApplyValue).toList();
+              case 's':
+                appliedStylesList = val.split(',').map(_unescapeApplyValue).toList();
+              case 'a':
+                appliedAttributesList = val.split(',').map(_unescapeApplyValue).toList();
+            }
+          }
+
+          Map<String, String>? appliedStyles;
+          if (appliedStylesList != null) {
+            final style = element.inlineStyle;
+            if (style != null) {
+              appliedStyles = {for (final s in appliedStylesList) s: style.getPropertyValue(s)};
+            }
+          }
+
+          Map<String, String>? appliedAttributes;
+          if (appliedAttributesList != null) {
+            appliedAttributes = {for (final a in appliedAttributesList) a: element.getAttribute(a) ?? ''};
+          }
+
+          _appliedParams[element] = _AppliedParams(
+            target: ApplyTarget.anyChild,
+            id: appliedId,
+            classes: appliedClasses,
+            styles: appliedStyles,
+            attributes: appliedAttributes,
+          );
+        } catch (_) {}
+      }
+    }
+
+    if (!isInsideSlot(root)) {
+      process(root);
+    }
+    final descendants = root.querySelectorAll('[data-j-apply]');
+    for (int i = 0; i < descendants.length; i++) {
+      final element = descendants.item(i) as web.Element;
+      if (!isInsideSlot(element)) {
+        process(element);
       }
     }
   }
 
   List<web.Element> _findMatchingElements(web.Element root, ApplyTarget target) {
-    final elements = <web.Element>[];
+    final selector = _selectorFor(target);
+    if (selector == null) return const [];
 
-    if (_isMatchingElement(target, root)) {
+    final elements = <web.Element>[];
+    if (root.matches(selector)) {
       elements.add(root);
     }
 
     if (!target.onlyChildren) {
-      final results = root.querySelectorAll(target.query);
+      final results = root.querySelectorAll(selector);
       for (int i = 0; i < results.length; i++) {
         elements.add(results.item(i) as web.Element);
       }
@@ -302,22 +433,32 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     return elements;
   }
 
-  bool _isMatchingElement(ApplyTarget target, web.Element element) {
-    if (target.tag case final expectedTag? when element.localName != expectedTag) return false;
-    if (target.id case final expectedId? when element.id != expectedId) return false;
-    if (target.classes case final expectedClasses? when !expectedClasses.every((c) => element.classList.contains(c))) {
-      return false;
-    }
+  /// Builds a CSS selector for [target], or returns `null` if no element can match.
+  String? _selectorFor(ApplyTarget target) {
+    if (target.tag == '' || (target.classes?.contains('') ?? false)) return null;
 
-    return true;
+    final cssUtils = web.CSS;
+    // Target fields are literal names, so escape them before using CSS selector syntax.
+    final selector = [
+      if (target.tag case final tag?) cssUtils.escape(tag),
+      // Element.id is empty for both a missing and an explicitly empty id attribute.
+      if (target.id case final id?) id.isEmpty ? ':is(:not([id]), [id=""])' : '#${cssUtils.escape(id)}',
+      if (target.classes case final classes?)
+        for (final c in classes) '.${cssUtils.escape(c)}',
+    ].join();
+    return selector.isEmpty ? '*' : selector;
+  }
+
+  /// Removes the DOM values and event listeners this view added,
+  /// then clears its record of them.
+  void _resetAppliedParams() {
+    _appliedParams.forEach(_resetElementParams);
+    _appliedParams.clear();
   }
 
   /// Removes the params this view applied to [element],
   /// without leaving behind empty attributes that it didn't have before.
-  void _resetElementParams(web.HTMLElement element) {
-    final params = _appliedParams[element];
-    if (params == null) return;
-
+  static void _resetElementParams(web.Element element, _AppliedParams params) {
     if (params.id != null && element.id == params.id) {
       element.removeAttribute('id');
     }
@@ -332,14 +473,17 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     }
 
     if (params.styles case final appliedStyles? when appliedStyles.isNotEmpty) {
-      for (final e in appliedStyles.entries) {
-        element.style.removeProperty(e.key);
-      }
-      if (element.style.length == 0) {
-        // Read the attribute first, so the browser syncs the pending style changes into it.
-        // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
-        element.getAttribute('style');
-        element.removeAttribute('style');
+      final style = element.inlineStyle;
+      if (style != null) {
+        for (final e in appliedStyles.entries) {
+          style.removeProperty(e.key);
+        }
+        if (style.length == 0) {
+          // Read the attribute first, so the browser syncs the pending style changes into it.
+          // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
+          element.getAttribute('style');
+          element.removeAttribute('style');
+        }
       }
     }
 
@@ -356,7 +500,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     }
   }
 
-  void _updateElementParams(web.HTMLElement element, ApplyParams newParams) {
+  void _updateElementParams(web.Element element, ApplyParams newParams) {
     final params = _appliedParams[element];
 
     String? appliedId = params?.id;
@@ -384,10 +528,13 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
     if (newParams.styles case final newStyles?) {
       appliedStyles ??= {};
-      for (final e in newStyles.entries) {
-        if (element.style.getPropertyValue(e.key).isEmpty) {
-          element.style.setProperty(e.key, e.value);
-          appliedStyles[e.key] = e.value;
+      final style = element.inlineStyle;
+      if (style != null) {
+        for (final e in newStyles.entries) {
+          if (style.getPropertyValue(e.key).isEmpty) {
+            style.setProperty(e.key, e.value);
+            appliedStyles[e.key] = e.value;
+          }
         }
       }
     }
@@ -422,12 +569,24 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   @override
+  void onReload() {
+    _resetAppliedParams();
+    _didHydrate = false;
+    super.onReload();
+  }
+
+  @override
   void unmount() {
-    for (final element in _appliedParams.keys) {
-      _resetElementParams(element);
-    }
-    _appliedParams.clear();
+    _resetAppliedParams();
     super.unmount();
+  }
+}
+
+extension on web.Element {
+  web.CSSStyleDeclaration? get inlineStyle {
+    if (isHtmlElement) return (this as web.HTMLElement).style;
+    if (isSvgElement) return (this as web.SVGElement).style;
+    return null;
   }
 }
 
@@ -527,27 +686,22 @@ class ChildSlotRenderObject extends DomRenderObject
     implements RenderFragment {
   /// Creates a slot that renders its children as the content of [node],
   /// hydrating the child nodes [node] already has.
-  ChildSlotRenderObject(this.node, DomRenderObject parent) {
-    this.parent = parent;
-    final childNodes = node.childNodes;
-    toHydrate = [
-      for (var childIndex = 0; childIndex < childNodes.length; childIndex += 1) childNodes.item(childIndex)!,
-    ];
-    _beforeStart = null;
-  }
+  ChildSlotRenderObject(web.Element node, DomRenderObject parent) : this._(node, parent);
 
   /// Creates a slot that renders its children between the sibling nodes [start] and [end],
   /// hydrating the nodes already between them.
-  ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end) : node = start.parentElement! {
+  ChildSlotRenderObject.between(DomRenderObject parent, web.Node start, web.Node end)
+    : this._(start.parentElement!, parent, start: start, end: end);
+
+  /// Creates a slot that hydrates all children of [node] or,
+  /// when anchors are supplied, only the nodes between [start] and [end].
+  ChildSlotRenderObject._(this.node, DomRenderObject parent, {web.Node? start, web.Node? end}) : _beforeStart = start {
     this.parent = parent;
-    toHydrate = [];
-    web.Node? curr = start.nextSibling;
-    while (curr != null && curr != end) {
-      toHydrate.add(curr);
-      curr = curr.nextSibling;
+    var current = start == null ? node.firstChild : start.nextSibling;
+    while (current != null && current != end) {
+      toHydrate.add(current);
+      current = current.nextSibling;
     }
-    // Place the children after the start node, even if the slot is empty.
-    _beforeStart = start;
   }
 
   /// The element this slot renders its children into.
@@ -557,9 +711,10 @@ class ChildSlotRenderObject extends DomRenderObject
   @override
   final web.Element node;
 
-  /// The node after which the children of this slot are placed,
+  /// The node after which children are placed,
+  /// even if the range is initially empty,
   /// or `null` to place them at the start of [node].
-  late final web.Node? _beforeStart;
+  final web.Node? _beforeStart;
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
@@ -571,3 +726,6 @@ class ChildSlotRenderObject extends DomRenderObject
     removeChild(child);
   }
 }
+
+String _unescapeApplyValue(String val) =>
+    val.contains('%') ? val.replaceAll('%2C', ',').replaceAll('%3B', ';').replaceAll('%25', '%') : val;

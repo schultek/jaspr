@@ -5,7 +5,7 @@ library;
 import 'dart:async';
 
 import 'package:jaspr/server.dart';
-import 'package:jaspr_router/jaspr_router.dart' hide RouteLoader;
+import 'package:jaspr_router/jaspr_router.dart' show Route, RouteBase, Router, ShellRoute;
 
 import 'data_loader/filesystem_data_loader.dart';
 import 'layouts/page_layout.dart';

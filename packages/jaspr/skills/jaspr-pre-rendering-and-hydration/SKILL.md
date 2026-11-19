@@ -33,7 +33,7 @@ Use parameters of `@client` components to pass data from the server to the clien
   - Primitive types: `int`, `double`, `String`, `bool`.
   - Collections: `List`, `List<dynamic>`, `List<Object?>`, or `List<T>` (where `T` is serializable); `Map<String, dynamic>`, `Map<String, Object?>`, or `Map<String, V>` (where `V` is serializable). Map keys MUST be `String`.
   - Enums or custom types: MUST define `@encoder` and `@decoder` methods.
-- **Rule 3:** Components CAN be passed as parameters (`Component` or `List<Component>`). When a component is passed to a `@client` component, it becomes a **Server Component** (see below).
+- **Rule 3:** Components CAN be passed as parameters (`Component`, `List<Component>`, or `Map<String, Component>`), or inside custom types using `ComponentMount` in their `@decoder` method. When a component is passed to a `@client` component, it becomes a **Server Component** (see below).
 - **Rule 4:** Parameters MUST NOT be functions or other non-serializable, non-component types.
 
 ---
@@ -117,6 +117,33 @@ void main() {
   ));
 }
 ```
+
+### Custom Models with Component Fields (`ComponentMount`)
+
+Custom models can also contain Server Components. The `@encoder` returns the Map containing the component field, and the `@decoder` accepts a `ComponentMount` parameter (`Component Function(String)`):
+
+```dart
+class TabItem {
+  final String label;
+  final Component content;
+  const TabItem({required this.label, required this.content});
+
+  @decoder
+  factory TabItem.fromJson(Map<String, dynamic> json, ComponentMount mount) {
+    return TabItem(
+      label: json['label'] as String,
+      content: mount(json['content'] as String),
+    );
+  }
+
+  @encoder
+  Map<String, dynamic> toJson() => {'label': label, 'content': content};
+}
+```
+
+- Parameter can be positional (`ComponentMount mount`) or named (`{ComponentMount? mount}`).
+- For nullable components, use a null check: `header: json['header'] != null ? mount(json['header'] as String) : null` (or a switch expression).
+- `ComponentMount` is only supported across `@client` boundaries, NOT for `@sync` fields.
 
 ---
 

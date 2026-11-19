@@ -6,6 +6,7 @@ import 'builder.dart';
 import 'configuration.dart';
 import 'matching.dart';
 import 'misc/inherited_router.dart';
+import 'misc/lazy_route_loader.dart';
 import 'parser.dart';
 import 'platform/platform.dart';
 import 'route.dart';
@@ -51,7 +52,9 @@ class RouterState extends State<Router> with PreloadStateMixin {
   RouteMatchList? _matchList;
   RouteMatchList get matchList => _matchList ?? RouteMatchList.empty;
 
-  Map<Object, RouteLoader> routeLoaders = {};
+  /// The loaders of the lazy routes matched so far, keyed by their matched location,
+  /// so that preloading and building load each lazy route only once.
+  final Map<Object, LazyRouteLoader> _routeLoaders = {};
   VoidCallback? _routeChangeDispose;
 
   @override
@@ -204,18 +207,18 @@ class RouterState extends State<Router> with PreloadStateMixin {
   }
 
   Future<RouteMatchList> _preload(RouteMatchList match) {
-    final loaders = <RouteLoader>[];
+    final loaders = <LazyRouteLoader>[];
     for (var i = 0; i < match.matches.length; i++) {
       final m = match.matches[i];
       final hasNext = i < match.matches.length - 1;
 
       if (m.route case final LazyRouteBase r when (!hasNext || r is ShellRoute)) {
         final key = m.subloc;
-        final l = (routeLoaders[key] ??= RouteLoader.from(r.load()));
+        final l = (_routeLoaders[key] ??= LazyRouteLoader.from(r.load()));
         loaders.add(l);
       }
     }
-    return RouteLoader.wait(loaders).then((_) => match);
+    return LazyRouteLoader.wait(loaders).then((_) => match);
   }
 
   Future<RouteMatchList> _matchRoute(String location, {Object? extra, bool applyRedirects = true}) {
@@ -244,28 +247,7 @@ class RouterState extends State<Router> with PreloadStateMixin {
   Component build(BuildContext context) {
     return Component.fragment([
       if (_matchList?.title case final title?) Document.head(title: title),
-      component._builder.build(this),
+      component._builder.build(this, _routeLoaders),
     ]);
-  }
-}
-
-class RouteLoader {
-  RouteLoader.from(this.future) : isPending = true {
-    future.whenComplete(() {
-      isPending = false;
-    });
-  }
-
-  final Future<void> future;
-
-  bool isPending;
-
-  static Future<void> wait(Iterable<RouteLoader> loaders) {
-    final pendingLoaders = loaders.where((l) => l.isPending).toList(growable: false);
-    if (pendingLoaders.isNotEmpty) {
-      return [for (final loader in pendingLoaders) loader.future].wait;
-    } else {
-      return SynchronousFuture(null);
-    }
   }
 }

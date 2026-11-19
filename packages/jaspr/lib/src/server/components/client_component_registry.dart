@@ -15,6 +15,7 @@ class ClientComponentRegistryElement extends ObserverElement {
   ClientComponentRegistryElement(super.component);
 
   final Map<Element, ClientTarget> clientElements = {};
+  final Set<Element> clientBoundaries = {};
 
   int serverElementNum = 1;
   final Map<(Element, Component), int> serverComponents = {};
