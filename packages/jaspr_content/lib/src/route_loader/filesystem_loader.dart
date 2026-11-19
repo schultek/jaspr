@@ -24,11 +24,12 @@ import 'route_loader.dart';
 /// and the partials they read change.
 ///
 /// To choose which files become pages and what their URLs are,
-/// use [filterExtensions], [ignorePattern], and [keepSuffixPattern].
+/// use [filterExtensions], [ignorePattern], [keepSuffixPattern], and [urlPrefix].
 /// To load pages from another kind of source, extend [RouteLoaderBase] instead.
 final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
   /// Creates a loader for the pages under [directory].
   ///
+  /// If [urlPrefix] is set, the URL of each page starts with it.
   /// If [debugPrint] is `true`, the routes are printed each time they're built.
   /// The [fileSystem] and [watcherFactory] are only meant to be replaced in tests.
   FilesystemLoader(
@@ -36,6 +37,7 @@ final class FilesystemLoader extends RouteLoaderBase<FilePageSource> {
     this.filterExtensions = const {},
     this.keepSuffixPattern,
     this.ignorePattern,
+    super.urlPrefix,
     super.debugPrint,
     @visibleForTesting this.fileSystem = const LocalFileSystem(),
     @visibleForTesting DirectoryWatcherFactory? watcherFactory,

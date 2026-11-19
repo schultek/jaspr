@@ -38,6 +38,8 @@ class Page {
   final String path;
 
   /// The url of the page, e.g. '/', '/some/path'.
+  ///
+  /// It starts with the [RouteLoaderBase.urlPrefix] of its loader, if set.
   final String url;
 
   /// The (unparsed) content of the page.

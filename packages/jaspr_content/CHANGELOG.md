@@ -1,3 +1,12 @@
+## Unreleased 0.6.0-beta.2
+
+### New Features and Improvements
+
+- Added `urlPrefix` parameter to `RouteLoaderBase` and the built-in route loaders,
+  which mounts the pages of a loader under a URL prefix, such as `/docs/v2`.
+  This lets one site serve several sets of pages side by side, such as multiple versions of the same docs.
+  The paths of the pages don't include the prefix, so config patterns and relative asset paths stay the same.
+
 ## 0.6.0-beta.1
 
 ### New Features and Improvements
