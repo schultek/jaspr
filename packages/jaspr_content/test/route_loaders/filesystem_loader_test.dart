@@ -428,6 +428,26 @@ void main() {
         expect(loader.sources, isEmpty);
       });
 
+      test('discards the page of a removed source without rebuilding it', () async {
+        // Arrange: Load the page eagerly, so that a rebuild would happen right away.
+        final fileSystem = MemoryFileSystem();
+        fileSystem.file('pages/index.md')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('Page content');
+        loader = FilesystemLoader('pages', fileSystem: fileSystem, watcherFactory: (_) => mockWatcher);
+        await loader.loadRoutes((_) => PageConfig(), true);
+        final source = loader.sources.single;
+        expect(source.page, isNotNull);
+
+        // Act: Report the file as removed. It still exists, so a rebuild would succeed.
+        eventController.add(WatchEvent(ChangeType.REMOVE, 'pages/index.md'));
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: The source is removed, and its page is discarded without being rebuilt.
+        expect(loader.sources, isEmpty);
+        expect(source.page, isNull);
+      });
+
       test('keeps the error of a failed eager rebuild until the page is requested', () async {
         // Arrange
         final fileSystem = MemoryFileSystem();
