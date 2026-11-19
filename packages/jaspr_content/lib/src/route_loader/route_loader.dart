@@ -373,7 +373,10 @@ abstract class PageSource {
     }
     _future = null;
     if (rebuild && loader._eager) {
-      load();
+      // Don't report a failed rebuild here,
+      // such as for invalid front matter saved while serving.
+      // The error is kept and surfaces when the page is requested.
+      load().ignore();
     }
   }
 }
