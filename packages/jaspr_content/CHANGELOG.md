@@ -19,6 +19,9 @@
     To create a custom route loader, extend `RouteLoaderBase` instead,
     or implement `RouteLoader` directly.
 
+  - `FilesystemLoader.addFile`, `removeFile`, `invalidateFile`, and `dependentSources` are now private.
+    To choose which files become pages, use `filterExtensions` or `ignorePattern`.
+
   - `PageSource.loadPage` is now private. Call `PageSource.load()` instead.
 
   - `PageSource` now asserts that its path is relative, such as `blog/post.md`.
@@ -38,6 +41,9 @@
     - `RouteLoaderBase`: `loadRoutes`, `addSource`, `removeSource`, `invalidateSource`,
       `invalidateRoutes`, and `invalidateAll`
     - `PageSource`: `invalidate`
+
+  - `RouteLoaderBase.invalidateSource` no longer takes a `rebuild` parameter,
+    and `removeSource` now discards the page of the removed source itself.
 
 ### New Features and Improvements
 
