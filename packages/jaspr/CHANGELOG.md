@@ -16,6 +16,7 @@
 - Fixed `jaspr build` and `jaspr serve` stopping a build daemon that another Jaspr process in the same directory started, which left that process serving empty 503 responses.
 - Fixed `jaspr serve` not noticing when its build daemon exits without a shutdown notification. It now stops with an error instead of answering every request with an empty 503.
 - Fixed `jaspr build` writing an invalid `sitemap.xml` when a route contains a character that XML requires to be escaped, such as the `&` in `/terms&conditions`.
+- Fixed `Animation(count: double.infinity)` rendering `infinity` instead of `infinite`, which made the browser drop the whole `animation` declaration.
 
 ## 0.24.0-beta.1
 

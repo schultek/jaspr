@@ -62,7 +62,8 @@ class _Animation implements Animation {
     var val = '${duration.inMilliseconds}ms';
     if (curve != null) val += ' ${curve!.value}';
     if (delay != null) val += ' ${delay!.inMilliseconds}ms';
-    if (count != null) val += ' ${count!.numstr}';
+    // `animation-iteration-count` takes the keyword `infinite`, not `infinity`.
+    if (count != null) val += ' ${count!.isInfinite ? 'infinite' : count!.numstr}';
     if (direction != null) val += ' ${direction!.value}';
     if (fillMode != null) val += ' ${fillMode!.value}';
     if (playState != null) val += ' ${playState!.value}';

@@ -28,9 +28,16 @@ void main() {
         expect(
           styles.properties,
           equals({
-            'animation': '500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinity normal forwards running slide',
+            'animation': '500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinite normal forwards running slide',
           }),
         );
+      });
+
+      test('finite count', () {
+        const styles = Styles(
+          animation: Animation(name: 'pulse', duration: Duration(seconds: 1), count: 2.5),
+        );
+        expect(styles.properties, equals({'animation': '1000ms 2.5 pulse'}));
       });
 
       group('combine', () {
