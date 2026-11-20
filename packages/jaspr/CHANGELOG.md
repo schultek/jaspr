@@ -1,11 +1,9 @@
-## Unreleased
+## Unreleased 0.24.0-beta.3
 
 - Fixed hot reload when adding new `@client` components, including the first client on a page.
   - Existing components keep their state when a new component has the same filename in another directory.
-  - Pages now include the client script whenever a client entrypoint exists, even without `@client` components.
-    Standalone fragments still only include it when they render a `@client` component.
-  - **Breaking:** `ClientOptions.clients` is now a function that returns the client registrations.
-    Regenerate `*.client.options.dart` files with `jaspr_builder` if they don't update automatically.
+  - Pages now include the client script whenever a client entrypoint exists, even without `@client` components. Standalone fragments still only include it when they render a `@client` component.
+  - **Breaking:** `ClientOptions.clients` is now a function that returns the client registrations. Regenerate `*.client.options.dart` files with `jaspr_builder` if they don't update automatically.
 
 ## 0.24.0-beta.2
 
