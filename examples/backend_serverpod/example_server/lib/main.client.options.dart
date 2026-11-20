@@ -31,5 +31,8 @@ Map<String, ClientLoader> _$clients() => {
   'counter': ClientLoader(
     (p) => _counter.Counter(),
     loader: _counter.loadLibrary,
+    libraryId: kDebugMode
+        ? 'package:example_server/components/counter.dart'
+        : null,
   ),
 };

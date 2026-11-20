@@ -32,9 +32,15 @@ Map<String, ClientLoader> _$clients() => {
   'counter': ClientLoader(
     (p) => _counter.Counter(),
     loader: _counter.loadLibrary,
+    libraryId: kDebugMode
+        ? 'package:backend_dart_frog/components/counter.dart'
+        : null,
   ),
   'hello': ClientLoader(
     (p) => _hello.Hello(name: p.get<String>('name')),
     loader: _hello.loadLibrary,
+    libraryId: kDebugMode
+        ? 'package:backend_dart_frog/components/hello.dart'
+        : null,
   ),
 };

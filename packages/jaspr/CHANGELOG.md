@@ -1,6 +1,7 @@
 ## Unreleased
 
 - Fixed hot reload when adding new `@client` components, including the first client on a page.
+  - Existing components keep their state when a new component has the same filename in another directory.
   - Pages now include the client script whenever a client entrypoint exists, even without `@client` components.
     Standalone fragments still only include it when they render a `@client` component.
   - **Breaking:** `ClientOptions.clients` is now a function that returns the client registrations.

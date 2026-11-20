@@ -44,5 +44,11 @@ ClientOptions get defaultClientOptions => ClientOptions(
 
 // A top-level function, so hot reload picks up added or removed clients.
 Map<String, ClientLoader> _$clients() => {
-  'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary),
+  'app': ClientLoader(
+    (p) => _app.App(),
+    loader: _app.loadLibrary,
+    libraryId: kDebugMode
+        ? 'package:flutter_plugin_interop/components/app.dart'
+        : null,
+  ),
 };

@@ -29,6 +29,16 @@ ClientOptions get defaultClientOptions => ClientOptions(clients: _$clients);
 
 // A top-level function, so hot reload picks up added or removed clients.
 Map<String, ClientLoader> _$clients() => {
-  'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary),
-  'hello': ClientLoader((p) => _hello.Hello(), loader: _hello.loadLibrary),
+  'app': ClientLoader(
+    (p) => _app.App(),
+    loader: _app.loadLibrary,
+    libraryId: kDebugMode ? 'package:backend_shelf/components/app.dart' : null,
+  ),
+  'hello': ClientLoader(
+    (p) => _hello.Hello(),
+    loader: _hello.loadLibrary,
+    libraryId: kDebugMode
+        ? 'package:backend_shelf/components/hello.dart'
+        : null,
+  ),
 };

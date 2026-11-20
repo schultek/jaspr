@@ -216,12 +216,14 @@ List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
         final data = match.group(3);
         final apply = match.group(4);
 
+        // The short name in the HTML can move to another library after a hot reload.
+        final id = kDebugMode ? Jaspr.clients[name]?.libraryId ?? name : name;
         final resolvedKey = key != null
-            ? '@$name#$key'
+            ? '@$id#$key'
             : (() {
-                final count = clientKeyCounters[name] ?? 0;
-                clientKeyCounters[name] = count + 1;
-                return '@$name-${anchors.length}-$count';
+                final count = clientKeyCounters[id] ?? 0;
+                clientKeyCounters[id] = count + 1;
+                return '@$id-${anchors.length}-$count';
               })();
 
         anchors.add(ClientComponentAnchor._(name, resolvedKey, currNode, data, apply));

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
 import 'package:jaspr_builder/src/options/client_options_builder.dart';
@@ -29,6 +31,33 @@ void main() {
         ClientOptionsBuilder(BuilderOptions({})),
         clientOptionsOtherSources,
         outputs: clientOptionsOtherOutputs,
+        readerWriter: reader,
+      );
+    });
+
+    test('uses distinct debug-only library IDs for clients with the same filename', () async {
+      await testBuilder(
+        ClientOptionsBuilder(BuilderOptions({})),
+        {
+          ...clientOptionsOtherSources,
+          'site|lib/clients.bundle.json': jsonEncode([
+            for (final dir in ['a', 'z'])
+              {
+                'name': 'Counter',
+                'id': ['site', 'lib/$dir/counter.dart'],
+                'import': 'package:site/$dir/counter.dart',
+                'params': <Object?>[],
+              },
+          ]),
+        },
+        outputs: {
+          'site|lib/other.client.options.dart': decodedMatches(
+            allOf(
+              contains("libraryId: kDebugMode ? 'package:site/a/counter.dart' : null"),
+              contains("libraryId: kDebugMode ? 'package:site/z/counter.dart' : null"),
+            ),
+          ),
+        },
         readerWriter: reader,
       );
     });

@@ -52,6 +52,50 @@ void main() {
     expect(Jaspr.clients['counter']!.loadedBuilder, isA<Future<Object?>>());
   });
 
+  testClient('keeps counter state when a new library takes its short marker name', (tester) async {
+    var added = false;
+    final loads = <String>[];
+    Future<void> loadOriginal() async => loads.add('z');
+    Future<void> loadAdded() async => loads.add('a');
+
+    // Adding a/counter.dart gives it the short name previously assigned to z/counter.dart.
+    String originalName() => added ? 'z/counter' : 'counter';
+    web.HTMLElement body() => _parseBody(
+      _client(originalName(), buttonId: 'original') + (added ? _client('counter', buttonId: 'added') : ''),
+    );
+
+    await _start(
+      tester,
+      body(),
+      ClientOptions(
+        clients: () => {
+          originalName(): ClientLoader(
+            (_) => const _Counter('original', 'Original'),
+            loader: loadOriginal,
+            libraryId: 'package:site/z/counter.dart',
+          ),
+          if (added)
+            'counter': ClientLoader(
+              (_) => const _Counter('added', 'Added'),
+              loader: loadAdded,
+              libraryId: 'package:site/a/counter.dart',
+            ),
+        },
+      ),
+    );
+    await _click('original', 'Original: 1');
+
+    added = true;
+    Jaspr.invalidateClients();
+    await _reload(tester, body());
+
+    expect(_button('original').textContent, 'Original: 1');
+    expect(_button('added').textContent, 'Added: 0');
+    await _click('added', 'Added: 1');
+    await _click('original', 'Original: 2');
+    expect(loads, ['z', 'a']);
+  });
+
   testClient('keeps parent state when a reload adds a deferred client in its server child', (tester) async {
     final marker = DomValidator.clientMarkerPrefix;
     web.HTMLElement shellBody({required bool withChild}) => _parseBody(
@@ -206,10 +250,10 @@ void main() {
 web.HTMLElement _body({required bool hasExistingClient, required bool hasAddedClient}) =>
     _parseBody([if (hasExistingClient) _client('existing'), if (hasAddedClient) _client('added')].join());
 
-/// The server-rendered markup of a client component that renders a button with the same [id].
-String _client(String id) {
+/// The server-rendered markup of a client component that renders a button.
+String _client(String name, {String? buttonId}) {
   final marker = DomValidator.clientMarkerPrefix;
-  return '<!--$marker$id--><button id="$id">Server</button><!--/$marker$id-->';
+  return '<!--$marker$name--><button id="${buttonId ?? name}">Server</button><!--/$marker$name-->';
 }
 
 web.HTMLElement _parseBody(String html) =>

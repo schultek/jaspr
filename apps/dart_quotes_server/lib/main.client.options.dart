@@ -35,5 +35,8 @@ Map<String, ClientLoader> _$clients() => {
       initialCount: p.get<int>('initialCount'),
     ),
     loader: _quote_like_button.loadLibrary,
+    libraryId: kDebugMode
+        ? 'package:dart_quotes_server/web/components/quote_like_button.dart'
+        : null,
   ),
 };

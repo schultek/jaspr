@@ -34,8 +34,11 @@ abstract final class Jaspr {
     final staleClients = _clients;
     if (staleClients == null) return;
 
+    final previousById = {
+      for (final entry in staleClients.entries) entry.value.libraryId ?? entry.key: entry.value,
+    };
     _clients = null;
-    clients.forEach((name, loader) => loader._keepLoadedFrom(staleClients[name]));
+    clients.forEach((name, loader) => loader._keepLoadedFrom(previousById[loader.libraryId ?? name]));
   }
 }
 
@@ -63,10 +66,14 @@ final class ClientOptions {
 /// **DO NOT USE DIRECTLY.**
 /// Use the generated `defaultClientOptions` instead.
 final class ClientLoader {
-  ClientLoader(this.builder, {this.loader});
+  ClientLoader(this.builder, {this.loader, this.libraryId});
 
   final Future<void> Function()? loader;
   final ClientBuilder builder;
+
+  /// The generated component's library URI, used to preserve its identity across hot reloads.
+  /// When omitted, the registration name identifies the component.
+  final String? libraryId;
 
   FutureOr<ClientBuilder>? _loadedBuilder;
 
@@ -93,8 +100,7 @@ final class ClientLoader {
   /// Marks this loader as loaded if [previous] already loaded the same [loader],
   /// so existing components resolve synchronously and keep their state after hot reload.
   ///
-  /// Names can move to a different library when clients are added,
-  /// so matching names alone don't mean the library is loaded.
+  /// A changed deferred import must run its own loader before its builder can be used.
   void _keepLoadedFrom(ClientLoader? previous) {
     if (previous != null && previous.loader == loader && previous._loadedBuilder is ClientBuilder) {
       _loadedBuilder = builder;

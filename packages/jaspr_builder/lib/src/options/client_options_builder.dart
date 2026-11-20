@@ -115,7 +115,11 @@ class ClientOptionsBuilder implements Builder {
       final id = compressed[c.id.path]!;
       final fullId = c.id.package != package ? '${c.id.package}:$id' : id;
       return '''
-        '$fullId': ClientLoader((p) => ${c.componentFactory()}, loader: [[=${c.import}]].loadLibrary),
+        '$fullId': ClientLoader(
+          (p) => ${c.componentFactory()},
+          loader: [[=${c.import}]].loadLibrary,
+          libraryId: kDebugMode ? '${c.import}' : null,
+        ),
       ''';
     }).join()}}';
   }

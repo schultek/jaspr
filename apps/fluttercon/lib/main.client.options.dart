@@ -45,9 +45,13 @@ Map<String, ClientLoader> _$clients() => {
       session: _session.SessionCodex.decode(p.get<String>('session')),
     ),
     loader: _like_button.loadLibrary,
+    libraryId: kDebugMode
+        ? 'package:fluttercon/components/like_button.dart'
+        : null,
   ),
   'favorites': ClientLoader(
     (p) => _favorites.FavoritesPage(),
     loader: _favorites.loadLibrary,
+    libraryId: kDebugMode ? 'package:fluttercon/pages/favorites.dart' : null,
   ),
 };
