@@ -1,22 +1,39 @@
 import 'dart:io';
 
 import '../markup_render_object.dart';
+import 'client_component_adapter.dart';
+import 'document_structure_helper.dart';
 import 'head_scope_adapter.dart';
 
+/// Adds the script of the client entrypoint to the document's head.
+///
+/// A standalone fragment only gets the script if it renders a @client component,
+/// as it is otherwise embedded in a page that the fragment knows nothing about.
 final class ClientScriptAdapter extends HeadScopeAdapter {
-  ClientScriptAdapter(this.clientId);
+  ClientScriptAdapter(this.clientId, this.documentUri);
 
   final String clientId;
+  final Uri documentUri;
 
   @override
   bool applyHead(MarkupRenderObject head) {
-    var scriptSrc = clientId;
-
-    // Use absolute path if no base tag is present, otherwise relative to the base.
-    final base = head.children.findWhere<MarkupRenderElement>((c) => c.tag == 'base');
-    if (base == null) {
-      scriptSrc = '/$scriptSrc';
+    if (binding.isStandalone && !binding.hasRenderAdapter<ClientComponentAdapter>()) {
+      return false;
     }
+
+    final base = findBaseWithHref(head);
+    // Emit a src relative to the base URL if one is set, otherwise from the root.
+    final scriptSrc = base != null ? clientId : '/$clientId';
+    final baseHref = base == null ? null : Uri.tryParse(base.attributes!['href']!.trim());
+    final baseUri = baseHref == null ? documentUri : documentUri.resolveUri(baseHref);
+    final entrypoint = baseUri.resolve(scriptSrc);
+    // Keep a script for the entrypoint that is already anywhere in the document,
+    // with the author's attributes and any cache-busting query.
+    var root = head;
+    for (var parent = head.parent; parent != null; parent = parent.parent) {
+      root = parent;
+    }
+    if (_loadsScript(root, entrypoint, baseUri)) return false;
 
     head.children.insertBefore(
       head.createChildRenderElement('script')..update(null, null, null, {'src': scriptSrc, 'defer': ''}, null),
@@ -24,6 +41,29 @@ final class ClientScriptAdapter extends HeadScopeAdapter {
 
     return true;
   }
+}
+
+/// Whether [object] or one of its descendants is a script that loads [url].
+///
+/// A relative `src` is resolved against [baseUri], and its query is ignored.
+/// Scripts that the browser never runs are not counted, which are those in a `<noscript>`
+/// or in a `<template>` that doesn't declare a shadow root.
+bool _loadsScript(MarkupRenderObject object, Uri url, Uri baseUri) {
+  if (object is MarkupRenderText) return false;
+  if (object case MarkupRenderElement(:final tag, :final attributes)) {
+    if (tag == 'script') {
+      final src = attributes?['src']?.trim();
+      final uri = src == null || src.isEmpty ? null : Uri.tryParse(src);
+      if (uri == null) return false;
+      final target = baseUri.resolveUri(uri);
+      return target.scheme == url.scheme && target.authority == url.authority && target.path == url.path;
+    }
+    if (tag == 'noscript' || (tag == 'template' && attributes?['shadowrootmode'] == null)) return false;
+  }
+  for (final child in object.children) {
+    if (_loadsScript(child, url, baseUri)) return true;
+  }
+  return false;
 }
 
 final class NoClientScriptAdapter extends HeadScopeAdapter {

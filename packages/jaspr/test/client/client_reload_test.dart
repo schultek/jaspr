@@ -28,11 +28,7 @@ void main() {
       // Simulate client reload with an empty body as returned in client mode
       final oldButton = web.document.querySelector('button')!;
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
-      final root = tester.binding.rootElement!;
-      (root.renderObject as RootDomRenderObject).setRootNode(newBody);
-      root.owner.performReload(root);
-      web.document.body!.replaceWith(newBody);
-      tester.binding.completeInitialFrame();
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       // Check for duplicated DOM nodes after reload
@@ -56,11 +52,7 @@ void main() {
       expect(web.document.querySelectorAll('.main > div').length, equals(1));
 
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
-      final root = tester.binding.rootElement!;
-      (root.renderObject as RootDomRenderObject).setRootNode(newBody);
-      root.owner.performReload(root);
-      web.document.body!.replaceWith(newBody);
-      tester.binding.completeInitialFrame();
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       expect(web.document.querySelectorAll('.main > div').length, equals(1));
@@ -75,10 +67,7 @@ void main() {
 
       for (var reload = 1; reload <= 3; reload++) {
         final newBody = web.document.createElement('body') as web.HTMLBodyElement;
-        rootRenderObject.setRootNode(newBody);
-        root.owner.performReload(root);
-        web.document.body!.replaceWith(newBody);
-        tester.binding.completeInitialFrame();
+        await tester.binding.reloadBody(newBody);
         await pumpEventQueue();
 
         // ConstApp renders one element below the root. A reload gives it a new render object,
@@ -108,7 +97,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'reload_app': ClientLoader((params) {
               return SyncReloadComponent(name: params.get<String>('name'));
             }),
@@ -133,13 +122,7 @@ void main() {
                   '</div>'
               .toJS;
 
-      final rootElement = tester.binding.rootElement!;
-      final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
-      rootRenderObject.setRootNode(newBody);
-      rootElement.owner.performReload(rootElement);
-
-      web.document.body!.replaceWith(newBody);
-      tester.binding.completeInitialFrame();
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       final newP = web.document.querySelector('body p')!;
@@ -168,7 +151,7 @@ void main() {
 
       Jaspr.initializeApp(
         options: ClientOptions(
-          clients: {
+          clients: () => {
             'dynamic_app': ClientLoader((params) {
               return DynamicClientApp(title: params.get<String>('title'));
             }),
@@ -191,13 +174,7 @@ void main() {
                   '</div>'
               .toJS;
 
-      final rootElement = tester.binding.rootElement!;
-      final rootRenderObject = rootElement.renderObject as RootDomRenderObject;
-      rootRenderObject.setRootNode(newBody);
-      rootElement.owner.performReload(rootElement);
-
-      web.document.body!.replaceWith(newBody);
-      tester.binding.completeInitialFrame();
+      await tester.binding.reloadBody(newBody);
       await pumpEventQueue();
 
       expect(web.document.querySelectorAll('#container .nested-card').length, equals(1));

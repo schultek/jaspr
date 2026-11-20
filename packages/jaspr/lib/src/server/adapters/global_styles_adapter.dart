@@ -1,14 +1,14 @@
 import '../../../server.dart';
 import '../../dom/styles/rules.dart' show StyleRulesRender;
+import 'document_structure_helper.dart';
 
 final class GlobalStylesAdapter extends HeadScopeAdapter {
   @override
   bool applyHead(MarkupRenderObject head) {
     var stylesId = binding.options.stylesId;
     if (stylesId != null) {
-      // Use absolute path if no base tag is present, otherwise relative to the base.
-      final base = head.children.findWhere<MarkupRenderElement>((c) => c.tag == 'base');
-      if (base == null) {
+      // Use a path relative to the base URL if one is set, otherwise from the root.
+      if (findBaseWithHref(head) == null) {
         stylesId = '/$stylesId';
       }
 

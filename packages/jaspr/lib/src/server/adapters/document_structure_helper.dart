@@ -1,5 +1,15 @@
 import '../markup_render_object.dart';
 
+/// Returns the `<base>` in [head] that sets the document's base URL,
+/// which is the first one with an `href`.
+///
+/// Without one, relative URLs in the document resolve against the URL of the page.
+MarkupRenderElement? findBaseWithHref(MarkupRenderObject head) {
+  return head.children.findWhere<MarkupRenderElement>(
+    (element) => element.tag == 'base' && element.attributes?['href'] != null,
+  );
+}
+
 ({MarkupRenderElement html, MarkupRenderElement head, MarkupRenderElement body}) createDocumentStructure(
   MarkupRenderObject root, [
   bool includeDoctype = false,
