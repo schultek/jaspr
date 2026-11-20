@@ -2,8 +2,10 @@ import * as vscode from "vscode";
 import {
   DynamicDebugConfigProvider,
   InitialLaunchJsonDebugConfigProvider,
+  JasprDebugAdapterTrackerFactory,
   JasprDebugConfigurationProvider,
 } from "./debug";
+import { JasprServeDaemon } from "./jaspr/serve_daemon";
 
 import { createJasprProject, handleNewProjects } from "./create";
 import { jasprClean, jasprDoctor, jasprServe } from "./commands";
@@ -59,6 +61,35 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("jaspr.doctor", jasprDoctor)
+  );
+
+  context.subscriptions.push(
+    vscode.debug.registerDebugAdapterTrackerFactory(
+      "dart",
+      new JasprDebugAdapterTrackerFactory()
+    )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("jaspr.hotReload", async () => {
+      const daemon = JasprServeDaemon.getActiveDaemon();
+      if (daemon) {
+        daemon.reload();
+      } else {
+        await vscode.commands.executeCommand("dart.hotReload");
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("jaspr.hotRestart", async () => {
+      const daemon = JasprServeDaemon.getActiveDaemon();
+      if (daemon) {
+        daemon.restart();
+      } else {
+        await vscode.commands.executeCommand("workbench.action.debug.restart");
+      }
+    })
   );
 
   context.subscriptions.push(
