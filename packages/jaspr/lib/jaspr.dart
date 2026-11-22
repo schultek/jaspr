@@ -24,7 +24,7 @@ export 'src/framework/framework.dart'
         GlobalComponentsBinding,
         DomRenderObjectElement,
         ApplyParams,
-        DomParamsResolver,
+        RenderChildSlot,
         ApplyDomComponent,
         DomParamsElement;
 export 'src/stub/app_context_stub.dart'

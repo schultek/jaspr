@@ -49,6 +49,13 @@ abstract interface class RawableRenderText implements RenderText {
 
 abstract interface class RenderFragment implements RenderObject {}
 
+/// A slot may render its children inside an existing, nested DOM element.
+@internal
+abstract interface class RenderChildSlot implements RenderFragment {
+  /// Whether the children render at the same DOM level as this fragment's parent.
+  bool get rendersIntoParent;
+}
+
 abstract class MultiChildRenderObjectElement = MultiChildElement with RenderObjectElement;
 abstract class LeafRenderObjectElement = LeafElement with RenderObjectElement;
 
