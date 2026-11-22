@@ -1526,6 +1526,70 @@ void main() {
       expect(inputs, 1);
     });
 
+    testClient('keeps a dialog and details the browser opened open in a removed slot', (tester) async {
+      window.document.body!.innerHTML =
+          '<button></button><!--start--><dialog>Content</dialog><details><summary>More</summary></details><!--end-->'
+              .toJS;
+      final outside = window.document.querySelector('button')! as HTMLElement;
+      final dialogElement = window.document.querySelector('dialog')! as HTMLDialogElement;
+      final detailsElement = window.document.querySelector('details')! as HTMLDetailsElement;
+      final start = dialogElement.previousSibling!;
+      final end = detailsElement.nextSibling!;
+      var slotted = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            // The applied `open` goes away along with the slot.
+            final attributes = slotted ? const {'open': 'false'} : null;
+            return .apply(
+              target: const .descendantWith(tag: 'dialog'),
+              attributes: attributes,
+              child: .apply(
+                target: const .descendantWith(tag: 'details'),
+                attributes: attributes,
+                child: SlottedChildView(
+                  slots: [
+                    if (slotted)
+                      .between(
+                        start: start,
+                        end: end,
+                        child: .fragment([
+                          dialog([.text('Content')]),
+                          details([
+                            summary([.text('More')]),
+                          ]),
+                        ]),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(dialogElement.open, isFalse);
+      expect(detailsElement.open, isFalse);
+      dialogElement.showModal();
+      detailsElement.open = true;
+
+      setState(() => slotted = false);
+      await pumpEventQueue();
+
+      // Removing `open` would hide the modal dialog without closing it, leaving the page inert.
+      expect(window.document.querySelector('dialog'), equals(dialogElement));
+      expect(dialogElement.open, isTrue);
+      expect(dialogElement.matches(':modal'), isTrue);
+      expect(detailsElement.open, isTrue);
+
+      dialogElement.close();
+      outside.focus();
+      expect(window.document.activeElement, equals(outside));
+    });
+
     testClient('applies params after being moved into them with a global key', (tester) async {
       window.document.body!.innerHTML = '<div id="source"><p class="static">Static</p></div>'.toJS;
       final paragraph = window.document.querySelector('p')!;
@@ -1878,6 +1942,64 @@ void main() {
       // The view checks each match once per render, and it renders twice as it mounts below an apply,
       // but mounting each range slot doesn't check them again.
       expect(parentReads, lessThanOrEqualTo(2 * count));
+    });
+
+    testClient('takes back removed range slots without listing the others again as each one unmounts', (tester) async {
+      const count = 32;
+      final body = window.document.body!;
+      body.innerHTML = '<section>${'<!--start--><b></b><!--end-->' * count}</section>'.toJS;
+      final section = body.firstChild!;
+      final anchors = [for (var i = 0; i < section.childNodes.length; i++) section.childNodes.item(i)!];
+      var slotted = true;
+      var enabled = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: const .descendantWith(tag: 'b'),
+              classes: enabled ? 'applied' : null,
+              child: SlottedChildView(
+                slots: [
+                  if (slotted)
+                    for (var i = 0; i < count; i++)
+                      .between(start: anchors[i * 3], end: anchors[i * 3 + 2], child: b([])),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      var siblingReads = 0;
+      final object = globalContext['Object']! as JSObject;
+      for (var i = 0; i < count; i++) {
+        // Listing the contents of a range reads the next sibling of each node in it.
+        // Count those reads without changing the shared DOM prototype or depending on elapsed time.
+        // The nodes don't move, so return their original sibling.
+        final end = anchors[i * 3 + 2];
+        final descriptor = JSObject()
+          ..['configurable'] = true.toJS
+          ..['get'] = (() {
+            siblingReads++;
+            return end;
+          }).toJS;
+        object.callMethod('defineProperty'.toJS, anchors[i * 3 + 1], 'nextSibling'.toJS, descriptor);
+      }
+
+      setState(() => slotted = false);
+      await pumpEventQueue();
+
+      expect(body.querySelectorAll('b.applied').length, count);
+      // The view lists each removed range once as it renders and once as it takes them all back.
+      expect(siblingReads, lessThanOrEqualTo(2 * count));
+
+      // The view now owns the values on each node it took back.
+      setState(() => enabled = false);
+      await pumpEventQueue();
+      expect(body.querySelectorAll('b.applied').length, 0);
     });
 
     testClient('applies params to the static elements around a nested range slot', (tester) async {

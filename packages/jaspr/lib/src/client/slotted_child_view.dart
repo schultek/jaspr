@@ -263,6 +263,12 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   /// which tracks only the values it applies itself.
   /// Applies within the slot keep their values.
   ///
+  /// As when a DOM component renders without an `open` attribute it had before,
+  /// an applied `open` stays on a dialog or details element.
+  /// The browser sets that attribute too, such as for `showModal()`,
+  /// and removing it from a modal dialog hides the dialog without closing it,
+  /// which leaves the rest of the page inert.
+  ///
   /// A slot that reactivates instead, such as one moved with a global key,
   /// gets its values back without help: its DOM components depend on the inherited applies,
   /// so they render again when they reactivate,
@@ -272,7 +278,12 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
     void release(Element child) {
       if (child is DomElement) {
-        child.appliedValuesFrom(fromAboveView)?.removeFrom(child.renderObject.node! as web.Element);
+        final node = child.renderObject.node! as web.Element;
+        final values = child.appliedValuesFrom(fromAboveView);
+        if (values != null) {
+          if (node.isHtmlDialogElement || node.isHtmlDetailsElement) values.attributes?.remove('open');
+          values.removeFrom(node);
+        }
       } else if (child is _SlottedChildViewElement) {
         child._appliedParams.release(from: fromAboveView);
         child._releasedByEnclosingSlot = true;
@@ -426,15 +437,25 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     super.onReload();
   }
 
-  /// Takes back the nodes an unmounted slot leaves behind
+  /// Takes back the nodes that removed slots leave behind
   /// as static content of this view.
+  ///
+  /// Removed slots are detached from the view and all unmount in the same pass,
+  /// so the first one to unmount takes them all back at once.
+  /// Taking them back one by one would index the remaining slots again for each.
   void _reclaimSlot(ChildSlotRenderObject slotObject) {
     // An inactive view unmounts along with the slot.
     if (!isActive) return;
     final viewObject = renderObject as SlottedDomRenderObject;
-    if (viewObject._slots.remove(slotObject)) {
-      _applyParams(viewObject, slotObject._contentNodes, inheritedDomParamsFor(viewObject));
-    }
+    // Already taken back with an earlier slot of this pass, or never attached, as after a reload.
+    if (!viewObject._slots.contains(slotObject)) return;
+
+    final removed = [
+      for (final slot in viewObject._slots)
+        if (slot == slotObject || slot.parent == null) slot,
+    ];
+    viewObject._slots.removeAll(removed);
+    _applyParams(viewObject, [for (final slot in removed) ...slot._contentNodes], inheritedDomParamsFor(viewObject));
   }
 
   @override
@@ -655,7 +676,8 @@ class SlottedDomRenderObject extends DomRenderFragment {
 
   /// The slots that render into this view's nodes.
   ///
-  /// A removed slot stays until it unmounts or moves to another view,
+  /// A removed slot is detached from the view, but stays here until
+  /// the removed slots unmount or it moves to another view,
   /// since its nodes can hold globally keyed children until then.
   final Set<ChildSlotRenderObject> _slots = {};
 
