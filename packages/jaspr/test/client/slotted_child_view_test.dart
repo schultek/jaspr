@@ -1590,6 +1590,89 @@ void main() {
       expect(window.document.activeElement, equals(outside));
     });
 
+    for (final nested in [false, true]) {
+      final removal = nested ? 'the slot around its view is removed' : 'its applied open is removed';
+      testClient('keeps a static dialog reopened with showModal() open when $removal', (tester) async {
+        window.document.body!.innerHTML =
+            '<button></button><section><main><article><dialog>Content</dialog></article></main></section>'.toJS;
+        final outside = window.document.querySelector('button')! as HTMLElement;
+        final dialogElement = window.document.querySelector('dialog')! as HTMLDialogElement;
+        var applied = true;
+        late void Function(void Function() cb) setState;
+
+        tester.pumpComponent(
+          StatefulBuilder(
+            builder: (context, set) {
+              setState = set;
+              return .apply(
+                target: const .descendantWith(tag: 'dialog'),
+                attributes: applied ? const {'open': ''} : null,
+                child: SlottedChildView(
+                  slots: [
+                    // The slot goes away along with the applied `open`.
+                    if (nested && applied) .fromQuery('main', child: article([SlottedChildView(slots: const [])])),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+
+        // The view added `open`, so the dialog isn't modal. Reopening it as one replaces that attribute.
+        expect(dialogElement.open, isTrue);
+        expect(dialogElement.matches(':modal'), isFalse);
+        dialogElement.close();
+        dialogElement.showModal();
+
+        setState(() => applied = false);
+        await pumpEventQueue();
+
+        // Removing `open` would hide the modal dialog without closing it, leaving the page inert.
+        expect(window.document.querySelector('dialog'), equals(dialogElement));
+        expect(dialogElement.open, isTrue);
+        expect(dialogElement.matches(':modal'), isTrue);
+
+        dialogElement.close();
+        outside.focus();
+        expect(window.document.activeElement, equals(outside));
+      });
+    }
+
+    testClient('removes an applied open from static details and a static dialog that is not modal', (tester) async {
+      window.document.body!.innerHTML = '<dialog>Content</dialog><details><summary>More</summary></details>'.toJS;
+      final dialogElement = window.document.querySelector('dialog')! as HTMLDialogElement;
+      final detailsElement = window.document.querySelector('details')! as HTMLDetailsElement;
+      var applied = true;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            final attributes = applied ? const {'open': ''} : null;
+            return .apply(
+              target: const .descendantWith(tag: 'dialog'),
+              attributes: attributes,
+              child: .apply(
+                target: const .descendantWith(tag: 'details'),
+                attributes: attributes,
+                child: SlottedChildView(slots: const []),
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(dialogElement.open, isTrue);
+      expect(detailsElement.open, isTrue);
+
+      // The view opened both by adding `open`, so it closes them again by removing it.
+      setState(() => applied = false);
+      await pumpEventQueue();
+      expect(dialogElement.hasAttribute('open'), isFalse);
+      expect(detailsElement.hasAttribute('open'), isFalse);
+    });
+
     testClient('applies params after being moved into them with a global key', (tester) async {
       window.document.body!.innerHTML = '<div id="source"><p class="static">Static</p></div>'.toJS;
       final paragraph = window.document.querySelector('p')!;

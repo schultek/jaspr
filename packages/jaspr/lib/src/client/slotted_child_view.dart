@@ -264,10 +264,12 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   /// Applies within the slot keep their values.
   ///
   /// As when a DOM component renders without an `open` attribute it had before,
-  /// an applied `open` stays on a dialog or details element.
+  /// an applied `open` stays on a dialog or details element that a DOM component rendered.
   /// The browser sets that attribute too, such as for `showModal()`,
   /// and removing it from a modal dialog hides the dialog without closing it,
   /// which leaves the rest of the page inert.
+  /// A nested view still takes back an `open` it added to a static element,
+  /// unless that element is a dialog that has become modal since.
   ///
   /// A slot that reactivates instead, such as one moved with a global key,
   /// gets its values back without help: its DOM components depend on the inherited applies,
@@ -505,6 +507,12 @@ extension on Map<web.Element, _StaticDomValues> {
 extension on AppliedDomValues {
   /// Removes these values from [element],
   /// along with any `class` or `style` attribute they leave empty.
+  ///
+  /// An `open` attribute stays on a modal dialog.
+  /// Only `showModal()` makes a dialog modal, and it sets `open` itself,
+  /// so the attribute is no longer the one these values record.
+  /// Removing it would hide the dialog without closing it,
+  /// which leaves the rest of the page inert.
   void removeFrom(web.Element element) {
     if (id != null && element.id == id) element.removeAttribute('id');
     if (classes case final names? when names.isNotEmpty) {
@@ -530,6 +538,7 @@ extension on AppliedDomValues {
     }
     if (attributes case final names?) {
       for (final name in names) {
+        if (name == 'open' && element.isHtmlDialogElement && element.matches(':modal')) continue;
         element.removeAttribute(name);
       }
     }
