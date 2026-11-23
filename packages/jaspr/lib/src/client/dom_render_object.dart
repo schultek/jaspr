@@ -427,7 +427,7 @@ class DomRenderFragment extends DomRenderObject
     assert(isAttached, 'Cannot remove fragment that is not attached to a parent.');
 
     if (kVerboseMode) {
-      print('Remove fragment $node from ${parent.node}');
+      print('Remove fragment $node from ${(parent as MultiChildDomRenderObject).attachTargetNode}');
     }
 
     final firstNode = firstChildNode;
@@ -444,7 +444,10 @@ class DomRenderFragment extends DomRenderObject
     while (currentNode != null) {
       final prevNode = currentNode != firstNode ? currentNode.previousSibling : null;
 
-      assert(currentNode.parentNode == parent.node, 'Fragment child must be a child of the parent.');
+      assert(
+        currentNode.parentNode == (parent as MultiChildDomRenderObject).attachTargetNode,
+        'Fragment child must be a child of the parent.',
+      );
 
       // Remove from parent, attach back to fragment.
       node.insertBefore(currentNode, beforeNode);
@@ -467,13 +470,7 @@ class DomRenderFragment extends DomRenderObject
 
   @override
   void remove(DomRenderObject child) {
-    if (!isAttached) {
-      removeChild(child);
-    } else {
-      // The parent removes the child's nodes, but only this fragment can unlink it from its children.
-      _unlinkChild(child);
-      parent!.remove(child);
-    }
+    removeChild(child);
   }
 
   @override
@@ -598,16 +595,19 @@ mixin MultiChildDomRenderObject on DomRenderObject {
     if (child case DomRenderFragment(isAttached: true)) {
       child.removeChildren(this);
     } else {
+      // An attached fragment's children are in the node it is attached to, not in the fragment.
+      final targetNode = attachTargetNode;
+
       if (kVerboseMode) {
-        print('Remove child ${child.node} of $node');
+        print('Remove child ${child.node} of $targetNode');
       }
 
       assert(
-        node == child.node.parentNode,
+        targetNode == child.node.parentNode,
         'Child node must be a child of this element.',
       );
 
-      node.removeChild(child.node);
+      targetNode.removeChild(child.node);
     }
 
     _unlinkChild(child);

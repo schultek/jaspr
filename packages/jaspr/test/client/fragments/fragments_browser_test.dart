@@ -499,5 +499,80 @@ void main() {
 
       expect(divElement.innerHTML.toString(), equals('<p>Replacement</p>'));
     });
+
+    group('with a fragment nested in a fragment', () {
+      final cases = <String, (Component, String, Component, String)>{
+        'replaced by an element': (
+          Component.fragment([
+            Component.fragment([
+              span([Component.text('home')]),
+            ]),
+          ]),
+          '<span>home</span>',
+          Component.fragment([
+            button([Component.text('edit')]),
+          ]),
+          '<button>edit</button>',
+        ),
+        'removed': (
+          Component.fragment([
+            b([Component.text('start')]),
+            Component.fragment([
+              span([Component.text('home')]),
+            ]),
+          ]),
+          '<b>start</b><span>home</span>',
+          Component.fragment([
+            b([Component.text('start')]),
+          ]),
+          '<b>start</b>',
+        ),
+        'empty and replaced by content': (
+          Component.fragment([
+            b([Component.text('start')]),
+            const Component.empty(),
+          ]),
+          '<b>start</b>',
+          Component.fragment([
+            b([Component.text('start')]),
+            span([Component.text('loaded')]),
+          ]),
+          '<b>start</b><span>loaded</span>',
+        ),
+        'two levels deep and replaced by an element': (
+          Component.fragment([
+            b([Component.text('start')]),
+            Component.fragment([
+              Component.fragment([
+                span([Component.text('home')]),
+              ]),
+            ]),
+          ]),
+          '<b>start</b><span>home</span>',
+          Component.fragment([
+            b([Component.text('start')]),
+            Component.fragment([
+              button([Component.text('edit')]),
+            ]),
+          ]),
+          '<b>start</b><button>edit</button>',
+        ),
+      };
+
+      for (final MapEntry(key: name, value: (before, beforeHtml, after, afterHtml)) in cases.entries) {
+        testClient('should update the parent element when the inner fragment is $name', (tester) async {
+          final component = FakeComponent(child: div([before]));
+          tester.pumpComponent(component);
+
+          final divElement = window.document.querySelector('body div')!;
+          expect(divElement.innerHTML.toString(), equals(beforeHtml));
+
+          component.updateChild(div([after]));
+          await pumpEventQueue();
+
+          expect(divElement.innerHTML.toString(), equals(afterHtml));
+        });
+      }
+    });
   });
 }
