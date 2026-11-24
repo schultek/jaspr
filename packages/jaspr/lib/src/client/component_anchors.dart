@@ -45,6 +45,10 @@ class ClientComponentAnchor extends ComponentAnchor {
     return const {};
   }
 
+  /// Whether this component can be built synchronously.
+  ///
+  /// This requires both its own [builder] to be loaded and
+  /// the client components nested in its [serverAnchors] to be resolved.
   bool get isResolved => builder is ClientBuilder && serverAnchors.every((a) => a.isResolved);
 
   Future<void> resolve() async {
@@ -180,7 +184,7 @@ final _serverStartRegex = RegExp('^s${DomValidator.clientMarkerPrefixRegex}(\\d+
 final _serverEndRegex = RegExp('^/s${DomValidator.clientMarkerPrefixRegex}(\\d+)\$');
 
 FutureOr<ClientBuilder> getClientByName(String name) {
-  final clients = Jaspr.options.clients;
+  final clients = Jaspr.clients;
   assert(clients.containsKey(name), "No client component registered with name '$name'.");
   return clients[name]!.loadedBuilder;
 }
@@ -212,12 +216,14 @@ List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
         final data = match.group(3);
         final apply = match.group(4);
 
+        // The short name in the HTML can move to another library after a hot reload.
+        final id = kDebugMode ? Jaspr.clients[name]?.libraryId ?? name : name;
         final resolvedKey = key != null
-            ? '@$name#$key'
+            ? '@$id#$key'
             : (() {
-                final count = clientKeyCounters[name] ?? 0;
-                clientKeyCounters[name] = count + 1;
-                return '@$name-${anchors.length}-$count';
+                final count = clientKeyCounters[id] ?? 0;
+                clientKeyCounters[id] = count + 1;
+                return '@$id-${anchors.length}-$count';
               })();
 
         anchors.add(ClientComponentAnchor._(name, resolvedKey, currNode, data, apply));

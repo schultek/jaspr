@@ -13,7 +13,6 @@ library;
 import 'dart:js_interop';
 
 import 'package:jaspr/client.dart';
-import 'package:jaspr/src/client/dom_render_object.dart' show RootDomRenderObject;
 import 'package:jaspr/src/client/utils.dart';
 import 'package:jaspr/src/dom/validator.dart';
 import 'package:jaspr_test/client_test.dart';
@@ -140,7 +139,7 @@ web.HTMLElement _parseBody(String html) => web.DOMParser().parseFromString(html.
 Future<void> _hydrate(ClientTester tester, {Map<int, Key> keys = const {}}) async {
   Jaspr.initializeApp(
     options: ClientOptions(
-      clients: {
+      clients: () => {
         'shell': ClientLoader((params) => HydrationShell(child: params.mount(params.get<String>('child')))),
         'counter': ClientLoader((params) {
           final id = params.get<int>('id');
@@ -153,13 +152,9 @@ Future<void> _hydrate(ClientTester tester, {Map<int, Key> keys = const {}}) asyn
   await pumpEventQueue(times: 1);
 }
 
+/// Reloads the app with actual `X-Jaspr-Reload` server output in [newBody].
 Future<void> _reload(ClientTester tester, web.HTMLElement newBody) async {
-  // Use the same root replacement and performReload sequence as
-  // the client's reload handler, with actual `X-Jaspr-Reload` server output.
-  final root = tester.binding.rootElement!;
-  (root.renderObject as RootDomRenderObject).setRootNode(newBody);
-  root.owner.performReload(root);
-  web.document.body!.replaceWith(newBody);
+  await tester.binding.reloadBody(newBody);
   await pumpEventQueue(times: 1);
 }
 

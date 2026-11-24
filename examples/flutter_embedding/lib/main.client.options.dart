@@ -31,5 +31,16 @@ ClientOptions get defaultClientOptions => ClientOptions(
     _firebase_core_web.FirebaseCoreWeb.registerWith(registrar);
     registrar.registerMessageHandler();
   },
-  clients: {'app': ClientLoader((p) => _app.App(), loader: _app.loadLibrary)},
+  clients: _$clients,
 );
+
+// A top-level function, so hot reload picks up added or removed clients.
+Map<String, ClientLoader> _$clients() => {
+  'app': ClientLoader(
+    (p) => _app.App(),
+    loader: _app.loadLibrary,
+    libraryId: kDebugMode
+        ? 'package:flutter_embedding_demo/components/app.dart'
+        : null,
+  ),
+};
