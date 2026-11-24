@@ -11,8 +11,9 @@ import 'route_loader.dart';
 final class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
   /// Creates a loader for the given `pages`.
   ///
+  /// If [urlPrefix] is set, the URL of each page starts with it.
   /// If [debugPrint] is `true`, the routes are printed each time they're built.
-  MemoryLoader({required this._pages, super.debugPrint});
+  MemoryLoader({required this._pages, super.urlPrefix, super.debugPrint});
 
   final List<MemoryPage> _pages;
 
@@ -58,6 +59,8 @@ final class MemoryPage {
   /// The source path of the page, including its suffix, e.g. 'index.html', 'some/path.md'.
   ///
   /// The path must always be in posix format, i.e. using forward slashes.
+  /// The URL of the page is derived from it,
+  /// and starts with the [RouteLoaderBase.urlPrefix] of the [MemoryLoader], if set.
   final String path;
 
   /// Whether to keep the suffix of the page.
