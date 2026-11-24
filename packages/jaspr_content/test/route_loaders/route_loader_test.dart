@@ -190,6 +190,47 @@ void main() {
       }
     });
   });
+
+  group('PageSource', () {
+    test('builds the page again after a failed build', () async {
+      // Arrange: The first build fails, such as on a network error.
+      final loader = _FlakyRouteLoader(failures: 1);
+      await loader.loadRoutes((_) => PageConfig(), false);
+      final source = loader.sources.single;
+
+      // Act and assert: The failed build isn't reused, so the next load builds the page again.
+      await expectLater(source.load(), throwsA(isA<_BuildException>()));
+      expect(source.page, isNull);
+      final component = await source.load();
+      expect(source.page, isNotNull);
+      expect(source.builds, equals(2));
+
+      // Act and assert: The successful build is reused.
+      expect(await source.load(), same(component));
+      expect(source.builds, equals(2));
+    });
+
+    test('shares a failed build with the loads made while it runs', () async {
+      // Arrange: Only the first build fails, so a second build would succeed instead.
+      final loader = _FlakyRouteLoader(failures: 1);
+      await loader.loadRoutes((_) => PageConfig(), false);
+      final source = loader.sources.single;
+
+      // Act: Load the page twice while its first build is still running.
+      final errors = await [
+        for (var i = 0; i < 2; i++)
+          source.load().then<Object?>(
+            (_) => null,
+            onError: (Object error) => error,
+          ),
+      ].wait;
+
+      // Assert: Both loads fail with the error of the same build.
+      expect(errors, everyElement(isA<_BuildException>()));
+      expect(errors.first, same(errors.last));
+      expect(source.builds, equals(1));
+    });
+  });
 }
 
 /// Returns the paths of the [routes].
@@ -253,3 +294,41 @@ class _LoadConcurrencyTracker {
     completedLoads += 1;
   }
 }
+
+/// A loader with a single page whose first [failures] builds fail.
+class _FlakyRouteLoader extends RouteLoaderBase<_FlakyPageSource> {
+  _FlakyRouteLoader({required this.failures});
+
+  /// The number of builds that fail before one succeeds.
+  final int failures;
+
+  @override
+  Future<List<_FlakyPageSource>> loadPageSources() async {
+    return [_FlakyPageSource('index.md', this, failures: failures)];
+  }
+}
+
+class _FlakyPageSource extends PageSource {
+  _FlakyPageSource(super.path, super.loader, {required this.failures});
+
+  /// The number of builds that fail before one succeeds.
+  final int failures;
+
+  /// The number of times the page was built.
+  int builds = 0;
+
+  @override
+  Future<Page> buildPage() async {
+    final build = builds += 1;
+
+    // Let other loads start while this build is running.
+    await Future<void>.delayed(Duration.zero);
+    if (build <= failures) {
+      throw _BuildException();
+    }
+
+    return Page(path: path, url: url, content: '', config: config, loader: loader);
+  }
+}
+
+class _BuildException implements Exception {}

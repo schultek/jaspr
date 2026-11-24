@@ -364,7 +364,8 @@ abstract class PageSource {
   /// The page from the latest [load], or `null` if it isn't built yet or was invalidated.
   Page? _page;
 
-  /// The result of the latest [load], reused until the source is invalidated.
+  /// The result of the latest [load],
+  /// reused until the source is invalidated or building the page fails.
   Future<Component>? _future;
 
   /// The page that this source built,
@@ -374,10 +375,21 @@ abstract class PageSource {
   /// Builds and renders the page of this source,
   /// or returns the result of an earlier call until the source is invalidated.
   ///
-  /// If building the page fails, later calls fail with the same error
-  /// until the source is invalidated.
+  /// If building the page fails,
+  /// the calls made while it was being built fail with the same error,
+  /// and the next call builds the page again.
   Future<Component> load() async {
-    return _future ??= _loadPage();
+    final future = _future ??= _loadPage();
+    try {
+      return await future;
+    } catch (_) {
+      // Forget the failed build, so that the next call can recover,
+      // such as after a network error.
+      if (identical(_future, future)) {
+        _future = null;
+      }
+      rethrow;
+    }
   }
 
   /// Builds the page with [buildPage], makes it the current [page],
@@ -435,7 +447,7 @@ abstract class PageSource {
     if (rebuild && loader._eager) {
       // Don't report a failed rebuild here,
       // such as for invalid front matter saved while serving.
-      // The error is kept and surfaces when the page is requested.
+      // The next request builds the page again and surfaces the error.
       load().ignore();
     }
   }
