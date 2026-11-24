@@ -11,6 +11,16 @@ import '../utils.dart';
 
 void main() {
   group('FilesystemLoader', () {
+    late MockDirectoryWatcher mockWatcher;
+    late StreamController<WatchEvent> eventController;
+
+    setUp(() {
+      mockWatcher = MockDirectoryWatcher();
+      eventController = StreamController<WatchEvent>.broadcast();
+      addTearDown(eventController.close);
+      when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
+    });
+
     group('loadPageSources()', () {
       test('loads basic file structure', () async {
         // Arrange
@@ -292,15 +302,7 @@ void main() {
     });
 
     group('File Watching', () {
-      late MockDirectoryWatcher mockWatcher;
-      late StreamController<WatchEvent> eventController;
       late FilesystemLoader loader;
-
-      setUp(() {
-        mockWatcher = MockDirectoryWatcher();
-        eventController = StreamController<WatchEvent>.broadcast();
-        when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
-      });
 
       test('does not add a source for an ignored file on file add event', () async {
         // Arrange
@@ -437,7 +439,7 @@ void main() {
         expect(source.page, isNull);
       });
 
-      test('keeps the error of a failed eager rebuild until the page is requested', () async {
+      test('surfaces the error of a failed eager rebuild when the page is requested', () async {
         // Arrange
         final fileSystem = MemoryFileSystem();
         fileSystem.file('pages/index.md')
@@ -457,17 +459,83 @@ void main() {
       });
     });
 
-    group('Partials and Dependencies', () {
-      late MockDirectoryWatcher mockWatcher;
-      late StreamController<WatchEvent> eventController;
+    group('urlPrefix', () {
+      test('prefixes the URLs of loaded and added pages', () async {
+        // Arrange: Mount the pages under /docs/v1, and keep the suffix of blog posts.
+        final fileSystem = MemoryFileSystem();
+        fileSystem.file('pages/index.md').createSync(recursive: true);
+        final loader = FilesystemLoader(
+          'pages',
+          keepSuffixPattern: RegExp('blog/'),
+          urlPrefix: '/docs/v1',
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
 
-      setUp(() {
-        mockWatcher = MockDirectoryWatcher();
-        eventController = StreamController<WatchEvent>.broadcast();
-        addTearDown(eventController.close);
-        when(() => mockWatcher.events).thenAnswer((_) => eventController.stream);
+        // Act and assert: The root index page gets the prefix as its URL.
+        await loader.loadRoutes((_) => PageConfig(), false);
+        expect(loader.sources, equals([pageSource('index.md', '/docs/v1')]));
+
+        // Act and assert: An added page gets a prefixed URL, but its path doesn't change,
+        // so keepSuffixPattern matches it without the prefix.
+        fileSystem.file('pages/blog/post.md').createSync(recursive: true);
+        eventController.add(WatchEvent(ChangeType.ADD, 'pages/blog/post.md'));
+        await Future<void>.delayed(Duration.zero);
+        expect(
+          loader.sources,
+          equals([pageSource('index.md', '/docs/v1'), pageSource('blog/post.md', '/docs/v1/blog/post.md')]),
+        );
       });
 
+      test('mounts directories with the same page paths under different prefixes', () async {
+        // Arrange: Two versions with the same pages, each with its own asset manager.
+        final fileSystem = MemoryFileSystem();
+        for (final version in ['v1', 'v2']) {
+          fileSystem.file('docs/$version/guide/intro.md')
+            ..createSync(recursive: true)
+            ..writeAsStringSync('---\ncover: cover.png\n---\nIntro');
+        }
+        final v1 = FilesystemLoader(
+          'docs/v1',
+          urlPrefix: '/docs',
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
+        final v2 = FilesystemLoader(
+          'docs/v2',
+          urlPrefix: '/docs/v2',
+          fileSystem: fileSystem,
+          watcherFactory: (_) => mockWatcher,
+        );
+        final config = PageConfig(
+          dataLoaders: [
+            for (final (loader, version) in [(v1, 'v1'), (v2, 'v2')])
+              AssetManager(
+                directory: 'docs/$version',
+                outputPrefix: 'assets/$version',
+                dataProperties: {'page.cover'},
+                filterPages: (page) => page.loader == loader,
+              ).dataLoader,
+          ],
+        );
+
+        // Act and assert: The pages share a path, but not a URL.
+        await v1.loadRoutes((_) => config, false);
+        await v2.loadRoutes((_) => config, false);
+        expect(v1.sources, equals([pageSource('guide/intro.md', '/docs/guide/intro')]));
+        expect(v2.sources, equals([pageSource('guide/intro.md', '/docs/v2/guide/intro')]));
+
+        // Act and assert: Each page resolves its assets with the asset manager of its loader.
+        final v1Intro = v1.sources.single;
+        final v2Intro = v2.sources.single;
+        await v1Intro.load();
+        await v2Intro.load();
+        expect(v1Intro.page!.data.page, containsPair('cover', '/assets/v1/guide/cover.png'));
+        expect(v2Intro.page!.data.page, containsPair('cover', '/assets/v2/guide/cover.png'));
+      });
+    });
+
+    group('Partials and Dependencies', () {
       for (final eager in [false, true]) {
         test(
           'invalidates the pages that read a page as a partial when it is marked for rebuild '

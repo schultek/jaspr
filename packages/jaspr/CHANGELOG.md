@@ -1,4 +1,4 @@
-## Unreleased patch
+## Unreleased 0.24.0-beta.3
 
 - Fixed a hue rotation crossing zero in `Color.withHue` producing the wrong color.
 

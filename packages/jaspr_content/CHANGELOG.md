@@ -1,3 +1,18 @@
+## Unreleased 0.6.0-beta.2
+
+### New Features and Improvements
+
+- Added `urlPrefix` parameter to `RouteLoaderBase` and the built-in route loaders,
+  which mounts the pages of a loader under a URL prefix, such as `/docs/v2`.
+  This lets one site serve several sets of pages side by side, such as multiple versions of the same docs.
+  The paths of the pages don't include the prefix, so config patterns and relative asset paths stay the same.
+- Added `PageConfig.matchUrlPrefix`, which resolves the config for the `urlPrefix` of the loader of each page, such as to configure each version of your docs differently.
+
+### Fixes
+
+- Fixed a page that failed to build, such as after a network error with `GitHubLoader`, failing with the same error on every request until its file changed or the server restarted.
+  The next request now builds the page again.
+
 ## 0.6.0-beta.1
 
 ### New Features and Improvements
