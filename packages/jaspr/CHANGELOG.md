@@ -1,3 +1,7 @@
+## Unreleased 0.24.0-beta.3
+
+- Fixed removing or replacing a fragment inside another fragment, including `Component.empty()`, failing with "Cannot remove fragment from a different parent." when asserts are enabled (such as in `jaspr serve`), which stopped the update and left the old content in place.
+
 ## 0.24.0-beta.2
 
 - **Breaking**: Changed `open` on `dialog()` and `details()` to `bool?`. When it is not set, the browser controls the attribute, which fixes a rebuild closing a dialog opened with `showModal()` or `show()` and a `details` element the user opened. Pass `open: false` to keep the element closed.
