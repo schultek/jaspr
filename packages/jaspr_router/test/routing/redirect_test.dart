@@ -109,5 +109,52 @@ void main() {
       expect(find.text('home'), findsOneComponent);
       expect(tester.routeOf(find.text('home')).location, equals('/'));
     });
+
+    testComponents('should not run redirects on preload', (tester) async {
+      var topRedirectCalls = 0;
+      var routeRedirectCalls = 0;
+
+      tester.pumpComponent(
+        Router(
+          routes: [
+            homeRoute(),
+            route('/a'),
+            route('/b', [], null, (_, s) {
+              routeRedirectCalls++;
+              return '/a';
+            }),
+          ],
+          redirect: (_, s) {
+            topRedirectCalls++;
+            return null;
+          },
+        ),
+      );
+
+      expect(find.text('home'), findsOneComponent);
+
+      // Route resolution for the initial location may run the top-level
+      // redirect, so only compare against the counts from here on.
+      final topRedirectCallsAfterInit = topRedirectCalls;
+      expect(routeRedirectCalls, equals(0));
+
+      await tester.router.preload('/a');
+      await tester.router.preload('/b');
+      await pumpEventQueue();
+
+      // Preloading a route (e.g. when hovering a Link) is not a navigation
+      // and must not run any redirect.
+      expect(topRedirectCalls, equals(topRedirectCallsAfterInit));
+      expect(routeRedirectCalls, equals(0));
+      expect(find.text('home'), findsOneComponent);
+
+      // An actual navigation still runs the redirects.
+      await tester.router.push('/b');
+      await pumpEventQueue();
+
+      expect(routeRedirectCalls, equals(1));
+      expect(find.text('a'), findsOneComponent);
+      expect(tester.routeOf(find.text('a')).location, equals('/a'));
+    });
   });
 }

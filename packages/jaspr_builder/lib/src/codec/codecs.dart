@@ -103,12 +103,8 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, Stri
         return (decoder: argument, cast: 'List<Object?>$nullCheck');
       }
       final nested = type.typeArguments.first.acceptWithArgument(this, 'i');
-      final nestedNullCheck =
-          !nested.cast.endsWith('?') && type.typeArguments.first.nullabilitySuffix == NullabilitySuffix.question
-          ? '?'
-          : '';
       var decoder = argument.endsWith(' as __CAST__') ? '($argument)$nullCheck' : '$argument$nullCheck';
-      decoder += '.cast<${nested.cast}$nestedNullCheck>()';
+      decoder += '.cast<${nested.cast}>()';
       if (nested.decoder != 'i') {
         decoder += '.map((i) => ${nested.decoder}).toList()';
       }
@@ -124,27 +120,26 @@ class DecoderVisitor extends UnifyingTypeVisitorWithArgument<DecoderResult, Stri
         return (decoder: argument, cast: 'Map<String, Object?>$nullCheck');
       }
       final nested = type.typeArguments[1].acceptWithArgument(this, 'v');
-      final nestedNullCheck =
-          !nested.cast.endsWith('?') && type.typeArguments[1].nullabilitySuffix == NullabilitySuffix.question
-          ? '?'
-          : '';
       var decoder = argument.endsWith(' as __CAST__') ? '($argument)$nullCheck' : '$argument$nullCheck';
-      decoder += '.cast<String, ${nested.cast}$nestedNullCheck>()';
+      decoder += '.cast<String, ${nested.cast}>()';
       if (nested.decoder != 'v') {
         decoder += '.map((k, v) => MapEntry(k, ${nested.decoder}))';
       }
       return (decoder: decoder, cast: 'Map<String, Object?>$nullCheck');
     } else if (codecs[type.element.name] case final codec?) {
+      if (codec.hasMount && !allowComponent) {
+        throw const InvalidMountParameterException();
+      }
+      final mountArg = codec.hasMount ? (codec.mountParam != null ? '${codec.mountParam}: p.mount' : 'p.mount') : null;
+      final args = mountArg != null ? '$argument, $mountArg' : argument;
       final decoderCall = '[[${codec.import}]].${codec.extension ?? codec.name}.${codec.decoder}';
-      final argRaw = argument.endsWith(' as __CAST__')
-          ? argument.substring(0, argument.length - ' as __CAST__'.length)
-          : argument;
-
-      final decoder = type.nullabilitySuffix == NullabilitySuffix.question
-          ? '$argRaw != null ? $decoderCall($argument) : null'
-          : '$decoderCall($argument)';
-
-      return (decoder: decoder, cast: codec.rawType);
+      if (type.nullabilitySuffix == NullabilitySuffix.question) {
+        final rawType = codec.rawType;
+        final cast = rawType == 'dynamic' || rawType.endsWith('?') ? rawType : '$rawType?';
+        final vArgs = mountArg != null ? 'v, $mountArg' : 'v';
+        return (decoder: 'switch ($argument) { final v? => $decoderCall($vArgs), _ => null }', cast: cast);
+      }
+      return (decoder: '$decoderCall($args)', cast: codec.rawType);
     } else if (allowComponent &&
         type.element.name == 'Component' &&
         type.element.library.identifier == 'package:jaspr/src/framework/framework.dart') {
@@ -196,4 +191,8 @@ extension on DartType {
 
 class InvalidParameterException implements Exception {
   const InvalidParameterException();
+}
+
+class InvalidMountParameterException implements Exception {
+  const InvalidMountParameterException();
 }

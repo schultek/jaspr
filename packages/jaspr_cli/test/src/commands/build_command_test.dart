@@ -97,6 +97,64 @@ void main() {
       });
     });
 
+    test('passes --enable-experiment on to build_runner and the server compile', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'server');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [...buildRunnerBuildArgs, '--enable-experiment=primary-constructors'],
+        );
+
+        final serverProcess = FakeProcess();
+        when(
+          () => io.process.start(
+            '/fake/bin/dart',
+            any(that: containsAllInOrder(['compile', 'exe'])),
+            workingDirectory: '/root/myapp',
+          ),
+        ).thenAnswer((inv) async {
+          expect(
+            inv.positionalArguments[1],
+            equals([
+              'compile',
+              'exe',
+              '--enable-experiment=primary-constructors',
+              'lib/main.server.dart',
+              '-o',
+              './build/jaspr/app',
+              '-Djaspr.flags.release=true',
+            ]),
+          );
+
+          return serverProcess;
+        });
+
+        final buildResult = runner.run(['build', '--verbose', '--enable-experiment=primary-constructors']);
+
+        await expectLater(
+          io.stdout.queue,
+          emits('Building myapp in server rendering mode.'),
+        );
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          io.stdout.queue,
+          emitsInOrderWithTimeout([
+            '[SERVER] Building server app...',
+            'Compiling server executable.',
+          ]),
+        );
+
+        serverProcess.exit(0);
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
+
+        expect(await buildResult, equals(0));
+      });
+    });
+
     test('builds project with static mode', () async {
       await io.runZoned(() async {
         io.setupFakeProject('myapp', mode: 'static');
@@ -116,6 +174,7 @@ void main() {
           expect(
             inv.positionalArguments[1],
             equals([
+              'run',
               '--enable-asserts',
               '-Djaspr.flags.release=true',
               '-Djaspr.flags.generate=true',
@@ -177,8 +236,8 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrderWithTimeout([
+            emitsThrough('Stopping server...'),
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -256,10 +315,82 @@ void main() {
         await expectLater(
           io.stdout.queue,
           emitsInOrderWithTimeout([
+            emitsThrough('Stopping server...'),
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
+
+        expect(await buildResult, equals(0));
+      });
+    });
+
+    test('fails when explicit --port is invalid or out of range', () async {
+      await io.runZoned(() async {
+        final stderr = io.stderr.queue;
+        io.setupFakeProject('myapp', mode: 'static');
+        io.stubDartSDK();
+
+        final buildDaemon = io.setupFakeBuildDaemon(verifyArgs: buildRunnerBuildArgs);
+        final buildResult = runner.run(['build', '--port', '0', '--verbose']);
+
+        await expectLater(
+          io.stdout.queue,
+          emits('Building myapp in static rendering mode.'),
+        );
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(
+          stderr,
+          emitsThrough('[LOG] [ERROR] Invalid port "0". Must be a number between 1 and 65535.'),
+        );
+
+        expect(await buildResult, equals(1));
+      });
+    });
+
+    // https://github.com/schultek/jaspr/issues/999
+    test('uses the precompiled DDC SDK from kernel/ddc/stable on Flutter 3.50 and later', () async {
+      await io.runZoned(() async {
+        io.setupFakeProject('myapp', mode: 'client', flutterEmbedding: true);
+        io.stubDartSDK();
+        io.stubFlutterSDK();
+        // Flutter 3.50 ships the precompiled SDKs in kernel/ddc/{stable,canary}
+        // instead of kernel/{amd,ddcLibraryBundle}-canvaskit.
+        io.fs.file('/fake/flutter/bin/cache/flutter_web_sdk/kernel/ddc/canary/dart_sdk.js').createSync(recursive: true);
+        io.fs.file('/fake/flutter/bin/cache/flutter_web_sdk/kernel/ddc/stable/dart_sdk.js').createSync(recursive: true);
+
+        final buildDaemon = io.setupFakeBuildDaemon(
+          verifyArgs: [
+            for (final arg in buildRunnerFlutterBuildArgs)
+              arg.replaceFirst('kernel/amd-canvaskit', 'kernel/ddc/stable'),
+          ],
+        );
+
+        final buildResult = runner.run(['build', '--verbose']);
+
+        await expectLater(io.stdout.queue, emits('Building myapp in client rendering mode.'));
+
+        when(
+          () => io.process.start(
+            'flutter',
+            [
+              'build',
+              'web',
+              '-t',
+              '.dart_tool/jaspr/flutter_target.dart',
+              '--no-wasm-dry-run',
+              '--no-tree-shake-icons',
+              '--output=build/flutter',
+            ],
+            workingDirectory: '/root/myapp',
+            runInShell: true,
+          ),
+        ).thenAnswer((_) async => FakeProcess.sync());
+
+        await io.runReleaseBuild(buildDaemon);
+
+        await expectLater(io.stdout.queue, emitsThrough(contains('Completed building')));
 
         expect(await buildResult, equals(0));
       });
@@ -363,7 +494,8 @@ void main() {
           request.response.write('FAKE HTML RESPONSE');
           await request.response.close();
         });
-        fakeServer.onRequest('/abc2', (request) async {
+        const route = "/terms&what's-new";
+        fakeServer.onRequest(route, (request) async {
           request.response.headers.set(
             'jaspr-sitemap-data',
             jsonEncode({
@@ -379,7 +511,7 @@ void main() {
           r'$jasprMessageHandler',
           jsonEncode({'route': '/abc', 'lastmod': '2026-01-02T12:34:56.789Z', 'changefreq': 'weekly', 'priority': 0.7}),
         );
-        await proxyConnection.sendFakeRequest(r'$jasprMessageHandler', jsonEncode({'route': '/abc2'}));
+        await proxyConnection.sendFakeRequest(r'$jasprMessageHandler', jsonEncode({'route': route}));
 
         await expectLater(
           io.stdout.queue,
@@ -388,7 +520,8 @@ void main() {
             '',
             'Generating pages:',
             '(1/1) Generating "/abc" ...',
-            '(2/2) Generating "/abc2" ...',
+            '(2/2) Generating "$route" ...',
+            'Stopping server...',
             '[LOG] Generating sitemap.xml...',
           ]),
         );
@@ -396,9 +529,9 @@ void main() {
         expect(io.fs.file('/root/myapp/build/jaspr/abc/index.html').existsSync(), isTrue);
         expect(io.fs.file('/root/myapp/build/jaspr/abc/index.html').readAsStringSync(), equals('FAKE HTML RESPONSE'));
 
-        expect(io.fs.file('/root/myapp/build/jaspr/abc2/index.html').existsSync(), isTrue);
+        expect(io.fs.file('/root/myapp/build/jaspr$route/index.html').existsSync(), isTrue);
         expect(
-          io.fs.file('/root/myapp/build/jaspr/abc2/index.html').readAsStringSync(),
+          io.fs.file('/root/myapp/build/jaspr$route/index.html').readAsStringSync(),
           equals('FAKE HTML RESPONSE 2'),
         );
 
@@ -415,7 +548,7 @@ void main() {
             '    <priority>0.7</priority>\n'
             '  </url>\n'
             '  <url>\n'
-            '    <loc>https://example.com/abc2</loc>\n'
+            '    <loc>https://example.com/terms&amp;what&#39;s-new</loc>\n'
             '    <lastmod>2026-01-01T12:34:56Z</lastmod>\n'
             '    <changefreq>daily</changefreq>\n'
             '  </url>\n'
@@ -428,7 +561,6 @@ void main() {
           io.stdout.queue,
           emitsInOrderWithTimeout([
             emitsThrough(contains('Completed building')),
-            emitsThrough('Terminating server...'),
           ]),
         );
 
@@ -495,7 +627,6 @@ void main() {
 const buildRunnerBuildArgs = [
   '--release',
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:entrypoint=compiler=dart2js',
   '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O2"]',
 ];
@@ -503,7 +634,6 @@ const buildRunnerBuildArgs = [
 const buildRunnerFlutterBuildArgs = [
   '--release',
   '--verbose',
-  '--delete-conflicting-outputs',
   '--define=build_web_compilers:entrypoint=compiler=dart2js',
   '--define=build_web_compilers:entrypoint=dart2js_args=["-Djaspr.flags.release=true","-O2","-Ddart.vm.product=true","-DFLUTTER_WEB_USE_SKWASM=false","-DFLUTTER_WEB_USE_SKIA=true"]',
   '--define=build_web_compilers:entrypoint=use-ui-libraries=true',

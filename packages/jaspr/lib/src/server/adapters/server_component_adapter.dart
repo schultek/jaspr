@@ -1,19 +1,46 @@
 import '../../dom/validator.dart';
+import '../../framework/framework.dart';
+import '../components/client_component_registry.dart';
 import '../markup_render_object.dart';
 import 'element_boundary_adapter.dart';
 
-class ServerComponentAdapter extends ElementBoundaryAdapter {
-  ServerComponentAdapter(this.id, super.element)
+final class ServerComponentAdapter extends ElementBoundaryAdapter {
+  ServerComponentAdapter(this.registry, this.id, super.element)
     : super(priority: ElementBoundaryAdapter.serverComponentBoundaryPriority);
 
+  final ClientComponentRegistryElement registry;
   final int id;
 
   @override
-  void applyBoundary(ChildListRange range) {
+  void applyBoundary(ChildGroup group) {
+    if (element.hasInheritedDomParams) {
+      _applyParamsToSubtree(element);
+    }
+
     final startMarker = MarkupRenderText('<!--s${DomValidator.clientMarkerPrefix}$id-->', true);
     final endMarker = MarkupRenderText('<!--/s${DomValidator.clientMarkerPrefix}$id-->', true);
 
-    range.start.insertNext(ChildNodeData(startMarker));
-    range.end.insertPrev(ChildNodeData(endMarker));
+    group.children.insertAfter(startMarker);
+    group.children.insertBefore(endMarker);
+  }
+
+  void _applyParamsToSubtree(Element element) {
+    if (registry.clientBoundaries.contains(element)) {
+      return;
+    }
+    if (element is DomElement) {
+      if (element.computeAppliedDiff(_isClientManaged) case final diff?) {
+        if (element.renderObject case final MarkupRenderElement renderObject) {
+          (renderObject.attributes ??= {})['data-j-apply'] = diff;
+        }
+      }
+    }
+    element.visitChildren(_applyParamsToSubtree);
+  }
+
+  bool _isClientManaged(ApplyParams param) {
+    final source = param.source;
+    if (source == null) return false;
+    return source.depth < element.depth;
   }
 }

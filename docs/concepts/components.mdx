@@ -212,9 +212,9 @@ final component = Component.empty();
 
 ### Component.apply()
 
-A component which applies its attributes and parameters (like `classes`, `styles`,) etc.) to its target element(s).
+A component which applies its attributes and parameters (like `classes`, `styles`, etc.) to its target element(s).
 
-This does not create a HTML element itself. All properties are merged with the respective target element's properties, with the target's properties taking precedence where there are conflicts.
+This does not create an HTML element itself. All properties are merged with the respective target element's properties, with the target's properties taking precedence where there are conflicts.
 
 ```dart
 final component = Component.apply(
@@ -233,7 +233,7 @@ final component = Component.apply(
 The above component renders the following HTML:
 
 ```html
-<div class="wrapping-class some-class" style="padding: 8px; background-color: red;">
+<div class="some-class wrapping-class" style="background-color: red; padding: 8px;">
   Hello World
 </div>
 ```
@@ -259,6 +259,16 @@ The above component renders the following HTML:
   <p style="color: blue;">Hello World</p>
 </div>
 ```
+
+#### Precedence and Merging Rules
+
+When properties are applied, the following rules and special cases apply:
+
+- **Target Precedence**: Properties defined on the target element always take precedence over applied properties. Where multiple nested `Component.apply()` components target the same element, inner (closer) wrappers take precedence over outer ones.
+- **Classes**: Applied class names are merged as a set of whitespace-separated tokens with the target's classes. If a target element specifies class names via `attributes: {'class': ...}`, classes from `Component.apply()` are **never applied** to that element to preserve raw attributes and prevent duplicate HTML attributes.
+- **Styles**: Applied styles are merged on a per-property basis. Any style property already defined on the target element is preserved. If a target element specifies raw inline styles via `attributes: {'style': ...}`, styles from `Component.apply()` are **never applied** to that element to avoid corrupting raw style declarations or unsafe mixing of structured and raw styles.
+- **ID & Attributes**: An `id` or other attributes defined on the target element (or in its `attributes` map) are never overwritten by applied values.
+- **Events**: Event listeners on the target element take precedence; applied listeners are added as supplementary listeners if not already bound.
 
 ## Formatting Whitespace
 

@@ -117,5 +117,22 @@ void main() {
       expect(response.statusCode, equals(302));
       expect(response.headers['location'], equals('/sub/path/a'));
     });
+
+    testServer('should keep the query string on redirect', (tester) async {
+      tester.pumpComponent(
+        Router(
+          routes: [
+            homeRoute(),
+            route('/a'),
+            route('/b', [], null, (_, s) => '/a?x=1'),
+          ],
+        ),
+      );
+
+      final response = await tester.request('/b');
+
+      expect(response.statusCode, equals(302));
+      expect(response.headers['location'], equals('/a?x=1'));
+    });
   });
 }

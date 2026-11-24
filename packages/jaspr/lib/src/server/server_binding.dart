@@ -84,22 +84,14 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
       adapter.apply(root);
     }
 
-    if (!standalone) {
-      createDocumentStructure(root, true);
-    }
+    final document = standalone ? null : createDocumentStructure(root, true);
 
     if (_responseBodyOverride case final override?) {
       return override;
     }
 
-    if (!standalone && request.headers.singleValues['X-Jaspr-Reload'] == 'true') {
-      final body = (root.children.findWhere<MarkupRenderElement>((c) => c.tag == 'html')?.node as MarkupRenderElement?)
-          ?.children
-          .findWhere<MarkupRenderElement>((c) => c.tag == 'body')
-          ?.node;
-      if (body != null) {
-        return utf8.encode(body.renderToHtml());
-      }
+    if (document != null && request.headers.singleValues['X-Jaspr-Reload'] == 'true') {
+      return utf8.encode(document.body.renderToHtml());
     }
 
     return utf8.encode(root.renderToHtml());
@@ -117,6 +109,7 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   }
 
   @override
+  @protected
   void scheduleFrame(VoidCallback frameCallback) {
     throw UnsupportedError('Scheduling a frame is not supported on the server, and should never happen.');
   }
@@ -156,8 +149,20 @@ class ServerAppBinding extends AppBinding with ComponentsBinding {
   static final Uint8List _emptyResponse = Uint8List(0);
 }
 
-abstract class RenderAdapter {
+/// A pass over the server-rendered markup that runs once the component tree is built,
+/// such as to insert markers or elements.
+///
+/// The binding calls [prepare] on its adapters in the order they were added,
+/// then [apply] in reverse order.
+abstract base class RenderAdapter {
+  /// The binding this adapter was added to with [ServerAppBinding.addRenderAdapter].
   late ServerAppBinding binding;
+
+  /// Called once the component tree is built, before any adapter is applied.
+  ///
+  /// Adapters added while preparing are prepared and applied as well.
   FutureOr<void> prepare() {}
+
+  /// Called once all adapters are prepared, to change the markup of [root].
   void apply(MarkupRenderObject root) {}
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http show get;
+import 'package:jaspr/server.dart' show protected;
 
 import '../page.dart';
 import 'route_loader.dart';
@@ -13,14 +14,19 @@ typedef GithubLoader = GitHubLoader;
 ///
 /// Routes are constructed based on the recursive folder structure starting at the root [path].
 /// Index files (index.*) are treated as the page for the containing folder.
-/// Files and folders starting with an underscore (_) are ignored.
-class GitHubLoader extends RouteLoaderBase<GitHubPageSource> {
+/// Files and folders starting with an underscore (_) or a dot (.) don't get routes.
+final class GitHubLoader extends RouteLoaderBase<GitHubPageSource> {
+  /// Creates a loader for the pages under [path] in the GitHub [repo] at [ref].
+  ///
+  /// If [urlPrefix] is set, the URL of each page starts with it.
+  /// If [debugPrint] is `true`, the routes are printed each time they're built.
   GitHubLoader(
     this.repo, {
     this.ref = 'main',
     this.path = 'docs/',
     this.keepSuffixPattern,
     this.accessToken,
+    super.urlPrefix,
     super.debugPrint,
   });
 
@@ -30,10 +36,14 @@ class GitHubLoader extends RouteLoaderBase<GitHubPageSource> {
   /// The branch, tag or commit to checkout the repository at.
   final String ref;
 
-  /// The root path to load pages from.
+  /// The path of the folder in the repository to load pages from.
   final String path;
 
-  /// A pattern to keep the file suffix for all matching pages.
+  /// A pattern for the pages that keep the file extension in their URL,
+  /// such as `/feed.xml` instead of `/feed`.
+  ///
+  /// A page keeps its extension when the pattern matches at the start of its path,
+  /// which is relative to [path].
   final Pattern? keepSuffixPattern;
 
   /// The access token to use for authentication.
@@ -104,13 +114,25 @@ extension type _GitHubTree._(Map<String, Object?> tree) {
   String get sha => tree['sha'] as String;
 }
 
-class GitHubPageSource extends PageSource {
+/// A page source that fetches the content of its page from a file in a GitHub repository.
+///
+/// A [GitHubLoader] creates one for each file it loads as a page.
+final class GitHubPageSource extends PageSource {
+  /// Creates a page source for the file at [blobUrl] that belongs to [loader].
+  ///
+  /// Unless [keepSuffix] is true, the URL of the page drops the file extension,
+  /// and an index file gets the URL of its folder.
   GitHubPageSource(super.path, this.blobUrl, super.loader, {this.accessToken, super.keepSuffix = false});
 
+  /// The GitHub API URL of the blob with the content of the file.
   final String blobUrl;
+
+  /// The access token to fetch the content with, if any.
   final String? accessToken;
 
+  /// Creates the page from the current content of the file on GitHub.
   @override
+  @protected
   Future<Page> buildPage() async {
     final response = await http.get(
       Uri.parse(blobUrl),

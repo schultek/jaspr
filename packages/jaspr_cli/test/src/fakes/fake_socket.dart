@@ -39,6 +39,7 @@ class FakeServerSocket extends Stream<io.Socket> implements io.ServerSocket {
     void Function()? onDone,
     bool? cancelOnError,
   }) {
+    fakeIO.notifyServerSocket(this);
     return _controller.stream.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 

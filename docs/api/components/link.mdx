@@ -33,6 +33,11 @@ renders to
 When using client-side routing, the `Link` component will override the default behavior of the `<a>`
 tag and use the [`Router`s](/api/components/router) `push()` or `replace()` method to navigate to the target route when clicked.
 
+Clicks that the browser would not handle as a plain navigation in the current tab are left to the browser:
+clicks with a modifier key (such as Ctrl or Cmd to open the link in a new tab) or a button other than the primary one,
+clicks whose default action was already prevented, and clicks on links with a `target` other than `_self` or with a
+`download` attribute.
+
 ## Parameters
 
 <Property name="to" type="String" required>
@@ -67,6 +72,8 @@ tag and use the [`Router`s](/api/components/router) `push()` or `replace()` meth
 
 <Property name="target" type="Target?" optional>
   The `target` attribute value applied to the anchor element.
+
+  Any value other than `Target.self` leaves the click to the browser instead of using client-side navigation.
 </Property>
 
 ---

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:universal_web/web.dart' as web;
 
 import '../../client.dart';
+import '../dom/styles/styles.dart';
 import '../dom/validator.dart';
 
 sealed class ComponentAnchor {
@@ -15,24 +16,24 @@ sealed class ComponentAnchor {
   late final web.Node endNode;
 }
 
-final Expando<ClientComponentAnchor> _clientAnchorExpando = Expando();
-
-extension ClientAnchorExtension on web.Node {
-  ClientComponentAnchor? get clientAnchor => _clientAnchorExpando[this];
-
-  set clientAnchor(ClientComponentAnchor? anchor) {
-    _clientAnchorExpando[this] = anchor;
-  }
-}
-
 class ClientComponentAnchor extends ComponentAnchor {
-  ClientComponentAnchor._(super.name, super.key, super.startNode, this.data);
+  ClientComponentAnchor._(super.name, super.key, super.startNode, this.data, this.apply);
 
   String? data;
+  String? apply;
   late FutureOr<ClientBuilder> builder;
   final List<ServerComponentAnchor> serverAnchors = [];
 
-  void Function(void Function())? _setState;
+  List<_ApplyData> get _decodedApplyParams {
+    if (apply case final rawApply?) {
+      final unescaped = const DomValidator().unescapeMarkerText(rawApply);
+      final list = jsonDecode(unescaped) as List;
+      return [
+        for (final item in list) _ApplyData.fromMap(item as Map<String, dynamic>),
+      ];
+    }
+    return const [];
+  }
 
   /// The decoded parameters for this client component.
   Map<String, Object?> get _decodedParameters {
@@ -44,37 +45,35 @@ class ClientComponentAnchor extends ComponentAnchor {
     return const {};
   }
 
+  bool get isResolved => builder is ClientBuilder && serverAnchors.every((a) => a.isResolved);
+
   Future<void> resolve() async {
-    final (clientBuilder, _) = await (
-      Future.value(builder),
-      serverAnchors.map((a) => a.resolve()).wait,
-    ).wait;
+    final (clientBuilder, _) = await (Future.value(builder), serverAnchors.map((a) => a.resolve()).wait).wait;
     builder = clientBuilder;
   }
 
   Component build() {
     assert(builder is ClientBuilder, 'ClientComponentAnchor was not resolved before calling build()');
-    return StatefulBuilder(
-      key: GlobalObjectKey(key),
-      builder: (_, setState) {
-        _setState = setState;
-        final clientParameters = ClientParams(_decodedParameters, serverAnchors);
-        return (builder as ClientBuilder)(clientParameters);
-      },
-    );
-  }
 
-  void rebuild(String? data, List<ServerComponentAnchor> serverAnchors) {
-    assert(_setState != null, 'ClientComponentAnchor was not built before calling rebuild()');
-    _setState!(() {
-      this.data = data;
-      this.serverAnchors.clear();
-      this.serverAnchors.addAll(serverAnchors);
-    });
+    final clientParameters = ClientParams(_decodedParameters, serverAnchors);
+    var component = (builder as ClientBuilder)(clientParameters);
+
+    for (final apply in _decodedApplyParams) {
+      component = Component.apply(
+        target: apply.target,
+        id: apply.id,
+        classes: apply.classes,
+        styles: apply.styles != null ? Styles(raw: apply.styles) : null,
+        attributes: apply.attributes,
+        child: component,
+      );
+    }
+
+    return Builder(key: _ClientAnchorKey(key), builder: (_) => component);
   }
 
   ChildSlot createSlot() {
-    return _AnchorChildSlot(
+    return ChildSlot.between(
       key: UniqueKey(),
       start: startNode,
       end: endNode,
@@ -83,29 +82,34 @@ class ClientComponentAnchor extends ComponentAnchor {
   }
 }
 
-class _AnchorChildSlot extends ChildSlot {
-  _AnchorChildSlot({required this.start, required this.end, required this.child, super.key});
+/// A global key for a client component anchor, compared by its string value.
+///
+/// Anchor keys are rebuilt as new strings each time
+/// markers are extracted, such as on reloads,
+/// so [GlobalObjectKey] can't be used, as it compares with [identical],
+/// which only matches equal strings when compiled with dart2js.
+final class _ClientAnchorKey extends GlobalKey {
+  const _ClientAnchorKey(this.value) : super.constructor();
 
-  final web.Node start;
-  final web.Node end;
-  @override
-  final Component child;
+  /// The string whose value is used by this key's [operator==].
+  final String value;
 
   @override
-  ChildSlotRenderObject createRenderObject(SlottedDomRenderObject parent) {
-    return ChildSlotRenderObject.between(parent, start, end);
-  }
+  bool operator ==(Object other) => other is _ClientAnchorKey && other.value == value;
 
   @override
-  bool canUpdate(ChildSlot oldComponent) {
-    return oldComponent is _AnchorChildSlot && oldComponent.start == start && oldComponent.end == end;
-  }
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => '[_ClientAnchorKey $value]';
 }
 
 class ServerComponentAnchor extends ComponentAnchor {
   ServerComponentAnchor(super.name, super.key, super.startNode);
 
   final List<ClientComponentAnchor> clientAnchors = [];
+
+  bool get isResolved => clientAnchors.every((a) => a.isResolved);
 
   Future<void> resolve() async {
     await [for (final anchor in clientAnchors) anchor.resolve()].wait;
@@ -122,13 +126,7 @@ class ServerComponentAnchor extends ComponentAnchor {
     }
     nodes.add(endNode);
 
-    return SlottedChildView.withNodes(
-      key: GlobalKey(),
-      nodes: nodes,
-      slots: [
-        for (final client in clientAnchors) client.createSlot(),
-      ],
-    );
+    return SlottedChildView.withNodes(nodes: nodes, slots: [for (final client in clientAnchors) client.createSlot()]);
   }
 }
 
@@ -173,7 +171,9 @@ class ServerComponentElement extends BuildableElement {
   }
 }
 
-final _clientStartRegex = RegExp('^${DomValidator.clientMarkerPrefixRegex}(\\S+)(?:\\s+#(\\S*))?(?:\\s+data=(.*))?\$');
+final _clientStartRegex = RegExp(
+  '^${DomValidator.clientMarkerPrefixRegex}(\\S+)(?:\\s+#(\\S*))?(?:\\s+data<([^>]*)>)?(?:\\s+apply<([^>]*)>)?\$',
+);
 final _clientEndRegex = RegExp('^/${DomValidator.clientMarkerPrefixRegex}(\\S+)\$');
 
 final _serverStartRegex = RegExp('^s${DomValidator.clientMarkerPrefixRegex}(\\d+)(?:\\s+#(\\S*))?\$');
@@ -185,9 +185,7 @@ FutureOr<ClientBuilder> getClientByName(String name) {
   return clients[name]!.loadedBuilder;
 }
 
-List<ClientComponentAnchor> extractAnchors({
-  List<web.Node>? nodes,
-}) {
+List<ClientComponentAnchor> extractAnchors({List<web.Node>? nodes}) {
   nodes ??= [?web.document.body];
 
   final List<ComponentAnchor> anchors = [];
@@ -212,6 +210,7 @@ List<ClientComponentAnchor> extractAnchors({
         final name = match.group(1)!;
         final key = match.group(2);
         final data = match.group(3);
+        final apply = match.group(4);
 
         final resolvedKey = key != null
             ? '@$name#$key'
@@ -221,7 +220,7 @@ List<ClientComponentAnchor> extractAnchors({
                 return '@$name-${anchors.length}-$count';
               })();
 
-        anchors.add(ClientComponentAnchor._(name, resolvedKey, currNode, data));
+        anchors.add(ClientComponentAnchor._(name, resolvedKey, currNode, data, apply));
         continue;
       }
 
@@ -241,10 +240,11 @@ List<ClientComponentAnchor> extractAnchors({
         comp.endNode = currNode;
         comp.builder = getClientByName(name);
 
-        // Remove the data string.
-        start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
+        if (!kDebugMode) {
+          // Remove the data string.
+          start.textContent = '${DomValidator.clientMarkerPrefix}${comp.name}';
+        }
 
-        start.clientAnchor = comp;
         if (anchors.isEmpty) {
           clientAnchors.add(comp);
         } else {
@@ -296,4 +296,24 @@ List<ClientComponentAnchor> extractAnchors({
   }
 
   return clientAnchors;
+}
+
+class _ApplyData {
+  _ApplyData({required this.target, this.id, this.classes, this.styles, this.attributes});
+
+  final ApplyTarget target;
+  final String? id;
+  final String? classes;
+  final Map<String, String>? styles;
+  final Map<String, String>? attributes;
+
+  factory _ApplyData.fromMap(Map<String, dynamic> map) {
+    return _ApplyData(
+      target: map['t'] != null ? ApplyTarget.fromMap(map['t'] as Map<String, dynamic>) : ApplyTarget.anyChild,
+      id: map['i'] as String?,
+      classes: map['c'] as String?,
+      styles: (map['s'] as Map?)?.cast<String, String>(),
+      attributes: (map['a'] as Map?)?.cast<String, String>(),
+    );
+  }
 }

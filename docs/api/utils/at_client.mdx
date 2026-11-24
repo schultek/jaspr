@@ -100,7 +100,7 @@ class Model {
 
 Learn more about how to set up serialization for custom data types using the [`@encoder`/ `@decoder`](/api/utils/at_encoder_decoder) annotations.
 
-With this setup you can use any class as the parameter of a `@client` component.
+With this setup you can use any class or enum as the parameter of a `@client` component.
 
 ### Server Components (Passing Components)
 
@@ -111,6 +111,8 @@ Parameters can also be other components (type `Component`, including `List`s and
 - Its pre-rendered HTML structure is embedded directly into the `@client` component's output and is automatically mounted on the client during hydration.
 
 This is extremely useful when building layout components (like modals, sidebars, or tabs) that wrap large parts of your website that don't need client-side interactivity, thereby keeping your client bundle small.
+
+Custom models passed to `@client` components can also contain `Component` fields by using `ComponentMount` in their `@decoder` function. See [Decoding models with Component fields](/api/utils/at_encoder_decoder#decoding-models-with-component-fields-server-components).
 
 <Info>
   For a detailed explanation of this design pattern, including advanced examples like Tab bars and component scope transitions, see the [Server Components Guide](/going_further/server_components).

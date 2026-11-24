@@ -13,7 +13,17 @@ extension AsyncElement on Element {
 class AsyncBuildOwner extends BuildOwner {
   @override
   void completeInitialBuild(Element element, void Function() buildCallback) async {
-    await element._asyncBuildLock?.asFuture;
+    final lock = element._asyncBuildLock;
+    await lock?.asFuture;
+
+    // A step that threw is reported here rather than left to unwind, and the
+    // build is completed either way. Skipping [buildCallback] would leave the
+    // frame -- and on the server the HTTP response waiting on it -- pending
+    // forever.
+    if (lock?._failure case final failure?) {
+      element.binding.reportBuildError(element, failure.error, failure.stackTrace);
+    }
+
     super.completeInitialBuild(element, buildCallback);
   }
 
@@ -41,13 +51,21 @@ class TaskChain {
   TaskChain.start() : _done = true;
 
   bool _done;
-  final Set<void Function()> _listeners = {};
 
-  void _complete() {
+  /// Callbacks waiting on this chain, run in insertion order once it completes.
+  final List<void Function()> _listeners = [];
+
+  /// The failure this chain completed with, if any.
+  ({Object error, StackTrace stackTrace})? _failure;
+
+  void _complete([({Object error, StackTrace stackTrace})? failure]) {
+    if (_done) return;
     _done = true;
+    _failure = failure;
     for (final l in _listeners) {
       l();
     }
+    _listeners.clear();
   }
 
   void _then(void Function() fn) {
@@ -61,15 +79,29 @@ class TaskChain {
   TaskChain then(Object? Function() fn) {
     final c = TaskChain._();
     _then(() {
-      final r = fn();
+      // Skip this step if an earlier one failed, and carry the failure down the
+      // chain, so that whoever awaits the end of it is told instead of waiting
+      // on a chain that can never complete.
+      if (_failure case final failure?) {
+        c._complete(failure);
+        return;
+      }
+
+      final Object? r;
+      try {
+        r = fn();
+      } catch (e, st) {
+        c._complete((error: e, stackTrace: st));
+        return;
+      }
+
       if (r is Future) {
-        r.then((_) {
-          c._complete();
-        });
-      } else if (r is TaskChain) {
-        r._then(() {
-          c._complete();
-        });
+        r.then(
+          (_) => c._complete(),
+          onError: (Object e, StackTrace st) => c._complete((error: e, stackTrace: st)),
+        );
+      } else if (r case final TaskChain chain) {
+        chain._then(() => c._complete(chain._failure));
       } else {
         c._complete();
       }

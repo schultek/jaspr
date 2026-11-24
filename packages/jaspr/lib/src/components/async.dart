@@ -6,7 +6,7 @@
 ///
 /// Asynchronous computations are represented by [Future]s and [Stream]s.
 ///
-/// @docImport '../foundation/change_notifier.dart';
+/// @docImport 'package:listen/listen.dart';
 /// @docImport '../server/components/async.dart';
 /// @docImport 'listenable_builder.dart';
 library;

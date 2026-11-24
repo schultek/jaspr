@@ -4,6 +4,7 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../../client.dart';
 import '../../client/utils.dart';
+import '../type_checks.dart';
 
 /// Renders its [text] input as raw HTML.
 ///
@@ -23,12 +24,49 @@ final class RawText extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    final fragment = web.document.createElement('template') as web.HTMLTemplateElement;
-    fragment.innerHTML = text.toJS;
     return Component.fragment([
-      for (final node in fragment.content.childNodes.toIterable()) _RawNode(node, key: ValueKey(node)),
+      for (final node in _parse(text, _parentElement(context))) _RawNode(node, key: ValueKey(node)),
     ]);
   }
+}
+
+/// The element the markup is about to be inserted into, if there is one.
+///
+/// The nearest ancestor dom node is not necessarily an element: a fragment
+/// renders into a `DocumentFragment`, so the chain is walked until an element
+/// turns up.
+web.Element? _parentElement(BuildContext context) {
+  var renderObject = (context as Element).parentRenderObjectElement?.renderObject;
+  while (renderObject is DomRenderObject) {
+    final node = renderObject.node;
+    if (node.isElement) return node as web.Element;
+    renderObject = renderObject.parent;
+  }
+  return null;
+}
+
+/// Parses [text] into dom nodes, in the context of [parent].
+///
+/// Parsing through `template.innerHTML` puts the nodes in the xhtml namespace,
+/// because that is what the html parser uses with no element around the
+/// markup. Inside an `<svg>` that is the wrong namespace: `<circle>` becomes an
+/// unknown element, and the browser lays an unknown element out as nothing. It
+/// is in the dom, it just cannot be seen — and server-rendered markup shows
+/// the shape until hydration replaces it with this.
+///
+/// `createContextualFragment` parses against an element instead, so the nodes
+/// come out in that element's namespace. It also settles the cases where the
+/// markup is only valid inside a specific parent, such as a `<td>` in a
+/// `<tr>`. The template is kept for the case where there is no element to parse
+/// against, which is what a fragment at the root of a component tree is.
+Iterable<web.Node> _parse(String text, web.Element? parent) {
+  if (parent != null) {
+    final range = web.document.createRange()..selectNodeContents(parent);
+    return range.createContextualFragment(text.toJS).childNodes.toIterable();
+  }
+  final template = web.document.createElement('template') as web.HTMLTemplateElement;
+  template.innerHTML = text.toJS;
+  return template.content.childNodes.toIterable();
 }
 
 class _RawNode extends Component {

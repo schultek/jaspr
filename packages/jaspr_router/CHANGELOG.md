@@ -1,3 +1,19 @@
+## 0.10.0-beta.2
+
+- **Breaking**: Removed `RouteLoader` and `RouterState.routeLoaders`.
+  They were internal helpers for lazy routes, and the name clashed with `RouteLoader` from `jaspr_content`.
+
+## 0.10.0-beta.1
+
+- Fixed `Link` navigating client-side on clicks the browser should handle: Ctrl/Cmd-, Shift- and Alt-clicks, non-primary buttons, already prevented clicks, and links with a `target` other than `_self` or a `download` attribute.
+- Fixed escaping of path segments that look like a parameter (`/:27017`), which previously failed the response with a 500 error.
+- Changed `redirect` to preserve the query string on server-side redirects.
+- Fixed `RouterState.preload()` running the top-level and route-level `redirect` callbacks. Preloading a route (for example when hovering a `Link`) is not a navigation, so redirects now only run on actual navigation.
+
+## 0.10.0-beta.0
+
+- Require Dart 3.13 or later.
+
 ## 0.9.0
 
 - Made `RouteSettings.priority` nullable and default to `null` instead of `0.5`, so the sitemap `priority` tag can be omitted (consistent with `changeFreq`).

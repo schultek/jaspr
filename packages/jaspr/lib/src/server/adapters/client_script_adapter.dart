@@ -3,7 +3,7 @@ import 'dart:io';
 import '../markup_render_object.dart';
 import 'head_scope_adapter.dart';
 
-class ClientScriptAdapter extends HeadScopeAdapter {
+final class ClientScriptAdapter extends HeadScopeAdapter {
   ClientScriptAdapter(this.clientId);
 
   final String clientId;
@@ -26,7 +26,7 @@ class ClientScriptAdapter extends HeadScopeAdapter {
   }
 }
 
-class NoClientScriptAdapter extends HeadScopeAdapter {
+final class NoClientScriptAdapter extends HeadScopeAdapter {
   static bool _didOutputWarning = false;
 
   @override

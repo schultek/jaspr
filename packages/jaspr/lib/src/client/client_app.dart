@@ -33,6 +33,7 @@ class _ClientAppElement extends BuildableElement {
   final List<ChildSlot> slots = [];
 
   bool mounted = true;
+  int _loadGeneration = 0;
 
   @override
   void didMount() {
@@ -48,24 +49,27 @@ class _ClientAppElement extends BuildableElement {
   }
 
   void loadSlots() {
+    final generation = ++_loadGeneration;
     final parent = parentRenderObjectElement!.renderObject;
     final nodes = parent is HydratableDomRenderObject ? parent.toHydrate : <web.Node>[];
     final anchors = extractAnchors(nodes: nodes);
 
     for (final anchor in anchors) {
-      if (anchor.builder is ClientBuilder) {
+      if (anchor.isResolved) {
         slots.add(anchor.createSlot());
       } else {
         anchor
             .resolve()
             .then((b) {
-              if (mounted) {
+              if (mounted && generation == _loadGeneration) {
                 slots.add(anchor.createSlot());
                 markNeedsBuild();
               }
             })
             .onError((error, stackTrace) {
-              print("Error loading client component '${anchor.name}': $error");
+              if (mounted && generation == _loadGeneration) {
+                print("Error loading client component '${anchor.name}': $error");
+              }
             });
       }
     }
@@ -79,6 +83,7 @@ class _ClientAppElement extends BuildableElement {
   @override
   void unmount() {
     mounted = false;
+    _loadGeneration++;
     super.unmount();
   }
 }

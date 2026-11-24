@@ -105,7 +105,9 @@ class HelperVisitor extends RecursiveAstVisitor<void> {
 
   /// Whether [args] consists of one positional argument and an optional named 'key' argument.
   static bool _isSingleOrKey(ArgumentList args) => switch (args.arguments) {
-    [_] || [Expression(), NamedArgument(name: Token(lexeme: 'key'))] => true,
+    [_] ||
+    [Expression(), NamedArgument(name: Token(lexeme: 'key'))] ||
+    [NamedArgument(name: Token(lexeme: 'key')), Expression()] => true,
     _ => false,
   };
 }

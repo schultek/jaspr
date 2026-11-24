@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../../dom/validator.dart';
 import '../../framework/framework.dart';
 import '../components/client_component_registry.dart';
@@ -6,7 +8,7 @@ import '../options.dart';
 import 'element_boundary_adapter.dart';
 import 'server_component_adapter.dart';
 
-class ClientComponentAdapter extends ElementBoundaryAdapter {
+final class ClientComponentAdapter extends ElementBoundaryAdapter {
   ClientComponentAdapter(this.registry, this.target, super.element)
     : super(priority: ElementBoundaryAdapter.clientComponentBoundaryPriority);
 
@@ -15,9 +17,10 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
   bool _isClientBoundary = true;
   late String? data;
+  String? applyData;
 
   @override
-  void prepareBoundary(ChildListRange range) {
+  void prepareBoundary(ChildGroup group) {
     // If a client component is itself a server component, it is a client boundary.
     if (registry.serverElements.containsKey(element)) {
       _isClientBoundary = true;
@@ -42,23 +45,51 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
       return;
     }
 
+    registry.clientBoundaries.add(element);
+
     data = getData();
+
+    final applied = <ApplyDomComponent>[];
+    if (!registry.serverElements.containsKey(element)) {
+      var hasRenderElement = false;
+      element.visitAncestorElements((e) {
+        final isServerElement = registry.serverElements.containsKey(e);
+        if (e is RenderObjectElement && e.renderObject is! RenderFragment) {
+          hasRenderElement = true;
+        }
+        if (e.component case final ApplyDomComponent applyComp) {
+          if (!applyComp.target.onlyChildren || !hasRenderElement) {
+            applied.add(applyComp);
+          }
+        }
+        if (isServerElement) {
+          return false;
+        }
+        return true;
+      });
+    }
+
+    if (applied.isNotEmpty) {
+      applyData = const DomValidator().escapeMarkerText(jsonEncode(applied.map((a) => a.toMap()).toList()));
+    } else {
+      applyData = null;
+    }
   }
 
   @override
-  void applyBoundary(ChildListRange range) {
+  void applyBoundary(ChildGroup group) {
     if (!_isClientBoundary) {
       return;
     }
 
     final startMarker = MarkupRenderText(
-      '<!--${DomValidator.clientMarkerPrefix}${target.name}${data != null ? ' data=$data' : ''}-->',
+      '<!--${DomValidator.clientMarkerPrefix}${target.name}${data != null ? ' data<$data>' : ''}${applyData != null ? ' apply<$applyData>' : ''}-->',
       true,
     );
     final endMarker = MarkupRenderText('<!--/${DomValidator.clientMarkerPrefix}${target.name}-->', true);
 
-    range.start.insertNext(ChildNodeData(startMarker));
-    range.end.insertPrev(ChildNodeData(endMarker));
+    group.children.insertAfter(startMarker);
+    group.children.insertBefore(endMarker);
   }
 
   String? getData() {
@@ -103,7 +134,7 @@ class ClientComponentAdapter extends ElementBoundaryAdapter {
 
     for (final element in elements) {
       registry.serverElements[element] = s;
-      binding.addRenderAdapter(ServerComponentAdapter(s, element));
+      binding.addRenderAdapter(ServerComponentAdapter(registry, s, element));
     }
 
     return 's${DomValidator.clientMarkerPrefix}$s';

@@ -121,6 +121,8 @@ class ClientOptionsBuilder implements Builder {
   }
 }
 
+bool _triedRunningFlutter = false;
+
 Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
   final pluginsDependenciesId = AssetId(buildStep.inputId.package, '.flutter-plugins-dependencies');
 
@@ -137,7 +139,8 @@ Future<List<Plugin>> loadWebPlugins(BuildStep buildStep) async {
 
   var content = await readPluginsDependencies();
 
-  if (content == null) {
+  if (content == null && !_triedRunningFlutter) {
+    _triedRunningFlutter = true;
     try {
       final result = await Process.run('flutter', ['packages', 'get']);
       if (result.exitCode != 0) {

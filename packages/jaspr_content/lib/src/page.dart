@@ -11,6 +11,7 @@ import 'layouts/page_layout.dart';
 import 'page_extension/page_extension.dart';
 import 'page_parser/page_parser.dart';
 import 'route_loader/route_loader.dart';
+import 'route_loader/url_prefix.dart';
 import 'secondary_output/secondary_output.dart';
 import 'template_engine/template_engine.dart';
 import 'theme/theme.dart';
@@ -38,6 +39,8 @@ class Page {
   final String path;
 
   /// The url of the page, e.g. '/', '/some/path'.
+  ///
+  /// It starts with the [RouteLoaderBase.urlPrefix] of its loader, if set.
   final String url;
 
   /// The (unparsed) content of the page.
@@ -259,6 +262,24 @@ class PageConfig {
       }
       return PageConfig();
     };
+  }
+
+  /// Resolves the config whose key is the [RouteLoaderBase.urlPrefix] of the loader of the page,
+  /// such as to configure each version of your docs differently.
+  ///
+  /// A key only matches that exact prefix, so `'/docs'` doesn't match the pages of
+  /// a loader with the prefix `'/docs/v1'`, even though their URLs start with it.
+  /// Pages of a loader without a prefix, or with one that isn't a key,
+  /// get the [fallback] config, or the default config if it isn't set.
+  ///
+  /// Throws an [ArgumentError] if a key isn't a valid prefix,
+  /// such as `'/'` or `'/docs/'`, since no loader can have it.
+  static ConfigResolver matchUrlPrefix(Map<String, PageConfig> configs, {PageConfig? fallback}) {
+    for (final prefix in configs.keys) {
+      checkUrlPrefix(prefix, parameterName: 'configs');
+    }
+    final unmatchedConfig = fallback ?? const PageConfig();
+    return (PageSource source) => configs[source.loader.urlPrefix] ?? unmatchedConfig;
   }
 }
 

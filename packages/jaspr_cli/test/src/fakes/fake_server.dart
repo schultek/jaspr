@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:jaspr_cli/src/project.dart';
@@ -39,6 +40,12 @@ class FakeProxyConnection {
     final request = await client.openUrl('POST', Uri.http('localhost:${socket.port}', path));
     request.write(body);
     await request.close();
+  }
+
+  Future<String> getFakeRequest(String path) async {
+    final request = await client.openUrl('GET', Uri.http('localhost:${socket.port}', path));
+    final response = await request.close();
+    return response.transform(utf8.decoder).join();
   }
 }
 

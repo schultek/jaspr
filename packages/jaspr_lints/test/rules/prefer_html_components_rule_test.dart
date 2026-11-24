@@ -45,4 +45,47 @@ class PreferHtmlComponentsRuleTest extends AnalysisRuleTest {
       '}',
     );
   }
+
+  void test_uses_known_tag_dot_shorthand() async {
+    await assertDiagnostics(
+      "import 'package:jaspr/jaspr.dart';\n\n"
+      'Component run() {\n'
+      "  return .element(tag: 'div');\n"
+      '}',
+      [
+        lint(
+          63,
+          8,
+          messageContainsAll: ["Prefer using 'div(...)' over '.element(tag: \"div\", ...)'"],
+        ),
+      ],
+    );
+  }
+
+  void test_uses_unknown_tag_dot_shorthand() async {
+    await assertNoDiagnostics(
+      "import 'package:jaspr/jaspr.dart';\n\n"
+      'Component run() {\n'
+      "  return .element(tag: 'unknown');\n"
+      '}',
+    );
+  }
+
+  void test_uses_known_tag_dot_shorthand_nested() async {
+    await assertDiagnostics(
+      "import 'package:jaspr/jaspr.dart';\n\n"
+      'Component run() {\n'
+      '  return div([\n'
+      "    .element(tag: 'p'),\n"
+      '  ]);\n'
+      '}',
+      [
+        lint(
+          73,
+          8,
+          messageContainsAll: ["Prefer using 'p(...)' over '.element(tag: \"p\", ...)'"],
+        ),
+      ],
+    );
+  }
 }

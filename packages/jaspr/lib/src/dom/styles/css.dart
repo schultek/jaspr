@@ -36,6 +36,18 @@ import 'styles.dart';
 ///   ])
 ///   ```
 ///
+///   Nested rules are rendered as [nested css](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting),
+///   which is what the definition already looks like:
+///
+///   ```css
+///   .someclass {
+///     width: 100px;
+///     &:hover {
+///       background-color: blue;
+///     }
+///   }
+///   ```
+///
 /// - Use special rule variants:
 ///   ```dart
 ///   css.import('/some/external/styles.css');
@@ -56,7 +68,7 @@ class CssUtility {
   /// Rules can be nested using the optional second list parameter. Nested rules
   /// can use the `&` symbol in their selector to refer to the parent selector.
   NestedStyleRule call(String selector, [List<StyleRule> children = const []]) {
-    return NestedStyleRule._(Selector(selector), Styles(), children);
+    return NestedStyleRule(Selector(selector), Styles(), children);
   }
 
   /// Renders a `@import url(...)` css rule.
@@ -107,93 +119,5 @@ class CssUtility {
   /// the animation sequence than transitions.
   KeyframesStyleRule keyframes(String name, Map<String, Styles> styles) {
     return KeyframesStyleRule(name: name, styles: styles);
-  }
-}
-
-class NestedStyleRule with StylesMixin<NestedStyleRule> implements StyleRule {
-  NestedStyleRule._(this._selector, this._styles, this._children);
-
-  final Selector _selector;
-  final Styles _styles;
-  final List<StyleRule> _children;
-
-  @override
-  NestedStyleRule combine(Styles styles) {
-    return NestedStyleRule._(_selector, _styles.combine(styles), _children);
-  }
-
-  @override
-  String toCss([String indent = '']) {
-    final rules = <String>[];
-
-    for (final rule in resolve('')) {
-      rules.add(rule.toCss(indent));
-    }
-
-    return rules.join(cssPropSpace);
-  }
-}
-
-extension SelectorResolve on Selector {
-  Selector resolve(String parent) {
-    return Selector(
-      selector.startsWith('&') || parent.isEmpty ? selector.replaceAll('&', parent) : '$parent $selector',
-    );
-  }
-}
-
-extension StyleRuleResolve on StyleRule {
-  List<StyleRule> resolve(String parent) {
-    final self = this;
-    return switch (self) {
-      NestedStyleRule() => self._resolve(parent),
-      BlockStyleRule() => [self._resolve(parent)],
-      MediaStyleRule() => [self._resolve(parent)],
-      LayerStyleRule() => [self._resolve(parent)],
-      SupportsStyleRule() => [self._resolve(parent)],
-      _ => throw UnsupportedError('Cannot nest ${self.runtimeType} inside other StyleRule.'),
-    };
-  }
-}
-
-extension on NestedStyleRule {
-  List<StyleRule> _resolve(String parent) {
-    final rules = <StyleRule>[];
-
-    final selector = _selector.resolve(parent);
-
-    if (_styles.properties.isNotEmpty) {
-      rules.add(StyleRule(selector: selector, styles: _styles));
-    }
-
-    for (final child in _children) {
-      rules.addAll(child.resolve(selector.selector));
-    }
-
-    return rules;
-  }
-}
-
-extension on BlockStyleRule {
-  StyleRule _resolve(String parent) {
-    return BlockStyleRule(selector: selector.resolve(parent), styles: styles);
-  }
-}
-
-extension on MediaStyleRule {
-  StyleRule _resolve(String parent) {
-    return MediaStyleRule(query: query, styles: [for (final style in styles) ...style.resolve(parent)]);
-  }
-}
-
-extension on LayerStyleRule {
-  StyleRule _resolve(String parent) {
-    return LayerStyleRule(name: name, styles: [for (final style in styles) ...style.resolve(parent)]);
-  }
-}
-
-extension on SupportsStyleRule {
-  StyleRule _resolve(String parent) {
-    return SupportsStyleRule(condition: condition, styles: [for (final style in styles) ...style.resolve(parent)]);
   }
 }

@@ -26,4 +26,5 @@ import 'package:flutter_embedding_demo/components/app.dart' as _app;
 ServerOptions get defaultServerOptions => ServerOptions(
   clientId: 'main.client.dart.js',
   clients: {_app.App: ClientTarget<_app.App>('app')},
+  styles: () => [],
 );

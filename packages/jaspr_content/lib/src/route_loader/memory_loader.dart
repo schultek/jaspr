@@ -8,8 +8,12 @@ import 'route_loader.dart';
 /// A loader that loads routes from memory.
 ///
 /// Takes a list of [MemoryPage]s and creates routes from them.
-class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
-  MemoryLoader({required this._pages, super.debugPrint});
+final class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
+  /// Creates a loader for the given `pages`.
+  ///
+  /// If [urlPrefix] is set, the URL of each page starts with it.
+  /// If [debugPrint] is `true`, the routes are printed each time they're built.
+  MemoryLoader({required this._pages, super.urlPrefix, super.debugPrint});
 
   final List<MemoryPage> _pages;
 
@@ -29,7 +33,7 @@ class MemoryLoader extends RouteLoaderBase<MemoryPageSource> {
 ///
 /// - Use `MemoryPage()` to create a normal page from a content String.
 /// - Use `MemoryPage.builder()` to create a page from a component builder function.
-class MemoryPage {
+final class MemoryPage {
   /// Creates a new [MemoryPage] with the given [path] and [content].
   ///
   /// Optionally takes [initialData] to pass to the page.
@@ -55,6 +59,8 @@ class MemoryPage {
   /// The source path of the page, including its suffix, e.g. 'index.html', 'some/path.md'.
   ///
   /// The path must always be in posix format, i.e. using forward slashes.
+  /// The URL of the page is derived from it,
+  /// and starts with the [RouteLoaderBase.urlPrefix] of the [MemoryLoader], if set.
   final String path;
 
   /// Whether to keep the suffix of the page.
@@ -73,12 +79,21 @@ class MemoryPage {
   final Map<String, Object?> initialData;
 }
 
-class MemoryPageSource extends PageSource {
+/// A page source that creates its page from a [MemoryPage].
+///
+/// A [MemoryLoader] creates one for each of its pages.
+final class MemoryPageSource extends PageSource {
+  /// Creates a page source for the given memory page that belongs to [loader].
+  ///
+  /// Unless [keepSuffix] is true, the URL of the page drops the file extension,
+  /// and an index file gets the URL of its folder.
   MemoryPageSource(this._page, super.path, super.loader, {super.keepSuffix = false});
 
   final MemoryPage _page;
 
+  /// Creates the page from the content or builder of the [MemoryPage].
   @override
+  @protected
   Future<Page> buildPage() async {
     if (_page.builder case final pageBuilder?) {
       return _BuilderPage(

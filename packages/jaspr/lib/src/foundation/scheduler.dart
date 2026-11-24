@@ -1,4 +1,6 @@
-import '../../jaspr.dart';
+import 'package:meta/meta.dart';
+
+import 'basic_types.dart' show VoidCallback;
 
 enum SchedulerPhase { idle, midFrameCallback, postFrameCallbacks }
 
@@ -7,13 +9,19 @@ mixin SchedulerBinding {
   SchedulerPhase get schedulerPhase => _schedulerPhase;
 
   /// Schedules a frame with the provided [frameCallback].
+  ///
+  /// Implementations should schedule [frameCallback] to run asynchronously,
+  /// so that updates made in the same task are batched into a single frame.
+  @protected
   void scheduleFrame(VoidCallback frameCallback);
 
   /// Schedules a build and ultimately calls [_handleFrame] with the provided [buildCallback].
+  @internal
   void scheduleBuild(VoidCallback buildCallback) {
     scheduleFrame(() => _handleFrame(buildCallback));
   }
 
+  @internal
   void completeInitialFrame() {
     _flushPostFrameCallbacks();
   }
