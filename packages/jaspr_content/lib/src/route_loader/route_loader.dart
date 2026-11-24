@@ -14,6 +14,7 @@ import 'package:pool/pool.dart' show Pool;
 
 import '../page.dart';
 import '../secondary_output/secondary_output.dart';
+import 'url_prefix.dart';
 
 /// A loader that loads routes and creates pages.
 ///
@@ -66,10 +67,44 @@ abstract interface class RouteLoader {
 /// Code outside of the loader rebuilds a page with [Page.markNeedsRebuild] instead.
 abstract class RouteLoaderBase<T extends PageSource> implements RouteLoader {
   /// Creates a loader that prints its routes each time it builds them if [debugPrint] is `true`.
-  RouteLoaderBase({this.debugPrint = false});
+  ///
+  /// If [urlPrefix] is set, the URL of each page starts with it.
+  /// Throws an [ArgumentError] if [urlPrefix] isn't a valid prefix.
+  RouteLoaderBase({this.debugPrint = false, this.urlPrefix}) {
+    if (urlPrefix case final prefix?) {
+      checkUrlPrefix(prefix);
+    }
+  }
 
   /// Whether to print the routes each time they're built.
   final bool debugPrint;
+
+  /// The prefix of the URLs of all pages of this loader, such as `/docs/v2`,
+  /// or `null` to not prefix them.
+  ///
+  /// The prefix is added in front of the URL that each page gets from its path.
+  /// For example, with the prefix `/docs/v2`, the page at `guide/intro.md`
+  /// gets the URL `/docs/v2/guide/intro`, and the page at `index.md` gets `/docs/v2`.
+  ///
+  /// Relative links in the content of the pages, such as `guide/intro`,
+  /// still resolve from the root of the site with the built-in layouts,
+  /// so links between the pages of this loader need to include the prefix,
+  /// such as `/docs/v2/guide/intro`.
+  ///
+  /// The paths of the pages don't include the prefix,
+  /// so patterns that match them, such as for [PageConfig.match],
+  /// parsers, and secondary outputs, stay the same.
+  /// To vary the config of the pages by their prefix,
+  /// use [PageConfig.matchUrlPrefix] as the [ConfigResolver],
+  /// or check [PageSource.loader] in a custom one.
+  ///
+  /// The prefix must start with a `/` and not end with one,
+  /// and its segments can't be empty, `.`, or `..`.
+  /// It can't contain `:`, `%`, or a character that URLs percent-encode,
+  /// such as a space, `?`, `#`, or a non-ASCII letter,
+  /// since routes can't match those characters as they are written.
+  /// A `.` in the last segment, such as in `/docs/1.2`, isn't supported.
+  final String? urlPrefix;
 
   /// The routes from the latest call to [loadRoutes],
   /// or `null` if they need to be created again.
@@ -284,14 +319,15 @@ abstract class PageSource {
   /// The [path] determines the URL of the page and must use forward slashes.
   /// Unless [keepSuffix] is `true`, the URL of the page drops the file extension,
   /// and an index file gets the URL of its folder.
+  /// The URL starts with the [RouteLoaderBase.urlPrefix] of [loader], if set.
   PageSource(this.path, this.loader, {bool keepSuffix = false})
     : assert(!path.contains(p.windows.separator), 'PageSource path must be in posix format (using forward slashes).'),
       assert(!p.posix.isAbsolute(path), 'PageSource path must be relative, such as `blog/post.md`.'),
       private = p.posix.split(path).any((segment) => segment.startsWith('_') || segment.startsWith('.')),
-      url = _createUrl(path, keepSuffix: keepSuffix);
+      url = _createUrl(path, loader.urlPrefix, keepSuffix: keepSuffix);
 
-  /// Returns the URL of the page at [path].
-  static String _createUrl(String path, {required bool keepSuffix}) {
+  /// Returns the URL of the page at [path], starting with [prefix] if it isn't `null`.
+  static String _createUrl(String path, String? prefix, {required bool keepSuffix}) {
     var segments = p.posix.split(path);
     if (segments case [...final folders, final file] when !keepSuffix) {
       // An index file gets the URL of its folder, such as `/blog` for `blog/index.md`.
@@ -300,15 +336,19 @@ abstract class PageSource {
       segments = name == 'index' ? folders : [...folders, name];
     }
 
-    return '/${segments.join('/')}';
+    // Without any segments, the URL is the prefix itself, such as `/docs` for `index.md`.
+    if (segments.isEmpty) return prefix ?? '/';
+    return '${prefix ?? ''}/${segments.join('/')}';
   }
 
   /// The path of the page, such as `blog/post.md`, written with forward slashes.
   ///
   /// Config patterns, such as for secondary outputs, match against it.
+  /// It never includes the [RouteLoaderBase.urlPrefix] of the [loader].
   final String path;
 
-  /// The URL of the page, such as `/blog/post`, derived from [path].
+  /// The URL of the page, such as `/blog/post`,
+  /// derived from [path] and the [RouteLoaderBase.urlPrefix] of the [loader].
   final String url;
 
   /// Whether a segment of [path] starts with `_` or `.`,
@@ -324,7 +364,8 @@ abstract class PageSource {
   /// The page from the latest [load], or `null` if it isn't built yet or was invalidated.
   Page? _page;
 
-  /// The result of the latest [load], reused until the source is invalidated.
+  /// The result of the latest [load],
+  /// reused until the source is invalidated or building the page fails.
   Future<Component>? _future;
 
   /// The page that this source built,
@@ -334,10 +375,21 @@ abstract class PageSource {
   /// Builds and renders the page of this source,
   /// or returns the result of an earlier call until the source is invalidated.
   ///
-  /// If building the page fails, later calls fail with the same error
-  /// until the source is invalidated.
+  /// If building the page fails,
+  /// the calls made while it was being built fail with the same error,
+  /// and the next call builds the page again.
   Future<Component> load() async {
-    return _future ??= _loadPage();
+    final future = _future ??= _loadPage();
+    try {
+      return await future;
+    } catch (_) {
+      // Forget the failed build, so that the next call can recover,
+      // such as after a network error.
+      if (identical(_future, future)) {
+        _future = null;
+      }
+      rethrow;
+    }
   }
 
   /// Builds the page with [buildPage], makes it the current [page],
@@ -395,7 +447,7 @@ abstract class PageSource {
     if (rebuild && loader._eager) {
       // Don't report a failed rebuild here,
       // such as for invalid front matter saved while serving.
-      // The error is kept and surfaces when the page is requested.
+      // The next request builds the page again and surfaces the error.
       load().ignore();
     }
   }

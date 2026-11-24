@@ -18,6 +18,7 @@ typedef GithubLoader = GitHubLoader;
 final class GitHubLoader extends RouteLoaderBase<GitHubPageSource> {
   /// Creates a loader for the pages under [path] in the GitHub [repo] at [ref].
   ///
+  /// If [urlPrefix] is set, the URL of each page starts with it.
   /// If [debugPrint] is `true`, the routes are printed each time they're built.
   GitHubLoader(
     this.repo, {
@@ -25,6 +26,7 @@ final class GitHubLoader extends RouteLoaderBase<GitHubPageSource> {
     this.path = 'docs/',
     this.keepSuffixPattern,
     this.accessToken,
+    super.urlPrefix,
     super.debugPrint,
   });
 
