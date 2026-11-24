@@ -41,12 +41,12 @@ class _StylesVisitor extends SimpleAstVisitor<void> {
     if (node.variables.length != 1) return;
     if (node.parent
         case TopLevelVariableDeclaration(
-              metadata: final metadata,
+              :final metadata,
               firstTokenAfterCommentAndMetadata: final token,
             ) ||
             FieldDeclaration(
               isStatic: true,
-              metadata: final metadata,
+              :final metadata,
               firstTokenAfterCommentAndMetadata: final token,
             )) {
       if (!metadata.any(checkCss)) {

@@ -65,7 +65,7 @@ class ClientOptionsBuilder implements Builder {
     var source =
         '''
       import 'package:jaspr/client.dart';
-      ${plugins.isNotEmpty ? "import 'package:flutter_web_plugins/flutter_web_plugins.dart';" : ''}
+      ${plugins.isNotEmpty ? "import 'package:flutter_web_plugins/flutter_web_plugins.dart';\nimport 'dart:ui_web' as ui_web;" : ''}
       [[/]]
 
       /// Default [ClientOptions] for use with your Jaspr project.
@@ -99,6 +99,7 @@ class ClientOptionsBuilder implements Builder {
 
     return '''
       initialize: () {
+        ui_web.initializeAssetManager();
         final Registrar registrar = webPluginRegistrar;
         ${plugins.map((p) => '[[${p.import}]].${p.pluginClass}.registerWith(registrar);').join('\n')}
         registrar.registerMessageHandler();

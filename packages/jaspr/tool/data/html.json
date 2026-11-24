@@ -732,8 +732,9 @@
         "doc": "The &lt;details&gt; HTML element creates a disclosure widget in which information is visible only when the widget is toggled into an \"open\" state. A summary or label must be provided using the &lt;summary&gt; element.",
         "attributes": {
           "open": {
-            "doc": "Indicates whether or not the details — that is, the contents of the &lt;details&gt; element — are currently visible.",
-            "type": "boolean"
+            "doc": "Indicates whether or not the details — that is, the contents of the &lt;details&gt; element — are currently visible. If not set, the browser keeps control of the state, so the details stay as the user toggled them.",
+            "type": "boolean",
+            "explicit": true
           }
         }
       },
@@ -741,8 +742,9 @@
         "doc": "The &lt;dialog&gt; HTML element represents a dialog box or other interactive component, such as a dismissible alert, inspector, or subwindow.",
         "attributes": {
           "open": {
-            "doc": "Indicates that the dialog is active and can be interacted with. When the open attribute is not set, the dialog shouldn't be shown to the user.",
-            "type": "boolean"
+            "doc": "Indicates that the dialog is active and can be interacted with. When the open attribute is not set, the dialog shouldn't be shown to the user. If not set, the browser keeps control of the state, which a dialog opened with `showModal()` or `show()` needs.",
+            "type": "boolean",
+            "explicit": true
           }
         }
       },

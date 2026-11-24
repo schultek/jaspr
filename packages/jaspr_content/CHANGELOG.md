@@ -1,4 +1,55 @@
-## Unreleased 0.6.0-beta.0
+## Unreleased 0.6.0-beta.2
+
+### New Features and Improvements
+
+- Added `urlPrefix` parameter to `RouteLoaderBase` and the built-in route loaders,
+  which mounts the pages of a loader under a URL prefix, such as `/docs/v2`.
+  This lets one site serve several sets of pages side by side, such as multiple versions of the same docs.
+  The paths of the pages don't include the prefix, so config patterns and relative asset paths stay the same.
+- Added `PageConfig.matchUrlPrefix`, which resolves the config for the `urlPrefix` of the loader of each page, such as to configure each version of your docs differently.
+
+### Fixes
+
+- Fixed a page that failed to build, such as after a network error with `GitHubLoader`, failing with the same error on every request until its file changed or the server restarted.
+  The next request now builds the page again.
+
+## 0.6.0-beta.1
+
+### New Features and Improvements
+
+- Added `ignorePattern` parameter to `FilesystemLoader`, which skips the files whose path it matches from the start.
+  This can be used to leave files such as `README.md` out of the pages.
+
+- **Breaking**: Tightened the route loader classes, so that each customization has one supported way:
+
+  - The following classes are now `final` and can no longer be extended or implemented: `FilesystemLoader` and `FilePageSource`, `GitHubLoader` and `GitHubPageSource`, `MemoryLoader`, `MemoryPageSource`, and `MemoryPage`.
+    To load pages from another kind of source, extend `RouteLoaderBase` and `PageSource` instead.
+  - `RouteLoader` is now an `interface` class and can no longer be extended, only implemented.
+    To create a custom route loader, extend `RouteLoaderBase` instead, or implement `RouteLoader` directly.
+  - `FilesystemLoader.addFile`, `removeFile`, `invalidateFile`, and `dependentSources` are now private. To choose which files become pages, use `filterExtensions` or `ignorePattern`.
+  - `PageSource.loadPage` is now private. Call `PageSource.load()` instead.
+  - `PageSource` now asserts that its path is relative, such as `blog/post.md`.
+    Pages with an absolute path never got a route that could be reached.
+  - These members are now marked as `@protected` and should no longer be used outside their subclasses.
+    - `RouteLoaderBase`: `loadPageSources`, `addSource`, `removeSource`, `invalidateSource`, `invalidateRoutes`, `invalidateAll`, `getSourceForPage`, `onReassemble`, and `resolver`
+    - `PageSource`: `buildPage` and `invalidate`
+    To rebuild a page from outside its loader, call `Page.markNeedsRebuild()` instead.
+  - These methods are now annotated with `@mustCallSuper`, so their overrides must call `super`:
+    - `RouteLoaderBase`: `loadRoutes`, `addSource`, `removeSource`, `invalidateSource`, `invalidateRoutes`, and `invalidateAll`
+    - `PageSource`: `invalidate`
+  - `RouteLoaderBase.invalidateSource` no longer takes a `rebuild` parameter,
+    and `removeSource` now discards the page of the removed source itself.
+
+### Fixes
+
+- Fixed pages not being rebuilt when a partial that is not a page source, such as a file excluded by `filterExtensions`, is edited while serving.
+- Fixed pages not being rebuilt or removed while serving when the `FilesystemLoader` directory or the path of a partial is absolute or not normalized, such as with an absolute Liquid `includesPath` inside the loader directory.
+- Fixed an uncaught error when a page that is loaded eagerly fails to rebuild while serving, such as after saving invalid front matter.
+  The error now surfaces when the page is requested.
+- Fixed `RSSOutput` writing feeds that are not valid RSS 2.0.
+  Dates now use the RFC 822 format, text is escaped, and the `guid` is marked as not a permalink.
+
+## 0.6.0-beta.0
 
 - Require Dart 3.13 or later.
 

@@ -17,6 +17,7 @@ class ClientComponentRegistryElement extends ObserverElement {
   bool _didHandleClientScript = false;
 
   final Map<Element, ClientTarget> clientElements = {};
+  final Set<Element> clientBoundaries = {};
 
   int serverElementNum = 1;
   final Map<(Element, Component), int> serverComponents = {};

@@ -136,7 +136,6 @@ enum FlutterOption {
       ('lib/components/embedded_counter.imports.dart', fileExists),
       ('lib/widgets/counter.dart', fileExists),
       ('web/manifest.json', fileExists),
-      ('web/flutter_bootstrap.js', fileExists),
     },
     pluginsOnly => {},
   };

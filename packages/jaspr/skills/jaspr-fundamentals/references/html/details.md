@@ -4,7 +4,7 @@ Signature of the details component:
 
 ```dart
 const details(List<Component> children, {
-  bool open = false,
+  bool? open,
   String? id,
   String? classes,
   Styles? styles,

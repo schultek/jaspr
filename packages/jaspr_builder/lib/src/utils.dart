@@ -118,6 +118,7 @@ class ImportEntry {
 
       if (element case final ExtensionElement ext) {
         for (final child in ext.children) {
+          if (child is! ExecutableElement && child is! FieldElement) continue;
           if (child.isPrivate || child.name == null) continue;
           if (child is ExecutableElement && child.isStatic) continue;
           if (child is VariableElement && child.isStatic) continue;

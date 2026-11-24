@@ -250,14 +250,38 @@ class FakeStdin extends Stream<List<int>> implements io.Stdin {
     _controller.add(utf8.encode('$line\n'));
   }
 
+  /// Emulates the Windows console, where [lineMode] can only be disabled while
+  /// [echoMode] is disabled, and [echoMode] can only be enabled while
+  /// [lineMode] is enabled.
+  bool windowsTerminalModes = false;
+
+  bool _echoMode = true;
+  bool _lineMode = true;
+
   @override
-  bool echoMode = true;
+  bool get echoMode => _echoMode;
+
+  @override
+  set echoMode(bool value) {
+    if (windowsTerminalModes && value && !_lineMode) {
+      throw const io.StdinException('Error setting terminal echo mode');
+    }
+    _echoMode = value;
+  }
 
   @override
   bool echoNewlineMode = false;
 
   @override
-  bool lineMode = true;
+  bool get lineMode => _lineMode;
+
+  @override
+  set lineMode(bool value) {
+    if (windowsTerminalModes && !value && _echoMode) {
+      throw const io.StdinException('Error setting terminal line mode');
+    }
+    _lineMode = value;
+  }
 
   void addBytes(List<int> bytes) {
     _controller.add(bytes);

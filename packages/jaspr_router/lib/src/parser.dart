@@ -29,7 +29,16 @@ class RouteInformationParser {
   final RouteRedirector redirector;
 
   /// Called by the [Router].
-  Future<RouteMatchList> parseRouteInformation(String location, BuildContext context, {Object? extra}) {
+  ///
+  /// When [applyRedirects] is false, the location is only matched against
+  /// the routes and no redirect is evaluated. This is used when preloading
+  /// a route, where no navigation takes place.
+  Future<RouteMatchList> parseRouteInformation(
+    String location,
+    BuildContext context, {
+    Object? extra,
+    bool applyRedirects = true,
+  }) {
     late final RouteMatchList initialMatches;
     try {
       initialMatches = matcher.findMatch(location, extra: extra);
@@ -47,6 +56,10 @@ class RouteInformationParser {
         );
       }
       return SynchronousFuture(matches);
+    }
+
+    if (!applyRedirects) {
+      return processRedirectorResult(initialMatches);
     }
 
     final FutureOr<RouteMatchList> redirectorResult = redirector(

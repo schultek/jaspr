@@ -11,9 +11,11 @@ import '../dev/css_runner.dart';
 import '../dev/flutter_runner.dart';
 import '../dev/server_runner.dart';
 import '../helpers/dart_define_helpers.dart';
+import '../helpers/experiment_helpers.dart';
 import '../helpers/port_helper.dart';
 import '../helpers/print_logo.dart';
 import '../helpers/proxy_helper.dart';
+import '../helpers/wasm_loader_helper.dart';
 import '../logging.dart';
 import '../process_runner.dart';
 import '../project.dart';
@@ -108,6 +110,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
       defaultsTo: true,
     );
     addDartDefineArgs();
+    addExperimentArgs();
   }
 
   @override
@@ -184,7 +187,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
     }
 
     if (!hasBuildError) {
-      final exitCode = await CssRunner.build(project: project, logger: logger);
+      final exitCode = await CssRunner.build(project: project, logger: logger, experiments: experiments);
       if (exitCode != 0) {
         hasBuildError = true;
       } else {
@@ -222,6 +225,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
       final process = await ProcessRunner.instance.start(dartExecutable, [
         'compile',
         compileTarget,
+        ...experimentArgs,
         if (targetOS != null) ...[
           '--target-os',
           targetOS,
@@ -298,6 +302,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
         port: serverPort,
         proxyPort: proxyPort,
         serverDefines: serverDefines,
+        experiments: experiments,
         logger: logger,
         serverStartedCompleter: serverStartedCompleter,
         guard: guardResource,
@@ -398,6 +403,16 @@ class BuildCommand extends BaseCommand with ProxyHelper {
         final excludePattern = sitemapExclude != null ? RegExp(sitemapExclude!) : null;
         final now = DateTime.now().toW3CDateTimeString();
 
+        // The sitemap protocol requires `&`, `'`, `"`, `>`, and `<` to be escaped,
+        // such as in a route like `/terms&conditions`.
+        const sitemapEscape = HtmlEscape(
+          HtmlEscapeMode(
+            escapeLtGt: true,
+            escapeQuot: true,
+            escapeApos: true,
+          ),
+        );
+
         for (final route in generatedRoutes.entries) {
           if (excludePattern != null && excludePattern.hasMatch(route.key)) {
             continue;
@@ -409,7 +424,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
           }
 
           content.writeln('  <url>');
-          content.writeln('    <loc>$domain${route.key}</loc>');
+          content.writeln('    <loc>${sitemapEscape.convert('$domain${route.key}')}</loc>');
           content.writeln('    <lastmod>${sitemapData.lastmod?.toW3CDateTimeFormat() ?? now}</lastmod>');
           if (sitemapData.changefreq != null) {
             content.writeln('    <changefreq>${sitemapData.changefreq}</changefreq>');
@@ -476,19 +491,25 @@ class BuildCommand extends BaseCommand with ProxyHelper {
     final args = [
       '-Djaspr.flags.release=true',
       '-O${argResults!.option('optimize')}',
-      if (useWasm) //
-        ...argResults!.multiOption('extra-wasm-compiler-option')
-      else
+      if (useWasm) ...[
+        '--enable-deferred-loading',
+        ...argResults!.multiOption('extra-wasm-compiler-option'),
+      ] else
         ...argResults!.multiOption('extra-js-compiler-option'),
-      if (useWasm && project.flutterMode != FlutterMode.none)
+      if (useWasm && project.flutterMode != FlutterMode.none) ...[
         '--extra-compiler-option=--platform=${p.join(FlutterRunner.webSdkDir, 'kernel', 'dart2wasm_platform.dill')}',
+      ],
+      if (useWasm && project.flutterMode == FlutterMode.embedded) ...[
+        '--extra-compiler-option=--import-shared-memory',
+        '--extra-compiler-option=--shared-memory-max-pages=32768',
+      ],
       for (final entry in dartDefines.entries) //
         '-D${entry.key}=${entry.value}',
     ];
 
     List<String> additionalFlutterBuildArgs() {
       final librariesPath = p.join(FlutterRunner.webSdkDir, 'libraries.json');
-      final sdkJsPath = p.join(FlutterRunner.webSdkDir, 'kernel', 'amd-canvaskit');
+      final sdkJsPath = FlutterRunner.precompiledDdcSdkDir(FlutterRunner.webSdkDir, ddcLibraryBundle: false);
       return [
         '--define=build_web_compilers:entrypoint=use-ui-libraries=true',
         '--define=build_web_compilers:entrypoint_marker=use-ui-libraries=true',
@@ -516,6 +537,7 @@ class BuildCommand extends BaseCommand with ProxyHelper {
             '--define=build_web_compilers:dart_source_cleanup=enabled=false',
           ],
         ],
+        ...experimentArgs,
       ],
       outputDir: outputDir,
       logger: logger,
@@ -524,6 +546,62 @@ class BuildCommand extends BaseCommand with ProxyHelper {
 
     if (exitCode == 0) {
       logger.write('Completed building web assets.', tag: Tag.builder, progress: ProgressState.completed);
+
+      if (useWasm) {
+        final rootDir = Directory(outputDir);
+        if (rootDir.existsSync()) {
+          final files = rootDir.listSync(recursive: true);
+          for (final file in files) {
+            if (file is File && file.path.endsWith('.dart.js')) {
+              final basename = p.basenameWithoutExtension(file.path);
+              final isFlutter = project.flutterMode != FlutterMode.none;
+
+              var cleanBasename = basename;
+              if (cleanBasename.endsWith('.dart')) {
+                cleanBasename = cleanBasename.substring(0, cleanBasename.length - 5);
+              }
+
+              List<String>? modulesNeedingSkwasm;
+              bool? needsSkwasmImmediately;
+
+              if (isFlutter) {
+                modulesNeedingSkwasm = [];
+                needsSkwasmImmediately = false;
+
+                final dirFiles = rootDir.listSync(recursive: true);
+                for (final f in dirFiles) {
+                  if (f is File && f.path.endsWith('.wasm')) {
+                    final isBase = p.basename(f.path) == '$cleanBasename.wasm';
+                    final bytes = f.readAsBytesSync();
+                    final detector = WasmImportsDetector(bytes);
+                    final imports = detector.getImports();
+
+                    final hasSkwasm = imports.any((imp) => imp.$1 == 'skwasm' || imp.$1 == 'ffi');
+                    final skwasmWrapperImports = imports.where((imp) => imp.$1 == 'skwasmWrapper').toList();
+                    final hasOnlyAddFunction = skwasmWrapperImports.every((imp) => imp.$2 == 'addFunction');
+
+                    if (isBase) {
+                      needsSkwasmImmediately = hasSkwasm || (skwasmWrapperImports.isNotEmpty && !hasOnlyAddFunction);
+                    } else {
+                      if (hasSkwasm || skwasmWrapperImports.isNotEmpty) {
+                        modulesNeedingSkwasm.add(p.basename(f.path));
+                      }
+                    }
+                  }
+                }
+              }
+
+              final loaderScript = getWasmLoaderScript(
+                basename: basename,
+                isFlutter: isFlutter,
+                modulesNeedingSkwasm: modulesNeedingSkwasm,
+                needsSkwasmImmediately: needsSkwasmImmediately,
+              );
+              file.writeAsStringSync(loaderScript);
+            }
+          }
+        }
+      }
 
       if (includeSourceMaps) {
         _fixSourceMaps(outputDir);

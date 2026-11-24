@@ -30,7 +30,7 @@ workspace:
   - examples/package_riverpod
 
 dev_dependencies:
-  melos: ^8.7.0
+  melos: ^8.10.0
 
 dependency_overrides:
   # Needed to resolve a dependency conflict with latest analysis_server_plugin
@@ -111,6 +111,10 @@ melos:
       run: |
         cd packages/jaspr_cli
         dart run tool/generate_versions.dart
+    generate:loader:
+      run: |
+        cd packages/jaspr_cli
+        dart run tool/generate_loader.dart
     activate:cli:
       run: |
         rm -r packages/jaspr_cli/.dart_tool

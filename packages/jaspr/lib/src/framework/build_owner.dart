@@ -214,6 +214,7 @@ class BuildOwner {
     try {
       _isReload = true;
       element.onReload();
+      element.rebuild();
     } finally {
       lockState(_inactiveElements._unmountAll);
       _isReload = false;

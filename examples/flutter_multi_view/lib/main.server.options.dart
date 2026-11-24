@@ -34,10 +34,10 @@ ServerOptions get defaultServerOptions => ServerOptions(
   clientId: 'main.client.dart.js',
   clients: {_app.App: ClientTarget<_app.App>('app')},
   styles: () => [
+    ..._view_transition.viewTransitionStyles,
+    ..._app.AppState.styles,
     ..._counter.CounterState.styles,
     ..._embedded_counter.EmbeddedCounter.styles,
     ..._pulsing_loader.PulsingLoader.styles,
-    ..._view_transition.viewTransitionStyles,
-    ..._app.AppState.styles,
   ],
 );

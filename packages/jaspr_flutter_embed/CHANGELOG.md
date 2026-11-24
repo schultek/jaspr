@@ -1,4 +1,4 @@
-## Unreleased 0.5.0-beta.0
+## 0.5.0-beta.0
 
 - Require Dart 3.13 or later.
 
