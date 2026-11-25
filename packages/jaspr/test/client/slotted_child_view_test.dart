@@ -1973,9 +1973,9 @@ void main() {
 
         expect(body.querySelectorAll('i.static').length, count);
         expect(body.querySelectorAll('b.static').length, 0);
-        // The view checks each match once per render, and it renders twice as it mounts below an apply,
-        // but mounting each range slot doesn't check them again, whatever other slots the view has.
-        expect(parentReads, lessThanOrEqualTo(2 * count));
+        // The view first renders once its slots have mounted and checks each match then,
+        // so a mounting slot has nothing to check, whatever other slots the view has.
+        expect(parentReads, lessThanOrEqualTo(count));
       });
     }
 

@@ -67,9 +67,6 @@ class _RangeChildSlot extends ChildSlot {
     return ChildSlotRenderObject.between(parent, start, end);
   }
 
-  /// The nodes currently between [start] and [end].
-  Iterable<web.Node> get contentNodes => siblingsUntil(start.nextSibling, end);
-
   @override
   bool canUpdate(ChildSlot oldComponent) {
     return oldComponent is _RangeChildSlot && oldComponent.start == start && oldComponent.end == end;
@@ -145,12 +142,9 @@ class _ChildSlotElement extends MultiChildRenderObjectElement {
     );
     final view = _view = parent as _SlottedChildViewElement;
     final slotObject = (component as ChildSlot).createRenderObject(view.renderObject as SlottedDomRenderObject);
-    // Release the values the view applied within the contents before the child hydrates them.
-    // A slot added in an update mounts before the view renders again,
-    // so only skip this when the view's last render already left the range alone.
-    if (!view._leftRangeAlone(slotObject)) {
-      view._releaseSlotContent(slotObject);
-    }
+    // A slot added after the view first rendered takes over nodes the view applied values to,
+    // so release them before the child hydrates them.
+    view._releaseSlotContent(slotObject);
     return slotObject;
   }
 
@@ -238,9 +232,9 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   @override
   RenderObject createRenderObject() {
     final parent = parentRenderObjectElement!.renderObject;
-    final renderObject = SlottedDomRenderObject._fromNodes(component.nodes, parent as DomRenderObject);
-    updateRenderObject(renderObject);
-    return renderObject;
+    // Render once the slots have mounted, when the view knows which contents are theirs.
+    markNeedsRender();
+    return SlottedDomRenderObject._fromNodes(component.nodes, parent as DomRenderObject);
   }
 
   bool _didHydrate = false;
@@ -295,33 +289,6 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     slot.visitChildren(release);
   }
 
-  /// The end node of each range, by its start node,
-  /// whose contents the view's last render left alone.
-  ///
-  /// A range's contents are known before its slot mounts,
-  /// so the view leaves them alone from the start.
-  /// The contents of other slots are only known once they mount,
-  /// so the view releases the values it applied within them then.
-  final Map<web.Node, web.Node> _rangesLeftAlone = nodeMap();
-
-  /// Records the ranges that a render applying [params] leaves alone:
-  /// every range slot if there are params to apply, or none otherwise.
-  void _updateRangesLeftAlone(List<ApplyParams> params) {
-    _rangesLeftAlone.clear();
-    // Without params, the view applies nothing, so it has nothing to release either.
-    if (params.isEmpty) return;
-    for (final slot in component.slots) {
-      if (slot is _RangeChildSlot) _rangesLeftAlone[slot.start] = slot.end;
-    }
-  }
-
-  /// Whether the view's last render left the range of [slot] alone,
-  /// so the view has no values within it to release.
-  bool _leftRangeAlone(ChildSlotRenderObject slot) {
-    final start = slot._start;
-    return start != null && _rangesLeftAlone[start] == slot._end;
-  }
-
   /// Removes the values this view applied within the contents of [slot],
   /// so the slot's child can take them over.
   void _releaseSlotContent(ChildSlotRenderObject slot) {
@@ -335,10 +302,7 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   void _applyParams(SlottedDomRenderObject viewObject, Iterable<web.Node> roots, List<ApplyParams> params) {
     if (params.isEmpty) return;
 
-    final isSlotted = _subtreeFilter([
-      for (final slot in viewObject._slots) ...slot._contentNodes,
-      for (final MapEntry(key: start, value: end) in _rangesLeftAlone.entries) ...siblingsUntil(start.nextSibling, end),
-    ]);
+    final isSlotted = _subtreeFilter([for (final slot in viewObject._slots) ...slot._contentNodes]);
 
     final targets = [
       for (final param in params.reversed)
@@ -370,29 +334,17 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     }
 
     _appliedParams.release();
-    _updateRangesLeftAlone(params);
     _applyParams(renderObject, renderObject._childNodes, params);
-  }
-
-  /// The contents of this view's slots before they mount,
-  /// with each query resolved against the DOM as it is now.
-  Iterable<web.Node> _initialSlotContents(SlottedDomRenderObject view) sync* {
-    for (final slot in component.slots) {
-      if (slot is _RangeChildSlot) {
-        yield* slot.contentNodes;
-      } else if (slot is _QueryChildSlot) {
-        final target = slot.findTargetElement(view);
-        if (target != null) yield* target.childNodes.toIterable();
-      }
-    }
   }
 
   /// Removes the values that the `data-j-apply` markers of this view's static elements record,
   /// which applies above the view added on the server, so the view can apply and track them itself.
   ///
-  /// Markers within the slots are left for the components that hydrate them.
+  /// Markers within the slots are left alone, since the slots have mounted by then.
+  /// A DOM component there has already rendered its own attributes over its element's,
+  /// dropping the marker, and a nested view hydrates the markers of its own static elements.
   void _hydrateInitialNodes(SlottedDomRenderObject view) {
-    final isSlotted = _subtreeFilter(_initialSlotContents(view));
+    final isSlotted = _subtreeFilter([for (final slot in view._slots) ...slot._contentNodes]);
     for (final root in view._childNodes) {
       if (!root.isElement || isSlotted(root)) continue;
       for (final node in _matches(root as web.Element, '[data-j-apply]')) {
