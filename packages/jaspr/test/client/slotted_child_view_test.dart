@@ -924,60 +924,32 @@ void main() {
       expect(link.classList.contains('btn-class'), isFalse);
     });
 
-    for (final query in ['#mount-target', '.mount-target', '[data-target="true"]']) {
-      testClient('resolves a new query slot for $query using applied values', (tester) async {
-        window.document.body!.innerHTML = '<section><main>Fallback</main></section>'.toJS;
-        final mainElement = window.document.querySelector('main')!;
-        var slotted = false;
-        var enabled = true;
-        var text = 'Hydrated';
-        late void Function(void Function() cb) setParams;
-        late void Function(void Function() cb) setSlot;
+    testClient('keeps the target of a query slot whose query stops matching', (tester) async {
+      window.document.body!.innerHTML = '<section><main class="mount-target">Fallback</main></section>'.toJS;
+      final mainElement = window.document.querySelector('main')!;
+      var text = 'Hydrated';
+      late void Function(void Function() cb) setState;
 
-        tester.pumpComponent(
-          StatefulBuilder(
-            builder: (context, set) {
-              setParams = set;
-              return .apply(
-                target: const .descendantWith(tag: 'main'),
-                id: enabled ? 'mount-target' : null,
-                classes: enabled ? 'mount-target' : null,
-                attributes: enabled ? const {'data-target': 'true'} : null,
-                child: StatefulBuilder(
-                  builder: (context, set) {
-                    setSlot = set;
-                    return SlottedChildView(
-                      slots: [
-                        if (slotted) .fromQuery(query, child: span([.text(text)])),
-                      ],
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-        );
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return SlottedChildView(
+              slots: [
+                .fromQuery('.mount-target', child: span([.text(text)])),
+              ],
+            );
+          },
+        ),
+      );
+      expect(mainElement.textContent, 'Hydrated');
 
-        // Only the view's applied values make the query match.
-        expect(window.document.querySelector(query), equals(mainElement));
-
-        setSlot(() => slotted = true);
-        await pumpEventQueue();
-        expect(mainElement.textContent, 'Hydrated');
-        // The slot only renders into `main`, so the view's values stay on `main` itself.
-        expect(window.document.querySelector(query), equals(mainElement));
-
-        // An existing slot keeps its target even when its query stops matching.
-        setParams(() => enabled = false);
-        await pumpEventQueue();
-        expect(window.document.querySelector(query), isNull);
-
-        setSlot(() => text = 'Updated');
-        await pumpEventQueue();
-        expect(window.document.querySelector('main'), equals(mainElement));
-        expect(mainElement.textContent, 'Updated');
-      });
-    }
+      mainElement.removeAttribute('class');
+      setState(() => text = 'Updated');
+      await pumpEventQueue();
+      expect(window.document.querySelector('main'), equals(mainElement));
+      expect(mainElement.textContent, 'Updated');
+    });
 
     testClient('hands applied params to the child hydrating a range added after the first render', (tester) async {
       window.document.body!.innerHTML = '<section><!--start--><button></button><!--end--></section>'.toJS;
@@ -1050,7 +1022,7 @@ void main() {
                 slots: [
                   if (showSlot)
                     .fromQuery(
-                      'main:has(button[data-target="true"])',
+                      'main',
                       child: div([
                         button(
                           classes: 'shared',
@@ -1068,7 +1040,7 @@ void main() {
         ),
       );
 
-      // The selector already matches when the child takes over the button.
+      // The view has applied its values to the button by the time the child takes it over.
       expect(slotted.getAttribute('data-target'), 'true');
       setState(() => showSlot = true);
       await pumpEventQueue();
@@ -1420,31 +1392,6 @@ void main() {
       expect(p.className, 'own');
       expect(p.hasAttribute('data-x'), isFalse);
       expect(p.getAttribute('data-applied'), 'true');
-    });
-
-    testClient('resolves a query slot using values applied within a later range slot', (tester) async {
-      window.document.body!.innerHTML = '<section><main></main><!--start--><button></button><!--end--></section>'.toJS;
-      final section = window.document.querySelector('section')!;
-      final start = section.childNodes.item(1)!;
-      final end = section.childNodes.item(3)!;
-      final btn = window.document.querySelector('button')! as HTMLElement;
-
-      tester.pumpComponent(
-        .apply(
-          target: const .descendantWith(tag: 'button'),
-          attributes: const {'data-target': 'true'},
-          child: SlottedChildView(
-            slots: [
-              .fromQuery('section:has(button[data-target="true"]) > main', child: span([])),
-              .between(start: start, end: end, child: button([])),
-            ],
-          ),
-        ),
-      );
-
-      expect(window.document.querySelector('main > span'), isNotNull);
-      expect(window.document.querySelector('button'), equals(btn));
-      expect(btn.getAttribute('data-target'), 'true');
     });
 
     testClient('keeps the state of form elements in a removed slot', (tester) async {
@@ -1888,7 +1835,7 @@ void main() {
       expect(clicks, 2);
     });
 
-    testClient('resolves a query using inherited params in an initial nested view', (tester) async {
+    testClient('applies inherited params to the target of a query slot in an initial nested view', (tester) async {
       window.document.body!.innerHTML = '<!--start--><section><main>Fallback</main></section><!--end-->'.toJS;
       final start = window.document.body!.firstChild!;
       final end = window.document.body!.lastChild!;
@@ -1905,7 +1852,7 @@ void main() {
                 end: end,
                 child: SlottedChildView(
                   slots: [
-                    .fromQuery('.mount-target', child: span([.text('Hydrated')])),
+                    .fromQuery('main', child: span([.text('Hydrated')])),
                   ],
                 ),
               ),
@@ -1914,7 +1861,7 @@ void main() {
         ),
       );
 
-      // The nested view applied its class to `main` before resolving the query.
+      // The slot only renders into `main`, so the nested view applies the class to `main` itself.
       expect(window.document.querySelector('main'), equals(mainElement));
       expect(mainElement.textContent, 'Hydrated');
       expect(mainElement.className, 'mount-target');
@@ -1923,7 +1870,7 @@ void main() {
       expect(mainElement.hasAttribute('class'), isFalse);
     });
 
-    testClient('resolves a query slot using applied values after a reload', (tester) async {
+    testClient('applies params to the target of a query slot again after a reload', (tester) async {
       const html = '<section><main>Server</main></section>';
       window.document.body!.innerHTML = html.toJS;
 
@@ -1933,7 +1880,7 @@ void main() {
           classes: 'mount-target',
           child: SlottedChildView(
             slots: [
-              .fromQuery('.mount-target', child: span([.text('Hydrated')])),
+              .fromQuery('main', child: span([.text('Hydrated')])),
             ],
           ),
         ),
@@ -1985,47 +1932,52 @@ void main() {
       expect(containsCalls, lessThanOrEqualTo(count));
     });
 
-    testClient('checks static matches without rescanning them as each range slot mounts', (tester) async {
-      const count = 32;
-      final body = window.document.body!;
-      body.innerHTML = '<section>${'<i></i>' * count}${'<!--start--><b></b><!--end-->' * count}</section>'.toJS;
-      final section = body.firstChild!;
-      final children = [for (var i = 0; i < section.childNodes.length; i++) section.childNodes.item(i)!];
-      final matches = children.take(count);
-      final anchors = children.skip(count).toList();
-      var parentReads = 0;
-      final object = globalContext['Object']! as JSObject;
-      for (final node in matches) {
-        // Count ancestor lookups on these nodes without
-        // changing the shared DOM prototype or depending on elapsed time.
-        // They don't move, so return their original parent.
-        final descriptor = JSObject()
-          ..['configurable'] = true.toJS
-          ..['get'] = (() {
-            parentReads++;
-            return section;
-          }).toJS;
-        object.callMethod('defineProperty'.toJS, node, 'parentNode'.toJS, descriptor);
-      }
+    for (final besideQuery in [false, true]) {
+      final suffix = besideQuery ? ' beside a query slot' : '';
+      testClient('checks static matches without rescanning them as each range slot mounts$suffix', (tester) async {
+        const count = 32;
+        final body = window.document.body!;
+        body.innerHTML =
+            '<section>${'<i></i>' * count}${'<!--start--><b></b><!--end-->' * count}<main></main></section>'.toJS;
+        final section = body.firstChild!;
+        final children = [for (var i = 0; i < section.childNodes.length; i++) section.childNodes.item(i)!];
+        final matches = children.take(count);
+        final anchors = children.skip(count).toList();
+        var parentReads = 0;
+        final object = globalContext['Object']! as JSObject;
+        for (final node in matches) {
+          // Count ancestor lookups on these nodes without
+          // changing the shared DOM prototype or depending on elapsed time.
+          // They don't move, so return their original parent.
+          final descriptor = JSObject()
+            ..['configurable'] = true.toJS
+            ..['get'] = (() {
+              parentReads++;
+              return section;
+            }).toJS;
+          object.callMethod('defineProperty'.toJS, node, 'parentNode'.toJS, descriptor);
+        }
 
-      tester.pumpComponent(
-        .apply(
-          target: const .descendantWith(tag: 'i'),
-          classes: 'static',
-          child: SlottedChildView(
-            slots: [
-              for (var i = 0; i < count; i++) .between(start: anchors[i * 3], end: anchors[i * 3 + 2], child: b([])),
-            ],
+        tester.pumpComponent(
+          .apply(
+            target: const .descendantWith(tag: 'i'),
+            classes: 'static',
+            child: SlottedChildView(
+              slots: [
+                if (besideQuery) .fromQuery('main', child: span([])),
+                for (var i = 0; i < count; i++) .between(start: anchors[i * 3], end: anchors[i * 3 + 2], child: b([])),
+              ],
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(body.querySelectorAll('i.static').length, count);
-      expect(body.querySelectorAll('b.static').length, 0);
-      // The view checks each match once per render, and it renders twice as it mounts below an apply,
-      // but mounting each range slot doesn't check them again.
-      expect(parentReads, lessThanOrEqualTo(2 * count));
-    });
+        expect(body.querySelectorAll('i.static').length, count);
+        expect(body.querySelectorAll('b.static').length, 0);
+        // The view checks each match once per render, and it renders twice as it mounts below an apply,
+        // but mounting each range slot doesn't check them again, whatever other slots the view has.
+        expect(parentReads, lessThanOrEqualTo(2 * count));
+      });
+    }
 
     testClient('takes back removed range slots without listing the others again as each one unmounts', (tester) async {
       const count = 32;

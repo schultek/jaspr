@@ -25,9 +25,9 @@ abstract class ChildSlot extends Component {
   /// not the top-level nodes themselves.
   ///
   /// The [query] must match an element when the slot mounts.
-  /// By then, a slot removed in the same update has already lost the
-  /// values that a [Component.apply] above the view added within its contents,
-  /// so the query can't depend on those values.
+  /// It can't rely on values that a [Component.apply] above the view adds,
+  /// since they aren't always in place by then.
+  /// Select the element by what it has without them instead.
   factory ChildSlot.fromQuery(String query, {required Component child, Key? key}) = _QueryChildSlot;
 
   /// Creates a slot that renders [child] between the [start] and [end] nodes,
@@ -145,8 +145,7 @@ class _ChildSlotElement extends MultiChildRenderObjectElement {
     );
     final view = _view = parent as _SlottedChildViewElement;
     final slotObject = (component as ChildSlot).createRenderObject(view.renderObject as SlottedDomRenderObject);
-    // Keep the view's values in place until the selector has found its target,
-    // then release the contents before the child hydrates them.
+    // Release the values the view applied within the contents before the child hydrates them.
     // A slot added in an update mounts before the view renders again,
     // so only skip this when the view's last render already left the range alone.
     if (!view._leftRangeAlone(slotObject)) {
@@ -300,22 +299,19 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   /// whose contents the view's last render left alone.
   ///
   /// A range's contents are known before its slot mounts,
-  /// so a view with only ranges leaves them alone from the start.
-  /// Query slots can depend on newly applied values, including values within ranges,
-  /// so other views leave slot contents alone once the slots mount.
+  /// so the view leaves them alone from the start.
+  /// The contents of other slots are only known once they mount,
+  /// so the view releases the values it applied within them then.
   final Map<web.Node, web.Node> _rangesLeftAlone = nodeMap();
 
   /// Records the ranges that a render applying [params] leaves alone:
-  /// every slot, if they're all ranges and there are params to apply, or none otherwise.
+  /// every range slot if there are params to apply, or none otherwise.
   void _updateRangesLeftAlone(List<ApplyParams> params) {
     _rangesLeftAlone.clear();
     // Without params, the view applies nothing, so it has nothing to release either.
     if (params.isEmpty) return;
-    final slots = component.slots;
-    if (slots.every((slot) => slot is _RangeChildSlot)) {
-      for (final slot in slots.cast<_RangeChildSlot>()) {
-        _rangesLeftAlone[slot.start] = slot.end;
-      }
+    for (final slot in component.slots) {
+      if (slot is _RangeChildSlot) _rangesLeftAlone[slot.start] = slot.end;
     }
   }
 
