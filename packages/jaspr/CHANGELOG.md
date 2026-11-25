@@ -1,7 +1,6 @@
-## Unreleased patch
+## Unreleased 0.24.0-beta.3
 
-### Fixes
-
+- Fixed a hue rotation crossing zero in `Color.withHue` producing the wrong color.
 - Fixed `Animation(count: double.infinity)` rendering `infinity`, which is not a valid `animation-iteration-count`, so the browser dropped the whole `animation` declaration. It now renders `infinite`.
 
 ## 0.24.0-beta.2
