@@ -1,5 +1,7 @@
 ## Unreleased 0.24.0-beta.3
 
+- Fixed a hue rotation crossing zero in `Color.withHue` producing the wrong color.
+- Fixed `Animation(count: double.infinity)` rendering `infinity`, which is not a valid `animation-iteration-count`, so the browser dropped the whole `animation` declaration. It now renders `infinite`.
 - Fixed `Component.apply` above a `SlottedChildView` conflicting with the components rendered in its slots:
   - A slot's child now keeps its own attributes, rather than the applied ones, when the slot is added after the first render or moves to another view with its key.
   - Applied event handlers no longer fire more than once on elements inside nested views.

@@ -101,6 +101,11 @@ void main() {
           expect(color6.value, equals('oklch(from #ff0000 l c 40)'));
         });
 
+        test('rotating a fixed hue past zero preserves its sign', () {
+          final color = Color('#ff0000').withHue(10).withHue(-30, replace: false);
+          expect(color.value, equals('oklch(from #ff0000 l c -20)'));
+        });
+
         test('withValues', () {
           final color = Color('#ff00ff');
           final color1 = color.withValues(red: 0, green: 255);

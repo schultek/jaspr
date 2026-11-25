@@ -28,9 +28,17 @@ void main() {
         expect(
           styles.properties,
           equals({
-            'animation': '500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinity normal forwards running slide',
+            'animation': '500ms linear(0.2 30% 60%, 0.3 40% 80.5%) 100ms infinite normal forwards running slide',
           }),
         );
+      });
+
+      test('finite count', () {
+        const animations = Animation.list([
+          Animation(name: 'slide', duration: Duration(milliseconds: 100), count: 3),
+          Animation(name: 'fade', duration: Duration(milliseconds: 200), count: 1.5),
+        ]);
+        expect(animations.value, equals('100ms 3 slide, 200ms 1.5 fade'));
       });
 
       group('combine', () {

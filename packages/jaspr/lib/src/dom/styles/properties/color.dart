@@ -322,7 +322,7 @@ abstract class _RelativeColor with _ColorMixin {
     final (value, replace) = data;
     final vStr = (value.toInt() == value) ? value.abs().toInt().toString() : value.abs().toString();
     if (replace) {
-      return vStr;
+      return value < 0 ? '-$vStr' : vStr;
     } else if (value < 0) {
       return 'calc($origin - $vStr)';
     } else {
