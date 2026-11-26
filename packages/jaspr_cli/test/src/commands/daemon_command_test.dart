@@ -55,6 +55,20 @@ void main() {
           ]),
         );
 
+        io.stdin.addLine('[{"method":"client.restart","params":{"fullRestart":true},"id":1}]');
+
+        await expectLater(
+          io.stdout.queue,
+          emitsThrough('[{"id":1,"result":{"code":0}}]'),
+        );
+
+        io.stdin.addLine('[{"method":"client.reload","id":2}]');
+
+        await expectLater(
+          io.stdout.queue,
+          emitsThrough('[{"id":2,"result":{"code":0}}]'),
+        );
+
         io.stdin.addLine('[{"method":"daemon.shutdown","id":0}]');
 
         expect(
