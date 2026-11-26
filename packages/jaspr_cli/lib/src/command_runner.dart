@@ -13,6 +13,7 @@ import 'commands/create_command.dart';
 import 'commands/daemon_command.dart';
 import 'commands/doctor_command.dart';
 import 'commands/migrate_command.dart';
+import 'commands/new_command.dart';
 import 'commands/post_update_command.dart';
 import 'commands/serve_command.dart';
 import 'commands/update_command.dart';
@@ -35,6 +36,7 @@ class JasprCommandRunner extends CompletionCommandRunner<int> {
     argParser.addFlag('enable-analytics', negatable: false, help: 'Enable anonymous analytics.');
     argParser.addFlag('disable-analytics', negatable: false, help: 'Disable anonymous analytics.');
     addCommand(CreateCommand());
+    addCommand(NewCommand());
     addCommand(ServeCommand());
     addCommand(DaemonCommand());
     addCommand(BuildCommand());
