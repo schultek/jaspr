@@ -43,26 +43,18 @@ List<String>? _splitClasses(String? classes) {
   return classNames.isEmpty ? null : classNames;
 }
 
-typedef _AppliedParam = ({
-  ApplyParams param,
-  String? id,
-  List<String>? classes,
-  List<String>? styles,
-  List<String>? attributes,
-});
-
 class DomElement extends DomRenderObjectElement {
   DomElement(DomComponent super.component);
 
   @override
   DomComponent get component => super.component as DomComponent;
 
-  List<_AppliedParam>? _appliedParams;
+  /// The values each inherited apply added during the last render,
+  /// leaving out any this component sets itself.
+  List<({ApplyParams param, AppliedDomValues values})>? _appliedParams;
 
   @override
-  List<Component> buildOwnChildren() {
-    return component.children ?? const [];
-  }
+  List<Component> buildChildren() => component.children ?? const [];
 
   @override
   void update(DomComponent newComponent) {
@@ -96,7 +88,8 @@ class DomElement extends DomRenderObjectElement {
     var attributes = component.attributes;
     var events = component.events;
 
-    if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
+    final inheritedDomParams = inheritedDomParamsFor(renderObject);
+    if (inheritedDomParams.isNotEmpty) {
       final classesSet = {
         ...?_splitClasses(classes),
         ...?_splitClasses(attributes?['class']),
@@ -111,20 +104,17 @@ class DomElement extends DomRenderObjectElement {
           continue;
         }
 
-        String? appliedId;
-        List<String>? appliedClasses;
-        List<String>? appliedStyles;
-        List<String>? appliedAttributes;
+        final added = AppliedDomValues();
 
         if (param.id case final paramId? when id == null && !attributes.containsKey('id')) {
           id = paramId;
-          appliedId = paramId;
+          added.id = paramId;
         }
 
         if (param.classes case final paramClasses? when !attributes.containsKey('class')) {
           for (final c in paramClasses) {
             if (classesSet.add(c)) {
-              (appliedClasses ??= []).add(c);
+              (added.classes ??= []).add(c);
             }
           }
         }
@@ -136,7 +126,7 @@ class DomElement extends DomRenderObjectElement {
           for (final MapEntry(:key, :value) in stylesProps.entries) {
             if (!styles.containsKey(key)) {
               styles[key] = value;
-              (appliedStyles ??= []).add(key);
+              (added.styles ??= []).add(key);
             }
           }
         }
@@ -144,11 +134,11 @@ class DomElement extends DomRenderObjectElement {
         if (param.attributes case final attributesMap?) {
           for (final MapEntry(:key, :value) in attributesMap.entries) {
             if (!attributes.containsKey(key)) {
-              if (key == 'id' && (id != null || appliedId != null)) continue;
+              if (key == 'id' && id != null) continue;
               if (key == 'class' && (classesSet.isNotEmpty || classes != null)) continue;
               if (key == 'style' && styles.isNotEmpty) continue;
               attributes[key] = value;
-              (appliedAttributes ??= []).add(key);
+              (added.attributes ??= []).add(key);
             }
           }
         }
@@ -159,15 +149,7 @@ class DomElement extends DomRenderObjectElement {
           }
         }
 
-        if (appliedId != null || appliedClasses != null || appliedStyles != null || appliedAttributes != null) {
-          (_appliedParams ??= []).add((
-            param: param,
-            id: appliedId,
-            classes: appliedClasses,
-            styles: appliedStyles,
-            attributes: appliedAttributes,
-          ));
-        }
+        if (!added.isEmpty) (_appliedParams ??= []).add((param: param, values: added));
       }
 
       classes = attributes.containsKey('class')
@@ -181,56 +163,21 @@ class DomElement extends DomRenderObjectElement {
     renderObject.update(id, classes, styles, attributes, events);
   }
 
+  /// The values that the applies [include] accepts contributed during the last render,
+  /// or `null` if they contributed none.
   @internal
-  String? computeAppliedDiff(bool Function(ApplyParams) isClientManaged) {
+  AppliedDomValues? appliedValuesFrom(bool Function(ApplyParams) include) {
+    AppliedDomValues? result;
     final applied = _appliedParams;
-    if (applied == null || applied.isEmpty) return null;
-
-    final appliedClasses = <String>[];
-    final appliedStyles = <String>[];
-    final appliedAttributes = <String>[];
-    String? appliedId;
-
+    if (applied == null) return null;
     for (final entry in applied) {
-      if (!isClientManaged(entry.param)) continue;
-
-      if (entry.id case final id?) {
-        appliedId = id;
-      }
-      if (entry.classes case final classes?) {
-        appliedClasses.addAll(classes);
-      }
-      if (entry.styles case final styles?) {
-        appliedStyles.addAll(styles);
-      }
-      if (entry.attributes case final attributes?) {
-        appliedAttributes.addAll(attributes);
+      if (include(entry.param)) {
+        (result ??= AppliedDomValues()).add(entry.values);
       }
     }
-
-    if (appliedId != null || appliedClasses.isNotEmpty || appliedStyles.isNotEmpty || appliedAttributes.isNotEmpty) {
-      final parts = <String>[];
-      if (appliedId != null) {
-        parts.add('i:${_escapeApplyValue(appliedId)}');
-      }
-      if (appliedClasses.isNotEmpty) {
-        parts.add('c:${appliedClasses.map(_escapeApplyValue).join(',')}');
-      }
-      if (appliedStyles.isNotEmpty) {
-        parts.add('s:${appliedStyles.map(_escapeApplyValue).join(',')}');
-      }
-      if (appliedAttributes.isNotEmpty) {
-        parts.add('a:${appliedAttributes.map(_escapeApplyValue).join(',')}');
-      }
-      return parts.join(';');
-    }
-    return null;
+    return result;
   }
 }
-
-String _escapeApplyValue(String val) => (val.contains(';') || val.contains(',') || val.contains('%'))
-    ? val.replaceAll('%', '%25').replaceAll(';', '%3B').replaceAll(',', '%2C')
-    : val;
 
 @internal
 class ApplyDomComponent extends StatelessComponent implements DomComponent {
@@ -264,7 +211,7 @@ class ApplyDomComponent extends StatelessComponent implements DomComponent {
   @override
   List<Component>? get children => null;
 
-  Map<String, dynamic> toMap() => {
+  Map<String, Object?> toMap() => {
     if (target != ApplyTarget.anyChild) 't': target.toMap(),
     if (id != null) 'i': id,
     if (classes != null) 'c': classes,
@@ -337,7 +284,7 @@ final class ApplyTarget {
     return true;
   }
 
-  Map<String, dynamic> toMap() => {
+  Map<String, Object?> toMap() => {
     if (!onlyChildren) 'd': true,
     if (tag != null) 't': tag,
     if (id != null) 'i': id,
@@ -361,6 +308,10 @@ final class ApplyTarget {
 abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
   DomRenderObjectElement(super.component);
 
+  /// Whether this element is currently part of the component tree.
+  @internal
+  bool get isActive => _lifecycleState == _ElementLifecycle.active;
+
   InheritedElement? _inheritedDomElement;
 
   @override
@@ -382,38 +333,12 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
   }
 
   @internal
-  @protected
-  DomParamsResolver? get inheritedDomResolver {
-    if (_inheritedDomElement case final inheritedDomElement?) {
-      final inheritedDomComponent = dependOnInheritedElement(inheritedDomElement) as _InheritedDomComponent;
-      return inheritedDomComponent.resolveParams;
+  List<ApplyParams> inheritedDomParamsFor(RenderObject target) {
+    if (_inheritedDomElement case final ancestor?) {
+      final inherited = dependOnInheritedElement(ancestor) as _InheritedDomComponent;
+      return inherited.resolveParams(target);
     }
-    return null;
-  }
-
-  @internal
-  List<ApplyParams>? inheritedDomParamsFor(RenderObject target) {
-    return inheritedDomResolver?.call(target);
-  }
-
-  @internal
-  @protected
-  Component wrapWithInheritedDomComponent({
-    required DomParamsResolver getParams,
-    required Component child,
-  }) {
-    return _InheritedDomComponent(
-      key: child.key == null ? null : ValueKey(child.key),
-      resolveParams: getParams,
-      child: child,
-    );
-  }
-
-  List<Component> buildOwnChildren();
-
-  @override
-  List<Component> buildChildren() {
-    return buildOwnChildren();
+    return const [];
   }
 }
 
@@ -438,27 +363,20 @@ class ApplyParams {
   final Element? source;
 }
 
-typedef DomParamsResolver = List<ApplyParams> Function(RenderObject target);
-
 bool _isDirectDomChild(RenderObject target, RenderObject? applyParent) {
-  RenderObject? current = target;
-  while (current != null) {
-    if (current.parent == applyParent) {
-      return true;
-    }
-    if (current.parent case final parent? when parent is RenderFragment) {
-      current = parent;
-    } else {
-      break;
-    }
+  var current = target;
+  while (current.parent != applyParent) {
+    final parent = current.parent;
+    if (parent is! RenderFragment || (parent is RenderChildSlot && !parent.rendersIntoParent)) return false;
+    current = parent;
   }
-  return false;
+  return true;
 }
 
 class _InheritedDomComponent extends InheritedComponent {
-  const _InheritedDomComponent({super.key, required this.resolveParams, required super.child});
+  const _InheritedDomComponent({required this.resolveParams, required super.child});
 
-  final DomParamsResolver resolveParams;
+  final List<ApplyParams> Function(RenderObject target) resolveParams;
 
   factory _InheritedDomComponent.merge(
     BuildContext context, {

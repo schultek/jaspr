@@ -40,6 +40,14 @@ int _nodeHashCode(web.Node node) {
   return hashCode;
 }
 
+/// The node [first] and its following siblings up to, but not including, [end],
+/// or through the last sibling if [end] is `null`.
+Iterable<web.Node> siblingsUntil(web.Node? first, web.Node? end) sync* {
+  for (var node = first; node != null && node != end; node = node.nextSibling) {
+    yield node;
+  }
+}
+
 extension NodeListIterable on web.NodeList {
   Iterable<web.Node> toIterable() sync* {
     for (var i = 0; i < length; i++) {

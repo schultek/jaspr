@@ -17,6 +17,7 @@ import '../dom/styles/styles.dart' show Styles, Padding, Colors, Unit;
 import '../foundation/basic_types.dart';
 import '../foundation/binding.dart';
 import '../foundation/object.dart';
+import 'applied_dom_values.dart';
 
 part 'build_context.dart';
 part 'build_owner.dart';

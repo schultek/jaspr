@@ -1,9 +1,11 @@
 /// @docImport 'client_app.dart';
 library;
 
+import 'package:meta/meta.dart';
 import 'package:universal_web/web.dart' as web;
 
 import '../dom/type_checks.dart';
+import '../framework/applied_dom_values.dart';
 import '../framework/framework.dart';
 import 'dom_render_object.dart';
 import 'utils.dart';
@@ -21,6 +23,11 @@ abstract class ChildSlot extends Component {
   ///
   /// Only elements nested in the view's nodes are searched,
   /// not the top-level nodes themselves.
+  ///
+  /// The [query] must match an element when the slot mounts.
+  /// It can't rely on values that a [Component.apply] above the view adds,
+  /// since they aren't always in place by then.
+  /// Select the element by what it has without them instead.
   factory ChildSlot.fromQuery(String query, {required Component child, Key? key}) = _QueryChildSlot;
 
   /// Creates a slot that renders [child] between the [start] and [end] nodes,
@@ -60,22 +67,6 @@ class _RangeChildSlot extends ChildSlot {
     return ChildSlotRenderObject.between(parent, start, end);
   }
 
-  bool Function(web.Node) _createFilter() {
-    final parentElement = start.parentElement;
-    if (parentElement == null) return (_) => false;
-
-    return (web.Node element) {
-      if (!parentElement.contains(element)) return false;
-      if (start.contains(element) || end.contains(element)) return false;
-
-      const following = web.Node.DOCUMENT_POSITION_FOLLOWING;
-      const containedBy = web.Node.DOCUMENT_POSITION_CONTAINED_BY;
-      final isAfterStart = (start.compareDocumentPosition(element) & (following | containedBy)) == following;
-      final isBeforeEnd = (end.compareDocumentPosition(element) & web.Node.DOCUMENT_POSITION_PRECEDING) != 0;
-      return isAfterStart && isBeforeEnd;
-    };
-  }
-
   @override
   bool canUpdate(ChildSlot oldComponent) {
     return oldComponent is _RangeChildSlot && oldComponent.start == start && oldComponent.end == end;
@@ -92,18 +83,13 @@ class _QueryChildSlot extends ChildSlot {
   final Component child;
 
   web.Element? findTargetElement(SlottedDomRenderObject parent) {
-    web.Node? current = parent.firstChildNode;
-    while (current != null) {
-      if (current.isElement) {
-        final target = (current as web.Element).querySelector(query);
+    for (final node in parent._childNodes) {
+      if (node.isElement) {
+        final target = (node as web.Element).querySelector(query);
         if (target != null) {
           return target;
         }
       }
-      if (current == parent.lastChildNode) {
-        break;
-      }
-      current = current.nextSibling;
     }
     return null;
   }
@@ -115,12 +101,6 @@ class _QueryChildSlot extends ChildSlot {
     return ChildSlotRenderObject(target!, parent);
   }
 
-  bool Function(web.Node) _createFilter(SlottedDomRenderObject parent) {
-    final target = findTargetElement(parent);
-    if (target == null) return (_) => false;
-    return (web.Node element) => element != target && target.contains(element);
-  }
-
   @override
   bool canUpdate(ChildSlot oldComponent) {
     return oldComponent is _QueryChildSlot && oldComponent.query == query;
@@ -129,6 +109,13 @@ class _QueryChildSlot extends ChildSlot {
 
 class _ChildSlotElement extends MultiChildRenderObjectElement {
   _ChildSlotElement(ChildSlot super.component);
+
+  /// The view that last owned this slot's render object.
+  ///
+  /// A removed render object loses its parent,
+  /// so this tracks the old view until a
+  /// keyed slot reactivates in a new one or unmounts.
+  late _SlottedChildViewElement _view;
 
   @override
   void update(ChildSlot newComponent) {
@@ -148,17 +135,51 @@ class _ChildSlotElement extends MultiChildRenderObjectElement {
 
   @override
   ChildSlotRenderObject createRenderObject() {
-    final slot = component as ChildSlot;
-    final parent = parentRenderObjectElement!.renderObject as DomRenderObject;
+    final parent = parentRenderObjectElement;
     assert(
-      parent is SlottedDomRenderObject,
+      parent is _SlottedChildViewElement,
       'ChildSlot must be used as a direct child of SlottedChildView.',
     );
-    return slot.createRenderObject(parent as SlottedDomRenderObject);
+    final view = _view = parent as _SlottedChildViewElement;
+    final slotObject = (component as ChildSlot).createRenderObject(view.renderObject as SlottedDomRenderObject);
+    // A slot added after the view first rendered takes over nodes the view applied values to,
+    // so release them before the child hydrates them.
+    view._releaseSlotContent(slotObject);
+    return slotObject;
   }
 
   @override
   void updateRenderObject(RenderObject renderObject) {}
+
+  @override
+  void activate() {
+    super.activate();
+    final view = parentRenderObjectElement as _SlottedChildViewElement;
+    if (view != _view) {
+      // A keyed slot keeps its render object when it moves to a new view,
+      // so hand over the existing contents before its children reactivate.
+      final slotObject = renderObject as ChildSlotRenderObject;
+      (_view.renderObject as SlottedDomRenderObject)._slots.remove(slotObject);
+      _view = view;
+      view._releaseSlotContent(slotObject);
+    }
+  }
+
+  @override
+  void deactivate() {
+    // Only the outermost departing slot releases inherited values. Its walk
+    // includes nested slots and preserves applies introduced inside this slot.
+    if (!_view._releasedByEnclosingSlot) {
+      _view._releaseInheritedValues(this);
+    }
+    super.deactivate();
+  }
+
+  @override
+  void unmount() {
+    _view._reclaimSlot(renderObject as ChildSlotRenderObject);
+    super.unmount();
+  }
 }
 
 /// A component that takes over existing DOM nodes and renders its [slots] into parts of them.
@@ -206,232 +227,150 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
   }
 
   @override
-  List<Component> buildChildren() {
-    final parentResolver = inheritedDomResolver;
-    if (parentResolver == null) {
-      return buildOwnChildren();
-    }
-
-    final parentDomNode = SlottedDomRenderObject._realNodeOf(
-      (renderObject as SlottedDomRenderObject).parent!,
-    );
-
-    List<ApplyParams> getParams(RenderObject target) {
-      final parentParams = parentResolver(target);
-      if (parentParams.isEmpty) return const [];
-
-      if (!parentParams.any((p) => p.target.onlyChildren)) {
-        return parentParams;
-      }
-
-      // Find ChildSlotRenderObject in target's ancestor chain
-      ChildSlotRenderObject? slotRenderObject;
-      RenderObject? current = target;
-      while (current != null && current != renderObject) {
-        if (current is ChildSlotRenderObject) {
-          slotRenderObject = current;
-          break;
-        }
-        current = current.parent;
-      }
-
-      if (slotRenderObject != null && slotRenderObject.node == parentDomNode) {
-        // Direct child slot -> allow all params including onlyChildren: true
-        return parentParams;
-      } else {
-        // Nested slot -> allow only descendant params
-        return parentParams.where((p) => !p.target.onlyChildren).toList();
-      }
-    }
-
-    return [
-      for (final slot in buildOwnChildren())
-        wrapWithInheritedDomComponent(
-          getParams: getParams,
-          child: slot,
-        ),
-    ];
-  }
-
-  @override
-  List<Component> buildOwnChildren() {
-    return component.slots;
-  }
+  List<Component> buildChildren() => component.slots;
 
   @override
   RenderObject createRenderObject() {
     final parent = parentRenderObjectElement!.renderObject;
-    final renderObject = SlottedDomRenderObject._fromNodes(component.nodes, parent as DomRenderObject);
-    updateRenderObject(renderObject);
-    return renderObject;
+    // Render once the slots have mounted, when the view knows which contents are theirs.
+    markNeedsRender();
+    return SlottedDomRenderObject._fromNodes(component.nodes, parent as DomRenderObject);
   }
 
   bool _didHydrate = false;
-  final Map<web.Element, _AppliedParams> _appliedParams = nodeMap();
+
+  /// The values and listeners this view added to each of its static elements.
+  final Map<web.Element, _StaticDomValues> _appliedParams = nodeMap();
+
+  /// Whether a departing slot that encloses this view has
+  /// already released the values from applies above that slot's view,
+  /// both in this view's slots and on its static elements,
+  /// leaving the values from applies within that slot in place.
+  bool _releasedByEnclosingSlot = false;
+
+  /// Removes the values that applies above this view contributed
+  /// to the DOM elements rendered by [slot].
+  ///
+  /// A removed slot leaves its DOM in place,
+  /// either for this view to take back as static content or for another view to take over,
+  /// which tracks only the values it applies itself.
+  /// Applies within the slot keep their values.
+  ///
+  /// As when a DOM component renders without an `open` attribute it had before,
+  /// an applied `open` stays on a dialog or details element that a DOM component rendered.
+  /// The browser sets that attribute too, such as for `showModal()`,
+  /// and removing it from a modal dialog hides the dialog without closing it,
+  /// which leaves the rest of the page inert.
+  /// A nested view still takes back an `open` it added to a static element,
+  /// unless that element is a dialog that has become modal since.
+  ///
+  /// A slot that reactivates instead, such as one moved with a global key,
+  /// gets its values back without help: its DOM components depend on the inherited applies,
+  /// so they render again when they reactivate,
+  /// and rendering sets their attributes on the live DOM rather than diffing against a cache.
+  void _releaseInheritedValues(_ChildSlotElement slot) {
+    bool fromAboveView(ApplyParams param) => param.source == null || param.source!.depth < depth;
+
+    void release(Element child) {
+      if (child is DomElement) {
+        final node = child.renderObject.node! as web.Element;
+        final values = child.appliedValuesFrom(fromAboveView);
+        if (values != null) {
+          if (node.isHtmlDialogElement || node.isHtmlDetailsElement) values.attributes?.remove('open');
+          values.removeFrom(node);
+        }
+      } else if (child is _SlottedChildViewElement) {
+        child._appliedParams.release(from: fromAboveView);
+        child._releasedByEnclosingSlot = true;
+      }
+      child.visitChildren(release);
+    }
+
+    slot.visitChildren(release);
+  }
+
+  /// Removes the values this view applied within the contents of [slot],
+  /// so the slot's child can take them over.
+  ///
+  /// Looks up the elements in the slot rather than testing each tracked element,
+  /// so adding many slots doesn't check the view's other elements again for each one.
+  void _releaseSlotContent(ChildSlotRenderObject slot) {
+    for (final root in slot._contentNodes) {
+      if (_appliedParams.isEmpty) return;
+      if (!root.isElement) continue;
+      for (final element in _matches(root as web.Element, '*')) {
+        _appliedParams.remove(element)?.removeFrom(element);
+      }
+    }
+  }
+
+  /// Applies the inherited params to [roots] and their descendants,
+  /// except within the contents of the view's slots,
+  /// which receive their params from the component tree instead.
+  void _applyParams(SlottedDomRenderObject viewObject, Iterable<web.Node> roots, List<ApplyParams> params) {
+    if (params.isEmpty) return;
+
+    final isSlotted = _subtreeFilter([for (final slot in viewObject._slots) ...slot._contentNodes]);
+
+    final targets = [
+      for (final param in params.reversed)
+        if (_selectorFor(param.target) case final selector?) (param: param, selector: selector),
+    ];
+
+    final viewParentNode = viewObject.firstChildNode?.parentNode;
+    for (final root in roots) {
+      if (!root.isElement || isSlotted(root)) continue;
+      final isTopLevel = root.parentNode == viewParentNode;
+      for (final (:param, :selector) in targets) {
+        // Child targets only match the view's top-level nodes.
+        if (param.target.onlyChildren && !isTopLevel) continue;
+        for (final element in _matches(root as web.Element, selector, onlyRoot: param.target.onlyChildren)) {
+          if (!isSlotted(element)) {
+            (_appliedParams[element] ??= _StaticDomValues()).apply(element, param);
+          }
+        }
+      }
+    }
+  }
 
   @override
   void updateRenderObject(SlottedDomRenderObject renderObject) {
-    final inheritedDomParams = inheritedDomParamsFor(renderObject);
-    if ((component.nodes != null || (inheritedDomParams != null && inheritedDomParams.isNotEmpty)) && !_didHydrate) {
+    final params = inheritedDomParamsFor(renderObject);
+    if (!_didHydrate && (component.nodes != null || params.isNotEmpty)) {
       _didHydrate = true;
       _hydrateInitialNodes(renderObject);
     }
 
-    _resetAppliedParams();
+    _appliedParams.release();
+    _applyParams(renderObject, renderObject._childNodes, params);
+  }
 
-    if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
-      final slotRanges = nodeMap<web.Node, web.Node>();
-      for (final slot in component.slots) {
-        if (slot is _RangeChildSlot) slotRanges[slot.start] = slot.end;
-      }
-
-      web.Node? current = renderObject.firstChildNode;
-      while (current != null) {
-        if (current.isElement) {
-          for (final param in inheritedDomParams.reversed) {
-            final elements = _findMatchingElements(current as web.Element, param.target);
-
-            for (final element in elements) {
-              _updateElementParams(element, param);
-            }
-          }
+  /// Removes the values that the `data-j-apply` markers of this view's static elements record,
+  /// which applies above the view added on the server, so the view can apply and track them itself.
+  ///
+  /// Markers within the slots are left alone, since the slots have mounted by then.
+  /// A DOM component there has already rendered its own attributes over its element's,
+  /// dropping the marker, and a nested view hydrates the markers of its own static elements.
+  void _hydrateInitialNodes(SlottedDomRenderObject view) {
+    final isSlotted = _subtreeFilter([for (final slot in view._slots) ...slot._contentNodes]);
+    for (final root in view._childNodes) {
+      if (!root.isElement || isSlotted(root)) continue;
+      for (final node in _matches(root as web.Element, '[data-j-apply]')) {
+        if (isSlotted(node)) continue;
+        if (node.getAttribute('data-j-apply') case final marker?) {
+          node.removeAttribute('data-j-apply');
+          AppliedDomValues.decode(marker).removeFrom(node);
         }
-
-        if (current == renderObject.lastChildNode) {
-          break;
-        }
-        // Skip the slot's contents and visit its end anchor,
-        // which can also start the next slot.
-        current = slotRanges[current] ?? current.nextSibling;
       }
     }
   }
 
-  void _hydrateInitialNodes(SlottedDomRenderObject renderObject) {
-    final slotRanges = nodeMap<web.Node, web.Node>();
-    for (final slot in component.slots) {
-      if (slot is _RangeChildSlot) slotRanges[slot.start] = slot.end;
-    }
-    final isInsideSlot = _createSlotFilter(renderObject);
-
-    web.Node? current = renderObject.firstChildNode;
-    while (current != null) {
-      if (current.isElement) {
-        _hydrateInitialAppliedParams(current as web.Element, isInsideSlot);
-      }
-
-      if (current == renderObject.lastChildNode) {
-        break;
-      }
-      current = slotRanges[current] ?? current.nextSibling;
-    }
-  }
-
-  bool Function(web.Node) _createSlotFilter(SlottedDomRenderObject renderObject) {
-    if (component.slots.isEmpty) {
-      return (_) => false;
-    }
-
-    final filters = [
-      for (final slot in component.slots)
-        switch (slot) {
-          _RangeChildSlot s => s._createFilter(),
-          _QueryChildSlot s => s._createFilter(renderObject),
-          _ => (_) => false,
-        },
-    ];
-
-    return (web.Node element) {
-      for (final filter in filters) {
-        if (filter(element)) return true;
-      }
-      return false;
-    };
-  }
-
-  void _hydrateInitialAppliedParams(web.Element root, bool Function(web.Node) isInsideSlot) {
-    void process(web.Element element) {
-      if (element.hasAttribute('data-j-apply')) {
-        final raw = element.getAttribute('data-j-apply')!;
-        element.removeAttribute('data-j-apply');
-
-        try {
-          String? appliedId;
-          List<String>? appliedClasses;
-          List<String>? appliedStylesList;
-          List<String>? appliedAttributesList;
-
-          for (final section in raw.split(';')) {
-            final colonIndex = section.indexOf(':');
-            if (colonIndex == -1) continue;
-            final key = section.substring(0, colonIndex);
-            final val = section.substring(colonIndex + 1);
-            switch (key) {
-              case 'i':
-                appliedId = _unescapeApplyValue(val);
-              case 'c':
-                appliedClasses = val.split(',').map(_unescapeApplyValue).toList();
-              case 's':
-                appliedStylesList = val.split(',').map(_unescapeApplyValue).toList();
-              case 'a':
-                appliedAttributesList = val.split(',').map(_unescapeApplyValue).toList();
-            }
-          }
-
-          Map<String, String>? appliedStyles;
-          if (appliedStylesList != null) {
-            final style = element.inlineStyle;
-            if (style != null) {
-              appliedStyles = {for (final s in appliedStylesList) s: style.getPropertyValue(s)};
-            }
-          }
-
-          Map<String, String>? appliedAttributes;
-          if (appliedAttributesList != null) {
-            appliedAttributes = {for (final a in appliedAttributesList) a: element.getAttribute(a) ?? ''};
-          }
-
-          _appliedParams[element] = _AppliedParams(
-            target: ApplyTarget.anyChild,
-            id: appliedId,
-            classes: appliedClasses,
-            styles: appliedStyles,
-            attributes: appliedAttributes,
-          );
-        } catch (_) {}
-      }
-    }
-
-    if (!isInsideSlot(root)) {
-      process(root);
-    }
-    final descendants = root.querySelectorAll('[data-j-apply]');
-    for (int i = 0; i < descendants.length; i++) {
-      final element = descendants.item(i) as web.Element;
-      if (!isInsideSlot(element)) {
-        process(element);
-      }
-    }
-  }
-
-  List<web.Element> _findMatchingElements(web.Element root, ApplyTarget target) {
-    final selector = _selectorFor(target);
-    if (selector == null) return const [];
-
-    final elements = <web.Element>[];
-    if (root.matches(selector)) {
-      elements.add(root);
-    }
-
-    if (!target.onlyChildren) {
-      final results = root.querySelectorAll(selector);
-      for (int i = 0; i < results.length; i++) {
-        elements.add(results.item(i) as web.Element);
-      }
-    }
-
-    return elements;
-  }
+  /// The elements matching [selector] among [root] and,
+  /// unless [onlyRoot] is `true`, its descendants.
+  List<web.Element> _matches(web.Element root, String selector, {bool onlyRoot = false}) => [
+    if (root.matches(selector)) root,
+    if (!onlyRoot) ...root.querySelectorAll(selector).toIterable().cast<web.Element>(),
+  ];
 
   /// Builds a CSS selector for [target], or returns `null` if no element can match.
   String? _selectorFor(ApplyTarget target) {
@@ -449,136 +388,115 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
     return selector.isEmpty ? '*' : selector;
   }
 
-  /// Removes the DOM values and event listeners this view added,
-  /// then clears its record of them.
-  void _resetAppliedParams() {
-    _appliedParams.forEach(_resetElementParams);
-    _appliedParams.clear();
+  @override
+  void onReload() {
+    _appliedParams.release();
+    _didHydrate = false;
+    super.onReload();
   }
 
-  /// Removes the params this view applied to [element],
-  /// without leaving behind empty attributes that it didn't have before.
-  static void _resetElementParams(web.Element element, _AppliedParams params) {
-    if (params.id != null && element.id == params.id) {
-      element.removeAttribute('id');
-    }
+  /// Takes back the nodes that removed slots leave behind
+  /// as static content of this view.
+  ///
+  /// Removed slots are detached from the view and all unmount in the same pass,
+  /// so the first one to unmount takes them all back at once.
+  /// Taking them back one by one would index the remaining slots again for each.
+  void _reclaimSlot(ChildSlotRenderObject slotObject) {
+    // An inactive view unmounts along with the slot.
+    if (!isActive) return;
+    final viewObject = renderObject as SlottedDomRenderObject;
+    // Already taken back with an earlier slot of this pass, or never attached, as after a reload.
+    if (!viewObject._slots.contains(slotObject)) return;
 
-    if (params.classes case final appliedClasses? when appliedClasses.isNotEmpty) {
-      for (final c in appliedClasses) {
-        element.classList.remove(c);
-      }
-      if (element.classList.length == 0) {
-        element.removeAttribute('class');
-      }
-    }
+    final removed = [
+      for (final slot in viewObject._slots)
+        if (slot == slotObject || slot.parent == null) slot,
+    ];
+    viewObject._slots.removeAll(removed);
+    _applyParams(viewObject, [for (final slot in removed) ...slot._contentNodes], inheritedDomParamsFor(viewObject));
+  }
 
-    if (params.styles case final appliedStyles? when appliedStyles.isNotEmpty) {
+  @override
+  void activate() {
+    super.activate();
+    _releasedByEnclosingSlot = false;
+  }
+
+  @override
+  void deactivate() {
+    // Another view can take over these nodes in the same frame,
+    // and it only tracks values that are missing when it applies them.
+    if (!_releasedByEnclosingSlot) {
+      _appliedParams.release();
+    }
+    super.deactivate();
+  }
+
+  @override
+  void unmount() {
+    if (_releasedByEnclosingSlot) {
+      // Like the DOM components in a removed slot,
+      // leave the values from applies within it in place, but stop listening.
+      for (final values in _appliedParams.values) {
+        values.clearEvents();
+      }
+      _appliedParams.clear();
+    } else {
+      _appliedParams.release();
+    }
+    super.unmount();
+  }
+}
+
+extension on Map<web.Element, _StaticDomValues> {
+  /// Removes and forgets the values and listeners this view applied,
+  /// limited to those of the applies [from] accepts when given.
+  void release({bool Function(ApplyParams)? from}) {
+    removeWhere((element, values) {
+      values.removeFrom(element, from);
+      return values.isEmpty;
+    });
+  }
+}
+
+extension on AppliedDomValues {
+  /// Removes these values from [element],
+  /// along with any `class` or `style` attribute they leave empty.
+  ///
+  /// An `open` attribute stays on a modal dialog.
+  /// Only `showModal()` makes a dialog modal, and it sets `open` itself,
+  /// so the attribute is no longer the one these values record.
+  /// Removing it would hide the dialog without closing it,
+  /// which leaves the rest of the page inert.
+  void removeFrom(web.Element element) {
+    if (id != null && element.id == id) element.removeAttribute('id');
+    if (classes case final names? when names.isNotEmpty) {
+      for (final name in names) {
+        // `remove` throws for an invalid token, such as an empty name from a malformed marker,
+        // but the element can't have one, and `contains` doesn't throw.
+        if (element.classList.contains(name)) element.classList.remove(name);
+      }
+      if (element.classList.length == 0) element.removeAttribute('class');
+    }
+    if (styles case final names? when names.isNotEmpty) {
       final style = element.inlineStyle;
       if (style != null) {
-        for (final e in appliedStyles.entries) {
-          style.removeProperty(e.key);
+        for (final name in names) {
+          style.removeProperty(name);
         }
         if (style.length == 0) {
-          // Read the attribute first, so the browser syncs the pending style changes into it.
-          // Otherwise, it can sync them afterwards and add back an empty `style` attribute.
+          // Sync pending style changes before deleting the empty attribute.
           element.getAttribute('style');
           element.removeAttribute('style');
         }
       }
     }
-
-    if (params.attributes case final appliedAttributes?) {
-      for (final e in appliedAttributes.entries) {
-        element.removeAttribute(e.key);
+    if (attributes case final names?) {
+      for (final name in names) {
+        if (name == 'open' && element.isHtmlDialogElement && element.matches(':modal')) continue;
+        element.removeAttribute(name);
       }
     }
-
-    if (params.eventBindings case final appliedEvents?) {
-      for (final e in appliedEvents.entries) {
-        e.value.clear();
-      }
-    }
-  }
-
-  void _updateElementParams(web.Element element, ApplyParams newParams) {
-    final params = _appliedParams[element];
-
-    String? appliedId = params?.id;
-    List<String>? appliedClasses = params?.classes;
-    Map<String, String>? appliedStyles = params?.styles;
-    Map<String, String>? appliedAttributes = params?.attributes;
-    Map<String, EventBinding>? appliedEvents = params?.eventBindings;
-
-    if (newParams.id case final newId?) {
-      if (element.id.isEmpty) {
-        element.id = newId;
-        appliedId = newId;
-      }
-    }
-
-    if (newParams.classes case final newClasses?) {
-      appliedClasses ??= [];
-      for (final c in newClasses) {
-        if (!element.classList.contains(c)) {
-          element.classList.add(c);
-          appliedClasses.add(c);
-        }
-      }
-    }
-
-    if (newParams.styles case final newStyles?) {
-      appliedStyles ??= {};
-      final style = element.inlineStyle;
-      if (style != null) {
-        for (final e in newStyles.entries) {
-          if (style.getPropertyValue(e.key).isEmpty) {
-            style.setProperty(e.key, e.value);
-            appliedStyles[e.key] = e.value;
-          }
-        }
-      }
-    }
-
-    if (newParams.attributes case final newAttributes?) {
-      appliedAttributes ??= {};
-      for (final e in newAttributes.entries) {
-        if (!element.hasAttribute(e.key)) {
-          element.setAttribute(e.key, e.value);
-          appliedAttributes[e.key] = e.value;
-        }
-      }
-    }
-
-    if (newParams.events case final newEvents?) {
-      appliedEvents ??= {};
-      for (final e in newEvents.entries) {
-        if (!appliedEvents.containsKey(e.key)) {
-          appliedEvents[e.key] = EventBinding(element, e.key, e.value);
-        }
-      }
-    }
-
-    _appliedParams[element] = _AppliedParams(
-      target: newParams.target,
-      id: appliedId,
-      classes: appliedClasses,
-      styles: appliedStyles,
-      attributes: appliedAttributes,
-      events: appliedEvents,
-    );
-  }
-
-  @override
-  void onReload() {
-    _resetAppliedParams();
-    _didHydrate = false;
-    super.onReload();
-  }
-
-  @override
-  void unmount() {
-    _resetAppliedParams();
-    super.unmount();
   }
 }
 
@@ -590,17 +508,84 @@ extension on web.Element {
   }
 }
 
-class _AppliedParams extends ApplyParams {
-  _AppliedParams({
-    required super.target,
-    super.id,
-    super.classes,
-    super.styles,
-    super.attributes,
-    Map<String, EventBinding>? events,
-  }) : eventBindings = events;
+/// The values and listeners a view added to one of its static elements,
+/// by the apply that added them, leaving out any the element already had,
+/// so it removes only its own.
+class _StaticDomValues {
+  /// The values each apply added, in the order they were added.
+  final List<({ApplyParams param, AppliedDomValues values})> _values = [];
 
-  final Map<String, EventBinding>? eventBindings;
+  /// The listener for each event type, along with the apply that added it.
+  ///
+  /// Only the first apply that handles an event type adds a listener for it.
+  final Map<String, ({ApplyParams param, EventBinding binding})> _events = {};
+
+  /// Whether no values or listeners remain.
+  bool get isEmpty => _values.isEmpty && _events.isEmpty;
+
+  /// Adds the values and listeners of [param] to [node],
+  /// skipping any values that [node] already has.
+  void apply(web.Element node, ApplyParams param) {
+    final added = AppliedDomValues();
+    if (param.id case final value? when node.id.isEmpty) {
+      node.id = value;
+      added.id = value;
+    }
+    for (final name in param.classes ?? const <String>[]) {
+      if (!node.classList.contains(name)) {
+        node.classList.add(name);
+        (added.classes ??= []).add(name);
+      }
+    }
+    if (param.styles case final properties?) {
+      final style = node.inlineStyle;
+      if (style != null) {
+        for (final MapEntry(:key, :value) in properties.entries) {
+          if (style.getPropertyValue(key).isEmpty) {
+            style.setProperty(key, value);
+            (added.styles ??= []).add(key);
+          }
+        }
+      }
+    }
+    if (param.attributes case final attrs?) {
+      for (final MapEntry(:key, :value) in attrs.entries) {
+        if (!node.hasAttribute(key)) {
+          node.setAttribute(key, value);
+          (added.attributes ??= []).add(key);
+        }
+      }
+    }
+    if (!added.isEmpty) _values.add((param: param, values: added));
+    if (param.events case final handlers?) {
+      for (final MapEntry(:key, :value) in handlers.entries) {
+        _events.putIfAbsent(key, () => (param: param, binding: EventBinding(node, key, value)));
+      }
+    }
+  }
+
+  /// Removes the values and listeners that the applies [from] accepts added to [node],
+  /// or all of them if [from] is `null`.
+  void removeFrom(web.Element node, [bool Function(ApplyParams)? from]) {
+    _values.removeWhere((entry) {
+      if (from != null && !from(entry.param)) return false;
+      entry.values.removeFrom(node);
+      return true;
+    });
+    _events.removeWhere((_, entry) {
+      if (from != null && !from(entry.param)) return false;
+      entry.binding.clear();
+      return true;
+    });
+  }
+
+  /// Removes the listeners, but leaves the values in place.
+  void clearEvents() {
+    for (final entry in _events.values) {
+      entry.binding.clear();
+    }
+    _events.clear();
+  }
 }
 
 /// The render object of a [SlottedChildView], which holds the DOM nodes the view takes over.
@@ -645,6 +630,21 @@ class SlottedDomRenderObject extends DomRenderFragment {
   @override
   final web.Node? lastChildNode;
 
+  /// The top-level DOM nodes this view takes over.
+  Iterable<web.Node> get _childNodes sync* {
+    for (var node = firstChildNode; node != null; node = node.nextSibling) {
+      yield node;
+      if (node == lastChildNode) break;
+    }
+  }
+
+  /// The slots that render into this view's nodes.
+  ///
+  /// A removed slot is detached from the view, but stays here until
+  /// the removed slots unmount or it moves to another view,
+  /// since its nodes can hold globally keyed children until then.
+  final Set<ChildSlotRenderObject> _slots = {};
+
   @override
   void attach(covariant RenderObject child, {covariant RenderObject? after}) {
     if (child is ChildSlotRenderObject) {
@@ -653,6 +653,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
         'Cannot attach a child that is not already part of the component fragment.',
       );
       child.parent = this;
+      _slots.add(child);
       child.finalize();
       return;
     }
@@ -683,7 +684,7 @@ class SlottedDomRenderObject extends DomRenderFragment {
 /// with the view's render object as its parent.
 class ChildSlotRenderObject extends DomRenderObject
     with MultiChildDomRenderObject, HydratableDomRenderObject
-    implements RenderFragment {
+    implements RenderChildSlot {
   /// Creates a slot that renders its children as the content of [node],
   /// hydrating the child nodes [node] already has.
   ChildSlotRenderObject(web.Element node, DomRenderObject parent) : this._(node, parent);
@@ -694,14 +695,10 @@ class ChildSlotRenderObject extends DomRenderObject
     : this._(start.parentElement!, parent, start: start, end: end);
 
   /// Creates a slot that hydrates all children of [node] or,
-  /// when anchors are supplied, only the nodes between [start] and [end].
-  ChildSlotRenderObject._(this.node, DomRenderObject parent, {web.Node? start, web.Node? end}) : _beforeStart = start {
+  /// when anchors are supplied, only the nodes between them.
+  ChildSlotRenderObject._(this.node, DomRenderObject parent, {this._start, this._end}) {
     this.parent = parent;
-    var current = start == null ? node.firstChild : start.nextSibling;
-    while (current != null && current != end) {
-      toHydrate.add(current);
-      current = current.nextSibling;
-    }
+    toHydrate.addAll(_contentNodes);
   }
 
   /// The element this slot renders its children into.
@@ -711,14 +708,29 @@ class ChildSlotRenderObject extends DomRenderObject
   @override
   final web.Element node;
 
+  // A keyed slot can move to another view, so check against its current view.
+  @internal
+  @override
+  bool get rendersIntoParent {
+    final view = parent;
+    return view != null && node == SlottedDomRenderObject._realNodeOf(view);
+  }
+
   /// The node after which children are placed,
   /// even if the range is initially empty,
   /// or `null` to place them at the start of [node].
-  final web.Node? _beforeStart;
+  final web.Node? _start;
+
+  /// The node before which the contents end,
+  /// or `null` if they run to the end of [node].
+  final web.Node? _end;
+
+  /// The current contents, which can differ from the nodes originally hydrated.
+  Iterable<web.Node> get _contentNodes => siblingsUntil(_start == null ? node.firstChild : _start.nextSibling, _end);
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {
-    attachChild(child, after, startNode: _beforeStart);
+    attachChild(child, after, startNode: _start);
   }
 
   @override
@@ -727,5 +739,20 @@ class ChildSlotRenderObject extends DomRenderObject
   }
 }
 
-String _unescapeApplyValue(String val) =>
-    val.contains('%') ? val.replaceAll('%2C', ',').replaceAll('%3B', ';').replaceAll('%25', '%') : val;
+/// Indexes the roots once and shares ancestor lookups across membership checks.
+bool Function(web.Node) _subtreeFilter(Iterable<web.Node> roots) {
+  final inside = nodeMap<web.Node, bool>();
+  for (final root in roots) {
+    inside[root] = true;
+  }
+  if (inside.isEmpty) return (_) => false;
+
+  bool contains(web.Node node) {
+    final known = inside[node];
+    if (known != null) return known;
+    final parent = node.parentNode;
+    return inside[node] = parent != null && contains(parent);
+  }
+
+  return contains;
+}

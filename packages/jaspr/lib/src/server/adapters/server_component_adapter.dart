@@ -29,9 +29,9 @@ final class ServerComponentAdapter extends ElementBoundaryAdapter {
       return;
     }
     if (element is DomElement) {
-      if (element.computeAppliedDiff(_isClientManaged) case final diff?) {
+      if (element.appliedValuesFrom(_isClientManaged) case final values?) {
         if (element.renderObject case final MarkupRenderElement renderObject) {
-          (renderObject.attributes ??= {})['data-j-apply'] = diff;
+          (renderObject.attributes ??= {})['data-j-apply'] = values.encode();
         }
       }
     }
