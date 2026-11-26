@@ -291,9 +291,17 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
   /// Removes the values this view applied within the contents of [slot],
   /// so the slot's child can take them over.
+  ///
+  /// Looks up the elements in the slot rather than testing each tracked element,
+  /// so adding many slots doesn't check the view's other elements again for each one.
   void _releaseSlotContent(ChildSlotRenderObject slot) {
-    if (_appliedParams.isEmpty) return;
-    _appliedParams.release(within: slot._contentFilter());
+    for (final root in slot._contentNodes) {
+      if (_appliedParams.isEmpty) return;
+      if (!root.isElement) continue;
+      for (final element in _matches(root as web.Element, '*')) {
+        _appliedParams.remove(element)?.removeFrom(element);
+      }
+    }
   }
 
   /// Applies the inherited params to [roots] and their descendants,
@@ -442,10 +450,9 @@ class _SlottedChildViewElement extends DomRenderObjectElement {
 
 extension on Map<web.Element, _StaticDomValues> {
   /// Removes and forgets the values and listeners this view applied,
-  /// limited to the elements [within] accepts and the applies [from] accepts when given.
-  void release({bool Function(web.Node)? within, bool Function(ApplyParams)? from}) {
+  /// limited to those of the applies [from] accepts when given.
+  void release({bool Function(ApplyParams)? from}) {
     removeWhere((element, values) {
-      if (within != null && !within(element)) return false;
       values.removeFrom(element, from);
       return values.isEmpty;
     });
@@ -720,12 +727,6 @@ class ChildSlotRenderObject extends DomRenderObject
 
   /// The current contents, which can differ from the nodes originally hydrated.
   Iterable<web.Node> get _contentNodes => siblingsUntil(_start == null ? node.firstChild : _start.nextSibling, _end);
-
-  /// Tests membership in the slot's current contents during one ownership transfer.
-  bool Function(web.Node) _contentFilter() {
-    if (_start == null) return (other) => other != node && node.contains(other);
-    return _subtreeFilter(_contentNodes);
-  }
 
   @override
   void attach(DomRenderObject child, {DomRenderObject? after}) {

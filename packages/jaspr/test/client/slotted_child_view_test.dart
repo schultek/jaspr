@@ -1979,6 +1979,63 @@ void main() {
       });
     }
 
+    testClient('releases its values without checking each static match for every range slot added later', (
+      tester,
+    ) async {
+      const count = 32;
+      final body = window.document.body!;
+      body.innerHTML = '<section>${'<i></i>' * count}${'<!--start--><b></b><!--end-->' * count}</section>'.toJS;
+      final section = body.firstChild!;
+      final children = [for (var i = 0; i < section.childNodes.length; i++) section.childNodes.item(i)!];
+      final matches = children.take(count);
+      final anchors = children.skip(count).toList();
+      var parentReads = 0;
+      final object = globalContext['Object']! as JSObject;
+      for (final node in matches) {
+        // Count ancestor lookups on these nodes without
+        // changing the shared DOM prototype or depending on elapsed time.
+        // They don't move, so return their original parent.
+        final descriptor = JSObject()
+          ..['configurable'] = true.toJS
+          ..['get'] = (() {
+            parentReads++;
+            return section;
+          }).toJS;
+        object.callMethod('defineProperty'.toJS, node, 'parentNode'.toJS, descriptor);
+      }
+      var slotted = false;
+      late void Function(void Function() cb) setState;
+
+      tester.pumpComponent(
+        StatefulBuilder(
+          builder: (context, set) {
+            setState = set;
+            return .apply(
+              target: const .descendantWith(tag: 'i'),
+              classes: 'static',
+              child: SlottedChildView(
+                slots: [
+                  if (slotted)
+                    for (var i = 0; i < count; i++)
+                      .between(start: anchors[i * 3], end: anchors[i * 3 + 2], child: b([])),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+      expect(body.querySelectorAll('i.static').length, count);
+
+      setState(() => slotted = true);
+      await pumpEventQueue();
+
+      expect(body.querySelectorAll('i.static').length, count);
+      // The view checks each match once as it renders again,
+      // and each new slot only looks through its own contents.
+      // Leave room for another check while rendering, but not for one per slot.
+      expect(parentReads, lessThanOrEqualTo(2 * count));
+    });
+
     testClient('takes back removed range slots without listing the others again as each one unmounts', (tester) async {
       const count = 32;
       final body = window.document.body!;
