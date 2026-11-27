@@ -9,6 +9,7 @@ import 'package:vm_service/vm_service.dart' as vm;
 import 'package:vm_service/vm_service_io.dart';
 
 import '../logging.dart';
+import '../project.dart';
 import 'client_call_guard.dart';
 import 'dev_workflow.dart';
 
@@ -100,6 +101,21 @@ class ClientManager {
   }
 }
 
+/// An update the dev workflow applies to the connected clients.
+///
+/// The values are ordered by how much of the page they replace,
+/// so a later update includes the ones before it.
+enum ClientUpdate {
+  /// A hot reload, which keeps the state of the app.
+  reload,
+
+  /// A hot restart, which runs the app from the start.
+  restart,
+
+  /// A full reload of the page.
+  refresh,
+}
+
 class ClientConnection {
   ClientConnection(this.appConnection, this.dwds, this.manager);
 
@@ -125,17 +141,17 @@ class ClientConnection {
       tag: .client,
       level: .warning,
     ),
-    onResponsive: () {
-      manager.workflow.logger.write(
-        'Client ${appConnection.request.appId} is responding again, it may show outdated content until the next reload.',
-        tag: .client,
-      );
-      // Changed stylesheets aren't part of the next reload, so deliver them now.
-      if (_pendingStylesheets.isNotEmpty && !_isDisposed) {
-        unawaited(reloadStylesheets(const []));
-      }
-    },
+    onResponsive: () => unawaited(_catchUp()),
   );
+
+  /// The update this client missed while it didn't respond.
+  ClientUpdate? _missedUpdate;
+
+  /// Whether this client is applying what it missed while it didn't respond.
+  bool _isCatchingUp = false;
+
+  /// Whether updates skip this client because it doesn't have the previous ones yet.
+  bool get _isBehind => _callGuard.isUnresponsive || _isCatchingUp;
 
   /// Stylesheets that changed while this client didn't receive them.
   final Set<String> _pendingStylesheets = {};
@@ -229,19 +245,124 @@ class ClientConnection {
     }
   }
 
-  Future<vm.Response?> restart() => _callGuard.run(() async {
+  /// Applies [update] to this client and returns whether it succeeded.
+  ///
+  /// A client that doesn't respond in time is skipped,
+  /// and catches up on [update] once it responds again.
+  Future<bool> update(ClientUpdate update) async {
+    if (_isBehind) {
+      _markMissed(update);
+      return false;
+    }
+
+    // Include an update that the catch-up couldn't apply.
+    _markMissed(update);
+    final pending = _missedUpdate!;
+    _missedUpdate = null;
+
+    final succeeded = await _apply(pending, _callGuard.run);
+    // A refresh that timed out still reloads the page once it gets through,
+    // so there is nothing left to catch up on.
+    if (_callGuard.isUnresponsive && pending != .refresh) {
+      _markMissed(pending);
+    }
+    return succeeded;
+  }
+
+  void _markMissed(ClientUpdate update) {
+    final missed = _missedUpdate;
+    if (missed == null || update.index > missed.index) {
+      _missedUpdate = update;
+    }
+  }
+
+  /// Applies what this client missed while it didn't respond.
+  ///
+  /// The calls aren't limited by a timeout. A client that responds slowly,
+  /// such as a background tab throttled by the browser, would otherwise time
+  /// out again and never get up to date. Updates that arrive in the meantime
+  /// skip this client and are applied afterwards, so nothing waits for it.
+  Future<void> _catchUp() async {
+    final appId = appConnection.request.appId;
+    final logger = manager.workflow.logger;
+    logger.write(
+      switch (_missedUpdate) {
+        final update? => 'Client $appId is responding again, catching up on the missed ${update.name}.',
+        null => 'Client $appId is responding again.',
+      },
+      tag: .client,
+    );
+    if (_isCatchingUp) return;
+
+    _isCatchingUp = true;
+    ClientUpdate? update;
+    try {
+      while (!_isDisposed) {
+        update = _missedUpdate;
+        if (update != null) {
+          _missedUpdate = null;
+          if (!await _apply(update, _unguarded)) break;
+          update = null;
+          continue;
+        }
+
+        // Changed stylesheets aren't part of an update, so deliver them afterwards.
+        final stylesheets = _pendingStylesheets.toList();
+        if (stylesheets.isEmpty) break;
+        _pendingStylesheets.clear();
+        if (await _reloadStylesheets(stylesheets) == null) {
+          // Keep them for the next stylesheet reload instead of retrying forever.
+          _pendingStylesheets.addAll(stylesheets);
+          break;
+        }
+      }
+    } catch (error, stackTrace) {
+      logger.write('Catching up failed for client $appId: $error', tag: .client, level: .warning);
+      logger.write(stackTrace.toString(), tag: .client, level: .verbose);
+    } finally {
+      // An update that couldn't be applied stays missed and is included in the
+      // next update, instead of being retried forever.
+      if (update != null) {
+        _markMissed(update);
+      }
+      _isCatchingUp = false;
+    }
+  }
+
+  static Future<T?> _unguarded<T>(Future<T?> Function() call) => call();
+
+  /// Runs the calls of [update] through [run] and returns whether it succeeded.
+  Future<bool> _apply(ClientUpdate update, Future<T?> Function<T>(Future<T?> Function() call) run) async {
+    switch (update) {
+      case ClientUpdate.reload:
+        if (await run(_performHotReload) != true) {
+          // Skip reassemble and html reload if client hot-reload fails.
+          return false;
+        }
+        await run(_reassemble);
+      case ClientUpdate.restart:
+        if (await run(_restart) == null) {
+          // Skip html reload if client restart fails.
+          return false;
+        }
+      case ClientUpdate.refresh:
+        return await run(_refreshPage) != null;
+    }
+    if (manager.workflow.project.requireMode != JasprMode.client) {
+      await run(_reloadHtml);
+    }
+    return true;
+  }
+
+  Future<vm.Response?> restart() => _callGuard.run(_restart);
+
+  Future<vm.Response?> _restart() async {
     final restartMethod = _registeredMethodsForService['hotRestart'] ?? 'hotRestart';
     final response = await vmService?.callServiceExtension(restartMethod);
     return response;
-  });
-
-  /// Performs a hot reload and returns whether it succeeded.
-  ///
-  /// Returns `false` if the client didn't respond in time.
-  Future<bool> performHotReload() async {
-    return await _callGuard.run(_performHotReload) ?? false;
   }
 
+  /// Performs a hot reload and returns whether it succeeded.
   Future<bool> _performHotReload() async {
     final vmService = this.vmService;
     if (vmService == null) {
@@ -281,6 +402,9 @@ class ClientConnection {
   /// Reloads the stylesheets at [urls], together with any stylesheets this client missed before.
   Future<vm.Response?> reloadStylesheets(List<String> urls) async {
     _pendingStylesheets.addAll(urls);
+    // Delivered at the end of the catch-up.
+    if (_isCatchingUp) return null;
+
     final pending = _pendingStylesheets.toList();
     final response = await _callGuard.run(() => _reloadStylesheets(pending));
     if (response != null) {
@@ -305,7 +429,9 @@ class ClientConnection {
     return null;
   }
 
-  Future<vm.Response?> reassemble() => _callGuard.run(() async {
+  Future<vm.Response?> reassemble() => _callGuard.run(_reassemble);
+
+  Future<vm.Response?> _reassemble() async {
     final reassembleMethod = _registeredMethodsForService['ext.jaspr.reassemble'] ?? 'ext.jaspr.reassemble';
     for (var i = 0; i < 5; i++) {
       try {
@@ -316,9 +442,11 @@ class ClientConnection {
       }
     }
     return null;
-  });
+  }
 
-  Future<vm.Response?> reloadHtml([String? path]) => _callGuard.run(() async {
+  Future<vm.Response?> reloadHtml([String? path]) => _callGuard.run(() => _reloadHtml(path));
+
+  Future<vm.Response?> _reloadHtml([String? path]) async {
     final reloadMethod = _registeredMethodsForService['ext.jaspr.reload_html'] ?? 'ext.jaspr.reload_html';
     final args = path != null ? {'path': path} : <String, String>{};
     for (var i = 0; i < 5; i++) {
@@ -330,9 +458,9 @@ class ClientConnection {
       }
     }
     return null;
-  });
+  }
 
-  Future<vm.Response?> refreshPage() => _callGuard.run(() async {
+  Future<vm.Response?> _refreshPage() async {
     final reloadMethod =
         _registeredMethodsForService['fullReload'] ?? _registeredMethodsForService['ext.dwds.reload'] ?? 'fullReload';
     try {
@@ -341,7 +469,7 @@ class ClientConnection {
     } catch (_) {
       return null;
     }
-  });
+  }
 
   int? _buildProgressEventId;
   var _progressEventId = 0;

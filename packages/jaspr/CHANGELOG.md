@@ -6,6 +6,7 @@
   - A slot's child now keeps its own attributes, rather than the applied ones, when the slot is added after the first render or moves to another view with its key.
   - Applied event handlers no longer fire more than once on elements inside nested views.
   - A view that replaces another over the same nodes no longer loses values that both views apply.
+- Fixed a browser that `jaspr serve` skipped because it didn't respond in time (e.g. a tab in the background) showing outdated content until the next change. It now catches up on the reload it missed as soon as it responds again.
 
 ## 0.24.0-beta.2
 
