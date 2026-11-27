@@ -49,10 +49,12 @@ class DomElement extends DomRenderObjectElement {
   @override
   DomComponent get component => super.component as DomComponent;
 
+  /// The values each inherited apply added during the last render,
+  /// leaving out any this component sets itself.
+  List<({ApplyParams param, AppliedDomValues values})>? _appliedParams;
+
   @override
-  List<Component> buildOwnChildren() {
-    return component.children ?? const [];
-  }
+  List<Component> buildChildren() => component.children ?? const [];
 
   @override
   void update(DomComponent newComponent) {
@@ -79,42 +81,65 @@ class DomElement extends DomRenderObjectElement {
 
   @override
   void updateRenderObject(RenderElement renderObject) {
+    _appliedParams = null;
     var id = component.id;
     var classes = component.classes;
     var styles = component.styles?.properties;
     var attributes = component.attributes;
     var events = component.events;
 
-    if (inheritedDomParamsFor(renderObject) case final inheritedDomParams? when inheritedDomParams.isNotEmpty) {
-      final classesSet = {...?_splitClasses(classes)};
+    final inheritedDomParams = inheritedDomParamsFor(renderObject);
+    if (inheritedDomParams.isNotEmpty) {
+      final classesSet = {
+        ...?_splitClasses(classes),
+        ...?_splitClasses(attributes?['class']),
+      };
       styles = Map.of(styles ?? {});
       attributes = Map.of(attributes ?? {});
       events = Map.of(events ?? {});
 
       for (final param in inheritedDomParams.reversed) {
-        if (param.target.tag case final expectedTag? when expectedTag != component.tag) continue;
-        // DOM Element.id is empty when neither the id field nor the attributes map supplies an ID.
-        if (param.target.id case final expectedId? when expectedId != (id ?? attributes['id'] ?? '')) continue;
-        if (param.target.classes case final expectedClasses?
-            when !expectedClasses.every((c) => classesSet.contains(c))) {
+        final String effectiveId = id ?? attributes['id'] ?? '';
+        if (!param.target.matches(tag: component.tag, id: effectiveId, classes: classesSet)) {
           continue;
         }
 
-        id ??= param.id;
+        final added = AppliedDomValues();
 
-        if (param.classes case final paramClasses?) {
-          classesSet.addAll(paramClasses);
+        if (param.id case final paramId? when id == null && !attributes.containsKey('id')) {
+          id = paramId;
+          added.id = paramId;
         }
 
-        if (param.styles case final stylesProps?) {
+        if (param.classes case final paramClasses? when !attributes.containsKey('class')) {
+          for (final c in paramClasses) {
+            if (classesSet.add(c)) {
+              (added.classes ??= []).add(c);
+            }
+          }
+        }
+
+        // Elements with raw inline styles in `attributes['style']` are not augmented
+        // with styles from apply wrappers. Mixing structured styles with raw inline
+        // declarations is not supported.
+        if (param.styles case final stylesProps? when !attributes.containsKey('style')) {
           for (final MapEntry(:key, :value) in stylesProps.entries) {
-            styles[key] ??= value;
+            if (!styles.containsKey(key)) {
+              styles[key] = value;
+              (added.styles ??= []).add(key);
+            }
           }
         }
 
         if (param.attributes case final attributesMap?) {
           for (final MapEntry(:key, :value) in attributesMap.entries) {
-            attributes[key] ??= value;
+            if (!attributes.containsKey(key)) {
+              if (key == 'id' && id != null) continue;
+              if (key == 'class' && (classesSet.isNotEmpty || classes != null)) continue;
+              if (key == 'style' && styles.isNotEmpty) continue;
+              attributes[key] = value;
+              (added.attributes ??= []).add(key);
+            }
           }
         }
 
@@ -123,17 +148,40 @@ class DomElement extends DomRenderObjectElement {
             events[key] ??= value;
           }
         }
+
+        if (!added.isEmpty) (_appliedParams ??= []).add((param: param, values: added));
       }
 
-      classes = classesSet.join(' ');
+      classes = attributes.containsKey('class')
+          ? component.classes
+          : (classesSet.isEmpty ? null : classesSet.join(' '));
+      if (styles.isEmpty) {
+        styles = null;
+      }
     }
 
     renderObject.update(id, classes, styles, attributes, events);
   }
+
+  /// The values that the applies [include] accepts contributed during the last render,
+  /// or `null` if they contributed none.
+  @internal
+  AppliedDomValues? appliedValuesFrom(bool Function(ApplyParams) include) {
+    AppliedDomValues? result;
+    final applied = _appliedParams;
+    if (applied == null) return null;
+    for (final entry in applied) {
+      if (include(entry.param)) {
+        (result ??= AppliedDomValues()).add(entry.values);
+      }
+    }
+    return result;
+  }
 }
 
-class _ApplyDomComponent extends StatelessComponent implements DomComponent {
-  const _ApplyDomComponent({
+@internal
+class ApplyDomComponent extends StatelessComponent implements DomComponent {
+  const ApplyDomComponent({
     this.target = ApplyTarget.anyChild,
     this.id,
     this.classes,
@@ -163,6 +211,14 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
   @override
   List<Component>? get children => null;
 
+  Map<String, Object?> toMap() => {
+    if (target != ApplyTarget.anyChild) 't': target.toMap(),
+    if (id != null) 'i': id,
+    if (classes != null) 'c': classes,
+    if (styles?.properties case final s? when s.isNotEmpty) 's': s,
+    if (attributes != null && attributes!.isNotEmpty) 'a': attributes,
+  };
+
   @override
   Component build(BuildContext context) {
     return _InheritedDomComponent.merge(
@@ -174,6 +230,7 @@ class _ApplyDomComponent extends StatelessComponent implements DomComponent {
         styles: styles?.properties,
         attributes: attributes,
         events: events,
+        source: context as Element,
       ),
       child: child,
     );
@@ -218,11 +275,42 @@ final class ApplyTarget {
 
   /// The classes an element must all have to match, or `null` for any.
   final Set<String>? classes;
+
+  @internal
+  bool matches({required String tag, required String id, required Set<String> classes}) {
+    if (this.tag case final expectedTag? when expectedTag != tag) return false;
+    if (this.id case final expectedId? when expectedId != id) return false;
+    if (this.classes case final expectedClasses? when !expectedClasses.every(classes.contains)) return false;
+    return true;
+  }
+
+  Map<String, Object?> toMap() => {
+    if (!onlyChildren) 'd': true,
+    if (tag != null) 't': tag,
+    if (id != null) 'i': id,
+    if (classes != null && classes!.isNotEmpty) 'c': classes!.toList(),
+  };
+
+  factory ApplyTarget.fromMap(Map<String, dynamic> map) {
+    final onlyChildren = map['d'] != true;
+    final tag = map['t'] as String?;
+    final id = map['i'] as String?;
+    final classes = (map['c'] as List?)?.cast<String>().toSet();
+    if (onlyChildren) {
+      return ApplyTarget.childWith(tag: tag, id: id, classes: classes);
+    } else {
+      return ApplyTarget.descendantWith(tag: tag, id: id, classes: classes);
+    }
+  }
 }
 
 @protected
 abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
   DomRenderObjectElement(super.component);
+
+  /// Whether this element is currently part of the component tree.
+  @internal
+  bool get isActive => _lifecycleState == _ElementLifecycle.active;
 
   InheritedElement? _inheritedDomElement;
 
@@ -245,39 +333,12 @@ abstract class DomRenderObjectElement extends MultiChildRenderObjectElement {
   }
 
   @internal
-  @protected
-  DomParamsResolver? get inheritedDomResolver {
-    if (_inheritedDomElement case final inheritedDomElement?) {
-      final inheritedDomComponent = dependOnInheritedElement(inheritedDomElement) as _InheritedDomComponent;
-      return inheritedDomComponent.resolveParams;
+  List<ApplyParams> inheritedDomParamsFor(RenderObject target) {
+    if (_inheritedDomElement case final ancestor?) {
+      final inherited = dependOnInheritedElement(ancestor) as _InheritedDomComponent;
+      return inherited.resolveParams(target);
     }
-    return null;
-  }
-
-  @internal
-  @protected
-  List<ApplyParams>? inheritedDomParamsFor(RenderObject target) {
-    return inheritedDomResolver?.call(target);
-  }
-
-  @internal
-  @protected
-  Component wrapWithInheritedDomComponent({
-    required DomParamsResolver getParams,
-    required Component child,
-  }) {
-    return _InheritedDomComponent(
-      key: child.key == null ? null : ValueKey(child.key),
-      resolveParams: getParams,
-      child: child,
-    );
-  }
-
-  List<Component> buildOwnChildren();
-
-  @override
-  List<Component> buildChildren() {
-    return buildOwnChildren();
+    return const [];
   }
 }
 
@@ -290,6 +351,7 @@ class ApplyParams {
     this.styles,
     this.attributes,
     this.events,
+    this.source,
   });
 
   final ApplyTarget target;
@@ -298,29 +360,23 @@ class ApplyParams {
   final Map<String, String>? styles;
   final Map<String, String>? attributes;
   final Map<String, EventCallback>? events;
+  final Element? source;
 }
 
-typedef DomParamsResolver = List<ApplyParams> Function(RenderObject target);
-
 bool _isDirectDomChild(RenderObject target, RenderObject? applyParent) {
-  RenderObject? current = target;
-  while (current != null) {
-    if (current.parent == applyParent) {
-      return true;
-    }
-    if (current.parent case final parent? when parent is RenderFragment) {
-      current = parent;
-    } else {
-      break;
-    }
+  var current = target;
+  while (current.parent != applyParent) {
+    final parent = current.parent;
+    if (parent is! RenderFragment || (parent is RenderChildSlot && !parent.rendersIntoParent)) return false;
+    current = parent;
   }
-  return false;
+  return true;
 }
 
 class _InheritedDomComponent extends InheritedComponent {
-  const _InheritedDomComponent({super.key, required this.resolveParams, required super.child});
+  const _InheritedDomComponent({required this.resolveParams, required super.child});
 
-  final DomParamsResolver resolveParams;
+  final List<ApplyParams> Function(RenderObject target) resolveParams;
 
   factory _InheritedDomComponent.merge(
     BuildContext context, {
@@ -351,6 +407,11 @@ class _InheritedDomComponent extends InheritedComponent {
   bool updateShouldNotify(_InheritedDomComponent oldComponent) {
     return true;
   }
+}
+
+extension DomParamsElement on Element {
+  @internal
+  bool get hasInheritedDomParams => _inheritedElements?.containsKey(_InheritedDomComponent) ?? false;
 }
 
 /// Represents a plain text node with no additional properties.

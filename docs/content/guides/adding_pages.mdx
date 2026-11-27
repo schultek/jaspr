@@ -147,7 +147,7 @@ You can of course do this by adding it as static assets to the `web/` directory.
 ContentApp.custom(
   loaders: [
     FilesystemLoader(
-      directory: 'content',
+      'content',
       keepSuffixPattern: RegExp(r'.*\.txt$'),
     ),
   ],
@@ -162,7 +162,7 @@ ContentApp.custom(
 - The `rawOutputPattern` will skip the HTML rendering for matching pages and output the raw content as is. The frontmatter parsing and templating will still be applied though.
 
 <Info>
-  Both patterns are a regex that is matched against the full path of the page. This means you can use it to match any part of the path, not just the file name.
+  Both patterns are matched from the start of the page's path, such as `llms.txt` or `docs/robots.txt`. The path is relative to the content directory and never includes a [URL prefix](/content/concepts/route_loading#url-prefixes). Start a pattern with `.*`, like in the example, to match the end of the path, such as just the file name.
 </Info>
 
 ---

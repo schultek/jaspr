@@ -11,6 +11,9 @@ import 'package:universal_web/web.dart' as web;
 /// since separate Dart references to the same node aren't `identical` on Wasm.
 Map<K, V> nodeMap<K extends web.Node, V>() => LinkedHashMap(hashCode: _nodeHashCode);
 
+/// Creates a set of DOM nodes with efficient lookups.
+Set<E> nodeSet<E extends web.Node>() => LinkedHashSet(hashCode: _nodeHashCode);
+
 /// A JS `WeakMap` from JS objects to numbers.
 ///
 /// Unlike an [Expando], it compares keys as JS objects.
@@ -35,6 +38,14 @@ int _nodeHashCode(web.Node node) {
   final hashCode = _nextNodeHashCode++;
   _nodeHashCodes.set(node, hashCode.toJS);
   return hashCode;
+}
+
+/// The node [first] and its following siblings up to, but not including, [end],
+/// or through the last sibling if [end] is `null`.
+Iterable<web.Node> siblingsUntil(web.Node? first, web.Node? end) sync* {
+  for (var node = first; node != null && node != end; node = node.nextSibling) {
+    yield node;
+  }
 }
 
 extension NodeListIterable on web.NodeList {

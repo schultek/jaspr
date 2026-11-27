@@ -1,14 +1,31 @@
-## Unreleased 0.24.0-beta.2
+## Unreleased 0.24.0-beta.3
+
+- Fixed a hue rotation crossing zero in `Color.withHue` producing the wrong color.
+- Fixed `Animation(count: double.infinity)` rendering `infinity`, which is not a valid `animation-iteration-count`, so the browser dropped the whole `animation` declaration. It now renders `infinite`.
+- Fixed `Component.apply` above a `SlottedChildView` conflicting with the components rendered in its slots:
+  - A slot's child now keeps its own attributes, rather than the applied ones, when the slot is added after the first render or moves to another view with its key.
+  - Applied event handlers no longer fire more than once on elements inside nested views.
+  - A view that replaces another over the same nodes no longer loses values that both views apply.
+- Fixed a browser that `jaspr serve` skipped because it didn't respond in time (e.g. a tab in the background) showing outdated content until the next change. It now catches up on the reload it missed as soon as it responds again.
+
+## 0.24.0-beta.2
 
 - **Breaking**: Changed `open` on `dialog()` and `details()` to `bool?`. When it is not set, the browser controls the attribute, which fixes a rebuild closing a dialog opened with `showModal()` or `show()` and a `details` element the user opened. Pass `open: false` to keep the element closed.
 
+- **Breaking**: Usages of `Component.apply` are now tracked across server-client boundaries and encoded on affected client component markers and elements. 
+  - Using `Component.apply` on the server to wrap a client component now properly affects child components on the client after hydration.
+  - Using `Component.apply` on the client to wrap a server component now properly applies properties to affected dom elements.
+
 ### Fixes
 
+- Fixed `Component.apply` not applying to server-rendered components inside `@client` components on the client, and fixed applied properties not being removed from slotted child elements when toggled off.
+  - Applied properties and classes are now tracked and cleanly removed on toggle-off without clearing the child element's own properties.
+  - Slotted child views reset applied parameters and event listeners on reload before re-hydration.
 - Fixed a server built with `dart build cli` on Linux with Dart 3.14 or later not finding its `web` directory and failing with "Could not resolve project directory containing pubspec.yaml" when no `pubspec.yaml` is above it. Since Dart 3.14 such a bundle keeps the snapshot in `lib/libdartaot<name>.so`, which `Platform.script` points at.
 - Fixed `jaspr serve` with Flutter embedding or plugins failing on Flutter 3.50, which moved the precompiled DDC SDK to `kernel/ddc/canary` and `kernel/ddc/stable`.
 - Fixed `jaspr build` and `jaspr serve` stopping a build daemon that another Jaspr process in the same directory started, which left that process serving empty 503 responses.
 - Fixed `jaspr serve` not noticing when its build daemon exits without a shutdown notification. It now stops with an error instead of answering every request with an empty 503.
-- Fixed a browser that `jaspr serve` skipped because it didn't respond in time (e.g. a tab in the background) showing outdated content until the next change. It now catches up on the reload it missed as soon as it responds again.
+- Fixed `jaspr build` writing an invalid `sitemap.xml` when a route contains a character that XML requires to be escaped, such as the `&` in `/terms&conditions`.
 
 ## 0.24.0-beta.1
 

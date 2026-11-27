@@ -1,3 +1,8 @@
+## 0.10.0-beta.2
+
+- **Breaking**: Removed `RouteLoader` and `RouterState.routeLoaders`.
+  They were internal helpers for lazy routes, and the name clashed with `RouteLoader` from `jaspr_content`.
+
 ## 0.10.0-beta.1
 
 - Fixed `Link` navigating client-side on clicks the browser should handle: Ctrl/Cmd-, Shift- and Alt-clicks, non-primary buttons, already prevented clicks, and links with a `target` other than `_self` or a `download` attribute.

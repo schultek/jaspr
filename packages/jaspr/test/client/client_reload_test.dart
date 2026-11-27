@@ -99,7 +99,7 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       web.document.body!.innerHTML =
           '<div>'
-                  '  <!--${marker}reload_app data={"name": "Alpha"}-->'
+                  '  <!--${marker}reload_app data<{"name": "Alpha"}>-->'
                   '  <!--\${"count": 10}-->'
                   '  <p>Fallback</p>'
                   '  <!--/${marker}reload_app-->'
@@ -126,7 +126,7 @@ void main() {
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
       newBody.innerHTML =
           '<div>'
-                  '  <!--${marker}reload_app data={"name": "Beta"}-->'
+                  '  <!--${marker}reload_app data<{"name": "Beta"}>-->'
                   '  <!--\${"count": 20}-->'
                   '  <p>Fallback</p>'
                   '  <!--/${marker}reload_app-->'
@@ -161,7 +161,7 @@ void main() {
       final marker = DomValidator.clientMarkerPrefix;
       web.document.body!.innerHTML =
           '<div id="container">'
-                  '  <!--${marker}dynamic_app data={"title": "V1"}-->'
+                  '  <!--${marker}dynamic_app data<{"title": "V1"}>-->'
                   '  <!--/${marker}dynamic_app-->'
                   '</div>'
               .toJS;
@@ -186,7 +186,7 @@ void main() {
       final newBody = web.document.createElement('body') as web.HTMLBodyElement;
       newBody.innerHTML =
           '<div id="container">'
-                  '  <!--${marker}dynamic_app data={"title": "V2"}-->'
+                  '  <!--${marker}dynamic_app data<{"title": "V2"}>-->'
                   '  <!--/${marker}dynamic_app-->'
                   '</div>'
               .toJS;

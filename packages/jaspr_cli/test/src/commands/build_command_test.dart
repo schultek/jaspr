@@ -502,7 +502,8 @@ void main() {
           request.response.write('FAKE HTML RESPONSE');
           await request.response.close();
         });
-        fakeServer.onRequest('/abc2', (request) async {
+        const route = "/terms&what's-new";
+        fakeServer.onRequest(route, (request) async {
           request.response.headers.set(
             'jaspr-sitemap-data',
             jsonEncode({
@@ -518,7 +519,7 @@ void main() {
           r'$jasprMessageHandler',
           jsonEncode({'route': '/abc', 'lastmod': '2026-01-02T12:34:56.789Z', 'changefreq': 'weekly', 'priority': 0.7}),
         );
-        await proxyConnection.sendFakeRequest(r'$jasprMessageHandler', jsonEncode({'route': '/abc2'}));
+        await proxyConnection.sendFakeRequest(r'$jasprMessageHandler', jsonEncode({'route': route}));
 
         await expectLater(
           io.stdout.queue,
@@ -527,7 +528,7 @@ void main() {
             '',
             'Generating pages:',
             '(1/1) Generating "/abc" ...',
-            '(2/2) Generating "/abc2" ...',
+            '(2/2) Generating "$route" ...',
             'Stopping server...',
             '[LOG] Generating sitemap.xml...',
           ]),
@@ -536,9 +537,9 @@ void main() {
         expect(io.fs.file('/root/myapp/build/jaspr/abc/index.html').existsSync(), isTrue);
         expect(io.fs.file('/root/myapp/build/jaspr/abc/index.html').readAsStringSync(), equals('FAKE HTML RESPONSE'));
 
-        expect(io.fs.file('/root/myapp/build/jaspr/abc2/index.html').existsSync(), isTrue);
+        expect(io.fs.file('/root/myapp/build/jaspr$route/index.html').existsSync(), isTrue);
         expect(
-          io.fs.file('/root/myapp/build/jaspr/abc2/index.html').readAsStringSync(),
+          io.fs.file('/root/myapp/build/jaspr$route/index.html').readAsStringSync(),
           equals('FAKE HTML RESPONSE 2'),
         );
 
@@ -555,7 +556,7 @@ void main() {
             '    <priority>0.7</priority>\n'
             '  </url>\n'
             '  <url>\n'
-            '    <loc>https://example.com/abc2</loc>\n'
+            '    <loc>https://example.com/terms&amp;what&#39;s-new</loc>\n'
             '    <lastmod>2026-01-01T12:34:56Z</lastmod>\n'
             '    <changefreq>daily</changefreq>\n'
             '  </url>\n'
